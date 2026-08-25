@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+    --text-xs: 0.875rem; /* 14px minimum */
+    --text-xs--line-height: 1.25rem;
+    --text-sm: 0.9375rem; /* 15px */
+    --text-sm--line-height: 1.375rem;
+    --text-base: 1rem; /* 16px */
+    --text-base--line-height: 1.5rem;
+    --text-lg: 1.125rem; /* 18px */
+    --text-lg--line-height: 1.625rem;
+    --text-xl: 1.25rem; /* 20px */
+    --text-xl--line-height: 1.75rem;
+    --text-2xl: 1.5rem; /* 24px */
+    --text-2xl--line-height: 2rem;
+
+    --color-primary: #780000;
+    --color-primary-hover: #5E0000;
+    --color-primary-pressed: #470000;
+    --color-primary-subtle: #F8EAEA;
+
+    --color-ocean: #00C3D0;
+    --color-ocean-dark: #008E98;
+    --color-ocean-light: #E0F9FB;
+
+    --color-success: #34C759;
+    --color-warning: #FF8D28;
+    --color-danger: #FF3B3C;
+    --color-info: #0088FF;
+
+    --color-text-primary: #1D1D1F;
+    --color-text-secondary: #6E6E73;
+    --color-text-tertiary: #8E8E93;
+
+    --color-border-neutral: #D1D1D6;
+    --color-divider-neutral: #E5E5EA;
+
+    --color-bg-secondary: #F2F2F7;
+    --color-bg-tertiary: #FAFAFC;
+
+    --radius-xs: 3px;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 10px;
+    --radius-2xl: 12px;
+    --radius-3xl: 14px;
+}
+
+/* Custom Base & Component Styles */
+@layer base {
+    html {
+        font-size: 16px;
+    }
+    body {
+        color: #1D1D1F;
+        background-color: #FAFAFC;
+        font-family: var(--font-sans);
+        font-size: 0.9375rem; /* 15px */
+        -webkit-font-smoothing: antialiased;
+    }
+
+    /* Enforce 14px minimum across all text sizes */
+    small, .text-xs, [class*="text-[10px]"], [class*="text-[11px]"], [class*="text-[12px]"], [class*="text-[13px]"], [class*="text-[9px]"], [class*="text-[8px]"] {
+        font-size: 14px !important;
+        line-height: 1.35;
+    }
+}
+
+/* Custom Utilities for Buttons & Interactive Specs */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #780000;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 150ms ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:hover {
+    background-color: #5E0000;
+    box-shadow: 0 4px 12px rgba(120, 0, 0, 0.25);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    background-color: #470000;
+    transform: translateY(0);
+}
+
+.btn-primary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(166, 30, 30, 0.4);
+}
+
+.btn-primary:disabled {
+    background-color: #F2F4F7;
+    color: #98A2B3;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    color: #1D1D1F;
+    border: 1px solid #D1D1D6;
+    font-weight: 600;
+    border-radius: 6px;
+    transition: all 150ms ease;
+}
+
+.btn-secondary:hover {
+    background-color: #F2F2F7;
+    border-color: #8E8E93;
+}
+
+.btn-secondary:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(166, 30, 30, 0.2);
+}
+
+.btn-ocean {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #00C3D0;
+    color: #004D54;
+    font-weight: 700;
+    border-radius: 6px;
+    transition: all 150ms ease;
+}
+
+.btn-ocean:hover {
+    background-color: #00B1BD;
+    box-shadow: 0 4px 12px rgba(0, 195, 208, 0.3);
+}
+
+.ocean-gradient {
+    background: linear-gradient(135deg, #00C3D0 0%, #007791 100%);
+}
+
+.brand-gradient {
+    background: linear-gradient(135deg, #780000 0%, #470000 100%);
+}
+
+[x-cloak] {
+    display: none !important;
+}
