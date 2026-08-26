@@ -614,7 +614,88 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // =========================================================================
-        // 6. SEED LIVE WEATHER RISK ASSESSMENTS FOR BATCHES
+        // 6. SEED DYNAMIC PRICING RULES
+        // =========================================================================
+
+        $pricingRules = [
+            [
+                'name' => 'Peak Season Discovery Bump',
+                'description' => 'Standard seasonal surcharge during peak Amihan diving months (Nov - Apr).',
+                'rule_type' => 'seasonality',
+                'condition_operator' => null,
+                'condition_value' => 'peak',
+                'applies_to' => 'all',
+                'adjustment_type' => 'increase',
+                'adjustment_method' => 'percentage',
+                'adjustment_value' => 10.00,
+                'priority' => 1,
+                'status' => 'active',
+                'created_by' => $owner->id,
+            ],
+            [
+                'name' => 'Off-Peak Seasonal Incentive',
+                'description' => 'Discounts to stimulate bookings and raise camp occupancy during off-peak rainy season (Jun - Sep).',
+                'rule_type' => 'seasonality',
+                'condition_operator' => null,
+                'condition_value' => 'off_peak',
+                'applies_to' => 'all',
+                'adjustment_type' => 'decrease',
+                'adjustment_method' => 'percentage',
+                'adjustment_value' => 15.00,
+                'priority' => 2,
+                'status' => 'active',
+                'created_by' => $owner->id,
+            ],
+            [
+                'name' => 'High Demand Surge',
+                'description' => 'Applies when batch occupancy exceeds 60% capacity.',
+                'rule_type' => 'demand',
+                'condition_operator' => null,
+                'condition_value' => 'high',
+                'applies_to' => 'all',
+                'adjustment_type' => 'increase',
+                'adjustment_method' => 'percentage',
+                'adjustment_value' => 10.00,
+                'priority' => 3,
+                'status' => 'active',
+                'created_by' => $owner->id,
+            ],
+            [
+                'name' => 'Early Bird Booking Reward',
+                'description' => 'Fixed discount incentive for divers booking at least 30 days in advance.',
+                'rule_type' => 'lead_time',
+                'condition_operator' => '>=',
+                'condition_value' => '30',
+                'applies_to' => 'all',
+                'adjustment_type' => 'decrease',
+                'adjustment_method' => 'fixed',
+                'adjustment_value' => 300.00,
+                'priority' => 4,
+                'status' => 'active',
+                'created_by' => $admin->id,
+            ],
+            [
+                'name' => 'Last-Minute Rush Adjustment',
+                'description' => 'Surcharge for reservations made within 3 days of departure.',
+                'rule_type' => 'lead_time',
+                'condition_operator' => '<=',
+                'condition_value' => '3',
+                'applies_to' => 'all',
+                'adjustment_type' => 'increase',
+                'adjustment_method' => 'fixed',
+                'adjustment_value' => 400.00,
+                'priority' => 5,
+                'status' => 'active',
+                'created_by' => $admin->id,
+            ],
+        ];
+
+        foreach ($pricingRules as $r) {
+            \App\Models\PricingRule::updateOrCreate(['name' => $r['name']], $r);
+        }
+
+        // =========================================================================
+        // 7. SEED LIVE WEATHER RISK ASSESSMENTS FOR BATCHES
         // =========================================================================
         $forecastService = app(\App\Services\WeatherForecastService::class);
         

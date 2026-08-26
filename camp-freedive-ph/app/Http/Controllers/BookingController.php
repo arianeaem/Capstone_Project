@@ -9,6 +9,7 @@ use App\Models\BookingStatusLog;
 use App\Models\Payment;
 use App\Models\PaymentStatusLog;
 use App\Services\AuditLogger;
+use App\Services\PricingRuleEngine;
 use App\Services\WeatherSafetyService;
 use Carbon\Carbon;
 use Exception;
@@ -21,7 +22,8 @@ use Illuminate\View\View;
 class BookingController extends Controller
 {
     public function __construct(
-        protected WeatherSafetyService $weatherSafetyService
+        protected WeatherSafetyService $weatherSafetyService,
+        protected PricingRuleEngine $pricingRuleEngine
     ) {}
 
     /**
@@ -89,12 +91,35 @@ class BookingController extends Controller
     }
 
     /**
+     * Get live dynamic pricing quote for a class and selected trip date.
+     */
+    public function getPricingQuote(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'class_type' => 'required|string',
+            'start_date' => 'required|date',
+            'is_certified_diver' => 'nullable|boolean',
+            'participants_count' => 'nullable|integer|min:1|max:10',
+        ]);
+
+        $quote = $this->pricingRuleEngine->evaluate(
+            $validated['class_type'],
+            $validated['start_date'],
+            (bool) ($validated['is_certified_diver'] ?? false),
+            (int) ($validated['participants_count'] ?? 1)
+        );
+
+        return response()->json($quote);
+    }
+
+    /**
      * Process and store a completed customer reservation.
      */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'class_type' => 'required|string|in:discovery,fundive,refinement',
+            'is_certified_diver' => 'nullable|boolean',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'participants' => 'required|array|min:1|max:10',
@@ -118,6 +143,7 @@ class BookingController extends Controller
         $paxCount = count($validated['participants']);
         $startDate = Carbon::parse($validated['start_date'])->format('Y-m-d');
         $endDate = Carbon::parse($validated['end_date'])->format('Y-m-d');
+        $isCertified = !empty($validated['is_certified_diver']);
 
         // Check 45-pax Capacity per weekend date
         $existingPaxOnDate = BookingParticipant::whereHas('booking', function ($q) use ($startDate) {
@@ -133,20 +159,22 @@ class BookingController extends Controller
             ], 422);
         }
 
-        // Pricing Configuration
-        $classPrice = match ($validated['class_type']) {
-            'discovery' => 4250.00,
-            'fundive' => 3800.00,
-            'refinement' => 4500.00,
-            default => 4250.00,
-        };
+        // Live Dynamic Pricing Evaluation
+        $quote = $this->pricingRuleEngine->evaluate(
+            $validated['class_type'],
+            $startDate,
+            $isCertified,
+            $paxCount
+        );
+
+        $classPrice = $quote['adjusted_price_per_pax'];
+        $subtotal = $quote['subtotal'];
 
         $lguFee = 300.00 * $paxCount;
         $envFee = 50.00 * $paxCount;
         $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1000.00 * $paxCount) : 0.00;
         $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? (800.00 * $paxCount) : 0.00;
 
-        $subtotal = $classPrice * $paxCount;
         $totalAmount = $subtotal + $lguFee + $envFee + $carpoolFee + $boatDiveFee;
         
         // Standard downpayment is ₱3,000 per head (or full amount if total < downpayment)
@@ -167,6 +195,7 @@ class BookingController extends Controller
                 'pin' => $pin,
                 'batch_id' => $existingBatch ? $existingBatch->id : null,
                 'class_type' => $validated['class_type'],
+                'is_certified_diver' => $isCertified,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'pickup_option' => $validated['pickup_option'],
@@ -195,6 +224,19 @@ class BookingController extends Controller
                     'health_condition' => $pData['health_condition'] ?? 'None',
                     'swimmer_status' => $pData['swimmer_status'] ?? 'beginner',
                     'price_per_person' => $classPrice,
+                ]);
+            }
+
+            // Save Dynamic Price Adjustments Audit Record
+            foreach ($quote['adjustments'] as $adj) {
+                $booking->priceAdjustments()->create([
+                    'pricing_rule_id' => $adj['rule_id'],
+                    'rule_name' => $adj['rule_name'],
+                    'rule_type' => $adj['rule_type'],
+                    'condition_summary' => $adj['condition_summary'],
+                    'base_price' => $quote['base_price_per_pax'],
+                    'adjustment_amount' => $adj['delta_per_pax'],
+                    'adjusted_price' => $quote['adjusted_price_per_pax'],
                 ]);
             }
 

@@ -33,6 +33,7 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/api/weather/check', [BookingController::class, 'checkWeather'])->name('api.weather.check');
+Route::post('/api/pricing/quote', [BookingController::class, 'getPricingQuote'])->name('api.pricing.quote');
 Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
 
 Route::get('/manage-booking', [ManageBookingController::class, 'index'])->name('manage.index');
@@ -144,6 +145,16 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:owner,admin']
         Route::post('/weather/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache'])->name('weather.sync_cache');
         Route::get('/weather/{batch}', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'show'])->name('weather.show');
         Route::post('/weather/{batch}/assess', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'assess'])->name('weather.assess');
+
+        // Dynamic Pricing Management Module (Admin / Owner)
+        Route::get('/pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'index'])->name('pricing.index');
+        Route::get('/pricing/create', [\App\Http\Controllers\Admin\PricingRuleController::class, 'create'])->name('pricing.create');
+        Route::post('/pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'store'])->name('pricing.store');
+        Route::get('/pricing/{rule}/edit', [\App\Http\Controllers\Admin\PricingRuleController::class, 'edit'])->name('pricing.edit');
+        Route::put('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'update'])->name('pricing.update');
+        Route::delete('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'destroy'])->name('pricing.destroy');
+        Route::patch('/pricing/{rule}/toggle-status', [\App\Http\Controllers\Admin\PricingRuleController::class, 'toggleStatus'])->name('pricing.toggle_status');
+        Route::get('/pricing/{rule}/triggered', [\App\Http\Controllers\Admin\PricingRuleController::class, 'triggered'])->name('pricing.triggered');
         Route::post('/weather/{batch}/override', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'override'])->name('weather.override');
         Route::post('/weather/{batch}/cancel', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'cancel'])->name('weather.cancel');
 

@@ -88,6 +88,45 @@
         <!-- LEFT 2 COLUMNS: BOOKING DETAILS & LOGISTICS -->
         <div class="lg:col-span-2 space-y-6 sm:space-y-8">
             
+            <!-- Dynamic Pricing & Rate Breakdown (if adjustments exist) -->
+            @if($booking->priceAdjustments && $booking->priceAdjustments->count() > 0)
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-sm space-y-3">
+                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                    <h3 class="text-base font-bold text-[#1D1D1F]">Price Breakdown & Applied Rules</h3>
+                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#F8EAEA] text-[#780000]">
+                        Dynamic Pricing Applied
+                    </span>
+                </div>
+
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <span>Base Class Rate:</span>
+                        <span class="font-bold text-[#1D1D1F]">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} / person</span>
+                    </div>
+
+                    <div class="space-y-1.5 py-2 border-y border-dashed border-[#E5E5EA]">
+                        @foreach($booking->priceAdjustments as $adj)
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-2">
+                                <span class="w-1.5 h-1.5 rounded-full {{ $adj->adjustment_amount >= 0 ? 'bg-rose-500' : 'bg-emerald-500' }}"></span>
+                                <span class="font-medium text-[#1D1D1F]">{{ $adj->rule_name }}</span>
+                                <span class="text-[10px] text-[#6E6E73]">({{ $adj->condition_summary }})</span>
+                            </div>
+                            <span class="font-bold {{ $adj->adjustment_amount >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
+                                {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }} / person
+                            </span>
+                        </div>
+                        @endforeach
+                    </div>
+
+                    <div class="flex justify-between items-center text-sm font-extrabold text-[#1D1D1F] pt-1">
+                        <span>Final Adjusted Rate:</span>
+                        <span>₱{{ number_format($booking->participants->first()->price_per_person ?? $booking->priceAdjustments->first()->adjusted_price, 2) }} / person</span>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <!-- Participant List -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm">
                 <h3 class="text-base font-bold text-[#1D1D1F] mb-4">Divers in this Booking ({{ $booking->participants->count() }})</h3>

@@ -78,6 +78,13 @@
                         <span>Weather & Safety</span>
                     </a>
 
+                    <!-- Dynamic Pricing -->
+                    <a href="{{ route('admin.pricing.index') }}" 
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.pricing.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                        <span>Dynamic Pricing</span>
+                    </a>
+
                     <!-- Payments & Refunds -->
                     <a href="{{ route('admin.payments.index') }}" 
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">

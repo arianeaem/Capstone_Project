@@ -80,6 +80,11 @@ class Booking extends Model
         return $this->hasMany(RescheduleRequest::class);
     }
 
+    public function priceAdjustments(): HasMany
+    {
+        return $this->hasMany(BookingPriceAdjustment::class)->orderBy('id', 'asc');
+    }
+
     public function cancellationRequests(): HasMany
     {
         return $this->hasMany(CancellationRequest::class);

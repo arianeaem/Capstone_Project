@@ -71,6 +71,21 @@
                     <th>Boat Dive</th>
                     <td>{{ $booking->boat_dive ? 'Yes (Included)' : 'No' }}</td>
                 </tr>
+                @if($booking->priceAdjustments && $booking->priceAdjustments->count() > 0)
+                <tr>
+                    <th>Seasonal / Demand Adjustments</th>
+                    <td>
+                        @foreach($booking->priceAdjustments as $adj)
+                            <div style="font-size: 13px; margin-bottom: 3px;">
+                                <strong>{{ $adj->rule_name }}:</strong> 
+                                <span style="color: {{ $adj->adjustment_amount >= 0 ? '#B91C1C' : '#047857' }};">
+                                    {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount) * $booking->participants->count(), 2) }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </td>
+                </tr>
+                @endif
                 <tr class="total-row">
                     <th>Total Trip Cost</th>
                     <td>₱{{ number_format($booking->total_amount, 2) }}</td>

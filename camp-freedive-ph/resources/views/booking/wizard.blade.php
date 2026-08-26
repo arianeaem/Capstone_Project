@@ -10,6 +10,7 @@
          pickupPoints: {{ json_encode($pickupPoints) }},
          csrfToken: '{{ csrf_token() }}',
          checkWeatherUrl: '{{ route('api.weather.check') }}',
+         pricingQuoteUrl: '{{ route('api.pricing.quote') }}',
          storeBookingUrl: '{{ route('booking.store') }}'
      })"
      x-init="initWizard()">
@@ -609,8 +610,30 @@
 
                         <div class="p-4 space-y-3 text-xs">
                             <div class="flex justify-between items-center text-[#6E6E73]">
-                                <span>Class Package (<span class="capitalize" x-text="form.class_type"></span> × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
+                                <span>Base Class Rate (<span class="capitalize" x-text="form.class_type"></span> × <span x-text="form.participants.length"></span>)</span>
+                                <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber((pricingQuote ? pricingQuote.base_price_per_pax : calculateBasePriceUnit()) * form.participants.length)"></span>
+                            </div>
+
+                            <!-- Dynamic Pricing Adjustments (Itemized Breakdown) -->
+                            <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
+                                <div class="space-y-1.5 py-2 border-y border-dashed border-[#E5E5EA]">
+                                    <div class="text-[10px] uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
+                                    <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
+                                        <div class="flex justify-between items-center text-xs">
+                                            <div class="flex items-center gap-1.5">
+                                                <span class="w-1.5 h-1.5 rounded-full" :class="adj.delta_per_pax >= 0 ? 'bg-rose-500' : 'bg-emerald-500'"></span>
+                                                <span class="text-[#1D1D1F]" x-text="adj.rule_name"></span>
+                                                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold" :class="adj.delta_per_pax >= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" x-text="adj.formatted_adjustment"></span>
+                                            </div>
+                                            <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+
+                            <div class="flex justify-between items-center text-[#1D1D1F] font-semibold">
+                                <span>Adjusted Class Subtotal</span>
+                                <span class="font-extrabold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
                             </div>
 
                             <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center text-[#6E6E73]">
@@ -955,6 +978,20 @@
                     <span class="text-[#6E6E73]">Participants:</span>
                     <span class="font-bold text-[#1D1D1F]" x-text="form.participants.length + ' participant(s)'"></span>
                 </div>
+
+                <!-- Step 5: Applied Pricing Rules Recap -->
+                <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
+                    <div class="py-2 border-b border-[#E5E5EA] space-y-1.5">
+                        <div class="text-[10px] uppercase font-bold tracking-wider text-[#6E6E73]">Applied Dynamic Pricing Rules:</div>
+                        <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-[#1D1D1F]" x-text="adj.rule_name + ' (' + adj.formatted_adjustment + ')'"></span>
+                                <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+
                 <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
                     <span class="text-[#6E6E73]">Transportation:</span>
                     <span class="font-bold text-[#1D1D1F]" x-text="form.pickup_option === 'carpool' ? form.pickup_location : 'Own Transportation'"></span>
@@ -1066,6 +1103,7 @@ function bookingWizard(config) {
             reference_number: ''
         },
         forecast: null,
+        pricingQuote: null,
         weatherLoading: false,
         weatherProgress: 0,
         weatherProgressTimer: null,
@@ -1103,6 +1141,11 @@ function bookingWizard(config) {
             this.$watch('form', () => {
                 this.saveDraft();
             });
+
+            // Watch for changes that affect live dynamic pricing quote
+            this.$watch('form.class_type', () => this.fetchPricingQuote());
+            this.$watch('form.is_certified_diver', () => this.fetchPricingQuote());
+            this.$watch('form.participants.length', () => this.fetchPricingQuote());
 
             // Auto-save step position (for steps 1 to 4)
             this.$watch('currentStep', (val) => {
@@ -1205,6 +1248,7 @@ function bookingWizard(config) {
             if (!this.form.start_date) {
                 this.form.end_date = '';
                 this.forecast = null;
+                this.pricingQuote = null;
                 return;
             }
             const start = new Date(this.form.start_date);
@@ -1212,6 +1256,43 @@ function bookingWizard(config) {
             end.setDate(start.getDate() + 1);
             this.form.end_date = end.toISOString().split('T')[0];
             this.fetchWeather();
+            this.fetchPricingQuote();
+        },
+
+        calculateBasePriceUnit() {
+            let price = 4250;
+            if (this.form.class_type === 'fundive') {
+                price = this.form.is_certified_diver ? 2500 : 3300;
+            } else if (this.form.class_type === 'refinement') {
+                price = 4100;
+            }
+            return price;
+        },
+
+        async fetchPricingQuote() {
+            if (!this.form.start_date) return;
+            try {
+                const response = await fetch(config.pricingQuoteUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': config.csrfToken
+                    },
+                    body: JSON.stringify({
+                        class_type: this.form.class_type,
+                        start_date: this.form.start_date,
+                        is_certified_diver: this.form.is_certified_diver,
+                        participants_count: this.form.participants.length
+                    })
+                });
+                const data = await response.json();
+                if (data && data.adjusted_price_per_pax) {
+                    this.pricingQuote = data;
+                }
+            } catch (e) {
+                console.warn('Pricing quote fetch error:', e);
+            }
         },
 
         async fetchWeather() {
@@ -1275,13 +1356,10 @@ function bookingWizard(config) {
 
         calculateSubtotal() {
             const count = this.form.participants.length;
-            let price = 4250;
-            if (this.form.class_type === 'fundive') {
-                price = this.form.is_certified_diver ? 2500 : 3300;
-            } else if (this.form.class_type === 'refinement') {
-                price = 4100;
+            if (this.pricingQuote && this.pricingQuote.adjusted_price_per_pax) {
+                return this.pricingQuote.adjusted_price_per_pax * count;
             }
-            return price * count;
+            return this.calculateBasePriceUnit() * count;
         },
 
         calculateCarpoolFee() {
