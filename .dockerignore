@@ -1,9 +1,0 @@
-camp-freedive-ph/node_modules
-camp-freedive-ph/vendor
-camp-freedive-ph/.git
-camp-freedive-ph/.env
-camp-freedive-ph/storage/*.key
-camp-freedive-ph/database/database.sqlite
-.git
-.phpunit.result.cache
-scratch
