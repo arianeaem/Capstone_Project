@@ -9,14 +9,11 @@
         
         <!-- Header & Logo -->
         <div class="text-center">
-            <a href="{{ route('landing') }}" class="inline-block group mb-3">
-                <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-contain mx-auto shadow-md border border-[#E5E5EA] group-hover:scale-105 transition-transform bg-white">
-            </a>
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] tracking-tight">Login</h1>
         </div>
 
         <!-- Form Card -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-5">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 space-y-5">
 
             <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
                 @csrf
@@ -76,13 +73,6 @@
                 </button>
             </form>
 
-        </div>
-
-        <!-- Quick link back to customer site -->
-        <div class="text-center">
-            <a href="{{ route('landing') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] transition-colors">
-                ← Back to Camp FreedivePH Main Website
-            </a>
         </div>
 
     </div>

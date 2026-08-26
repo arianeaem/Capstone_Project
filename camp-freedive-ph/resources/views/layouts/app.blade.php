@@ -87,6 +87,13 @@
                         </a>
                     </div>
 
+                    <!-- Number Contact -->
+                    <div class="flex items-center gap-2 text-sm text-[#D1D1D6]">
+                        <a href="tel:+639154069330" class="hover:text-white hover:underline transition-colors font-medium">
+                            +63 000 000 0000
+                        </a>
+                    </div>
+
                     <!-- Clickable Address to Google Maps -->
                     <div class="pt-1">
                         <div class="text-xs uppercase tracking-wider text-[#8E8E93] font-semibold mb-1">Camp Location & Resort Venue:</div>

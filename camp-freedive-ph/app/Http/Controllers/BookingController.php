@@ -244,6 +244,15 @@ class BookingController extends Controller
 
             DB::commit();
 
+            // Send Confirmation Email to Guest
+            try {
+                \Illuminate\Support\Facades\Mail::to($booking->contact_email)->send(
+                    new \App\Mail\BookingConfirmedMail($booking->fresh()->load('participants', 'payments'))
+                );
+            } catch (\Throwable $mailEx) {
+                \Illuminate\Support\Facades\Log::warning("Booking confirmation email could not be sent to {$booking->contact_email}: " . $mailEx->getMessage());
+            }
+
             return response()->json([
                 'success' => true,
                 'booking_number' => $booking->booking_number,

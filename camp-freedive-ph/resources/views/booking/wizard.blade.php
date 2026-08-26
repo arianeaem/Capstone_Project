@@ -179,7 +179,7 @@
                     <div class="relative group inline-flex items-center self-start sm:self-center">
                         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-xs font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
                             <svg class="w-4 h-4 text-[#008E98] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                            <span>About Sea Forecast</span>
+                            <span>About  Forecast</span>
                         </div>
 
                         <!-- Hover Popover Notice -->
@@ -912,7 +912,7 @@
 
             <div class="space-y-2">
                 <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">
-                    5. Booking Confirmed!
+                    Booking Confirmed!
                 </h2>
                 <p class="text-xs sm:text-sm text-[#6E6E73] max-w-md mx-auto">
                     We've emailed your booking confirmation to <strong class="text-[#1D1D1F]" x-text="form.contact_email"></strong>. Please save your reference number and PIN below.
@@ -936,7 +936,7 @@
                     <button type="button" 
                             @click="copyCredentials()" 
                             class="px-4 py-2 rounded-lg bg-white text-[#780000] border border-[#780000]/30 hover:bg-[#F8EAEA] text-xs font-bold transition-colors shadow-2xs">
-                        <span x-text="copied ? '✓ Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
+                        <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
                     </button>
                 </div>
             </div>
