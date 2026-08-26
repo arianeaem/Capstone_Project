@@ -187,7 +187,7 @@
     </section>
 
     <!-- 3. Add-ons, Carpool & Fees in #F8EAEA Card Grid Format -->
-    <section id="addons" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm">
+    <section id="addons" class="max-w-7xl mx-auto px-8 sm:px-16 lg:px-32 text-sm">
         <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Carpool, Add-ons & Reservation Policies</h2>
             <p class="text-sm sm:text-base text-[#6E6E73] mt-2">Transparent pricing and clear logistics for your 2D1N Batangas freedive experience.</p>
@@ -201,7 +201,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Manila Carpool Service</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#6E6E73] leading-relaxed">
+                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
                         ₱1,200/person for roundtrip van transportation to Mabini, Batangas. Pickup points: Monumento, Shell Tiendesitas, Market! Market! BGC, Starmall Alabang, and Sto. Tomas SLEX Exit.
                     </p>
                 </div>
@@ -213,7 +213,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Reservation Downpayment</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#6E6E73] leading-relaxed">
+                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
                         A per-head downpayment is required to secure your slot: ₱3,000/person with carpool or ₱2,000/person with own transportation.
                     </p>
                 </div>
@@ -225,7 +225,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Boat Dive (Optional)</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#6E6E73] leading-relaxed">
+                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
                         ₱600/person for an optional boat excursion to deeper marine sanctuaries in Anilao for extended reef exploration and marine life observation.
                     </p>
                 </div>
@@ -237,7 +237,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Mabini LGU Marine Fees</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#6E6E73] leading-relaxed">
+                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
                         Mandatory LGU fees support marine sanctuary preservation and coastal management. ₱50 one-time Municipal Environmental Fee and ₱300 for Mabini LGU Dive Pass fo 2 days.
                     </p>
                 </div>
