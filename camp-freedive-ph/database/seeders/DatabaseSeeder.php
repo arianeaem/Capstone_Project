@@ -36,80 +36,107 @@ class DatabaseSeeder extends Seeder
         // =========================================================================
         
         // 1. Camp Owner (Superadmin)
-        $owner = User::create([
-            'name' => 'Camp Owner',
-            'email' => 'owner@campfreedive.ph',
-            'phone' => '0927 887 9894',
-            'password' => Hash::make('Password123!'),
-            'role' => 'owner',
-            'status' => 'active',
-            'must_change_password' => false,
-            'email_verified_at' => now(),
-        ]);
+        $owner = User::updateOrCreate(
+            ['email' => 'owner@campfreedive.ph'],
+            [
+                'name' => 'Camp Owner',
+                'phone' => '0927 887 9894',
+                'password' => Hash::make('Password123!'),
+                'role' => 'owner',
+                'status' => 'active',
+                'must_change_password' => false,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // 2. Camp Admin (Operations Staff)
-        $admin = User::create([
-            'name' => 'Camp Admin Coordinator',
-            'email' => 'admin@campfreedive.ph',
-            'phone' => '0917 888 1234',
-            'password' => Hash::make('Password123!'),
-            'role' => 'admin',
-            'status' => 'active',
-            'must_change_password' => false,
-            'email_verified_at' => now(),
-        ]);
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@campfreedive.ph'],
+            [
+                'name' => 'Camp Admin Coordinator',
+                'phone' => '0917 888 1234',
+                'password' => Hash::make('Password123!'),
+                'role' => 'admin',
+                'status' => 'active',
+                'must_change_password' => false,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        // 2b. Group 8 Peer Evaluator / Restricted Admin Tester
+        $tester = User::updateOrCreate(
+            ['email' => 'group8@campfreedive.ph'],
+            [
+                'name' => 'Group 8 Peer Tester',
+                'phone' => '0917 000 0008',
+                'password' => Hash::make('Password123!'),
+                'role' => 'admin',
+                'status' => 'active',
+                'must_change_password' => false,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // 3. Freediving Coach 1 (Active)
-        $coachMiko = User::create([
-            'name' => 'Coach Miko Reyes',
-            'email' => 'coach.miko@campfreedive.ph',
-            'phone' => '0919 456 7890',
-            'password' => Hash::make('Password123!'),
-            'role' => 'coach',
-            'status' => 'active',
-            'must_change_password' => false,
-            'email_verified_at' => now(),
-        ]);
+        $coachMiko = User::updateOrCreate(
+            ['email' => 'coach.miko@campfreedive.ph'],
+            [
+                'name' => 'Coach Miko Reyes',
+                'phone' => '0919 456 7890',
+                'password' => Hash::make('Password123!'),
+                'role' => 'coach',
+                'status' => 'active',
+                'must_change_password' => false,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // 4. Freediving Coach 2 (Active, First-time Login)
-        $coachElena = User::create([
-            'name' => 'Coach Elena Santos',
-            'email' => 'coach.elena@campfreedive.ph',
-            'phone' => '0920 111 2233',
-            'password' => Hash::make('TempPass123!'),
-            'role' => 'coach',
-            'status' => 'active',
-            'must_change_password' => true,
-            'email_verified_at' => now(),
-        ]);
+        $coachElena = User::updateOrCreate(
+            ['email' => 'coach.elena@campfreedive.ph'],
+            [
+                'name' => 'Coach Elena Santos',
+                'phone' => '0920 111 2233',
+                'password' => Hash::make('TempPass123!'),
+                'role' => 'coach',
+                'status' => 'active',
+                'must_change_password' => true,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // 5. Freediving Coach 3 (Active)
-        $coachRyan = User::create([
-            'name' => 'Coach Ryan Gomez',
-            'email' => 'coach.ryan@campfreedive.ph',
-            'phone' => '0917 555 4321',
-            'password' => Hash::make('Password123!'),
-            'role' => 'coach',
-            'status' => 'active',
-            'must_change_password' => false,
-            'email_verified_at' => now(),
-        ]);
+        $coachRyan = User::updateOrCreate(
+            ['email' => 'coach.ryan@campfreedive.ph'],
+            [
+                'name' => 'Coach Ryan Gomez',
+                'phone' => '0917 555 4321',
+                'password' => Hash::make('Password123!'),
+                'role' => 'coach',
+                'status' => 'active',
+                'must_change_password' => false,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // 6. Freediving Coach 4 (Deactivated / Inactive)
-        $coachInactive = User::create([
-            'name' => 'Coach Inactive Test',
-            'email' => 'coach.inactive@campfreedive.ph',
-            'phone' => '0999 000 1111',
-            'password' => Hash::make('Password123!'),
-            'role' => 'coach',
-            'status' => 'inactive',
-            'must_change_password' => false,
-            'email_verified_at' => now(),
-        ]);
+        $coachInactive = User::updateOrCreate(
+            ['email' => 'coach.inactive@campfreedive.ph'],
+            [
+                'name' => 'Coach Inactive Test',
+                'phone' => '0999 000 1111',
+                'password' => Hash::make('Password123!'),
+                'role' => 'coach',
+                'status' => 'inactive',
+                'must_change_password' => false,
+                'email_verified_at' => now(),
+            ]
+        );
 
         // Seed Initial Audit Logs
         AuditLogger::log('USER_CREATED', 'Owner account initialized: owner@campfreedive.ph', $owner, 'System Seeder');
         AuditLogger::log('USER_CREATED', 'Admin coordinator provisioned: admin@campfreedive.ph', $admin, 'Camp Owner');
+        AuditLogger::log('USER_CREATED', 'Group 8 peer reviewer provisioned: group8@campfreedive.ph', $tester, 'System Seeder');
         AuditLogger::log('USER_CREATED', 'Coach provisioned: coach.miko@campfreedive.ph', $coachMiko, 'Camp Owner');
         AuditLogger::log('USER_CREATED', 'Coach provisioned: coach.elena@campfreedive.ph', $coachElena, 'Camp Admin Coordinator');
         AuditLogger::log('USER_CREATED', 'Coach provisioned: coach.ryan@campfreedive.ph', $coachRyan, 'Camp Admin Coordinator');
