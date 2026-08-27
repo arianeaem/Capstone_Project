@@ -34,7 +34,7 @@
     @if(isset($masterForecast['daily_summaries']) && !empty($masterForecast['daily_summaries']))
     <div class="space-y-2">
         <div class="flex items-center justify-between">
-            <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73]">16-Day Whole-Day Sea State Horizon</h3>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73]">16-Day Whole-Day Horizon</h3>
             <span class="text-[11px] text-[#8E8E93]">Scroll horizontally →</span>
         </div>
 
@@ -67,9 +67,8 @@
     @if($criticalCount > 0)
     <div class="p-4 bg-[#FEF2F2] rounded-xl border border-[#FECACA] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#991B1B]">
         <div class="flex items-center gap-2.5">
-            <span class="text-lg">🚨</span>
             <div>
-                <strong>Elevated Marine Risk Alert:</strong> <strong>{{ $criticalCount }} batch(es)</strong> are currently classified as <strong>High Risk</strong> or <strong>Critical Risk</strong>. Review conditions immediately to confirm go/no-go or initiate cancellation flows.
+                <strong>{{ $criticalCount }} batch(es)</strong> are currently classified as <strong>High Risk</strong> or <strong>Critical Risk</strong>. Review conditions immediately to confirm go/no-go or initiate cancellation flows.
             </div>
         </div>
         <span class="font-bold uppercase tracking-wider text-xs text-[#DC2626]">Safety Advisory</span>
@@ -83,7 +82,7 @@
             <!-- Risk Classification -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Risk Level</label>
-                <select name="risk" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                <select name="risk" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Risk Levels</option>
                     <option value="very_safe" {{ request('risk') === 'very_safe' ? 'selected' : '' }}>Very Safe (Calm)</option>
                     <option value="safe" {{ request('risk') === 'safe' ? 'selected' : '' }}>Safe</option>
@@ -96,7 +95,7 @@
             <!-- Batch Status -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Batch Status</label>
-                <select name="status" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses</option>
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
@@ -108,17 +107,14 @@
             <!-- Date From -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Date From</label>
-                <input type="date" name="date_from" value="{{ request('date_from') }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                <input type="date" name="date_from" onchange="this.form.submit()" value="{{ request('date_from') }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
             </div>
 
-            <!-- Submit -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold w-full">
-                    Filter Batches
-                </button>
+            <!-- Reset Button (If Filtered) -->
+            <div class="flex items-end">
                 @if(request()->anyFilled(['risk', 'status', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.weather.index') }}" class="btn-secondary px-3 py-2 text-xs text-center">
-                        Reset
+                    <a href="{{ route('admin.weather.index') }}" class="btn-secondary px-4 py-2 text-xs text-center w-full block font-semibold">
+                        Clear Filters
                     </a>
                 @endif
             </div>
