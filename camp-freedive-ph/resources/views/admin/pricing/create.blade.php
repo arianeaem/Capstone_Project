@@ -154,7 +154,7 @@
 
                 <!-- Condition: Demand -->
                 <div x-show="rule_type === 'demand'" class="space-y-2">
-                    <label class="block text-xs font-bold text-[#1D1D1F]">When Live Demand Level is:</label>
+                    <label class="block text-xs font-bold text-[#1D1D1F]">When Demand Level is:</label>
                     <select name="condition_value" x-model="condition_value" :disabled="rule_type !== 'demand'"
                             class="w-full text-xs sm:text-sm rounded-xl border border-[#D1D1D6] px-3.5 py-2.5 bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
                         <option value="high">High Demand (> 60% Batch Capacity Booked)</option>

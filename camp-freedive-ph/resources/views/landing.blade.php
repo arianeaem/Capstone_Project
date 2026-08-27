@@ -74,7 +74,7 @@
     <section id="packages" class="w-full bg-[#FAFAFC] py-16 sm:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-                <h2 class="text-3-xl sm:text-4xl font-extrabold text-[#1D1D1F] tracking-tight">Diving packages for every stage of your journey</h2>
+                <h2 class="text-4xl sm:text-6xl font-extrabold text-[#1D1D1F] tracking-tight">Diving packages for every stage of your journey</h2>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">

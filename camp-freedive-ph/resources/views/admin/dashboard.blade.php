@@ -29,41 +29,50 @@
         </div>
     </div>
 
-    <!-- Quick Stats Grid (PayMongo Design System Spec) -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="stat-card">
-            <div class="stat-label">Total Reservations</div>
-            <div class="stat-value">{{ $stats['total_bookings'] }}</div>
-            <span class="text-xs text-[#34C759] font-semibold block mt-1.5 flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#34C759]"></span>
-                {{ $stats['confirmed_bookings'] }} Confirmed
-            </span>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-label">Pending Staff Actions</div>
-            <div class="stat-value" style="color: var(--warning);">
-                {{ $stats['pending_reschedules'] + $stats['pending_cancellations'] }}
+    <!-- Quick Stats Grid (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-4">
+            <!-- Total Reservations -->
+            <div class="px-4 sm:px-6 py-1">
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Reservations</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['total_bookings'] }}</div>
+                <span class="text-xs text-[#34C759] font-semibold block mt-1 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#34C759]"></span>
+                    {{ $stats['confirmed_bookings'] }} Confirmed
+                </span>
             </div>
-            <span class="text-xs text-[#6E6E73] block mt-1.5">
-                {{ $stats['pending_reschedules'] }} Resched / {{ $stats['pending_cancellations'] }} Cancel
-            </span>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-label">Verified Revenue</div>
-            <div class="stat-value text-[#780000]">
-                ₱{{ number_format($stats['total_revenue'], 2) }}
+            <!-- Pending Staff Actions -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Pending Actions</span>
+                <div class="text-2xl font-extrabold text-[#FF8D28] mt-1">
+                    {{ $stats['pending_reschedules'] + $stats['pending_cancellations'] }}
+                </div>
+                <span class="text-xs text-[#6E6E73] block mt-1">
+                    {{ $stats['pending_reschedules'] }} Resched / {{ $stats['pending_cancellations'] }} Cancel
+                </span>
             </div>
-            <span class="text-xs text-[#6E6E73] block mt-1.5">PayMongo Gateway Sync</span>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-label">Active Freedive Coaches</div>
-            <div class="stat-value text-[#008E98]">
-                {{ $stats['active_coaches'] }}
+            <!-- Verified Revenue -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Verified Revenue</span>
+                <div class="text-2xl font-extrabold text-[#780000] mt-1">
+                    ₱{{ number_format($stats['total_revenue'], 2) }}
+                </div>
+                <span class="text-xs text-[#6E6E73] block mt-1">PayMongo Gateway Sync</span>
             </div>
-            <span class="text-xs text-[#6E6E73] block mt-1.5">Total Staff: {{ $stats['total_users'] }}</span>
+
+            <!-- Active Coaches -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Active Coaches</span>
+                <div class="text-2xl font-extrabold text-[#008E98] mt-1">
+                    {{ $stats['active_coaches'] }}
+                </div>
+                <span class="text-xs text-[#6E6E73] block mt-1">Total Staff: {{ $stats['total_users'] }}</span>
+            </div>
         </div>
     </div>
 

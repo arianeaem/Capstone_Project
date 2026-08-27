@@ -47,7 +47,14 @@ class UserManagementController extends Controller
         $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
         $users = $query->paginate($perPage)->withQueryString();
 
-        return view('admin.users.index', compact('users', 'currentUser'));
+        $stats = [
+            'total' => User::count(),
+            'coaches' => User::where('role', 'coach')->count(),
+            'admins' => User::whereIn('role', ['admin', 'owner'])->count(),
+            'active' => User::where('status', 'active')->count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'currentUser', 'stats'));
 
     }
 

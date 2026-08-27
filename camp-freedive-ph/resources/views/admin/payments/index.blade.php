@@ -32,50 +32,59 @@
         </div>
     </div>
 
-    <!-- Quick Stats Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="stat-card">
-            <div class="stat-label">Total Collections</div>
-            <div class="stat-value text-emerald-700">₱{{ number_format($stats['total_gross'] ?? 0, 2) }}</div>
-            <span class="text-xs text-[#6E6E73] block mt-1">Verified completed payments</span>
-        </div>
+    <!-- Quick Stats Grid (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-4">
+            <!-- Total Collections -->
+            <div class="px-4 sm:px-6 py-1">
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Collections</span>
+                <div class="text-2xl font-extrabold text-emerald-700 mt-1">₱{{ number_format($stats['total_gross'] ?? 0, 2) }}</div>
+                <span class="text-xs text-[#6E6E73] block mt-0.5">Verified completed payments</span>
+            </div>
 
-        <div class="stat-card">
-            <div class="stat-label">Net Received</div>
-            <div class="stat-value text-[#1D1D1F]">₱{{ number_format($stats['total_net'] ?? 0, 2) }}</div>
-            <span class="text-xs text-[#6E6E73] block mt-1">Net of gateway processing fees</span>
-        </div>
+            <!-- Net Received -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Net Received</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">₱{{ number_format($stats['total_net'] ?? 0, 2) }}</div>
+                <span class="text-xs text-[#6E6E73] block mt-0.5">Net of gateway processing fees</span>
+            </div>
 
-        <div class="stat-card">
-            <div class="stat-label">Total Refunded</div>
-            <div class="stat-value text-blue-700">₱{{ number_format($stats['total_refunded'] ?? 0, 2) }}</div>
-            <span class="text-xs text-[#6E6E73] block mt-1">Returned to guest accounts</span>
-        </div>
+            <!-- Total Refunded -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Refunded</span>
+                <div class="text-2xl font-extrabold text-blue-700 mt-1">₱{{ number_format($stats['total_refunded'] ?? 0, 2) }}</div>
+                <span class="text-xs text-[#6E6E73] block mt-0.5">Returned to guest accounts</span>
+            </div>
 
-        <div class="stat-card">
-            <div class="stat-label">Forfeited (Policy Locked)</div>
-            <div class="stat-value text-purple-700">₱{{ number_format($stats['total_forfeited'] ?? 0, 2) }}</div>
-            <span class="text-xs text-[#6E6E73] block mt-1">Non-refundable cancellations</span>
+            <!-- Forfeited -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Forfeited (Policy Locked)</span>
+                <div class="text-2xl font-extrabold text-purple-700 mt-1">₱{{ number_format($stats['total_forfeited'] ?? 0, 2) }}</div>
+                <span class="text-xs text-[#6E6E73] block mt-0.5">Non-refundable cancellations</span>
+            </div>
         </div>
     </div>
 
-    <!-- Filter & Search Bar -->
+    <!-- Filter & Search Bar (Auto-filter on select, No manual Filter button) -->
     <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-        <form method="GET" action="{{ route('admin.payments.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs">
+        <form method="GET" action="{{ route('admin.payments.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs items-end">
             <!-- Search -->
             <div class="lg:col-span-2">
                 <label class="block font-bold text-[#1D1D1F] mb-1">Search</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
-                       placeholder="Booking #, Transaction ID, Guest Name..." 
-                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                       placeholder="Booking #, Transaction ID, Guest (Enter)..." 
+                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
             </div>
 
             <!-- Status Filter -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Payment Status</label>
-                <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses</option>
                     <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
                     <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
@@ -89,7 +98,7 @@
             <!-- Payment Type / Stage -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Stage</label>
-                <select name="stage" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                <select name="stage" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Stages</option>
                     <option value="downpayment" {{ request('stage') === 'downpayment' ? 'selected' : '' }}>Downpayment</option>
                     <option value="balance_settlement" {{ request('stage') === 'balance_settlement' ? 'selected' : '' }}>Balance Settlement</option>
@@ -100,7 +109,7 @@
             <!-- Payment Method -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Method</label>
-                <select name="method" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                <select name="method" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Methods</option>
                     <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
                     <option value="bpi_bank_transfer" {{ request('method') === 'bpi_bank_transfer' ? 'selected' : '' }}>BPI Bank Transfer</option>
@@ -109,14 +118,11 @@
                 </select>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold w-full">
-                    Filter
-                </button>
+            <!-- Reset Button (If Filtered) -->
+            <div>
                 @if(request()->anyFilled(['search', 'status', 'stage', 'method', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-3 py-2 text-xs text-center">
-                        Reset
+                    <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-4 py-2 text-xs font-semibold w-full text-center block">
+                        Clear Filters
                     </a>
                 @endif
             </div>

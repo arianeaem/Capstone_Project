@@ -82,10 +82,6 @@
                 <span class="px-3 py-1 rounded-full text-xs font-extrabold border {{ $batch->status_badge['class'] }}">
                     Batch Status: {{ $batch->status_badge['label'] }}
                 </span>
-
-                <span class="px-3 py-1 rounded-full text-xs font-extrabold border {{ $batch->risk_badge['class'] }}">
-                    Weather Forecast: {{ $batch->risk_badge['label'] }}
-                </span>
             </div>
 
             @if($batch->capacity_note)
@@ -102,7 +98,7 @@
         </div>
 
         <!-- Honest Occupancy Display -->
-        <div class="p-5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-right space-y-1.5 shrink-0 min-w-[260px]">
+        <div class="p-5 rounded-xl text-right space-y-1.5 shrink-0 min-w-[260px]">
             <span class="text-xs uppercase font-bold text-[#6E6E73] tracking-wider block">Staffing & Occupancy</span>
             
             @if($batch->is_coach_pending)
@@ -149,21 +145,16 @@
 
                 <div class="divide-y divide-[#E5E5EA]">
                     @forelse($batch->bookings as $booking)
-                    <div class="py-4 space-y-2.5 text-xs sm:text-sm">
+                    <div class="py-4 space-y-2.5 text-xs sm:text-sm bg-[#FAFAFC] p-3 rounded-xl border border-[#E5E5EA]">
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                             <div>
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-[#780000] hover:underline text-sm">
                                         {{ $booking->booking_number }}
                                     </a>
-                                    <span class="font-bold text-[#1D1D1F]">{{ $booking->contact_name }}</span>
                                     <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]">
                                         {{ ucfirst($booking->class_type ?? 'Discovery') }}
                                     </span>
-                                </div>
-                                <div class="text-xs text-[#6E6E73] mt-0.5 space-y-0.5">
-                                    <div>{{ $booking->contact_email }}</div>
-                                    <div>{{ $booking->contact_phone }}</div>
                                 </div>
                             </div>
 
@@ -187,7 +178,7 @@
                         </div>
 
                         <!-- Participants List with Assigned Coach -->
-                        <div class="bg-[#FAFAFC] p-3 rounded-xl border border-[#E5E5EA] text-xs space-y-1.5">
+                        <div class="text-xs space-y-1.5">
                             <div class="text-[#6E6E73] font-bold uppercase text-xs">
                                 Participants ({{ $booking->participants->count() }}):
                             </div>
@@ -195,7 +186,7 @@
                                 @foreach($booking->participants as $p)
                                     @php $coach = $p->coach; @endphp
                                     <div class="text-[#1D1D1F] flex items-center justify-between">
-                                        <span><strong>{{ $p->name }}</strong> (Age {{ $p->age }})</span>
+                                        <span><strong>{{ $p->name }}</strong></span>
                                         @if($coach)
                                             <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded-md border border-[#A7F3D0]">
                                                 Coach {{ $coach->name }}

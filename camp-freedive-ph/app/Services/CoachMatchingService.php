@@ -451,6 +451,8 @@ class CoachMatchingService
 
     /**
      * Review & approve a coach request for an open slot.
+     * Supports multi-coach batches: keeps opening and pending requests open
+     * until all needed coaches (based on 1:4 ratio) are approved.
      */
     public function approveCoachRequest(CoachRequest $request, User $reviewer): void
     {
@@ -462,18 +464,35 @@ class CoachMatchingService
                 'reviewed_at' => now(),
             ]);
 
-            // 2. Mark competing requests for same opening/batch as not_selected
-            CoachRequest::where('batch_id', $request->batch_id)
-                ->where('id', '!=', $request->id)
-                ->where('status', 'pending')
-                ->update([
-                    'status' => 'not_selected',
-                    'reviewed_by' => $reviewer->id,
-                    'reviewed_at' => now(),
-                ]);
+            // Calculate how many coaches are needed for this batch (1:4 ratio)
+            $batch = $request->batch;
+            $headcount = $batch->booked_headcount ?: ($request->opening?->needed_students_count ?: 4);
+            $coachesNeeded = max(1, (int) ceil($headcount / 4));
 
-            if ($request->opening) {
-                $request->opening->update(['status' => 'filled']);
+            // Count how many coaches are currently approved for this batch
+            $approvedCount = CoachRequest::where('batch_id', $batch->id)
+                ->where('status', 'approved')
+                ->count();
+
+            // If we have now fulfilled all needed coaches, mark opening as filled and mark remaining pending as not_selected
+            if ($approvedCount >= $coachesNeeded) {
+                CoachRequest::where('batch_id', $batch->id)
+                    ->where('id', '!=', $request->id)
+                    ->where('status', 'pending')
+                    ->update([
+                        'status' => 'not_selected',
+                        'reviewed_by' => $reviewer->id,
+                        'reviewed_at' => now(),
+                    ]);
+
+                if ($request->opening) {
+                    $request->opening->update(['status' => 'filled']);
+                }
+            } else {
+                // More coaches still needed! Keep opening open
+                if ($request->opening) {
+                    $request->opening->update(['status' => 'open']);
+                }
             }
 
             // 3. Mark coach availability to assigned
@@ -492,7 +511,7 @@ class CoachMatchingService
 
             AuditLogger::log(
                 'COACH_REQUEST_APPROVED',
-                "Approved Coach {$request->coach->name} for batch {$request->batch->batch_code}.",
+                "Approved Coach {$request->coach->name} for batch {$request->batch->batch_code} ({$approvedCount}/{$coachesNeeded} coach slots filled).",
                 $reviewer,
                 $reviewer->name
             );

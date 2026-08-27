@@ -28,7 +28,6 @@
 
     <!-- Human Decision Rule Banner -->
     <div class="p-4 bg-[#EFF6FF] rounded-xl border border-[#BFDBFE] flex items-start gap-3 text-xs text-[#1E40AF]">
-        <span class="text-base">⚖️</span>
         <div>
             <strong>Admin/Owner Final Decision:</strong> When multiple coaches apply for the same open batch, all applicants are listed for your review. Approving one coach assigns them to the slot and automatically marks other applicants as <em>Not Selected</em>.
         </div>
@@ -39,25 +38,30 @@
         <h2 class="text-base font-bold text-[#1D1D1F]">Pending Open Slot Applications</h2>
 
         @forelse($pendingRequests as $batchId => $groupRequests)
-        @php $batch = $groupRequests->first()->batch; @endphp
+        @php 
+            $batch = $groupRequests->first()->batch;
+            $headcount = $batch->booked_headcount ?: 4;
+            $coachesNeeded = max(1, (int) ceil($headcount / 4));
+            $alreadyApproved = \App\Models\CoachRequest::where('batch_id', $batch->id)->where('status', 'approved')->count();
+            $slotsRemaining = max(0, $coachesNeeded - $alreadyApproved);
+        @endphp
         <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E5E5EA] pb-3">
                 <div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
                         <span class="font-mono font-extrabold text-base text-[#780000]">{{ $batch->batch_code }}</span>
                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A]">
-                            {{ $groupRequests->count() }} Coach Applicant(s)
+                            {{ $groupRequests->count() }} Applicant(s)
+                        </span>
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-800 border border-blue-200">
+                            Needs {{ $coachesNeeded }} Coach(es) • {{ $alreadyApproved }}/{{ $coachesNeeded }} Approved
                         </span>
                     </div>
                     <span class="text-xs text-[#6E6E73] block mt-0.5">
-                        {{ $batch->start_date->format('F d, Y (l)') }} - {{ $batch->end_date->format('F d, Y (l)') }}
+                        {{ $batch->start_date->format('F d, Y (l)') }} - {{ $batch->end_date->format('F d, Y (l)') }} • {{ $headcount }} Students Booked
                     </span>
                 </div>
-
-                <span class="text-xs text-[#6E6E73]">
-                    Batch Capacity: <strong>{{ $batch->computed_capacity }} Pax</strong>
-                </span>
             </div>
 
             <!-- Coaches Applied Table / List -->
@@ -70,10 +74,6 @@
                         </div>
                         <div>
                             <strong class="font-bold text-[#1D1D1F] text-sm block">{{ $req->coach->name }}</strong>
-                            <div class="text-xs text-[#6E6E73] space-y-0.5 mt-0.5">
-                                <div>{{ $req->coach->email }}</div>
-                                <div class="text-[#8E8E93]">{{ $req->coach->phone }}</div>
-                            </div>
                             <span class="text-xs text-[#8E8E93] block mt-0.5">Applied at {{ $req->created_at->format('M d, Y h:i A') }}</span>
                             @if($req->notes)
                                 <p class="text-xs text-[#1D1D1F] italic mt-1 bg-[#FAFAFC] p-2 rounded-lg border border-[#E5E5EA]">
@@ -83,10 +83,11 @@
                         </div>
                     </div>
 
-                    <form action="{{ route('admin.coaches.requests.approve', $req) }}" method="POST" onsubmit="return confirm('Approve Coach {{ $req->coach->name }} for {{ $batch->batch_code }}? This will mark other pending applicants for this slot as Not Selected.');">
+                    <form action="{{ route('admin.coaches.requests.approve', $req) }}" method="POST" 
+                          onsubmit="return confirm('Approve Coach {{ $req->coach->name }} for {{ $batch->batch_code }}? {{ $slotsRemaining > 1 ? 'Slot ' . ($alreadyApproved + 1) . ' of ' . $coachesNeeded . ' will be filled. Other applicants remain available for the next slot.' : 'This will fill the final coach slot and complete the roster for this batch.' }}');">
                         @csrf
                         <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold shadow-sm whitespace-nowrap">
-                            Approve Coach
+                            Approve Coach (Slot {{ $alreadyApproved + 1 }}/{{ $coachesNeeded }})
                         </button>
                     </form>
                 </div>

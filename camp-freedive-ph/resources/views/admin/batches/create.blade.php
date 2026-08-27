@@ -76,7 +76,7 @@
                         
                         <div class="space-y-2">
                             <template x-for="dup in duplicateBatches" :key="dup.id">
-                                <div class="p-3 rounded-xl bg-white border border-[#FDE68A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                <div class="p-3 rounded-xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                                     <div>
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <strong class="text-[#1D1D1F] text-sm" x-text="dup.name || dup.batch_number"></strong>

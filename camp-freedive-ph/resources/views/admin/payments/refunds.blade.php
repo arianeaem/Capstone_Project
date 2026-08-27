@@ -56,8 +56,10 @@
                         <span class="text-xs text-[#6E6E73]">• Lead Guest: <strong class="text-[#1D1D1F]">{{ $booking->contact_name }}</strong></span>
                     </div>
                     <p class="text-xs text-[#6E6E73] mt-1">
-                        Requested on {{ $req->requested_at ? $req->requested_at->format('M d, Y g:i A') : $req->created_at->format('M d, Y') }} •
-                        Original Dive Date: <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('M d, Y') }}</strong>
+                        Dive Date: <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('M d, Y') }}</strong>
+                    </p>
+                    <p class="text-xs text-[#6E6E73] mt-1">
+                        Requested on {{ $req->requested_at ? $req->requested_at->format('M d, Y g:i A') : $req->created_at->format('M d, Y') }}
                     </p>
                 </div>
 
@@ -73,12 +75,12 @@
                     <div class="flex items-center gap-2">
                         <span class="text-xs font-bold text-[#1D1D1F]">Camp Cancellation Policy Evaluation:</span>
                         @if($policy && ($policy['refund_percentage'] ?? 0) > 0)
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                ✓ Eligible for Full Refund ({{ $policy['refund_percentage'] }}% • Notice > 7 Days)
+                            <span class="py-0.5 text-xs font-bold text-emerald-700">
+                                Eligible for Full Refund ({{ $policy['refund_percentage'] }}% • Notice > 7 Days)
                             </span>
                         @else
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
-                                ⚠️ Non-Refundable Cancellation Window (Notice < 7 Days)
+                            <span class="py-0.5 text-xs font-bold text-purple-700">
+                                Non-Refundable Cancellation Window (Notice < 7 Days)
                             </span>
                         @endif
                     </div>

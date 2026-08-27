@@ -71,9 +71,17 @@
         font-size: 14px !important;
         line-height: 1.35;
     }
+
+    /* Ensure comfortable breathing room for dropdown arrow on all select inputs */
+    select, .form-select {
+        padding-right: 2.5rem !important;
+        cursor: pointer;
+    }
 }
 
-/* Custom Utilities for Buttons & Interactive Specs */
+/* ========================================================================= */
+/* BUTTON DESIGN SYSTEM (Consistent Primary, Secondary, Tertiary, Danger, Ghost) */
+/* ========================================================================= */
 .btn-primary {
     display: inline-flex;
     align-items: center;
@@ -81,7 +89,9 @@
     background-color: #780000;
     color: #ffffff;
     font-weight: 600;
-    border-radius: 6px;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    border: 1px solid transparent;
     transition: all 150ms ease;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
@@ -118,7 +128,8 @@
     color: #1D1D1F;
     border: 1px solid #D1D1D6;
     font-weight: 600;
-    border-radius: 6px;
+    font-size: 0.875rem;
+    border-radius: 10px;
     transition: all 150ms ease;
 }
 
@@ -127,9 +138,81 @@
     border-color: #8E8E93;
 }
 
+.btn-secondary:active {
+    background-color: #E5E5EA;
+}
+
 .btn-secondary:focus-visible {
     outline: none;
     box-shadow: 0 0 0 3px rgba(166, 30, 30, 0.2);
+}
+
+.btn-secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-tertiary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F2F2F7;
+    color: #1D1D1F;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    transition: all 150ms ease;
+}
+
+.btn-tertiary:hover {
+    background-color: #E5E5EA;
+    color: #1D1D1F;
+}
+
+.btn-tertiary:active {
+    background-color: #D1D1D6;
+}
+
+.btn-danger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    transition: all 150ms ease;
+}
+
+.btn-danger:hover {
+    background-color: #FEE2E2;
+    border-color: #FCA5A5;
+    color: #B91C1C;
+}
+
+.btn-danger:active {
+    background-color: #FECACA;
+}
+
+.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: #6E6E73;
+    border: 1px solid transparent;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    transition: all 150ms ease;
+}
+
+.btn-ghost:hover {
+    background-color: #F2F2F7;
+    color: #1D1D1F;
 }
 
 .btn-ocean {
@@ -139,7 +222,8 @@
     background-color: #00C3D0;
     color: #004D54;
     font-weight: 700;
-    border-radius: 6px;
+    font-size: 0.875rem;
+    border-radius: 10px;
     transition: all 150ms ease;
 }
 

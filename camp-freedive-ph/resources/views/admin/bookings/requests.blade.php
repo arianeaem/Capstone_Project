@@ -73,7 +73,7 @@
                 </div>
                 <div>
                     <span class="text-[#6E6E73] block mb-1">Requested New Dates:</span>
-                    <strong class="text-emerald-700 text-sm">📅 {{ $req->requested_start_date->format('M d, Y') }} – {{ $req->requested_end_date->format('M d, Y') }}</strong>
+                    <strong class="text-emerald-700 text-sm">{{ $req->requested_start_date->format('M d, Y') }} – {{ $req->requested_end_date->format('M d, Y') }}</strong>
                 </div>
             </div>
 

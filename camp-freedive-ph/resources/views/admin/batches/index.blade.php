@@ -63,18 +63,16 @@
             
             <!-- Search -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Search Batch</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
-                       placeholder="Batch number (e.g. Batch 4...)"
+                       placeholder="Search Batch number (e.g. Batch 4...)"
                        class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
             </div>
 
             <!-- Status Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Batch Status</label>
-                <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses</option>
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
                     <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
@@ -85,25 +83,13 @@
 
             <!-- Staffing Status -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Staffing Status</label>
-                <select name="staffing" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                <select name="staffing" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Staffing</option>
                     <option value="staffed" {{ request('staffing') === 'staffed' ? 'selected' : '' }}>Coaches Assigned</option>
                     <option value="pending" {{ request('staffing') === 'pending' ? 'selected' : '' }}>Coach Pending (0)</option>
                 </select>
             </div>
 
-            <!-- Filter Buttons -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold w-full">
-                    Filter
-                </button>
-                @if(request()->anyFilled(['search', 'status', 'staffing', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.batches.index') }}" class="btn-secondary px-3 py-2 text-xs text-center">
-                        Reset
-                    </a>
-                @endif
-            </div>
         </form>
     </div>
 

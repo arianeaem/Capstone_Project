@@ -53,7 +53,7 @@
             <!-- Status Filter -->
             <div>
                 <label class="block font-bold text-[#1D1D1F] mb-1">Account Status</label>
-                <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses ({{ $activeCount + $inactiveCount }})</option>
                     <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only ({{ $activeCount }})</option>
                     <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive Only ({{ $inactiveCount }})</option>
@@ -65,18 +65,16 @@
                 <label class="block font-bold text-[#1D1D1F] mb-1">Available on Specific Date</label>
                 <input type="date" 
                        name="available_on" 
+                       onchange="this.form.submit()"
                        value="{{ request('available_on') }}" 
-                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
             </div>
 
-            <!-- Submit / Reset -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold w-full">
-                    Apply Filters
-                </button>
+            <!-- Reset Button (If Filtered) -->
+            <div class="flex items-end">
                 @if(request()->anyFilled(['search', 'status', 'available_on', 'has_capacity']))
-                    <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-3 py-2 text-xs text-center">
-                        Reset
+                    <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2 text-xs text-center w-full block font-semibold">
+                        Clear Filters
                     </a>
                 @endif
             </div>
@@ -120,9 +118,6 @@
                             @if($coach->nickname)
                                 <span class="text-xs font-semibold text-[#008E98]">"{{ $coach->nickname }}"</span>
                             @endif
-                            <div class="text-[11px] text-[#6E6E73] mt-0.5">
-                                {{ $coach->specialties_notes ?: 'Certified Freedive Coach' }}
-                            </div>
                         </div>
                     </div>
 

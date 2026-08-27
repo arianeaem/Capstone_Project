@@ -36,6 +36,10 @@
     <!-- Booking Overview Banner -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="space-y-2">
+            <h2 class="text-xl font-bold text-[#1D1D1F]">{{ $booking->formatted_class_type }}</h2>
+            <div class="text-xs text-[#6E6E73]">
+                <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> to <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong> (2D1N)
+            </div>
             <div class="flex items-center gap-3">
                 <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $booking->status_badge['bg'] }}">
                     {{ $booking->status_badge['label'] }}
@@ -43,10 +47,6 @@
                 <span class="text-xs px-2.5 py-1 rounded-full font-bold border {{ $booking->payment_status_badge['class'] }}">
                     {{ $booking->payment_status_badge['label'] }}
                 </span>
-            </div>
-            <h2 class="text-xl font-bold text-[#1D1D1F]">{{ $booking->formatted_class_type }}</h2>
-            <div class="text-xs text-[#6E6E73]">
-                <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> to <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong> (2D1N)
             </div>
         </div>
 

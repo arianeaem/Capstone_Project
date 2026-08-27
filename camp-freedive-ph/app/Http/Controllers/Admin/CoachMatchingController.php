@@ -257,7 +257,19 @@ class CoachMatchingController extends Controller
         try {
             $this->matchingService->approveCoachRequest($coachRequest, auth()->user());
 
-            return back()->with('success', "✓ Approved Coach {$coachRequest->coach->name} for {$coachRequest->batch->batch_code}. Competing requests have been marked as Not Selected.");
+            $batch = $coachRequest->batch;
+            $headcount = $batch->booked_headcount ?: 4;
+            $coachesNeeded = max(1, (int) ceil($headcount / 4));
+            $approvedCount = CoachRequest::where('batch_id', $batch->id)->where('status', 'approved')->count();
+
+            if ($approvedCount >= $coachesNeeded) {
+                $msg = "✓ Approved Coach {$coachRequest->coach->name}. All {$coachesNeeded} coach slot(s) for batch {$batch->batch_code} are now filled!";
+            } else {
+                $remaining = $coachesNeeded - $approvedCount;
+                $msg = "✓ Approved Coach {$coachRequest->coach->name} for {$batch->batch_code} ({$approvedCount} of {$coachesNeeded} slots filled). {$remaining} more coach(es) needed.";
+            }
+
+            return back()->with('success', $msg);
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

@@ -36,52 +36,70 @@
         </div>
     </div>
 
-    <!-- Quick Stats (Flat border, no shadow) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs sm:text-sm">
-        <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-            <span class="text-xs text-[#6E6E73] font-bold uppercase block">Total</span>
-            <div class="text-xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['total'] }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-            <span class="text-xs text-[#34C759] font-bold uppercase block">Confirmed</span>
-            <div class="text-xl font-extrabold text-[#34C759] mt-1">{{ $stats['confirmed'] }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-            <span class="text-xs text-[#FF8D28] font-bold uppercase block">Rescheduled</span>
-            <div class="text-xl font-extrabold text-[#FF8D28] mt-1">{{ $stats['rescheduled'] }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-            <span class="text-xs text-[#6E6E73] font-bold uppercase block">Completed</span>
-            <div class="text-xl font-extrabold text-[#6E6E73] mt-1">{{ $stats['completed'] }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-            <span class="text-xs text-[#7E22CE] font-bold uppercase block">No-Show</span>
-            <div class="text-xl font-extrabold text-[#7E22CE] mt-1">{{ $stats['no_show'] }}</div>
-        </div>
-        <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-            <span class="text-xs text-[#FF3B3C] font-bold uppercase block">Cancelled</span>
-            <div class="text-xl font-extrabold text-[#FF3B3C] mt-1">{{ $stats['cancelled'] }}</div>
+    <!-- Quick Stats (Single Box with Vertical Dividers) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 items-center gap-y-4">
+            <!-- Total -->
+            <div class="px-4 sm:px-5 py-1">
+                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Total</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['total'] }}</div>
+            </div>
+
+            <!-- Confirmed -->
+            <div class="relative px-4 sm:px-5 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Confirmed</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['confirmed'] }}</div>
+            </div>
+
+            <!-- Rescheduled -->
+            <div class="relative px-4 sm:px-5 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Rescheduled</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['rescheduled'] }}</div>
+            </div>
+
+            <!-- Completed -->
+            <div class="relative px-4 sm:px-5 py-1">
+                <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Completed</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['completed'] }}</div>
+            </div>
+
+            <!-- No-Show -->
+            <div class="relative px-4 sm:px-5 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">No-Show</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['no_show'] }}</div>
+            </div>
+
+            <!-- Cancelled -->
+            <div class="relative px-4 sm:px-5 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Cancelled</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['cancelled'] }}</div>
+            </div>
         </div>
     </div>
 
-    <!-- Filters & Search Bar (Flat border, no shadow) -->
+    <!-- Filters & Search Bar (Auto-filter on select, No manual Filter button) -->
     <div class="bg-white p-4 sm:p-5 rounded-xl border border-[#E5E5EA]">
-        <form method="GET" action="{{ route('admin.bookings.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 text-xs sm:text-sm">
+        <form method="GET" action="{{ route('admin.bookings.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs sm:text-sm items-end">
             
             <!-- Search Query -->
             <div class="lg:col-span-2">
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Search Reservations</label>
+                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Search Reservations</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
-                       placeholder="Booking #, Name, Phone, Email..." 
-                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
+                       placeholder="Booking #, Name, Phone, Email (Enter)..." 
+                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
             </div>
 
             <!-- Status Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Lifecycle Status</label>
-                <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
+                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Lifecycle Status</label>
+                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses</option>
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                     <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
@@ -96,8 +114,8 @@
 
             <!-- Batch Status Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Batch Assignment</label>
-                <select name="batch_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
+                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Batch Assignment</label>
+                <select name="batch_status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Batches</option>
                     <option value="unassigned" {{ request('batch_status') === 'unassigned' || request('unassigned') === '1' ? 'selected' : '' }}>No Batch (Unassigned)</option>
                     <option value="assigned" {{ request('batch_status') === 'assigned' ? 'selected' : '' }}>Batch Assigned</option>
@@ -106,8 +124,8 @@
 
             <!-- Class Type Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Class Package</label>
-                <select name="class_type" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
+                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Class Package</label>
+                <select name="class_type" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Classes</option>
                     <option value="discovery" {{ request('class_type') === 'discovery' ? 'selected' : '' }}>Discovery</option>
                     <option value="fundive" {{ request('class_type') === 'fundive' ? 'selected' : '' }}>Fundive</option>
@@ -115,24 +133,19 @@
                 </select>
             </div>
 
-            <!-- Sort By -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Sort Order</label>
-                <select name="sort" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
-                    <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest to Oldest</option>
-                    <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest to Newest</option>
-                    <option value="dive_date_desc" {{ request('sort') === 'dive_date_desc' ? 'selected' : '' }}>Dive Date (Latest)</option>
-                    <option value="dive_date_asc" {{ request('sort') === 'dive_date_asc' ? 'selected' : '' }}>Dive Date (Soonest)</option>
-                </select>
-            </div>
-
-            <!-- Filter Buttons -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary w-full py-2 text-xs sm:text-sm font-bold">
-                    Filter
-                </button>
+            <!-- Sort By / Reset -->
+            <div class="flex items-center gap-2">
+                <div class="flex-1">
+                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Sort Order</label>
+                    <select name="sort" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
+                        <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest</option>
+                        <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest</option>
+                        <option value="dive_date_desc" {{ request('sort') === 'dive_date_desc' ? 'selected' : '' }}>Dive Date (Latest)</option>
+                        <option value="dive_date_asc" {{ request('sort') === 'dive_date_asc' ? 'selected' : '' }}>Dive Date (Soonest)</option>
+                    </select>
+                </div>
                 @if(request()->hasAny(['search', 'status', 'class_type', 'sort', 'batch_status', 'unassigned', 'date_from', 'date_to', 'payment_status']))
-                    <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-3 py-2 text-xs sm:text-sm">
+                    <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-3.5 py-2 text-xs shrink-0 self-end mb-0.5" title="Clear all filters">
                         Reset
                     </a>
                 @endif

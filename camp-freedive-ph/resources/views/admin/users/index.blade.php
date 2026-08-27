@@ -24,21 +24,55 @@
         </div>
     </div>
 
-    <!-- Filters Bar -->
+    <!-- Summary Metrics (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    @if(isset($stats))
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center">
+            <!-- Total Staff -->
+            <div class="px-4 sm:px-6 py-1">
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Total Staff</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['total'] }}</div>
+            </div>
+
+            <!-- Coaches -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Freedive Coaches</span>
+                <div class="text-2xl font-extrabold text-[#008E98] mt-1">{{ $stats['coaches'] }}</div>
+            </div>
+
+            <!-- Admins & Owners -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Admins & Owners</span>
+                <div class="text-2xl font-extrabold text-[#780000] mt-1">{{ $stats['admins'] }}</div>
+            </div>
+
+            <!-- Active Accounts -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs text-[#34C759] font-bold uppercase tracking-wider block">Active Accounts</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['active'] }}</div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Filters Bar (Auto Filter on Select, No Manual Filter Button) -->
     <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-        <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div class="sm:col-span-2">
+        <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
+            <div>
                 <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Search Staff</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
-                       placeholder="Name, email, or phone number..." 
+                       placeholder="Name, email, phone (Enter)..." 
                        class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
             </div>
 
             <div>
                 <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Filter Role</label>
-                <select name="role" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                <select name="role" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Staff Roles</option>
                     <option value="owner" {{ request('role') === 'owner' ? 'selected' : '' }}>Camp Owner</option>
                     <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Camp Admin</option>
@@ -46,21 +80,19 @@
                 </select>
             </div>
 
-            <div class="flex items-end gap-2">
-                <div class="flex-1">
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Status</label>
-                    <select name="status" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                        <option value="">All Statuses</option>
-                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold shrink-0">
-                    Filter
-                </button>
+            <div>
+                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Status</label>
+                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                    <option value="">All Statuses</option>
+                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+            </div>
+
+            <div>
                 @if(request()->anyFilled(['search', 'role', 'status']))
-                    <a href="{{ route('admin.users.index') }}" class="btn-secondary px-3 py-2 text-xs text-center shrink-0">
-                        Reset
+                    <a href="{{ route('admin.users.index') }}" class="btn-secondary px-4 py-2 text-xs font-semibold w-full text-center block">
+                        Clear Filters
                     </a>
                 @endif
             </div>
@@ -131,8 +163,8 @@
                         <td class="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
                             @if($currentUser->isOwner() || ($currentUser->isAdmin() && $user->isCoach()))
                                 <!-- Edit Profile -->
-                                <a href="{{ route('admin.users.edit', $user) }}" class="px-3 py-1.5 rounded-lg border border-[#D1D1D6] hover:bg-[#F2F2F7] font-semibold text-xs text-[#1D1D1F] transition-colors inline-block">
-                                    Edit Profile
+                                <a href="{{ route('admin.users.edit', $user) }}" class="btn-secondary px-3 py-1.5 text-xs inline-block">
+                                    Edit
                                 </a>
 
                                 <!-- Status Toggle (Cannot toggle self) -->
@@ -142,7 +174,7 @@
                                         @method('PATCH')
                                         <button type="submit" 
                                                 onclick="return confirm('Are you sure you want to {{ $user->isActive() ? 'deactivate' : 'activate' }} this account?')"
-                                                class="px-3 py-1.5 rounded-lg border text-xs font-semibold transition-colors {{ $user->isActive() ? 'border-[#FECACA] text-[#DC2626] hover:bg-[#FEF2F2]' : 'border-[#A7F3D0] text-[#059669] hover:bg-[#ECFDF5]' }}">
+                                                class="{{ $user->isActive() ? 'btn-danger' : 'btn-secondary' }} px-3 py-1.5 text-xs font-semibold">
                                             {{ $user->isActive() ? 'Deactivate' : 'Activate' }}
                                         </button>
                                     </form>

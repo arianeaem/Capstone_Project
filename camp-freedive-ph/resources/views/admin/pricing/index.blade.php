@@ -23,32 +23,41 @@
         </div>
     </div>
 
-    <!-- Metrics Summary Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
-        <div class="p-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-2xs space-y-1">
-            <div class="text-xs font-semibold text-[#6E6E73] uppercase tracking-wider">Total Rules</div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F]">{{ number_format($totalRules) }}</div>
-            <div class="text-[11px] text-[#6E6E73]">Configured pricing rules</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-2xs space-y-1">
-            <div class="text-xs font-semibold text-[#6E6E73] uppercase tracking-wider">Active Rules</div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-700">{{ number_format($activeRules) }}</div>
-            <div class="text-[11px] text-emerald-600 font-medium">Affecting live booking engine</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-2xs space-y-1">
-            <div class="text-xs font-semibold text-[#6E6E73] uppercase tracking-wider">Bookings Triggered</div>
-            <div class="text-2xl sm:text-3xl font-extrabold text-[#780000]">{{ number_format($totalTriggered) }}</div>
-            <div class="text-[11px] text-[#6E6E73]">Historical reservations affected</div>
-        </div>
-
-        <div class="p-4 rounded-2xl bg-white border border-[#E5E5EA] shadow-2xs space-y-1">
-            <div class="text-xs font-semibold text-[#6E6E73] uppercase tracking-wider">Net Price Delta</div>
-            <div class="text-2xl sm:text-3xl font-extrabold {{ $netRevenueImpact >= 0 ? 'text-[#1D1D1F]' : 'text-rose-700' }}">
-                {{ $netRevenueImpact >= 0 ? '+' : '−' }}₱{{ number_format(abs($netRevenueImpact), 2) }}
+    <!-- Metrics Summary (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-4">
+            <!-- Total Rules -->
+            <div class="px-4 sm:px-6 py-1">
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Rules</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ number_format($totalRules) }}</div>
+                <div class="text-xs text-[#6E6E73] mt-0.5">Configured pricing rules</div>
             </div>
-            <div class="text-[11px] text-[#6E6E73]">Cumulative discount/surge volume</div>
+
+            <!-- Active Rules -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Active Rules</span>
+                <div class="text-2xl font-extrabold text-emerald-700 mt-1">{{ number_format($activeRules) }}</div>
+                <div class="text-xs text-emerald-600 mt-0.5 font-medium">Affecting live booking engine</div>
+            </div>
+
+            <!-- Bookings Triggered -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Bookings Triggered</span>
+                <div class="text-2xl font-extrabold text-[#780000] mt-1">{{ number_format($totalTriggered) }}</div>
+                <div class="text-xs text-[#6E6E73] mt-0.5">Reservations affected</div>
+            </div>
+
+            <!-- Net Price Delta -->
+            <div class="relative px-4 sm:px-6 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Net Price Delta</span>
+                <div class="text-2xl font-extrabold mt-1 {{ $netRevenueImpact >= 0 ? 'text-[#1D1D1F]' : 'text-rose-700' }}">
+                    {{ $netRevenueImpact >= 0 ? '+' : '−' }}₱{{ number_format(abs($netRevenueImpact), 2) }}
+                </div>
+                <div class="text-xs text-[#6E6E73] mt-0.5">Cumulative discount/surge volume</div>
+            </div>
         </div>
     </div>
 
