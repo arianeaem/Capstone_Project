@@ -25,7 +25,7 @@
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
             <!-- Brand Logo -->
             <a href="{{ route('landing') }}" class="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-                <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-contain bg-white shadow-sm border border-[#E5E5EA] group-hover:scale-105 transition-transform">
+                <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-contain bg-white">
                 <div class="block">
                     <span class="font-extrabold text-base sm:text-xl tracking-tight text-[#1D1D1F] block leading-none">Camp Freedive<span class="text-[#780000]">PH</span></span>
                     <span class="text-xs sm:text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>

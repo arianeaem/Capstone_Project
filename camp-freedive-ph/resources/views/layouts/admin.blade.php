@@ -267,7 +267,7 @@
             </div>
 
             <!-- Page Specific Content -->
-            <div class="flex-1 px-4 sm:px-8 pb-12 pt-2 max-w-7xl w-full mx-auto">
+            <div class="flex-1 px-4 sm:px-6 lg:px-8 xl:px-10 pb-12 pt-2 max-w-[1600px] w-full mx-auto">
                 @yield('content')
             </div>
 

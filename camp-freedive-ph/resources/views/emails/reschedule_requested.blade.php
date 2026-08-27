@@ -16,7 +16,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h2 style="margin: 0;">📅 Reschedule Request Received</h2>
+            <h2 style="margin: 0;">Reschedule Request Received</h2>
             <p style="margin: 4px 0 0 0; opacity: 0.9;">Booking #{{ $booking->booking_number }}</p>
         </div>
         <div class="content">

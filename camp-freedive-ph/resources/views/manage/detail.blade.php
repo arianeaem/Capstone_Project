@@ -26,7 +26,7 @@
 
     <!-- Booking Overview Header -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm mb-6 sm:mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6">
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Reservation Details</span>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
@@ -215,9 +215,8 @@
             <!-- Policy Engine Status Box -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm space-y-5">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Automated Policy Engine</span>
-                    <h3 class="text-lg font-bold text-[#1D1D1F] mt-0.5">Self-Service Actions</h3>
-                    <p class="text-xs text-[#6E6E73] mt-1">Live policy based on days before your dive date.</p>
+                    <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Cancllation & Rescheduling Policy Engine</span>
+                    <p class="text-xs text-[#6E6E73] mt-1">Policy based on days before your dive date.</p>
                 </div>
 
                 <!-- Reschedule Status Card -->

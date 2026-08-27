@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Internal Staff Login | Camp FreedivePH')
-@section('meta_description', 'Internal portal login for Camp FreedivePH coaches, administrators, and owner.')
+@section('title', 'Staff Login | Camp FreedivePH')
+@section('meta_description', 'Staff Login for Camp FreedivePH.')
 
 @section('content')
 <div class="min-h-[75vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10">
@@ -69,7 +69,7 @@
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md">
-                    Sign In to Portal
+                    Sign In
                 </button>
             </form>
 

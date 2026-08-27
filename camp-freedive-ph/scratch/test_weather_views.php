@@ -25,7 +25,7 @@ $renderedIndex = $responseIndex->render();
 
 echo "   Index Render Status: SUCCESS (HTML length: " . strlen($renderedIndex) . " bytes)\n";
 echo "   Contains 'Live 24-Hour Continuous Cache Active': " . (str_contains($renderedIndex, 'Live 24-Hour Continuous Cache Active') ? 'YES' : 'NO') . "\n";
-echo "   Contains '16-Day Whole-Day Sea State Horizon': " . (str_contains($renderedIndex, '16-Day Whole-Day Sea State Horizon') ? 'YES' : 'NO') . "\n";
+echo "   Contains '16-Day Whole-Day Horizon': " . (str_contains($renderedIndex, '16-Day Whole-Day Horizon') ? 'YES' : 'NO') . "\n";
 echo "   Contains 'Sync Forecast Now': " . (str_contains($renderedIndex, 'Sync Forecast Now') ? 'YES' : 'NO') . "\n";
 
 // 2. Test Admin Weather Show View
