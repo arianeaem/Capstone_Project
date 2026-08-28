@@ -82,69 +82,143 @@
         </div>
     </div>
 
-    <!-- Filters & Search Bar (Auto-filter on select, No manual Filter button) -->
-    <div class="bg-white p-4 sm:p-5 rounded-xl border border-[#E5E5EA]">
-        <form method="GET" action="{{ route('admin.bookings.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs sm:text-sm items-end">
-            
-            <!-- Search Query -->
-            <div class="lg:col-span-2">
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Search Booking #, Name, Phone, Email (Enter)..." 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Statuses</option>
-                    <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
-                    <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
-                    <option value="reschedule_requested" {{ request('status') === 'reschedule_requested' ? 'selected' : '' }}>Reschedule Requested</option>
-                    <option value="cancellation_requested" {{ request('status') === 'cancellation_requested' ? 'selected' : '' }}>Cancellation Requested</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                    <option value="no_show" {{ request('status') === 'no_show' ? 'selected' : '' }}>No-Show</option>
-                    <option value="cancelled_by_camp" {{ request('status') === 'cancelled_by_camp' ? 'selected' : '' }}>Cancelled by Camp</option>
-                    <option value="cancelled_by_guest" {{ request('status') === 'cancelled_by_guest' ? 'selected' : '' }}>Cancelled by Guest</option>
-                </select>
-            </div>
-
-            <!-- Batch Status Filter -->
-            <div>
-                <select name="batch_status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Batches</option>
-                    <option value="unassigned" {{ request('batch_status') === 'unassigned' || request('unassigned') === '1' ? 'selected' : '' }}>No Batch (Unassigned)</option>
-                    <option value="assigned" {{ request('batch_status') === 'assigned' ? 'selected' : '' }}>Batch Assigned</option>
-                </select>
-            </div>
-
-            <!-- Class Type Filter -->
-            <div>
-                <select name="class_type" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Classes</option>
-                    <option value="discovery" {{ request('class_type') === 'discovery' ? 'selected' : '' }}>Discovery</option>
-                    <option value="fundive" {{ request('class_type') === 'fundive' ? 'selected' : '' }}>Fundive</option>
-                    <option value="refinement" {{ request('class_type') === 'refinement' ? 'selected' : '' }}>Refinement</option>
-                </select>
-            </div>
-
-            <!-- Sort By / Reset -->
-            <div class="flex items-center gap-2">
-                <div class="flex-1">
-                    <select name="sort" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
-                        <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest</option>
-                        <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest</option>
-                        <option value="dive_date_desc" {{ request('sort') === 'dive_date_desc' ? 'selected' : '' }}>Dive Date (Latest)</option>
-                        <option value="dive_date_asc" {{ request('sort') === 'dive_date_asc' ? 'selected' : '' }}>Dive Date (Soonest)</option>
-                    </select>
+    <!-- Bookings Table Container with Integrated Toolbar Header -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+        
+        <!-- Integrated Toolbar Header (Pills + Search + Filter Popover) -->
+        <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                
+                <!-- Left: Class Package Pill Tabs (Primary: #780000) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                    <a href="{{ request()->fullUrlWithQuery(['class_type' => '']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('class_type') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        All Classes
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['class_type' => 'discovery']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'discovery' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Discovery
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['class_type' => 'fundive']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'fundive' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Fundive
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['class_type' => 'refinement']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'refinement' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Refinement
+                    </a>
                 </div>
-            </div>
-        </form>
-    </div>
 
-    <!-- Bookings Table (Flat border, no shadow) -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-x-auto">
+                <!-- Right: Search Input + Filter Popover -->
+                <div class="flex items-center gap-2" x-data="{ openFilters: false }">
+                    <form method="GET" action="{{ route('admin.bookings.index') }}" class="flex items-center gap-2">
+                        @if(request('class_type'))
+                            <input type="hidden" name="class_type" value="{{ request('class_type') }}">
+                        @endif
+                        @if(request('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+                        @if(request('batch_status'))
+                            <input type="hidden" name="batch_status" value="{{ request('batch_status') }}">
+                        @endif
+                        @if(request('sort'))
+                            <input type="hidden" name="sort" value="{{ request('sort') }}">
+                        @endif
+
+                        <div class="relative w-48 sm:w-64">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ request('search') }}" 
+                                   placeholder="Search booking #, name..." 
+                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                            <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                    </form>
+
+                    <!-- Filter Button with Popover -->
+                    <div class="relative">
+                        <button type="button" 
+                                @click="openFilters = !openFilters" 
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            <span>Filter</span>
+                            @if(request()->anyFilled(['status', 'batch_status', 'sort']))
+                                <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            @endif
+                        </button>
+
+                        <!-- Filter Popover Menu -->
+                        <div x-show="openFilters" 
+                             @click.outside="openFilters = false" 
+                             x-cloak 
+                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <form method="GET" action="{{ route('admin.bookings.index') }}" class="space-y-3 text-xs">
+                                @if(request('class_type'))
+                                    <input type="hidden" name="class_type" value="{{ request('class_type') }}">
+                                @endif
+                                @if(request('search'))
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Lifecycle Status</label>
+                                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="">All Statuses</option>
+                                        <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
+                                        <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
+                                        <option value="reschedule_requested" {{ request('status') === 'reschedule_requested' ? 'selected' : '' }}>Reschedule Requested</option>
+                                        <option value="cancellation_requested" {{ request('status') === 'cancellation_requested' ? 'selected' : '' }}>Cancellation Requested</option>
+                                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                                        <option value="no_show" {{ request('status') === 'no_show' ? 'selected' : '' }}>No-Show</option>
+                                        <option value="cancelled_by_camp" {{ request('status') === 'cancelled_by_camp' ? 'selected' : '' }}>Cancelled by Camp</option>
+                                        <option value="cancelled_by_guest" {{ request('status') === 'cancelled_by_guest' ? 'selected' : '' }}>Cancelled by Guest</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Batch Assignment</label>
+                                    <select name="batch_status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="">All Batches</option>
+                                        <option value="unassigned" {{ request('batch_status') === 'unassigned' || request('unassigned') === '1' ? 'selected' : '' }}>No Batch (Unassigned)</option>
+                                        <option value="assigned" {{ request('batch_status') === 'assigned' ? 'selected' : '' }}>Batch Assigned</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Sort Order</label>
+                                    <select name="sort" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest</option>
+                                        <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest</option>
+                                        <option value="dive_date_desc" {{ request('sort', 'dive_date_desc') === 'dive_date_desc' ? 'selected' : '' }}>Dive Date (Latest)</option>
+                                        <option value="dive_date_asc" {{ request('sort', 'dive_date_asc') === 'dive_date_asc' ? 'selected' : '' }}>Dive Date (Soonest)</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                    <a href="{{ route('admin.bookings.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                    <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if(request()->anyFilled(['search', 'status', 'batch_status', 'sort']))
+                        <a href="{{ route('admin.bookings.index', ['class_type' => request('class_type')]) }}" 
+                           class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
         <table class="w-full text-left min-w-[900px]">
             <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">
                 <tr>

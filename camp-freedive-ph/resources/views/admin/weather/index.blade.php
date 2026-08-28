@@ -72,47 +72,94 @@
     </div>
     @endif
 
-    <!-- Search & Filters (Flat border, no shadow) -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 space-y-4">
-        <form action="{{ route('admin.weather.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+    <!-- Modern Integrated Toolbar (Pill Tabs + Secondary Filter Popover) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-3 sm:p-4 shadow-2xs">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             
-            <!-- Risk Classification -->
-            <div>
-                <select name="risk" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Risk Levels</option>
-                    <option value="very_safe" {{ request('risk') === 'very_safe' ? 'selected' : '' }}>Very Safe (Calm)</option>
-                    <option value="safe" {{ request('risk') === 'safe' ? 'selected' : '' }}>Safe</option>
-                    <option value="moderate" {{ request('risk') === 'moderate' ? 'selected' : '' }}>Moderate</option>
-                    <option value="high_risk" {{ request('risk') === 'high_risk' ? 'selected' : '' }}>High Risk</option>
-                    <option value="critical_risk" {{ request('risk') === 'critical_risk' ? 'selected' : '' }}>Critical</option>
-                </select>
+            <!-- Left: Risk Level Pill Tabs (Primary: #780000) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+                <a href="{{ request()->fullUrlWithQuery(['risk' => '']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('risk') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    All Risks
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['risk' => 'very_safe']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('risk') === 'very_safe' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Very Safe
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['risk' => 'safe']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('risk') === 'safe' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Safe
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['risk' => 'moderate']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('risk') === 'moderate' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Moderate
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['risk' => 'high_risk']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('risk') === 'high_risk' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    High Risk
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['risk' => 'critical_risk']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('risk') === 'critical_risk' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Critical
+                </a>
             </div>
 
-            <!-- Batch Status -->
-            <div>
-                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Statuses</option>
-                    <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                    <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
-                    <option value="cancelled_by_camp" {{ request('status') === 'cancelled_by_camp' ? 'selected' : '' }}>Cancelled by Camp</option>
-                </select>
-            </div>
-
-            <!-- Date From -->
-            <div>
-                <input type="date" name="date_from" onchange="this.form.submit()" value="{{ request('date_from') }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-            </div>
-
-            <!-- Reset Button (If Filtered) -->
-            <div class="flex items-end">
-                @if(request()->anyFilled(['risk', 'status', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.weather.index') }}" class="btn-secondary px-4 py-2 text-xs text-center w-full block font-semibold">
-                        Clear Filters
+            <!-- Right: Secondary Filter Popover -->
+            <div class="flex items-center gap-2 self-end md:self-auto shrink-0" x-data="{ openFilters: false }">
+                @if(request()->anyFilled(['status', 'date_from', 'date_to']))
+                    <a href="{{ route('admin.weather.index', ['risk' => request('risk')]) }}" 
+                       class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-2 py-1">
+                        Clear Extras
                     </a>
                 @endif
+
+                <div class="relative">
+                    <button type="button" 
+                            @click="openFilters = !openFilters" 
+                            class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        <span>Filter</span>
+                        @if(request()->anyFilled(['status', 'date_from', 'date_to']))
+                            <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                        @endif
+                    </button>
+
+                    <!-- Filter Dropdown Card -->
+                    <div x-show="openFilters" 
+                         @click.outside="openFilters = false" 
+                         x-cloak 
+                         class="absolute right-0 mt-2 w-72 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                        <form action="{{ route('admin.weather.index') }}" method="GET" class="space-y-3 text-xs">
+                            <input type="hidden" name="risk" value="{{ request('risk') }}">
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] mb-1">Batch Status</label>
+                                <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                    <option value="">All Statuses</option>
+                                    <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
+                                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
+                                    <option value="cancelled_by_camp" {{ request('status') === 'cancelled_by_camp' ? 'selected' : '' }}>Cancelled by Camp</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] mb-1">Dive Date From</label>
+                                <input type="date" name="date_from" onchange="this.form.submit()" value="{{ request('date_from') }}" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <a href="{{ route('admin.weather.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
-        </form>
+
+        </div>
     </div>
 
     <!-- Weather Safety Cards Grid -->
@@ -122,6 +169,22 @@
             $day1 = $batch->latestDay1Assessment;
             $day2 = $batch->latestDay2Assessment;
             $override = $batch->latestManualOverride;
+
+            $day1Bg = match($day1?->overall_classification) {
+                'Very Safe', 'Safe' => 'bg-emerald-50/70 border-emerald-200',
+                'Moderate' => 'bg-amber-50/70 border-amber-200',
+                'High Risk' => 'bg-rose-50/70 border-rose-200',
+                'Critical Risk' => 'bg-red-100/70 border-red-300',
+                default => 'bg-[#FAFAFC] border-[#E5E5EA]',
+            };
+
+            $day2Bg = match($day2?->overall_classification) {
+                'Very Safe', 'Safe' => 'bg-emerald-50/70 border-emerald-200',
+                'Moderate' => 'bg-amber-50/70 border-amber-200',
+                'High Risk' => 'bg-rose-50/70 border-rose-200',
+                'Critical Risk' => 'bg-red-100/70 border-red-300',
+                default => 'bg-[#FAFAFC] border-[#E5E5EA]',
+            };
         @endphp
         
         <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 hover:border-[#008E98]/40 transition-all flex flex-col justify-between space-y-4 {{ in_array($batch->risk_classification, ['high_risk', 'critical_risk']) ? 'border-[#FECACA] bg-[#FFF8F8]' : '' }}">
@@ -148,37 +211,31 @@
                 <div class="mt-3.5 grid grid-cols-2 gap-2.5">
                     
                     <!-- Day 1 Assessment -->
-                    <div class="p-3 rounded-xl bg-white border border-[#E5E5EA] space-y-1.5">
+                    <div class="p-3 rounded-xl border space-y-1.5 {{ $day1Bg }}">
+                        <div class="text-[11px] font-bold text-[#6E6E73]">
+                            Day 1 ({{ $batch->start_date->format('M d') }})
+                        </div>
                         @if($day1)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border inline-block {{ $day1->classification_badge['class'] }}">
-                                {{ $day1->overall_classification }}
-                            </span>
                             <div class="text-[11px] text-[#6E6E73]">
                                 Worst: <strong class="text-[#1D1D1F]">{{ $day1->worst_hour ? $day1->worst_hour->format('g:i A') : 'N/A' }}</strong>
                             </div>
                         @else
                             <span class="text-xs text-[#8E8E93] italic">Not Assessed</span>
                         @endif
-                        <div class="text-[11px] font-bold text-[#6E6E73]">
-                            Day 1 ({{ $batch->start_date->format('M d') }})
-                        </div>
                     </div>
 
                     <!-- Day 2 Assessment -->
-                    <div class="p-3 rounded-xl bg-white border border-[#E5E5EA] space-y-1.5">
+                    <div class="p-3 rounded-xl border space-y-1.5 {{ $day2Bg }}">
+                        <div class="text-[11px] font-bold text-[#6E6E73]">
+                            Day 2 ({{ $batch->end_date->format('M d') }})
+                        </div>
                         @if($day2)
-                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border inline-block {{ $day2->classification_badge['class'] }}">
-                                {{ $day2->overall_classification }}
-                            </span>
                             <div class="text-[11px] text-[#6E6E73]">
                                 Worst: <strong class="text-[#1D1D1F]">{{ $day2->worst_hour ? $day2->worst_hour->format('g:i A') : 'N/A' }}</strong>
                             </div>
                         @else
                             <span class="text-xs text-[#8E8E93] italic">Not Assessed</span>
                         @endif
-                        <div class="text-[11px] font-bold text-[#6E6E73]">
-                            Day 2 ({{ $batch->end_date->format('M d') }})
-                        </div>
                     </div>
 
                 </div>

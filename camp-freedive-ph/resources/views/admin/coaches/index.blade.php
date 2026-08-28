@@ -37,48 +37,102 @@
     </div>
 
     <!-- Search & Filter Controls (Flat border, no shadow) -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 space-y-4">
-        <form action="{{ route('admin.coaches.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+    <!-- Modern Integrated Toolbar (Status Pill Tabs + Search & Filter Popover) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-3 sm:p-4 shadow-2xs">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             
-            <!-- Search -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Search Coach</label>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Name, email, or phone..." 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+            <!-- Left: Account Status Pill Tabs (Primary: #780000) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    All Coaches ({{ $activeCount + $inactiveCount }})
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'active']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('status') === 'active' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Active ({{ $activeCount }})
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'inactive']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('status') === 'inactive' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Inactive ({{ $inactiveCount }})
+                </a>
             </div>
 
-            <!-- Status Filter -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Account Status</label>
-                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Statuses ({{ $activeCount + $inactiveCount }})</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only ({{ $activeCount }})</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive Only ({{ $inactiveCount }})</option>
-                </select>
-            </div>
+            <!-- Right: Search Input + Filter Popover -->
+            <div class="flex items-center gap-2" x-data="{ openFilters: false }">
+                <form action="{{ route('admin.coaches.index') }}" method="GET" class="flex items-center gap-2">
+                    @if(request('status'))
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                    @endif
+                    @if(request('available_on'))
+                        <input type="hidden" name="available_on" value="{{ request('available_on') }}">
+                    @endif
 
-            <!-- Date Filter -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Available on Specific Date</label>
-                <input type="date" 
-                       name="available_on" 
-                       onchange="this.form.submit()"
-                       value="{{ request('available_on') }}" 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-            </div>
+                    <div class="relative w-48 sm:w-64">
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}" 
+                               placeholder="Search coach name, email..." 
+                               class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                        <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                </form>
 
-            <!-- Reset Button (If Filtered) -->
-            <div class="flex items-end">
-                @if(request()->anyFilled(['search', 'status', 'available_on', 'has_capacity']))
-                    <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2 text-xs text-center w-full block font-semibold">
-                        Clear Filters
+                <!-- Filter Button with Popover -->
+                <div class="relative">
+                    <button type="button" 
+                            @click="openFilters = !openFilters" 
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        <span>Filter</span>
+                        @if(request()->filled('available_on'))
+                            <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                        @endif
+                    </button>
+
+                    <!-- Filter Popover Menu -->
+                    <div x-show="openFilters" 
+                         @click.outside="openFilters = false" 
+                         x-cloak 
+                         class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                        <form action="{{ route('admin.coaches.index') }}" method="GET" class="space-y-3 text-xs">
+                            @if(request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                            @endif
+                            @if(request('search'))
+                                <input type="hidden" name="search" value="{{ request('search') }}">
+                            @endif
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] mb-1">Available on Specific Date</label>
+                                <input type="date" 
+                                       name="available_on" 
+                                       onchange="this.form.submit()"
+                                       value="{{ request('available_on') }}" 
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <a href="{{ route('admin.coaches.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                @if(request()->anyFilled(['search', 'available_on']))
+                    <a href="{{ route('admin.coaches.index', ['status' => request('status')]) }}" 
+                       class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
+                        Reset
                     </a>
                 @endif
             </div>
-        </form>
+
+        </div>
     </div>
 
     <!-- Coach Roster Cards Grid -->

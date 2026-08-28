@@ -61,55 +61,105 @@
         </div>
     </div>
 
-    <!-- Filters & Sort Bar -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 shadow-2xs">
-        <form method="GET" action="{{ route('admin.pricing.index') }}" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 items-end">
-            <!-- Rule Type Filter -->
-            <div>
-                <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Rule Type</label>
-                <select name="rule_type" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
-                    <option value="all" {{ request('rule_type') === 'all' || !request('rule_type') ? 'selected' : '' }}>All Rule Types</option>
-                    <option value="demand" {{ request('rule_type') === 'demand' ? 'selected' : '' }}>Demand Level</option>
-                    <option value="seasonality" {{ request('rule_type') === 'seasonality' ? 'selected' : '' }}>Seasonality</option>
-                    <option value="lead_time" {{ request('rule_type') === 'lead_time' ? 'selected' : '' }}>Lead Time</option>
-                </select>
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-                <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Status</label>
-                <select name="status" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
-                    <option value="all" {{ request('status') === 'all' || !request('status') ? 'selected' : '' }}>All Statuses</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive Only</option>
-                </select>
-            </div>
-
-            <!-- Applies To Filter -->
-            <div>
-                <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Applies To</label>
-                <select name="applies_to" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
-                    <option value="all" {{ request('applies_to') === 'all' || !request('applies_to') ? 'selected' : '' }}>All Classes</option>
-                    <option value="discovery" {{ request('applies_to') === 'discovery' ? 'selected' : '' }}>Discovery Class</option>
-                    <option value="fundive" {{ request('applies_to') === 'fundive' ? 'selected' : '' }}>Fundive</option>
-                    <option value="refinement" {{ request('applies_to') === 'refinement' ? 'selected' : '' }}>Refinement</option>
-                </select>
-            </div>
-
-            <!-- Sort By -->
-            <div>
-                <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Sort Order</label>
-                <select name="sort" onchange="this.form.submit()" class="w-full text-xs rounded-xl border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
-                    <option value="priority" {{ request('sort', 'priority') === 'priority' ? 'selected' : '' }}>By Priority (Execution Order)</option>
-                    <option value="triggered" {{ request('sort') === 'triggered' ? 'selected' : '' }}>Most Triggered Bookings</option>
-                    <option value="recent" {{ request('sort') === 'recent' ? 'selected' : '' }}>Most Recently Created</option>
-                </select>
-            </div>
-        </form>
-    </div>
-
-    <!-- Pricing Rules Table -->
+    <!-- Pricing Rules Table with Integrated Toolbar Header -->
     <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+        
+        <!-- Integrated Toolbar Header (Pill Tabs + Filter Popover) -->
+        <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                
+                <!-- Left: Rule Type Pill Tabs (Primary: #780000) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                    <a href="{{ request()->fullUrlWithQuery(['rule_type' => 'all']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('rule_type', 'all') === 'all' || !request('rule_type') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        All Rules
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['rule_type' => 'demand']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('rule_type') === 'demand' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Demand Level
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['rule_type' => 'seasonality']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('rule_type') === 'seasonality' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Seasonality
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['rule_type' => 'lead_time']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('rule_type') === 'lead_time' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Lead Time
+                    </a>
+                </div>
+
+                <!-- Right: Filter Popover -->
+                <div class="flex items-center gap-2 self-end lg:self-auto shrink-0" x-data="{ openFilters: false }">
+                    <div class="relative">
+                        <button type="button" 
+                                @click="openFilters = !openFilters" 
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            <span>Filter</span>
+                            @if(request()->anyFilled(['status', 'applies_to', 'sort']))
+                                <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            @endif
+                        </button>
+
+                        <!-- Filter Popover Menu -->
+                        <div x-show="openFilters" 
+                             @click.outside="openFilters = false" 
+                             x-cloak 
+                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <form method="GET" action="{{ route('admin.pricing.index') }}" class="space-y-3 text-xs">
+                                @if(request('rule_type'))
+                                    <input type="hidden" name="rule_type" value="{{ request('rule_type') }}">
+                                @endif
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Status</label>
+                                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="all" {{ request('status') === 'all' || !request('status') ? 'selected' : '' }}>All Statuses</option>
+                                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only</option>
+                                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive Only</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Applies To</label>
+                                    <select name="applies_to" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="all" {{ request('applies_to') === 'all' || !request('applies_to') ? 'selected' : '' }}>All Classes</option>
+                                        <option value="discovery" {{ request('applies_to') === 'discovery' ? 'selected' : '' }}>Discovery Class</option>
+                                        <option value="fundive" {{ request('applies_to') === 'fundive' ? 'selected' : '' }}>Fundive</option>
+                                        <option value="refinement" {{ request('applies_to') === 'refinement' ? 'selected' : '' }}>Refinement</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Sort Order</label>
+                                    <select name="sort" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="priority" {{ request('sort', 'priority') === 'priority' ? 'selected' : '' }}>By Priority (Execution Order)</option>
+                                        <option value="triggered" {{ request('sort') === 'triggered' ? 'selected' : '' }}>Most Triggered Bookings</option>
+                                        <option value="recent" {{ request('sort') === 'recent' ? 'selected' : '' }}>Most Recently Created</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                    <a href="{{ route('admin.pricing.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                    <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if(request()->anyFilled(['status', 'applies_to', 'sort']))
+                        <a href="{{ route('admin.pricing.index', ['rule_type' => request('rule_type', 'all')]) }}" 
+                           class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>

@@ -36,17 +36,6 @@
                 </a>
             </div>
 
-            <!-- Active User Info Badge -->
-            <div class="p-4 mx-4 my-4 rounded-xl bg-[#FAFAFC]">
-                <div class="font-bold text-sm text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                <div class="text-xs text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
-                <div class="mt-2">
-                    <span class="text-xs px-2.5 py-0.5 rounded-full inline-block font-semibold {{ auth()->user()->role_badge['class'] }}">
-                        {{ auth()->user()->role_badge['label'] }}
-                    </span>
-                </div>
-            </div>
-
             <!-- Sidebar Navigation Links -->
             <nav class="flex-1 px-4 space-y-1.5 overflow-y-auto">
                 @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
@@ -124,11 +113,22 @@
                 @endif
             </nav>
 
+            <!-- Active User Info Badge -->
+            <div class="p-4 mx-4 my-4 rounded-xl bg-[#FAFAFC]">
+                <div class="font-bold text-sm text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                <div class="text-xs text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
+                <div class="mt-2">
+                    <span class="text-xs px-2.5 py-0.5 rounded-full inline-block font-semibold {{ auth()->user()->role_badge['class'] }}">
+                        {{ auth()->user()->role_badge['label'] }}
+                    </span>
+                </div>
+            </div>
+
             <!-- Bottom Actions -->
             <div class="p-4 border-t border-[#E5E5EA] space-y-2 bg-white">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-[#FF3B3C] bg-[#FEF2F2] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-colors">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-[#FF3B3C] bg-[#FECACA] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-colors">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         <span>Sign Out</span>
                     </button>

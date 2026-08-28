@@ -58,49 +58,111 @@
     </div>
     @endif
 
-    <!-- Filters Bar (Auto Filter on Select, No Manual Filter Button) -->
-    <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-        <form method="GET" action="{{ route('admin.users.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end">
-            <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Search Staff</label>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Name, email, phone (Enter)..." 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-            </div>
-
-            <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Filter Role</label>
-                <select name="role" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Staff Roles</option>
-                    <option value="owner" {{ request('role') === 'owner' ? 'selected' : '' }}>Camp Owner</option>
-                    <option value="admin" {{ request('role') === 'admin' ? 'selected' : '' }}>Camp Admin</option>
-                    <option value="coach" {{ request('role') === 'coach' ? 'selected' : '' }}>Freediving Coach</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Status</label>
-                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Statuses</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                </select>
-            </div>
-
-            <div>
-                @if(request()->anyFilled(['search', 'role', 'status']))
-                    <a href="{{ route('admin.users.index') }}" class="btn-secondary px-4 py-2 text-xs font-semibold w-full text-center block">
-                        Clear Filters
+    <!-- Staff Directory Table Container with Integrated Toolbar Header -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+        
+        <!-- Integrated Toolbar Header (Role Pills + Search + Filter Popover) -->
+        <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                
+                <!-- Left: Role Pill Tabs (Primary: #780000) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                    <a href="{{ request()->fullUrlWithQuery(['role' => '']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('role') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        All Staff
                     </a>
-                @endif
-            </div>
-        </form>
-    </div>
+                    <a href="{{ request()->fullUrlWithQuery(['role' => 'coach']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('role') === 'coach' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Coaches
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['role' => 'admin']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('role') === 'admin' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Admins
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['role' => 'owner']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('role') === 'owner' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Owners
+                    </a>
+                </div>
 
-    <!-- Users Table -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+                <!-- Right: Search Input + Filter Popover -->
+                <div class="flex items-center gap-2" x-data="{ openFilters: false }">
+                    <form method="GET" action="{{ route('admin.users.index') }}" class="flex items-center gap-2">
+                        @if(request('role'))
+                            <input type="hidden" name="role" value="{{ request('role') }}">
+                        @endif
+                        @if(request('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+
+                        <div class="relative w-48 sm:w-64">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ request('search') }}" 
+                                   placeholder="Search name, email, phone..." 
+                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                            <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                    </form>
+
+                    <!-- Filter Button with Popover -->
+                    <div class="relative">
+                        <button type="button" 
+                                @click="openFilters = !openFilters" 
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            <span>Filter</span>
+                            @if(request()->filled('status'))
+                                <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            @endif
+                        </button>
+
+                        <!-- Filter Popover Menu -->
+                        <div x-show="openFilters" 
+                             @click.outside="openFilters = false" 
+                             x-cloak 
+                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-3 text-xs">
+                                @if(request('role'))
+                                    <input type="hidden" name="role" value="{{ request('role') }}">
+                                @endif
+                                @if(request('search'))
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Account Status</label>
+                                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="">All Statuses</option>
+                                        <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
+                                        <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                    <a href="{{ route('admin.users.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                    <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if(request()->anyFilled(['search', 'status']))
+                        <a href="{{ route('admin.users.index', ['role' => request('role')]) }}" 
+                           class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">

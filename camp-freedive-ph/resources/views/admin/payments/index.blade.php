@@ -68,69 +68,129 @@
         </div>
     </div>
 
-    <!-- Filter & Search Bar (Auto-filter on select, No manual Filter button) -->
-    <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
-        <form method="GET" action="{{ route('admin.payments.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 text-xs items-end">
-            <!-- Search -->
-            <div class="lg:col-span-2">
-                <label class="block font-bold text-[#1D1D1F] mb-1">Search</label>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Booking #, Transaction ID, Guest (Enter)..." 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-            </div>
-
-            <!-- Status Filter -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Payment Status</label>
-                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Statuses</option>
-                    <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
-                    <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
-                    <option value="refund_requested" {{ request('status') === 'refund_requested' ? 'selected' : '' }}>Refund Requested</option>
-                    <option value="refunded" {{ request('status') === 'refunded' ? 'selected' : '' }}>Refunded</option>
-                    <option value="forfeited" {{ request('status') === 'forfeited' ? 'selected' : '' }}>Forfeited</option>
-                    <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>Failed / Cancelled</option>
-                </select>
-            </div>
-
-            <!-- Payment Type / Stage -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Stage</label>
-                <select name="stage" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Stages</option>
-                    <option value="downpayment" {{ request('stage') === 'downpayment' ? 'selected' : '' }}>Downpayment</option>
-                    <option value="balance_settlement" {{ request('stage') === 'balance_settlement' ? 'selected' : '' }}>Balance Settlement</option>
-                    <option value="full" {{ request('stage') === 'full' ? 'selected' : '' }}>Full Payment</option>
-                </select>
-            </div>
-
-            <!-- Payment Method -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Method</label>
-                <select name="method" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Methods</option>
-                    <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
-                    <option value="bpi_bank_transfer" {{ request('method') === 'bpi_bank_transfer' ? 'selected' : '' }}>BPI Bank Transfer</option>
-                    <option value="card" {{ request('method') === 'card' ? 'selected' : '' }}>Credit / Debit Card</option>
-                    <option value="cash" {{ request('method') === 'cash' ? 'selected' : '' }}>Cash at Camp</option>
-                </select>
-            </div>
-
-            <!-- Reset Button (If Filtered) -->
-            <div>
-                @if(request()->anyFilled(['search', 'status', 'stage', 'method', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-4 py-2 text-xs font-semibold w-full text-center block">
-                        Clear Filters
+    <!-- Payments Ledger Table Container with Integrated Toolbar Header -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+        
+        <!-- Integrated Toolbar Header (Stage Pills + Search + Filter Popover) -->
+        <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                
+                <!-- Left: Stage Pill Tabs (Primary: #780000) -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                    <a href="{{ request()->fullUrlWithQuery(['stage' => '']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('stage') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        All Stages
                     </a>
-                @endif
-            </div>
-        </form>
-    </div>
+                    <a href="{{ request()->fullUrlWithQuery(['stage' => 'downpayment']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('stage') === 'downpayment' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Downpayment
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['stage' => 'balance_settlement']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('stage') === 'balance_settlement' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Balance Settlement
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['stage' => 'full']) }}" 
+                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('stage') === 'full' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Full Payment
+                    </a>
+                </div>
 
-    <!-- Payments Ledger Table -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+                <!-- Right: Search Input + Filter Popover -->
+                <div class="flex items-center gap-2" x-data="{ openFilters: false }">
+                    <form method="GET" action="{{ route('admin.payments.index') }}" class="flex items-center gap-2">
+                        @if(request('stage'))
+                            <input type="hidden" name="stage" value="{{ request('stage') }}">
+                        @endif
+                        @if(request('status'))
+                            <input type="hidden" name="status" value="{{ request('status') }}">
+                        @endif
+                        @if(request('method'))
+                            <input type="hidden" name="method" value="{{ request('method') }}">
+                        @endif
+
+                        <div class="relative w-48 sm:w-64">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ request('search') }}" 
+                                   placeholder="Search booking, txn, guest..." 
+                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                            <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                    </form>
+
+                    <!-- Filter Button with Popover -->
+                    <div class="relative">
+                        <button type="button" 
+                                @click="openFilters = !openFilters" 
+                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            <span>Filter</span>
+                            @if(request()->anyFilled(['status', 'method', 'date_from', 'date_to']))
+                                <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            @endif
+                        </button>
+
+                        <!-- Filter Popover Menu -->
+                        <div x-show="openFilters" 
+                             @click.outside="openFilters = false" 
+                             x-cloak 
+                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <form method="GET" action="{{ route('admin.payments.index') }}" class="space-y-3 text-xs">
+                                @if(request('stage'))
+                                    <input type="hidden" name="stage" value="{{ request('stage') }}">
+                                @endif
+                                @if(request('search'))
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Payment Status</label>
+                                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="">All Statuses</option>
+                                        <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
+                                        <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="refund_requested" {{ request('status') === 'refund_requested' ? 'selected' : '' }}>Refund Requested</option>
+                                        <option value="refunded" {{ request('status') === 'refunded' ? 'selected' : '' }}>Refunded</option>
+                                        <option value="forfeited" {{ request('status') === 'forfeited' ? 'selected' : '' }}>Forfeited</option>
+                                        <option value="failed" {{ request('status') === 'failed' ? 'selected' : '' }}>Failed / Cancelled</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] mb-1">Payment Method</label>
+                                    <select name="method" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                        <option value="">All Methods</option>
+                                        <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
+                                        <option value="bpi_bank_transfer" {{ request('method') === 'bpi_bank_transfer' ? 'selected' : '' }}>BPI Bank Transfer</option>
+                                        <option value="card" {{ request('method') === 'card' ? 'selected' : '' }}>Credit / Debit Card</option>
+                                        <option value="cash" {{ request('method') === 'cash' ? 'selected' : '' }}>Cash at Camp</option>
+                                    </select>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                    <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                    <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    @if(request()->anyFilled(['search', 'status', 'method', 'date_from', 'date_to']))
+                        <a href="{{ route('admin.payments.index', ['stage' => request('stage')]) }}" 
+                           class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+
+            </div>
+        </div>
+
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">

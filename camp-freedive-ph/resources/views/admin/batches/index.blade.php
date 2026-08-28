@@ -57,40 +57,110 @@
     </div>
     @endif
 
-    <!-- Search & Filter Controls -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 space-y-4">
-        <form action="{{ route('admin.batches.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+    <!-- Modern Integrated Toolbar (Status Pill Tabs + Search & Filter Popover) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-3 sm:p-4 shadow-2xs">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             
-            <!-- Search -->
-            <div>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Search Batch number (e.g. Batch 4...)"
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+            <!-- Left: Batch Status Pill Tabs (Primary: #780000) -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    All Batches
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'confirmed']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('status') === 'confirmed' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Confirmed
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('status') === 'completed' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Completed
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'rescheduled']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('status') === 'rescheduled' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Rescheduled
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'cancelled_by_camp']) }}" 
+                   class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('status') === 'cancelled_by_camp' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Cancelled
+                </a>
             </div>
 
-            <!-- Status Filter -->
-            <div>
-                <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Statuses</option>
-                    <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
-                    <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                    <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
-                    <option value="cancelled_by_camp" {{ request('status') === 'cancelled_by_camp' ? 'selected' : '' }}>Cancelled by Camp</option>
-                </select>
+            <!-- Right: Search Input + Filter Popover -->
+            <div class="flex items-center gap-2" x-data="{ openFilters: false }">
+                <form action="{{ route('admin.batches.index') }}" method="GET" class="flex items-center gap-2">
+                    @if(request('status'))
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                    @endif
+                    @if(request('staffing'))
+                        <input type="hidden" name="staffing" value="{{ request('staffing') }}">
+                    @endif
+
+                    <div class="relative w-48 sm:w-64">
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}" 
+                               placeholder="Search batch (e.g. Batch 4)..." 
+                               class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                        <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                </form>
+
+                <!-- Filter Button with Popover -->
+                <div class="relative">
+                    <button type="button" 
+                            @click="openFilters = !openFilters" 
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                        <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                        </svg>
+                        <span>Filter</span>
+                        @if(request()->anyFilled(['staffing', 'date_from', 'date_to']))
+                            <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                        @endif
+                    </button>
+
+                    <!-- Filter Popover Menu -->
+                    <div x-show="openFilters" 
+                         @click.outside="openFilters = false" 
+                         x-cloak 
+                         class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                        <form action="{{ route('admin.batches.index') }}" method="GET" class="space-y-3 text-xs">
+                            @if(request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                            @endif
+                            @if(request('search'))
+                                <input type="hidden" name="search" value="{{ request('search') }}">
+                            @endif
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] mb-1">Staffing Status</label>
+                                <select name="staffing" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                    <option value="">All Staffing</option>
+                                    <option value="staffed" {{ request('staffing') === 'staffed' ? 'selected' : '' }}>Coaches Assigned</option>
+                                    <option value="pending" {{ request('staffing') === 'pending' ? 'selected' : '' }}>Coach Pending (0)</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
+                                <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                @if(request()->anyFilled(['search', 'staffing', 'date_from', 'date_to']))
+                    <a href="{{ route('admin.batches.index', ['status' => request('status')]) }}" 
+                       class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
+                        Reset
+                    </a>
+                @endif
             </div>
 
-            <!-- Staffing Status -->
-            <div>
-                <select name="staffing" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Staffing</option>
-                    <option value="staffed" {{ request('staffing') === 'staffed' ? 'selected' : '' }}>Coaches Assigned</option>
-                    <option value="pending" {{ request('staffing') === 'pending' ? 'selected' : '' }}>Coach Pending (0)</option>
-                </select>
-            </div>
-
-        </form>
+        </div>
     </div>
 
     <!-- Batches Cards Grid -->
