@@ -248,7 +248,6 @@
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Coaches</h3>
-                        <p class="text-xs text-[#6E6E73] mt-0.5">Staffing for this 2D1N dive schedule.</p>
                     </div>
 
                     <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-3 py-1.5 text-xs font-bold shadow-sm">

@@ -6,7 +6,7 @@
 <div class="space-y-6 text-sm" x-data="{
     openOverrideModal: false,
     openCancelModal: false,
-    cancelReason: '{{ $overallClassification === 'Critical Risk' ? 'Critical Marine Risk / Active PAGASA Weather Advisory' : 'Elevated Marine Conditions (Moderate/High Risk)' }}'
+    cancelReason: '{{ $overallClassification === 'Critical Risk' ? 'Critical Risk' : 'Elevated Marine Conditions (Moderate/High Risk)' }}'
 }">
     
     <!-- Top Header Bar -->
@@ -613,7 +613,6 @@
         <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                 <div class="flex items-center gap-2">
-                    <span class="text-lg">🚨</span>
                     <h3 class="text-lg font-bold text-[#FF3B3C]">Cancel Batch & Dispatch Customer Notifications</h3>
                 </div>
                 <button type="button" @click="openCancelModal = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>

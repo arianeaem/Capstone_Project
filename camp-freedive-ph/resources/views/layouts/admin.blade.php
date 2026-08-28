@@ -37,68 +37,68 @@
             </div>
 
             <!-- Sidebar Navigation Links -->
-            <nav class="flex-1 px-4 space-y-1.5 overflow-y-auto">
+            <nav class="flex-1 py-2 px-4 space-y-1.5 overflow-y-auto">
                 @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
                     <!-- Dashboard -->
                     <a href="{{ route('admin.dashboard') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
                         <span>Dashboard</span>
                     </a>
 
                     <!-- Bookings -->
                     <a href="{{ route('admin.bookings.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.bookings.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.bookings.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Bookings">
                         <span>Bookings</span>
                     </a>
 
                     <!-- Batches -->
                     <a href="{{ route('admin.batches.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.batches.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.batches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-medium-icons-32.png') }}" class="w-5 h-5 shrink-0" alt="Batches">
                         <span>Batches</span>
                     </a>
 
                     <!-- Weather & Marine Safety -->
                     <a href="{{ route('admin.weather.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.weather.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
-                        <span>Weather & Safety</span>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.weather.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-warning-shield-32.png') }}" class="w-5 h-5 shrink-0" alt="SafetyMonitoring">
+                        <span>Safety Monitoring</span>
                     </a>
 
                     <!-- Dynamic Pricing -->
                     <a href="{{ route('admin.pricing.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.pricing.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.pricing.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-price-tag-60.png') }}" class="w-5 h-5 shrink-0" alt="DynamicPricing">
                         <span>Dynamic Pricing</span>
                     </a>
 
                     <!-- Payments & Refunds -->
                     <a href="{{ route('admin.payments.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-magnetic-card-60.png') }}" class="w-5 h-5 shrink-0" alt="PaymentsAndRefunds">
                         <span>Payments & Refunds</span>
                     </a>
 
                     <!-- Coaches & Schedules -->
                     <a href="{{ route('admin.coaches.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.coaches.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><polyline points="17 11 19 13 23 9"></polyline></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.coaches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="Coaches">
                         <span>Coaches & Schedules</span>
                     </a>
 
                     <!-- User Management -->
                     <a href="{{ route('admin.users.index') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.users.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.users.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
                         <span>User Management</span>
                     </a>
 
                     <!-- Audit Logs (Owner Only) -->
                     @if(auth()->user()->isOwner())
                         <a href="{{ route('admin.audit_logs.index') }}" 
-                           class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.audit_logs.*') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                           class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('admin.audit_logs.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
                             <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                             <span>Audit Logs</span>
                         </a>
@@ -106,33 +106,30 @@
                 @else
                     <!-- Coach Portal -->
                     <a href="{{ route('coach.dashboard') }}" 
-                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000] text-white shadow-sm' : 'text-[#1D1D1F] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
                         <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <span>My Schedule & Students</span>
                     </a>
                 @endif
             </nav>
 
-            <!-- Active User Info Badge -->
-            <div class="p-4 mx-4 my-4 rounded-xl bg-[#FAFAFC]">
-                <div class="font-bold text-sm text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                <div class="text-xs text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
-                <div class="mt-2">
-                    <span class="text-xs px-2.5 py-0.5 rounded-full inline-block font-semibold {{ auth()->user()->role_badge['class'] }}">
-                        {{ auth()->user()->role_badge['label'] }}
-                    </span>
-                </div>
-            </div>
+            <!-- Bottom User Info & Sign Out -->
+            <div class="p-3 border-t border-[#E5E5EA] bg-white">
+                <div class="flex items-center justify-between gap-2.5 p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                        <div class="text-[11px] text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
+                    </div>
 
-            <!-- Bottom Actions -->
-            <div class="p-4 border-t border-[#E5E5EA] space-y-2 bg-white">
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-[#FF3B3C] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-colors">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
-                        <span>Sign Out</span>
-                    </button>
-                </form>
+                    <form action="{{ route('logout') }}" method="POST" class="shrink-0">
+                        @csrf
+                        <button type="submit" 
+                                title="Sign Out" 
+                                class="p-2 rounded-xl text-[#8E8E93] hover:text-[#FF3B30] hover:bg-[#FEE2E2] transition-all flex items-center justify-center border border-transparent hover:border-[#FECACA]">
+                            <img src="{{ asset('icons/icons8-logout-60.png') }}" class="w-5 h-5 object-contain" alt="Sign Out">
+                        </button>
+                    </form>
+                </div>
             </div>
         </aside>
 
@@ -172,59 +169,73 @@
                     <button type="button" @click="mobileMenuOpen = false" class="text-lg font-bold text-[#8E8E93]">✕</button>
                 </div>
 
-                <div class="p-4">
-                    <div class="font-bold text-sm text-[#1D1D1F]">{{ auth()->user()->name }}</div>
-                    <span class="text-xs px-2 py-0.5 rounded-full inline-block border font-semibold mt-1 {{ auth()->user()->role_badge['class'] }}">
-                        {{ auth()->user()->role_badge['label'] }}
-                    </span>
-                </div>
-
-                <nav class="px-4 space-y-1.5">
+                <nav class="px-4 pt-2 space-y-1.5 overflow-y-auto">
                     @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
                             <span>Dashboard</span>
                         </a>
-                        <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.bookings.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.bookings.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Bookings">
                             <span>Bookings</span>
                         </a>
-                        <a href="{{ route('admin.batches.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.batches.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('admin.batches.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.batches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-medium-icons-32.png') }}" class="w-5 h-5 shrink-0" alt="Batches">
                             <span>Batches</span>
                         </a>
-                        <a href="{{ route('admin.weather.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.weather.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
-                            <span>Weather & Safety</span>
+                        <a href="{{ route('admin.weather.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.weather.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-warning-shield-32.png') }}" class="w-5 h-5 shrink-0" alt="SafetyMonitoring">
+                            <span>Safety Monitoring</span>
                         </a>
-                        <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('admin.pricing.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.pricing.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-price-tag-60.png') }}" class="w-5 h-5 shrink-0" alt="DynamicPricing">
+                            <span>Dynamic Pricing</span>
+                        </a>
+                        <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-magnetic-card-60.png') }}" class="w-5 h-5 shrink-0" alt="PaymentsAndRefunds">
                             <span>Payments & Refunds</span>
                         </a>
-                        <a href="{{ route('admin.coaches.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.coaches.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('admin.coaches.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.coaches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="Coaches">
                             <span>Coaches & Schedules</span>
                         </a>
-                        <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
                             <span>User Management</span>
                         </a>
                         @if(auth()->user()->isOwner())
-                            <a href="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.audit_logs.*') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                            <a href="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('admin.audit_logs.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                                 <span>Audit Logs</span>
                             </a>
                         @endif
                     @else
-                        <a href="{{ route('coach.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000] text-white' : 'text-[#1D1D1F] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ route('coach.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                             <span>My Schedule & Students</span>
                         </a>
                     @endif
                 </nav>
             </div>
 
-            <div class="p-4 border-t border-[#E5E5EA] space-y-2">
-                <a href="{{ route('landing') }}" class="flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] rounded-xl">
-                    <span>View Customer Site</span>
-                </a>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-[#FF3B3C] bg-[#FEF2F2] rounded-xl border border-[#FECACA]">
-                        <span>Sign Out</span>
-                    </button>
-                </form>
+            <div class="p-3 border-t border-[#E5E5EA] bg-white">
+                <div class="flex items-center justify-between gap-2.5 p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
+                    <div class="min-w-0 flex-1">
+                        <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                        <div class="text-[11px] text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
+                        <div class="mt-1">
+                        </div>
+                    </div>
+
+                    <form action="{{ route('logout') }}" method="POST" class="shrink-0">
+                        @csrf
+                        <button type="submit" 
+                                title="Sign Out" 
+                                class="p-2 rounded-xl text-[#8E8E93] hover:text-[#FF3B30] hover:bg-[#FEE2E2] transition-all flex items-center justify-center border border-transparent hover:border-[#FECACA]">
+                            <img src="{{ asset('icons/icons8-logout-60.png') }}" class="w-5 h-5 object-contain" alt="Sign Out">
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
 
