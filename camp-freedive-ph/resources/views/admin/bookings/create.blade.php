@@ -35,7 +35,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Class Package -->
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Class Type <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Class Type <span class="text-[#780000]">*</span></label>
                     <select name="class_type" x-model="classType" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="discovery">Discovery (Beginner Class - ₱4,250)</option>
                         <option value="fundive">Fundive (₱2,500 Certified / ₱3,300 Non-Certified)</option>
@@ -45,7 +45,7 @@
 
                 <!-- Certified Diver Flag for Fundive -->
                 <div x-show="classType === 'fundive'" x-cloak>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Fundive Diver Certification</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Fundive Diver Certification</label>
                     <select name="is_certified_diver" x-model="isCertified" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option :value="false">Non-Certified Diver (₱3,300)</option>
                         <option :value="true">Certified Freediver (₱2,500)</option>
@@ -56,7 +56,7 @@
             <!-- 2D1N Dates -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Trip Start Date (Day 1) <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Trip Start Date (Day 1) <span class="text-[#780000]">*</span></label>
                     <input type="date" 
                            name="start_date" 
                            x-model="startDate" 

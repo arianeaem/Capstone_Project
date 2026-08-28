@@ -28,7 +28,7 @@
 
             <!-- Name -->
             <div>
-                <label for="name" class="block font-bold text-[#1D1D1F] mb-1">
+                <label for="name" class="block font-bold text-[#1D1D1F] mb-2">
                     Full Name <span class="text-[#780000]">*</span>
                 </label>
                 <input type="text" 
@@ -44,7 +44,7 @@
 
             <!-- Email -->
             <div>
-                <label for="email" class="block font-bold text-[#1D1D1F] mb-1">
+                <label for="email" class="block font-bold text-[#1D1D1F] mb-2">
                     Staff Email Address <span class="text-[#780000]">*</span>
                 </label>
                 <input type="email" 
@@ -60,7 +60,7 @@
 
             <!-- Phone -->
             <div>
-                <label for="phone" class="block font-bold text-[#1D1D1F] mb-1">
+                <label for="phone" class="block font-bold text-[#1D1D1F] mb-2">
                     Mobile / Phone Number
                 </label>
                 <input type="tel" 
@@ -77,7 +77,7 @@
             <!-- Role & Status -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="role" class="block font-bold text-[#1D1D1F] mb-1">
+                    <label for="role" class="block font-bold text-[#1D1D1F] mb-2">
                         Assigned Role <span class="text-[#780000]">*</span>
                     </label>
                     <select name="role" id="role" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -90,7 +90,7 @@
                 </div>
 
                 <div>
-                    <label for="status" class="block font-bold text-[#1D1D1F] mb-1">
+                    <label for="status" class="block font-bold text-[#1D1D1F] mb-2">
                         Account Status <span class="text-[#780000]">*</span>
                     </label>
                     <select name="status" id="status" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -102,7 +102,7 @@
 
             <!-- Optional Password Reset by Admin/Owner -->
             <div class="pt-3 border-t border-[#E5E5EA]">
-                <label for="new_password" class="block font-bold text-[#1D1D1F] mb-1">
+                <label for="new_password" class="block font-bold text-[#1D1D1F] mb-2">
                     Assign New Temporary Password (Optional)
                 </label>
                 <input type="text" 

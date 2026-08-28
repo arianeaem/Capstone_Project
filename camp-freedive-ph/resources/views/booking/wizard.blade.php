@@ -199,7 +199,7 @@
             <!-- Date Picker Inputs -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">
+                    <label class="block font-bold text-[#1D1D1F] mb-2">
                         Trip Start Date (Day 1) <span class="text-[#780000]">*</span>
                     </label>
                     <input type="date" 

@@ -110,7 +110,7 @@
                     <button type="submit" 
                             onclick="return confirm('Mark downpayment as forfeited under camp cancellation policy?')"
                             class="px-4 py-2 rounded-xl border border-purple-300 bg-purple-50 hover:bg-purple-100 text-xs font-bold text-purple-800 transition-colors">
-                        Forfeit Downpayment (Policy Lock)
+                        Forfeit Downpayment
                     </button>
                 </form>
 

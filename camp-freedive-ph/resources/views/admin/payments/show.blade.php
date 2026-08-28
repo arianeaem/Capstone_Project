@@ -41,7 +41,7 @@
                 <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $payment->status_badge['class'] }}">
                     {{ $payment->status_badge['label'] }}
                 </span>
-                <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-[#F2F2F7] text-[#1D1D1F]">
+                <span class="text-xs px-2 py-0.5 rounded font-bold bg-[#F2F2F7] text-[#1D1D1F]">
                     {{ $payment->payment_stage_label }}
                 </span>
             </div>

@@ -165,7 +165,7 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Lifecycle Status</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Lifecycle Status</label>
                                     <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="">All Statuses</option>
                                         <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
@@ -180,7 +180,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Batch Assignment</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Batch Assignment</label>
                                     <select name="batch_status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="">All Batches</option>
                                         <option value="unassigned" {{ request('batch_status') === 'unassigned' || request('unassigned') === '1' ? 'selected' : '' }}>No Batch (Unassigned)</option>
@@ -189,7 +189,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Sort Order</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Sort Order</label>
                                     <select name="sort" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest</option>
                                         <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest</option>
@@ -198,7 +198,7 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <div class="flex items-center justify-between pt-2">
                                     <a href="{{ route('admin.bookings.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                     <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                                 </div>
@@ -282,7 +282,7 @@
 
                     <!-- Status Badge -->
                     <td class="p-4">
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold {{ $b->status_badge['bg'] }}">
+                        <span class="px-2 py-0.5 rounded text-xs font-bold {{ $b->status_badge['bg'] }}">
                             {{ $b->status_badge['label'] }}
                         </span>
                     </td>
@@ -299,7 +299,6 @@
                     <td class="p-4 text-right pr-6 whitespace-nowrap">
                         <a href="{{ route('admin.bookings.show', $b) }}" class="btn-primary px-3.5 py-1.5 text-xs font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
                             <span>Manage</span>
-                            <span>→</span>
                         </a>
                     </td>
                 </tr>

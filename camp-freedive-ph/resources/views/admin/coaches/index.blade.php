@@ -108,7 +108,7 @@
                             @endif
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] mb-1">Available on Specific Date</label>
+                                <label class="block font-bold text-[#1D1D1F] mb-2">Available on Specific Date</label>
                                 <input type="date" 
                                        name="available_on" 
                                        onchange="this.form.submit()"
@@ -116,7 +116,7 @@
                                        class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                             </div>
 
-                            <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                            <div class="flex items-center justify-between pt-2">
                                 <a href="{{ route('admin.coaches.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                 <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                             </div>
@@ -241,7 +241,6 @@
                 <a href="{{ route('admin.coaches.show', $coach) }}" 
                    class="w-full py-2 px-3 rounded-xl font-bold text-xs text-center flex items-center justify-center gap-1.5 whitespace-nowrap btn-secondary hover:bg-[#F2F2F7] transition-all">
                     <span>View Profile</span>
-                    <span>→</span>
                 </a>
             </div>
 

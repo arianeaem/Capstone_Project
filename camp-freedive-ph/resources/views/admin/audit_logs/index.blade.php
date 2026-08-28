@@ -24,7 +24,7 @@
     <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
         <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
             <div class="lg:col-span-2">
-                <label class="block font-bold text-[#1D1D1F] mb-1">Search Logs</label>
+                <label class="block font-bold text-[#1D1D1F] mb-2">Search Logs</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
@@ -33,7 +33,7 @@
             </div>
 
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Event Action</label>
+                <label class="block font-bold text-[#1D1D1F] mb-2">Event Action</label>
                 <select name="action" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Actions</option>
                     @foreach($actions as $act)
@@ -45,7 +45,7 @@
             </div>
 
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Date From</label>
+                <label class="block font-bold text-[#1D1D1F] mb-2">Date From</label>
                 <input type="date" 
                        name="date_from" 
                        value="{{ request('date_from') }}" 

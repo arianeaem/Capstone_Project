@@ -38,13 +38,13 @@
         <div class="space-y-2">
             <h2 class="text-xl font-bold text-[#1D1D1F]">{{ $booking->formatted_class_type }}</h2>
             <div class="text-xs text-[#6E6E73]">
-                <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> to <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong> (2D1N)
+                <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> to <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong>
             </div>
             <div class="flex items-center gap-3">
                 <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $booking->status_badge['bg'] }}">
                     {{ $booking->status_badge['label'] }}
                 </span>
-                <span class="text-xs px-2.5 py-1 rounded-full font-bold border {{ $booking->payment_status_badge['class'] }}">
+                <span class="text-xs px-2 py-0.5 rounded font-bold border {{ $booking->payment_status_badge['class'] }}">
                     {{ $booking->payment_status_badge['label'] }}
                 </span>
             </div>
@@ -272,7 +272,7 @@
                 @method('PATCH')
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">New Status <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">New Status <span class="text-[#780000]">*</span></label>
                     <select name="status" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="confirmed" {{ $booking->status === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                         <option value="completed" {{ $booking->status === 'completed' ? 'selected' : '' }}>Completed (Dive Completed)</option>
@@ -284,7 +284,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Reason / Status Note</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Reason / Status Note</label>
                     <textarea name="note" rows="3" placeholder="Explain why this status is being changed..." class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 

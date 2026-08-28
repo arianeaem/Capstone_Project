@@ -25,7 +25,7 @@
 
                 <!-- Email Input -->
                 <div>
-                    <label for="email" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                    <label for="email" class="block font-bold text-[#1D1D1F] mb-2.5 text-sm">
                         Staff Email <span class="text-[#780000]">*</span>
                     </label>
                     <input type="email" 
@@ -42,7 +42,7 @@
 
                 <!-- New Password -->
                 <div>
-                    <label for="password" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                    <label for="password" class="block font-bold text-[#1D1D1F] mb-2.5 text-sm">
                         New Password <span class="text-[#780000]">*</span>
                     </label>
                     <input type="password" 
@@ -59,7 +59,7 @@
 
                 <!-- Confirm Password -->
                 <div>
-                    <label for="password_confirmation" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                    <label for="password_confirmation" class="block font-bold text-[#1D1D1F] mb-2.5 text-sm">
                         Confirm New Password <span class="text-[#780000]">*</span>
                     </label>
                     <input type="password" 

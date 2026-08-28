@@ -80,13 +80,11 @@
                                     <div>
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <strong class="text-[#1D1D1F] text-sm" x-text="dup.name || dup.batch_number"></strong>
-                                            <span class="font-mono text-[#780000] font-bold text-xs" x-text="'[' + (dup.batch_code || dup.batch_number) + ']'"></span>
                                         </div>
                                         <span class="text-[#6E6E73] mt-0.5 block" x-text="(dup.participants_count || 0) + ' Pax assigned • ' + (dup.coaches_count || 0) + ' Coach(es) staffed'"></span>
                                     </div>
                                     <a :href="'/admin/batches/' + dup.id" class="btn-primary px-4 py-2 text-xs font-bold shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap">
                                         <span>Open Existing Batch</span>
-                                        <span>→</span>
                                     </a>
                                 </div>
                             </template>

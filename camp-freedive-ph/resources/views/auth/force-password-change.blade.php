@@ -30,7 +30,7 @@
 
                 <!-- Current Temporary Password -->
                 <div>
-                    <label for="current_password" class="block font-bold text-[#1D1D1F] mb-1 text-sm">
+                    <label for="current_password" class="block font-bold text-[#1D1D1F] mb-2 text-sm">
                         Current Temporary Password <span class="text-[#780000]">*</span>
                     </label>
                     <input type="password" 
@@ -48,7 +48,7 @@
 
                 <!-- New Password -->
                 <div>
-                    <label for="password" class="block font-bold text-[#1D1D1F] mb-1 text-sm">
+                    <label for="password" class="block font-bold text-[#1D1D1F] mb-2 text-sm">
                         New Permanent Password <span class="text-[#780000]">*</span>
                     </label>
                     <input type="password" 
@@ -65,7 +65,7 @@
 
                 <!-- Confirm New Password -->
                 <div>
-                    <label for="password_confirmation" class="block font-bold text-[#1D1D1F] mb-1 text-sm">
+                    <label for="password_confirmation" class="block font-bold text-[#1D1D1F] mb-2 text-sm">
                         Confirm New Permanent Password <span class="text-[#780000]">*</span>
                     </label>
                     <input type="password" 

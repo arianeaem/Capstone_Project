@@ -41,7 +41,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Start Date (Day 1) <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Start Date (Day 1) <span class="text-[#780000]">*</span></label>
                     <input type="date" 
                            name="start_date" 
                            value="{{ old('start_date', $booking->start_date->format('Y-m-d')) }}" 
@@ -50,7 +50,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">End Date (Day 2) <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">End Date (Day 2) <span class="text-[#780000]">*</span></label>
                     <input type="date" 
                            name="end_date" 
                            value="{{ old('end_date', $booking->end_date->format('Y-m-d')) }}" 
@@ -63,7 +63,7 @@
             <div class="pt-2">
                 @if($booking->pickup_option === 'carpool')
                     <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-1">Carpool Pickup Location & Schedule</label>
+                        <label class="block font-bold text-[#1D1D1F] mb-2">Carpool Pickup Location & Schedule</label>
                         <select name="pickup_location" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                             @foreach($pickupPoints as $pt)
                                 <option value="{{ $pt['name'] }}" {{ $booking->pickup_location === $pt['name'] ? 'selected' : '' }}>
@@ -96,7 +96,7 @@
                     <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants ({{ $booking->participants->count() }} pax)</h3>
                     <p class="text-xs text-[#6E6E73]">Update participant medical and roster information for this reservation.</p>
                 </div>
-                <span class="text-xs text-[#6E6E73] font-semibold bg-[#F2F2F7] px-2.5 py-1 rounded-full">Fixed Participant Count</span>
+                <span class="text-xs text-[#6E6E73] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded">Fixed Participant Count</span>
             </div>
 
             <div class="space-y-4">

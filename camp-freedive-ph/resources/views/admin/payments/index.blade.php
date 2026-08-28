@@ -149,7 +149,7 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Payment Status</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Payment Status</label>
                                     <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="">All Statuses</option>
                                         <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
@@ -162,7 +162,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Payment Method</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Payment Method</label>
                                     <select name="method" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="">All Methods</option>
                                         <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
@@ -172,7 +172,7 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <div class="flex items-center justify-between pt-2">
                                     <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                     <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                                 </div>

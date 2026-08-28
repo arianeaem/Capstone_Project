@@ -19,8 +19,7 @@
                 <a href="{{ route('admin.bookings.index', ['batch_status' => 'unassigned']) }}" 
                    class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-xs font-bold text-[#92400E] hover:bg-[#FEF3C7] transition-all shadow-2xs">
                     <span class="w-2 h-2 rounded-full bg-[#D97706] animate-pulse"></span>
-                    <span>{{ $unbatchedCount }} Confirmed Booking(s) Have No Batch Assigned ({{ $unbatchedPaxCount }} pax)</span>
-                    <span class="text-[#B45309]">→</span>
+                    <span>{{ $unbatchedCount }} Confirmed Booking(s) Have No Batch Assigned</span>
                 </a>
             @endif
 
@@ -111,7 +110,7 @@
                             @endif
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] mb-1">Staffing Status</label>
+                                <label class="block font-bold text-[#1D1D1F] mb-2">Staffing Status</label>
                                 <select name="staffing" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                     <option value="">All Staffing</option>
                                     <option value="staffed" {{ request('staffing') === 'staffed' ? 'selected' : '' }}>Coaches Assigned</option>
@@ -119,7 +118,7 @@
                                 </select>
                             </div>
 
-                            <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                            <div class="flex items-center justify-between pt-2">
                                 <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                 <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                             </div>
@@ -139,7 +138,7 @@
     </div>
 
     <!-- Batches Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         @forelse($batches as $batch)
         <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 hover:border-[#008E98]/40 transition-all flex flex-col justify-between space-y-4 {{ $batch->needs_attention ? 'border-[#FDE68A] bg-[#FFFDF7]' : '' }}">
             
@@ -201,7 +200,6 @@
                 <a href="{{ route('admin.batches.show', $batch) }}" 
                    class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-center flex items-center justify-center gap-1.5 whitespace-nowrap btn-secondary hover:bg-[#F2F2F7] transition-all">
                     <span>View Batch</span>
-                    <span>→</span>
                 </a>
             </div>
 

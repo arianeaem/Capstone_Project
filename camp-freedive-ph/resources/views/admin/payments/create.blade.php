@@ -26,7 +26,7 @@
 
             <!-- Target Booking -->
             <div>
-                <label for="booking_id" class="block font-bold text-[#1D1D1F] mb-1">
+                <label for="booking_id" class="block font-bold text-[#1D1D1F] mb-2">
                     Select Dive Reservation <span class="text-[#780000]">*</span>
                 </label>
                 <select name="booking_id" id="booking_id" x-model="selectedBookingId" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -45,7 +45,7 @@
             <!-- Amount & Stage -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div>
-                    <label for="amount" class="block font-bold text-[#1D1D1F] mb-1">
+                    <label for="amount" class="block font-bold text-[#1D1D1F] mb-2">
                         Amount Received (PHP) <span class="text-[#780000]">*</span>
                     </label>
                     <input type="number" 
@@ -60,7 +60,7 @@
                 </div>
 
                 <div>
-                    <label for="payment_type" class="block font-bold text-[#1D1D1F] mb-1">
+                    <label for="payment_type" class="block font-bold text-[#1D1D1F] mb-2">
                         Payment Stage <span class="text-[#780000]">*</span>
                     </label>
                     <select name="payment_type" id="payment_type" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -74,7 +74,7 @@
             <!-- Payment Method & Reference -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                 <div>
-                    <label for="payment_method" class="block font-bold text-[#1D1D1F] mb-1">
+                    <label for="payment_method" class="block font-bold text-[#1D1D1F] mb-2">
                         Payment Channel / Mode <span class="text-[#780000]">*</span>
                     </label>
                     <select name="payment_method" id="payment_method" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -87,7 +87,7 @@
                 </div>
 
                 <div>
-                    <label for="transaction_id" class="block font-bold text-[#1D1D1F] mb-1">
+                    <label for="transaction_id" class="block font-bold text-[#1D1D1F] mb-2">
                         Reference Number (Optional)
                     </label>
                     <input type="text" 
@@ -100,7 +100,7 @@
 
             <!-- Staff Notes -->
             <div class="pt-1">
-                <label for="notes" class="block font-bold text-[#1D1D1F] mb-1">
+                <label for="notes" class="block font-bold text-[#1D1D1F] mb-2">
                     Staff Notes / Explanation
                 </label>
                 <textarea name="notes" id="notes" rows="2" placeholder="e.g. Remaining balance collected during gear fitting" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>

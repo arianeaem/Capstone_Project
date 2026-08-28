@@ -126,24 +126,24 @@
                 @csrf
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Batch Code (Optional)</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Batch Code (Optional)</label>
                     <input type="text" name="batch_code" placeholder="e.g. BATCH-2026-SEP05" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-1">Start Date (Day 1) <span class="text-[#780000]">*</span></label>
+                        <label class="block font-bold text-[#1D1D1F] mb-2">Start Date (Day 1) <span class="text-[#780000]">*</span></label>
                         <input type="date" name="start_date" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                     </div>
 
                     <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-1">End Date (Day 2) <span class="text-[#780000]">*</span></label>
+                        <label class="block font-bold text-[#1D1D1F] mb-2">End Date (Day 2) <span class="text-[#780000]">*</span></label>
                         <input type="date" name="end_date" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Notes / Destination</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Notes / Destination</label>
                     <textarea name="notes" rows="2" placeholder="e.g. Open for Discovery & Practice Dive students" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
@@ -169,7 +169,7 @@
                 @csrf
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Select Active Coach <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Select Active Coach <span class="text-[#780000]">*</span></label>
                     <select name="coach_id" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                         <option value="">-- Choose Certified Coach --</option>
                         @foreach($activeCoaches as $c)

@@ -61,7 +61,7 @@
             </div>
 
             <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                <span class="text-xs text-[#6E6E73] block mb-1">Trip Dates (2D1N):</span>
+                <span class="text-xs text-[#6E6E73] block mb-1">Trip Dates:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</strong>
                 <span class="text-xs text-[#780000] font-semibold">
                     @if($policy['days_until_dive'] > 0)
@@ -304,7 +304,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-1">New Start Date <span class="text-[#780000]">*</span></label>
+                        <label class="block font-bold text-[#1D1D1F] mb-2">New Start Date <span class="text-[#780000]">*</span></label>
                         <input type="date" 
                                name="requested_start_date" 
                                x-model="rescheduleStartDate" 
@@ -335,7 +335,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Reason for Rescheduling (Optional)</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Reason for Rescheduling (Optional)</label>
                     <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
@@ -390,7 +390,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Reason for Cancellation</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Reason for Cancellation</label>
                     <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 

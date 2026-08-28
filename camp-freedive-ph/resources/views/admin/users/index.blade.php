@@ -18,7 +18,7 @@
             <button type="button" 
                     @click="openAddModal = true"
                     class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <img src="{{ asset('icons/icons8-plus-math-60.png') }}" class="w-5 h-5 shrink-0" alt="ProvisionNewAccount">
                 <span>Provision New Account</span>
             </button>
         </div>
@@ -136,7 +136,7 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Account Status</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Account Status</label>
                                     <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="">All Statuses</option>
                                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
@@ -144,7 +144,7 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <div class="flex items-center justify-between pt-2">
                                     <a href="{{ route('admin.users.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                     <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                                 </div>
@@ -279,22 +279,22 @@
                 @csrf
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Full Name <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Full Name <span class="text-[#780000]">*</span></label>
                     <input type="text" name="name" required placeholder="e.g. Maria Santos" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Email Address (Login Username) <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Email Address (Login Username) <span class="text-[#780000]">*</span></label>
                     <input type="email" name="email" required placeholder="name@campfreedive.ph" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Mobile Phone Number</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Mobile Phone Number</label>
                     <input type="text" name="phone" placeholder="0917 123 4567" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Assigned Staff Role <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Assigned Staff Role <span class="text-[#780000]">*</span></label>
                     <select name="role" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                         <option value="coach" selected>Freediving Coach (Instructor Portal Access)</option>
                         @if($currentUser->isOwner())
@@ -304,7 +304,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Temporary Initial Password (Optional)</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Temporary Initial Password (Optional)</label>
                     <input type="text" name="temp_password" placeholder="Leave blank to auto-generate secure password" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                     <span class="text-[11px] text-[#6E6E73] mt-1 block">Staff member will be prompted to change password on first login.</span>
                 </div>

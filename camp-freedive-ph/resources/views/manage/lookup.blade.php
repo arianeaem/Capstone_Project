@@ -20,7 +20,7 @@
             @csrf
 
             <div>
-                <label for="booking_number" class="block font-bold text-[#1D1D1F] mb-1.5">
+                <label for="booking_number" class="block font-bold text-[#1D1D1F] mb-2.5">
                     Booking Number <span class="text-[#780000]">*</span>
                 </label>
                 <input type="text" 
@@ -33,7 +33,7 @@
             </div>
 
             <div>
-                <label for="pin" class="block font-bold text-[#1D1D1F] mb-1.5">
+                <label for="pin" class="block font-bold text-[#1D1D1F] mb-2.5">
                     4-Digit PIN <span class="text-[#780000]">*</span>
                 </label>
                 <input type="password" 

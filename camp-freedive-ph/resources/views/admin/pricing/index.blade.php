@@ -114,7 +114,7 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Status</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Status</label>
                                     <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="all" {{ request('status') === 'all' || !request('status') ? 'selected' : '' }}>All Statuses</option>
                                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only</option>
@@ -123,7 +123,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Applies To</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Applies To</label>
                                     <select name="applies_to" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="all" {{ request('applies_to') === 'all' || !request('applies_to') ? 'selected' : '' }}>All Classes</option>
                                         <option value="discovery" {{ request('applies_to') === 'discovery' ? 'selected' : '' }}>Discovery Class</option>
@@ -133,7 +133,7 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-1">Sort Order</label>
+                                    <label class="block font-bold text-[#1D1D1F] mb-2">Sort Order</label>
                                     <select name="sort" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                         <option value="priority" {{ request('sort', 'priority') === 'priority' ? 'selected' : '' }}>By Priority (Execution Order)</option>
                                         <option value="triggered" {{ request('sort') === 'triggered' ? 'selected' : '' }}>Most Triggered Bookings</option>
@@ -141,7 +141,7 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                                <div class="flex items-center justify-between pt-2">
                                     <a href="{{ route('admin.pricing.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                     <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                                 </div>
@@ -233,7 +233,7 @@
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" 
-                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold cursor-pointer transition-all {{ $rule->status === 'active' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold cursor-pointer transition-all {{ $rule->status === 'active' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
                                     <span class="w-1.5 h-1.5 rounded-full {{ $rule->status === 'active' ? 'bg-emerald-600' : 'bg-gray-400' }}"></span>
                                     <span>{{ ucfirst($rule->status) }}</span>
                                 </button>

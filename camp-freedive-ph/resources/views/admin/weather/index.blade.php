@@ -31,7 +31,7 @@
     @if(isset($masterForecast['daily_summaries']) && !empty($masterForecast['daily_summaries']))
     <div class="space-y-2">
         <div class="flex items-center justify-between">
-            <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73]">16-Day Whole-Day Horizon</h3>
+            <h3 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73]">aalisin ko rin for checking lang</h3>
             <span class="text-[11px] text-[#8E8E93]">Scroll horizontally →</span>
         </div>
 
@@ -135,7 +135,7 @@
                             <input type="hidden" name="risk" value="{{ request('risk') }}">
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] mb-1">Batch Status</label>
+                                <label class="block font-bold text-[#1D1D1F] mb-2">Batch Status</label>
                                 <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                                     <option value="">All Statuses</option>
                                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
@@ -146,11 +146,11 @@
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] mb-1">Dive Date From</label>
+                                <label class="block font-bold text-[#1D1D1F] mb-2">Dive Date From</label>
                                 <input type="date" name="date_from" onchange="this.form.submit()" value="{{ request('date_from') }}" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                             </div>
 
-                            <div class="flex items-center justify-between pt-2 border-t border-[#E5E5EA]">
+                            <div class="flex items-center justify-between pt-2">
                                 <a href="{{ route('admin.weather.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
                                 <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
                             </div>

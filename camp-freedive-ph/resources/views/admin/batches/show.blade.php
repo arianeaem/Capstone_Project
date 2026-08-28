@@ -349,7 +349,7 @@
                 <input type="hidden" name="status" value="cancelled_by_camp">
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">
+                    <label class="block font-bold text-[#1D1D1F] mb-2">
                         Camp Advisory / Cancellation Reason <span class="text-[#780000]">*</span>
                     </label>
                     <textarea name="note" required rows="3" placeholder="e.g. Typhoon storm signal #2 in Batangas / Severe localized marine surge" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
@@ -380,7 +380,7 @@
                 <input type="hidden" name="status" value="rescheduled">
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">
+                    <label class="block font-bold text-[#1D1D1F] mb-2">
                         Reschedule Explanation / Instructions <span class="text-[#780000]">*</span>
                     </label>
                     <textarea name="note" required rows="3" placeholder="e.g. Venue maintenance on resort / Weather shift. Please choose a new weekend." class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
@@ -411,7 +411,7 @@
                 <input type="hidden" name="booking_id" :value="selectedBookingId">
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Target Batch</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Target Batch</label>
                     <select name="target_batch_id" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                         <option value="">-- Remove from Batch (Unbatch) --</option>
                         @foreach($otherBatches as $ob)
@@ -423,7 +423,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Reason / Note</label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Reason / Note</label>
                     <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 

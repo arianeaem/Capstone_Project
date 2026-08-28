@@ -204,7 +204,7 @@
                 <input type="hidden" name="participant_id" :value="selectedParticipantId">
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Select New Coach <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Select New Coach <span class="text-[#780000]">*</span></label>
                     <select name="new_coach_id" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                         <option value="">-- Choose Active Coach --</option>
                         @foreach($otherCoaches as $c)
@@ -214,7 +214,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">Reassignment Reason <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-2">Reassignment Reason <span class="text-[#780000]">*</span></label>
                     <textarea name="reason" required rows="3" placeholder="e.g. Original coach reported sick / Schedule balance adjustment" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 

@@ -540,7 +540,7 @@
 
                 <!-- TCWS Signal -->
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">
+                    <label class="block font-bold text-[#1D1D1F] mb-2">
                         Tropical Cyclone Wind Signal (TCWS)
                     </label>
                     <select name="tcws_signal" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
@@ -555,7 +555,7 @@
 
                 <!-- Boolean Advisory Checkboxes -->
                 <div class="space-y-2 bg-[#FAFAFC] p-3.5 rounded-xl border border-[#E5E5EA]">
-                    <span class="block font-bold text-[#1D1D1F] mb-1 text-xs uppercase tracking-wider">Active Severe Marine Advisories</span>
+                    <span class="block font-bold text-[#1D1D1F] mb-2 text-xs uppercase tracking-wider">Active Severe Marine Advisories</span>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="gale_warning" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
@@ -580,7 +580,7 @@
 
                 <!-- Reason / Description -->
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">
+                    <label class="block font-bold text-[#1D1D1F] mb-2">
                         Advisory Details / Source <span class="text-[#780000]">*</span>
                     </label>
                     <textarea name="reason" required rows="2" placeholder="e.g. PAGASA Severe Weather Bulletin #4 - Gale Warning in Southern Luzon coasts" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
@@ -626,7 +626,7 @@
                 @csrf
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1">
+                    <label class="block font-bold text-[#1D1D1F] mb-2">
                         Cancellation Reasons / Marine Hazard Drivers <span class="text-[#780000]">*</span>
                     </label>
                     <input type="text" 

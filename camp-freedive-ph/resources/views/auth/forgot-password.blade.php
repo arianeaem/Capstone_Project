@@ -30,7 +30,7 @@
 
                 <!-- Email Input -->
                 <div>
-                    <label for="email" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                    <label for="email" class="block font-bold text-[#1D1D1F] mb-2.5 text-sm">
                         Registered Staff Email <span class="text-[#780000]">*</span>
                     </label>
                     <input type="email" 

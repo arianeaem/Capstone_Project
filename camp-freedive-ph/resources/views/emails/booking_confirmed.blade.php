@@ -46,7 +46,7 @@
                     <td><strong>{{ $booking->formatted_class_type }}</strong></td>
                 </tr>
                 <tr>
-                    <th>Trip Dates (2D1N)</th>
+                    <th>Trip Dates</th>
                     <td>{{ $booking->start_date->format('F d, Y (l)') }} - {{ $booking->end_date->format('F d, Y (l)') }}</td>
                 </tr>
                 <tr>
