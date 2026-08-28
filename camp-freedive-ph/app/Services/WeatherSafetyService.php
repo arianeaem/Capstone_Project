@@ -19,13 +19,15 @@ class WeatherSafetyService
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
 
-        $daysOut = (int) Carbon::now(WeatherForecastService::TIMEZONE)->diffInDays($start->copy()->startOfDay(), false);
+        $today = Carbon::today(WeatherForecastService::TIMEZONE);
+        $daysOut = (int) $today->diffInDays($start->copy()->startOfDay(), false);
 
         if ($daysOut >= 0 && $daysOut <= WeatherForecastService::MAX_FORECAST_DAYS) {
             $assessment = $this->forecastService->previewDateAssessment($start);
-            $overallClass = $assessment['overall_classification'] ?? 'Safe';
-            $day1 = $assessment['day1'] ?? [];
-            $day2 = $assessment['day2'] ?? [];
+            if (!empty($assessment['available'])) {
+                $overallClass = $assessment['overall_classification'] ?? 'Safe';
+                $day1 = $assessment['day1'] ?? [];
+                $day2 = $assessment['day2'] ?? [];
 
             $riskLevel = match ($overallClass) {
                 'Very Safe' => 'very_safe',
@@ -83,6 +85,7 @@ class WeatherSafetyService
                 'suggested_dates' => $suggestedDates,
                 'location' => 'Mabini / Anilao, Batangas',
             ];
+            }
         }
 
         // For dates beyond 16 days or advance bookings:

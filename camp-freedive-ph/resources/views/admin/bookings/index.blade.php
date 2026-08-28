@@ -20,7 +20,6 @@
 
         <div class="flex items-center gap-3">
             <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#FF8D28]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <span>Pending Requests</span>
                 @if($pendingRequestsCount > 0)
                     <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FF3B3C] text-white">

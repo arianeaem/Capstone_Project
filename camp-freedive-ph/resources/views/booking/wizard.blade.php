@@ -171,7 +171,7 @@
             <div class="border-b border-[#E5E5EA] pb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your 2D1N Dive Dates</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Dive Dates</h2>
                         <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select your preferred weekend or trip dates for your Batangas freediving experience.</p>
                     </div>
 
@@ -343,24 +343,6 @@
                             </div>
                         </template>
 
-                        <!-- Critical Risk Alternate Dates -->
-                        <template x-if="!forecast.is_bookable">
-                            <div class="mt-3 p-4 rounded-xl bg-white text-[#991B1B] border border-[#FECACA] space-y-2">
-                                <h5 class="font-bold uppercase text-xs">
-                                    Suggested Safer Alternate Dates:
-                                </h5>
-                                <p class="text-xs text-[#6E6E73]">Please select one of our verified safe dates below to proceed:</p>
-                                <div class="flex flex-wrap gap-2">
-                                    <template x-for="sug in forecast.suggested_dates" :key="sug.start_date">
-                                        <button type="button" 
-                                                @click="form.start_date = sug.start_date; onStartDateChange()"
-                                                class="px-3.5 py-2 rounded-lg bg-[#ECFDF5] text-[#065F46] border border-[#A7F3D0] hover:bg-[#D1FAE5] text-xs font-bold transition-colors">
-                                            <span x-text="sug.label"></span>
-                                        </button>
-                                    </template>
-                                </div>
-                            </div>
-                        </template>
                     </div>
                 </template>
             </div>
@@ -1434,7 +1416,7 @@ function bookingWizard(config) {
                     return;
                 }
                 if (this.forecast && !this.forecast.is_bookable) {
-                    this.errorMessage = "The selected dive date has a Marine Storm Warning (Critical Risk). Please choose an alternate safe date.";
+                    this.errorMessage = "The selected dive date has a Critical Risk. Please choose an alternate safe date.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }

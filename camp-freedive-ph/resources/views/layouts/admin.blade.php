@@ -128,7 +128,7 @@
             <div class="p-4 border-t border-[#E5E5EA] space-y-2 bg-white">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-[#FF3B3C] bg-[#FECACA] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-colors">
+                    <button type="submit" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 text-xs font-bold text-[#FF3B3C] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-colors">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                         <span>Sign Out</span>
                     </button>

@@ -76,7 +76,7 @@ class WeatherSafetyController extends Controller
     {
         try {
             $result = $this->forecastService->updateAllForecasts(16);
-            return back()->with('success', "✓ Successfully synced 24-hour continuous weather & marine forecast cache for the next {$result['days_cached']} days from Open-Meteo.");
+            return back()->with('success', "Successfully synced 24-hour continuous weather & marine forecast cache for the next {$result['days_cached']} days from Open-Meteo.");
         } catch (Exception $e) {
             return back()->with('error', "Forecast cache sync failed: " . $e->getMessage());
         }

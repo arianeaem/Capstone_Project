@@ -28,17 +28,18 @@ class WeatherForecastService
     public const TIMEZONE = 'Asia/Manila';
     public const MAX_FORECAST_DAYS = 16;
 
-    // Weight table from weather_risk_assessment.ipynb
+    // Weight table incorporating direct wind speed and compound synergies
     public const WEIGHTS = [
-        'wave_height' => 0.160,
-        'wave_period' => 0.138,
-        'swell_height' => 0.138,
-        'ocean_current' => 0.138,
-        'wind_wave_height' => 0.128,
-        'rain' => 0.085,
-        'sea_level_pressure' => 0.085,
-        'tide_height' => 0.085,
-        'wind_direction' => 0.043,
+        'wave_height' => 0.150,
+        'wind_speed' => 0.140,
+        'ocean_current' => 0.130,
+        'swell_height' => 0.120,
+        'wave_period' => 0.110,
+        'wind_wave_height' => 0.100,
+        'rain' => 0.080,
+        'sea_level_pressure' => 0.070,
+        'tide_height' => 0.050,
+        'wind_direction' => 0.050,
     ];
 
     public const MEANING_MAP = [
@@ -185,6 +186,24 @@ class WeatherForecastService
             $worstHour = $amData['worst_hour'];
         }
 
+        // Incorporate 24-Hour Day Peak if worse than window assessments
+        $cachedDay = $this->getCachedDayForecast($date->format('Y-m-d'));
+        if ($cachedDay && !$overrideTriggered) {
+            $cachedRank = self::RISK_RANK[$cachedDay['overall_classification']] ?? 1;
+            $currentRank = self::RISK_RANK[$dayClassification] ?? 1;
+            if ($cachedRank > $currentRank) {
+                $dayClassification = $cachedDay['overall_classification'];
+                $weightedScorePct = $cachedDay['overall_score_pct'];
+                foreach ($cachedDay['hourly'] as $h) {
+                    if (($h['weighted_score_pct'] ?? 0) >= $weightedScorePct) {
+                        $worstHour = $h['iso_time'];
+                        $worstWindow = sprintf('%02d:00', $h['hour']);
+                        break;
+                    }
+                }
+            }
+        }
+
         $recommendedAction = self::MEANING_MAP[$dayClassification] ?? 'Proceed with caution.';
 
         // Persist BatchRiskAssessment
@@ -243,20 +262,96 @@ class WeatherForecastService
     public function previewDateAssessment(Carbon $startDate): array
     {
         $endDate = $startDate->copy()->addDay();
+        $today = Carbon::today(self::TIMEZONE);
+        $daysOut = $today->diffInDays($startDate->copy()->startOfDay(), false);
 
-        $daysOut = Carbon::now(self::TIMEZONE)->diffInDays($startDate->copy()->startOfDay(), false);
         if ($daysOut > self::MAX_FORECAST_DAYS || $daysOut < 0) {
             return [
                 'available' => false,
                 'message' => $daysOut > self::MAX_FORECAST_DAYS
-                    ? "Assessment Not Available. Open-Meteo forecast models are available up to 16 days in advance (currently available through " . Carbon::now(self::TIMEZONE)->addDays(16)->format('M d, Y') . ")."
+                    ? "Assessment Not Available. Open-Meteo forecast models are available up to 16 days in advance (currently available through " . $today->copy()->addDays(16)->format('M d, Y') . ")."
                     : "Selected date is in the past.",
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date' => $endDate->format('Y-m-d'),
             ];
         }
 
-        // Evaluate Day 1 & Day 2 in-memory
+        // Check if day 1 and day 2 are in the unified cache
+        $d1Key = $startDate->format('Y-m-d');
+        $d2Key = $endDate->format('Y-m-d');
+
+        $d1Cache = $this->getCachedDayForecast($d1Key);
+        $d2Cache = $this->getCachedDayForecast($d2Key);
+
+        if (!$d1Cache || !$d2Cache) {
+            try {
+                $this->updateAllForecasts(16);
+                $d1Cache = $this->getCachedDayForecast($d1Key);
+                $d2Cache = $this->getCachedDayForecast($d2Key);
+            } catch (\Throwable $e) {
+                // Ignore failure and fallback to live window calculation
+            }
+        }
+
+        if ($d1Cache && $d2Cache) {
+            // Day 1 & Day 2 Full 24-Hour Day Peak Classifications
+            $day1Class = $d1Cache['overall_classification'] ?? 'Safe';
+            $day2Class = $d2Cache['overall_classification'] ?? 'Safe';
+
+            // Trip Overall (worse of Day 1 and Day 2 24-hour peaks)
+            $worseRank = max(self::RISK_RANK[$day1Class] ?? 1, self::RISK_RANK[$day2Class] ?? 1);
+            $overallClass = array_search($worseRank, self::RISK_RANK) ?: 'Safe';
+
+            // Worst hour across the whole day for Day 1
+            $d1WorstHour = null;
+            $d1MaxScore = -1;
+            foreach ($d1Cache['hourly'] ?? [] as $h) {
+                if (($h['weighted_score_pct'] ?? 0) > $d1MaxScore) {
+                    $d1MaxScore = $h['weighted_score_pct'];
+                    $d1WorstHour = $h['iso_time'] ?? null;
+                }
+            }
+
+            // Worst hour across the whole day for Day 2
+            $d2WorstHour = null;
+            $d2MaxScore = -1;
+            foreach ($d2Cache['hourly'] ?? [] as $h) {
+                if (($h['weighted_score_pct'] ?? 0) > $d2MaxScore) {
+                    $d2MaxScore = $h['weighted_score_pct'];
+                    $d2WorstHour = $h['iso_time'] ?? null;
+                }
+            }
+
+            return [
+                'available' => true,
+                'start_date' => $startDate->format('Y-m-d'),
+                'start_date_formatted' => $startDate->format('M d, Y (l)'),
+                'end_date' => $endDate->format('Y-m-d'),
+                'end_date_formatted' => $endDate->format('M d, Y (l)'),
+                'overall_classification' => $overallClass,
+                'data_source' => 'Live Open-Meteo Marine & Weather Radar (Anilao, Batangas)',
+                'day1' => [
+                    'date' => $startDate->format('M d, Y'),
+                    'classification' => $day1Class,
+                    'recommended_action' => self::MEANING_MAP[$day1Class] ?? 'Proceed with caution.',
+                    'worst_hour' => $d1WorstHour ? Carbon::parse($d1WorstHour)->format('g:i A') : '11:00 AM',
+                    'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->copy()->setTime(9, 30), false)) . ' hours',
+                ],
+                'day2' => [
+                    'date' => $endDate->format('M d, Y'),
+                    'classification' => $day2Class,
+                    'recommended_action' => self::MEANING_MAP[$day2Class] ?? 'Proceed with caution.',
+                    'worst_hour' => $d2WorstHour ? Carbon::parse($d2WorstHour)->format('g:i A') : '11:00 AM',
+                    'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->copy()->setTime(9, 30), false)) . ' hours',
+                ],
+                'advisory_notes' => [
+                    'Forecast models are updated hourly as the scheduled trip approaches.',
+                    'Final go/no-go departure decision is subject to Camp FreedivePH operator confirmation.',
+                ],
+            ];
+        }
+
+        // Fallback to Window Evaluation
         $day1AM = $this->assessWindow($startDate->format('Y-m-d'), '09:30', '12:00', 'am');
         $day1PM = $this->assessWindow($startDate->format('Y-m-d'), '15:30', '17:30', 'pm');
         $day1Class = (self::RISK_RANK[$day1PM['classification']] ?? 1) > (self::RISK_RANK[$day1AM['classification']] ?? 1)
@@ -293,14 +388,14 @@ class WeatherForecastService
                 'classification' => $day1Class,
                 'recommended_action' => self::MEANING_MAP[$day1Class] ?? 'Proceed with caution.',
                 'worst_hour' => $worstHourD1 ? Carbon::parse($worstHourD1)->format('g:i A') : '11:00 AM',
-                'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->setTime(9, 30), false)) . ' hours',
+                'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->copy()->setTime(9, 30), false)) . ' hours',
             ],
             'day2' => [
                 'date' => $endDate->format('M d, Y'),
                 'classification' => $day2Class,
                 'recommended_action' => self::MEANING_MAP[$day2Class] ?? 'Proceed with caution.',
                 'worst_hour' => $worstHourD2 ? Carbon::parse($worstHourD2)->format('g:i A') : '11:00 AM',
-                'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->setTime(9, 30), false)) . ' hours',
+                'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->copy()->setTime(9, 30), false)) . ' hours',
             ],
             'advisory_notes' => [
                 'Forecast models are updated hourly as the scheduled trip approaches.',
@@ -514,17 +609,34 @@ class WeatherForecastService
             $rawCurrent = isset($marineData['ocean_current_velocity'][$idx]) ? (float)$marineData['ocean_current_velocity'][$idx] : 1.1;
             $oceanCurrent = round($rawCurrent * 0.27778, 2);
 
-            $rain = isset($weatherData['rain'][$idx]) ? (float)$weatherData['rain'][$idx] : 0.0;
+            $precip = isset($weatherData['precipitation'][$idx]) ? (float)$weatherData['precipitation'][$idx] : 0.0;
+            $rawRain = isset($weatherData['rain'][$idx]) ? (float)$weatherData['rain'][$idx] : 0.0;
+            $showers = isset($weatherData['showers'][$idx]) ? (float)$weatherData['showers'][$idx] : 0.0;
+            $rain = max($precip, $rawRain, $showers);
+
             $pressure = isset($weatherData['pressure_msl'][$idx]) ? (float)$weatherData['pressure_msl'][$idx] : 1010.5;
-            $windSpeed = isset($weatherData['wind_speed_10m'][$idx]) ? (float)$weatherData['wind_speed_10m'][$idx] : 12.5;
+            $rawWindSpeed = isset($weatherData['wind_speed_10m'][$idx]) ? (float)$weatherData['wind_speed_10m'][$idx] : 12.5;
+            $windGusts = isset($weatherData['wind_gusts_10m'][$idx]) ? (float)$weatherData['wind_gusts_10m'][$idx] : 0.0;
+            $windSpeed = max($rawWindSpeed, $windGusts * 0.75);
+
             $windDir = isset($weatherData['wind_direction_10m'][$idx]) ? (float)$weatherData['wind_direction_10m'][$idx] : 245.0;
+
+            // Deterministic Physical Hard-Gates (PCG Small Craft / Marine Ceilings)
+            $isPhysicalBreach = (
+                $rawWindSpeed >= 38.0 || $windGusts >= 48.0 ||
+                $waveHeight >= 1.80 || $swellHeight >= 1.80 ||
+                $oceanCurrent >= 0.80 ||
+                $rain >= 25.0 ||
+                $pressure <= 998.0
+            );
 
             // Score variables (0-4)
             $scores = [
                 'wave_height' => $this->scoreWaveHeight($waveHeight),
-                'wave_period' => $this->scoreWavePeriod($wavePeriod),
-                'swell_height' => $this->scoreWaveHeight($swellHeight),
+                'wind_speed' => $this->scoreWindSpeed($rawWindSpeed, $windGusts),
                 'ocean_current' => $this->scoreOceanCurrent($oceanCurrent),
+                'swell_height' => $this->scoreSwellHeight($swellHeight),
+                'wave_period' => $this->scoreWavePeriod($wavePeriod),
                 'wind_wave_height' => $this->scoreWindWaveHeight($windWaveHeight),
                 'rain' => $this->scoreRain($rain),
                 'sea_level_pressure' => $this->scoreSeaLevelPressure($pressure),
@@ -532,8 +644,8 @@ class WeatherForecastService
                 'wind_direction' => $this->scoreWindDirection($windDir),
             ];
 
-            $weightedScorePct = $this->computeWeightedScore($scores);
-            $hourClass = $overrideTriggered ? 'Critical Risk' : $this->classifyScore($weightedScorePct);
+            $weightedScorePct = $isPhysicalBreach ? 100.0 : $this->computeWeightedScore($scores);
+            $hourClass = ($overrideTriggered || $isPhysicalBreach) ? 'Critical Risk' : $this->classifyScore($weightedScorePct);
 
             if ($weightedScorePct > $maxScore) {
                 $maxScore = $weightedScorePct;
@@ -649,7 +761,7 @@ class WeatherForecastService
             'timezone' => self::TIMEZONE,
             'start_date' => $startDateStr,
             'end_date' => $endDateStr,
-            'hourly' => 'rain,pressure_msl,wind_speed_10m,wind_direction_10m',
+            'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
         ]);
         $weatherHourly = $weatherRes->successful() ? ($weatherRes->json()['hourly'] ?? []) : [];
 
@@ -705,9 +817,15 @@ class WeatherForecastService
 
             // Populate weather array
             $dayBuckets[$dateKey]['weather']['time'][] = $isoTime;
-            $rainVal = (float) ($weatherHourly['rain'][$index] ?? 0.0);
+            $precipVal = (float) ($weatherHourly['precipitation'][$index] ?? 0.0);
+            $rawRainVal = (float) ($weatherHourly['rain'][$index] ?? 0.0);
+            $showersVal = (float) ($weatherHourly['showers'][$index] ?? 0.0);
+            $rainVal = max($precipVal, $rawRainVal, $showersVal);
+
             $pressVal = (float) ($weatherHourly['pressure_msl'][$index] ?? 1010.5);
-            $windSpd = (float) ($weatherHourly['wind_speed_10m'][$index] ?? 12.0);
+            $rawWindSpd = (float) ($weatherHourly['wind_speed_10m'][$index] ?? 12.0);
+            $windGustsVal = (float) ($weatherHourly['wind_gusts_10m'][$index] ?? 0.0);
+            $windSpd = max($rawWindSpd, $windGustsVal * 0.75);
             $windDir = (float) ($weatherHourly['wind_direction_10m'][$index] ?? 245.0);
 
             $dayBuckets[$dateKey]['weather']['rain'][] = $rainVal;
@@ -717,11 +835,22 @@ class WeatherForecastService
 
             // Calculate hour safety score (0-100%)
             $oceanCurrent = round($rawCurrent * 0.27778, 2);
+
+            // Deterministic Physical Hard-Gates (PCG Small Craft / Marine Ceilings)
+            $isPhysicalBreach = (
+                $rawWindSpd >= 38.0 || $windGustsVal >= 48.0 ||
+                $wHeight >= 1.80 || $sHeight >= 1.80 ||
+                $oceanCurrent >= 0.80 ||
+                $rainVal >= 25.0 ||
+                $pressVal <= 998.0
+            );
+
             $scores = [
                 'wave_height' => $this->scoreWaveHeight($wHeight),
-                'wave_period' => $this->scoreWavePeriod($wPeriod),
-                'swell_height' => $this->scoreSwellHeight($sHeight),
+                'wind_speed' => $this->scoreWindSpeed($rawWindSpd, $windGustsVal),
                 'ocean_current' => $this->scoreOceanCurrent($oceanCurrent),
+                'swell_height' => $this->scoreSwellHeight($sHeight),
+                'wave_period' => $this->scoreWavePeriod($wPeriod),
                 'wind_wave_height' => $this->scoreWindWaveHeight($wwHeight),
                 'rain' => $this->scoreRain($rainVal),
                 'sea_level_pressure' => $this->scoreSeaLevelPressure($pressVal),
@@ -729,12 +858,8 @@ class WeatherForecastService
                 'wind_direction' => $this->scoreWindDirection($windDir),
             ];
 
-            $weightedScore = 0.0;
-            foreach ($scores as $var => $score) {
-                $weightedScore += $score * (self::WEIGHTS[$var] ?? 0.0);
-            }
-            $weightedScorePct = round(($weightedScore / 4.0) * 100, 1);
-            $hourClass = $this->classifyScore($weightedScorePct);
+            $weightedScorePct = $isPhysicalBreach ? 100.0 : $this->computeWeightedScore($scores);
+            $hourClass = $isPhysicalBreach ? 'Critical Risk' : $this->classifyScore($weightedScorePct);
 
             $dayBuckets[$dateKey]['hourly_scores'][$hour] = [
                 'hour' => $hour,
@@ -873,7 +998,7 @@ class WeatherForecastService
                 'timezone' => self::TIMEZONE,
                 'start_date' => $date,
                 'end_date' => $date,
-                'hourly' => 'rain,pressure_msl,wind_speed_10m,wind_direction_10m',
+                'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
             ]);
 
             if ($res->successful()) {
@@ -894,10 +1019,10 @@ class WeatherForecastService
 
     protected function scoreWaveHeight(float $v): int
     {
-        if ($v < 0.3) return 0;
-        if ($v < 0.5) return 1;
-        if ($v < 0.8) return 2;
-        if ($v < 1.0) return 3;
+        if ($v < 0.30) return 0;
+        if ($v < 0.50) return 1;
+        if ($v < 0.80) return 2;
+        if ($v < 1.00) return 3;
         return 4;
     }
 
@@ -908,46 +1033,58 @@ class WeatherForecastService
 
     protected function scoreWindWaveHeight(float $v): int
     {
-        if ($v < 0.2) return 0;
-        if ($v < 0.4) return 1;
-        if ($v < 0.6) return 2;
-        if ($v < 0.8) return 3;
+        if ($v < 0.20) return 0;
+        if ($v < 0.40) return 1;
+        if ($v < 0.60) return 2;
+        if ($v < 0.80) return 3;
         return 4;
     }
 
     protected function scoreWavePeriod(float $v): int
     {
-        if ($v > 7) return 0;
-        if ($v > 5) return 1;
-        if ($v > 3) return 2;
-        if ($v > 2) return 3;
+        if ($v > 7.0) return 0;
+        if ($v > 5.0) return 1;
+        if ($v > 3.0) return 2;
+        if ($v > 2.0) return 3;
         return 4;
     }
 
     protected function scoreOceanCurrent(float $v): int
     {
-        if ($v < 0.1) return 0;
-        if ($v < 0.3) return 1;
-        if ($v < 0.5) return 2;
-        if ($v < 0.8) return 3;
+        if ($v < 0.10) return 0;
+        if ($v < 0.30) return 1;
+        if ($v < 0.50) return 2;
+        if ($v < 0.80) return 3;
+        return 4;
+    }
+
+    protected function scoreWindSpeed(float $sustained, float $gusts): int
+    {
+        // Evaluates sustained wind and sudden squall gusts (PCG Small Craft / Banca criteria)
+        if ($sustained < 12.0 && $gusts < 18.0) return 0;
+        if ($sustained < 20.0 && $gusts < 28.0) return 1;
+        if ($sustained < 28.0 && $gusts < 38.0) return 2;
+        if ($sustained < 38.0 && $gusts < 48.0) return 3;
         return 4;
     }
 
     protected function scoreRain(float $v): int
     {
-        if ($v < 1) return 0;
-        if ($v < 5) return 1;
-        if ($v < 15) return 2;
-        if ($v < 30) return 3;
+        // Tightened bounds: 0.2mm captures tropical monsoon mist and convective drizzle
+        if ($v < 0.2) return 0;
+        if ($v < 2.5) return 1;
+        if ($v < 7.5) return 2;
+        if ($v < 20.0) return 3;
         return 4;
     }
 
     protected function scoreSeaLevelPressure(float $v): int
     {
-        if ($v > 1012) return 0;
-        if ($v > 1008) return 1;
-        if ($v > 1004) return 2;
-        if ($v > 1000) return 3;
+        // Fixed boundary inequality logic to eliminate gaps
+        if ($v >= 1012.0) return 0;
+        if ($v >= 1008.0) return 1;
+        if ($v >= 1004.0) return 2;
+        if ($v >= 1000.0) return 3;
         return 4;
     }
 
@@ -961,13 +1098,30 @@ class WeatherForecastService
 
     protected function computeWeightedScore(array $scores): float
     {
-        $maxPossible = 4 * array_sum(self::WEIGHTS);
-        $weightedSum = 0;
+        $maxPossible = 4.0 * array_sum(self::WEIGHTS);
+        $weightedSum = 0.0;
         foreach (self::WEIGHTS as $var => $weight) {
             $weightedSum += ($scores[$var] ?? 0) * $weight;
         }
 
-        return round(($weightedSum / $maxPossible) * 100, 2);
+        $rawScorePct = ($weightedSum / $maxPossible) * 100.0;
+
+        // Compound Risk Synergy: Exponential penalty when multiple hazards co-occur
+        $highRiskFactors = 0;
+        if (($scores['wave_height'] ?? 0) >= 2) $highRiskFactors++;
+        if (($scores['wind_speed'] ?? 0) >= 2) $highRiskFactors++;
+        if (($scores['ocean_current'] ?? 0) >= 2) $highRiskFactors++;
+        if (($scores['wind_direction'] ?? 0) >= 2) $highRiskFactors++;
+        if (($scores['wave_period'] ?? 0) >= 2) $highRiskFactors++;
+
+        $synergyMultiplier = 1.0;
+        if ($highRiskFactors >= 4) {
+            $synergyMultiplier = 1.25; // 25% compound multiplier for multi-hazard conditions
+        } elseif ($highRiskFactors >= 3) {
+            $synergyMultiplier = 1.15; // 15% compound multiplier
+        }
+
+        return min(100.0, round($rawScorePct * $synergyMultiplier, 1));
     }
 
     protected function classifyScore(float $weightedPct): string

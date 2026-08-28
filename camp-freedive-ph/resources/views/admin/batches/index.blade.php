@@ -14,48 +14,23 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-3 flex-wrap">
+            @if(isset($unbatchedCount) && $unbatchedCount > 0)
+                <a href="{{ route('admin.bookings.index', ['batch_status' => 'unassigned']) }}" 
+                   class="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-xs font-bold text-[#92400E] hover:bg-[#FEF3C7] transition-all shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-[#D97706] animate-pulse"></span>
+                    <span>{{ $unbatchedCount }} Confirmed Booking(s) Have No Batch Assigned ({{ $unbatchedPaxCount }} pax)</span>
+                    <span class="text-[#B45309]">→</span>
+                </a>
+            @endif
+
             <a href="{{ route('admin.batches.create') }}" 
-               class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2">
+               class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2 shrink-0">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Add Batch</span>
             </a>
         </div>
     </div>
-
-    <!-- Unassigned Bookings Notification Banner -->
-    @if(isset($unbatchedCount) && $unbatchedCount > 0)
-    <div class="rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div class="flex items-start gap-3.5">
-            <div>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <h3 class="font-extrabold text-[#92400E] text-sm sm:text-base">
-                        {{ $unbatchedCount }} Confirmed Booking(s) Have No Batch Assigned
-                    </h3>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#FDE68A] text-[#78350F]">
-                        {{ $unbatchedPaxCount }} Total Participant(s)
-                    </span>
-                </div>
-                <div class="mt-2.5 flex items-center gap-2 flex-wrap">
-                    @foreach($unbatchedBookings->take(4) as $ub)
-                        <a href="{{ route('admin.bookings.show', $ub) }}" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border border-[#FDE68A] text-xs font-medium text-[#78350F] hover:bg-[#FEF3C7] transition-colors">
-                            <span class="font-mono font-bold text-[#780000]">{{ $ub->booking_number }}</span>
-                            <span>({{ $ub->start_date->format('M d') }} to {{ $ub->end_date->format('M d') }} • {{ $ub->participants->count() }}pax)</span>
-                        </a>
-                    @endforeach
-                    @if($unbatchedCount > 4)
-                        <span class="text-xs text-[#A16207] font-semibold">+{{ $unbatchedCount - 4 }} more</span>
-                    @endif
-                </div>
-            </div>
-        </div>
-        <div class="flex items-center gap-2 shrink-0">
-            <a href="{{ route('admin.bookings.index', ['batch_status' => 'unassigned']) }}" class="btn-secondary px-3.5 py-2 text-xs font-bold whitespace-nowrap">
-                View Unassigned →
-            </a>
-        </div>
-    </div>
-    @endif
 
     <!-- Modern Integrated Toolbar (Status Pill Tabs + Search & Filter Popover) -->
     <div class="bg-white rounded-2xl border border-[#E5E5EA] p-3 sm:p-4 shadow-2xs">
