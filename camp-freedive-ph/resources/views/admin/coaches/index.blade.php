@@ -163,7 +163,7 @@
                                      style="width: {{ min(100, ($loadOnNext / 4) * 100) }}%"></div>
                             </div>
                             @if($loadOnNext > 4)
-                                <span class="text-[11px] font-bold text-[#FF3B3C] block">Override Exception (Over Capacity)</span>
+                                <span class="text-[11px] font-bold text-[#FF3B3C] block">Override Exception</span>
                             @endif
                         </div>
                     @endif
@@ -183,7 +183,7 @@
             </div>
 
             <!-- Card Footer Actions -->
-            <div class="pt-2 border-t border-[#F2F2F7] flex items-center justify-between gap-2">
+            <div class="pt-2 flex items-center justify-between gap-2">
                 <a href="{{ route('admin.coaches.show', $coach) }}" 
                    class="w-full py-2 px-3 rounded-xl font-bold text-xs text-center flex items-center justify-center gap-1.5 whitespace-nowrap btn-secondary hover:bg-[#F2F2F7] transition-all">
                     <span>View Profile</span>

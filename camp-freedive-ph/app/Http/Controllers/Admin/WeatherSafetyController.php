@@ -57,6 +57,14 @@ class WeatherSafetyController extends Controller
         // 24-Hour Master Continuous Cache Info
         $lastUpdatedAt = Cache::get('forecast:last_updated_at');
         $masterForecast = Cache::get('forecast:continuous_16d');
+        if (!$masterForecast) {
+            try {
+                $masterForecast = $this->forecastService->updateAllForecasts(16);
+                $lastUpdatedAt = Cache::get('forecast:last_updated_at');
+            } catch (\Throwable $e) {
+                // Ignore API failure
+            }
+        }
 
         return view('admin.weather.index', compact('batches', 'criticalCount', 'lastUpdatedAt', 'masterForecast'));
     }
@@ -155,6 +163,58 @@ class WeatherSafetyController extends Controller
         $day2Date = $batch->end_date ? $batch->end_date->format('Y-m-d') : $batch->start_date->copy()->addDay()->format('Y-m-d');
         $day1Continuous24h = Cache::get("forecast:date:{$day1Date}");
         $day2Continuous24h = Cache::get("forecast:date:{$day2Date}");
+
+        // Auto-refresh continuous 16-day cache on demand if missing or expired (e.g. IDE/server restarted)
+        if ((!$day1Continuous24h || empty($day1Continuous24h['hourly'])) && Carbon::now()->diffInDays($batch->start_date, false) <= 16) {
+            try {
+                $master = $this->forecastService->updateAllForecasts(16);
+                $day1Continuous24h = $master['daily_summaries'][$day1Date] ?? Cache::get("forecast:date:{$day1Date}");
+                $day2Continuous24h = $master['daily_summaries'][$day2Date] ?? Cache::get("forecast:date:{$day2Date}");
+            } catch (\Throwable $e) {
+                // If Open-Meteo API is temporarily unreachable, gracefully fallback to DB
+            }
+        }
+
+        // Resilient Fallback: If 24h continuous cache is still empty, populate from persisted DB hourly assessments
+        if (empty($day1Continuous24h['hourly']) && $day1Assessment && $day1Assessment->hourlyAssessments->isNotEmpty()) {
+            $day1Continuous24h = [
+                'date' => $day1Date,
+                'hourly' => $day1Assessment->hourlyAssessments->map(fn($h) => [
+                    'hour' => (int) $h->forecast_time->format('H'),
+                    'time' => $h->forecast_time->format('H:i'),
+                    'classification' => $h->classification,
+                    'wave_height' => (float) $h->wave_height,
+                    'wave_period' => (float) $h->wave_period,
+                    'swell_height' => (float) $h->swell_height,
+                    'ocean_current' => (float) $h->ocean_current,
+                    'wind_wave_height' => (float) $h->wind_wave_height,
+                    'rain' => (float) $h->rain,
+                    'sea_level_pressure' => (float) $h->sea_level_pressure,
+                    'wind_speed' => (float) $h->wind_speed,
+                    'wind_direction' => (float) $h->wind_direction,
+                ])->toArray(),
+            ];
+        }
+
+        if (empty($day2Continuous24h['hourly']) && $day2Assessment && $day2Assessment->hourlyAssessments->isNotEmpty()) {
+            $day2Continuous24h = [
+                'date' => $day2Date,
+                'hourly' => $day2Assessment->hourlyAssessments->map(fn($h) => [
+                    'hour' => (int) $h->forecast_time->format('H'),
+                    'time' => $h->forecast_time->format('H:i'),
+                    'classification' => $h->classification,
+                    'wave_height' => (float) $h->wave_height,
+                    'wave_period' => (float) $h->wave_period,
+                    'swell_height' => (float) $h->swell_height,
+                    'ocean_current' => (float) $h->ocean_current,
+                    'wind_wave_height' => (float) $h->wind_wave_height,
+                    'rain' => (float) $h->rain,
+                    'sea_level_pressure' => (float) $h->sea_level_pressure,
+                    'wind_speed' => (float) $h->wind_speed,
+                    'wind_direction' => (float) $h->wind_direction,
+                ])->toArray(),
+            ];
+        }
 
         return view('admin.weather.show', compact(
             'batch',

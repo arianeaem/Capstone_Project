@@ -15,9 +15,6 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <span class="text-xs text-[#6E6E73] bg-[#FAFAFC] px-3 py-1.5 rounded-xl border border-[#E5E5EA]">
-                Timezone: <strong>Asia/Manila</strong>
-            </span>
 
             <!-- Sync Forecast Cache Button -->
             <form action="{{ route('admin.weather.sync_cache') }}" method="POST">
@@ -81,7 +78,6 @@
             
             <!-- Risk Classification -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Risk Level</label>
                 <select name="risk" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Risk Levels</option>
                     <option value="very_safe" {{ request('risk') === 'very_safe' ? 'selected' : '' }}>Very Safe (Calm)</option>
@@ -94,7 +90,6 @@
 
             <!-- Batch Status -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Batch Status</label>
                 <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses</option>
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed (Active)</option>
@@ -106,7 +101,6 @@
 
             <!-- Date From -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Date From</label>
                 <input type="date" name="date_from" onchange="this.form.submit()" value="{{ request('date_from') }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
             </div>
 

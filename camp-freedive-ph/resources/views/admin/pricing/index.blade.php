@@ -248,10 +248,6 @@
          @keydown.escape.window="deleteModal = false">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-xl border border-[#E5E5EA]"
              @click.away="deleteModal = false">
-            <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-700 flex items-center justify-center">
-                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-            </div>
-
             <div class="space-y-1.5">
                 <h3 class="text-lg font-extrabold text-[#1D1D1F]">Delete Pricing Rule?</h3>
                 <p class="text-xs text-[#6E6E73]">

@@ -95,7 +95,6 @@
                             <div>
                                 <div class="flex items-center gap-2">
                                     <strong class="font-bold text-[#1D1D1F] text-sm">{{ $p->name }}</strong>
-                                    <span class="text-xs text-[#6E6E73]">(Age {{ $p->age }})</span>
                                     <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]">
                                         {{ ucfirst($p->booking->class_type ?? 'Discovery') }}
                                     </span>
@@ -117,20 +116,6 @@
                                     class="btn-secondary px-3 py-1.5 text-xs font-semibold text-[#FF3B3C] hover:bg-[#FEF2F2] shrink-0">
                                 Reassign Away
                             </button>
-                        </div>
-
-                        <!-- Health & Swimmer Notes -->
-                        <div class="bg-[#FAFAFC] p-3 rounded-xl border border-[#E5E5EA] text-xs space-y-1">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                <div>
-                                    <span class="text-[#6E6E73] font-semibold">Swimmer Status:</span>
-                                    <strong class="text-[#1D1D1F] ml-1">{{ ucfirst(str_replace('_', ' ', $p->swimmer_status)) }}</strong>
-                                </div>
-                                <div>
-                                    <span class="text-[#6E6E73] font-semibold">Health Condition:</span>
-                                    <span class="text-[#1D1D1F] ml-1">{{ $p->health_condition ?: 'None declared' }}</span>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     @empty

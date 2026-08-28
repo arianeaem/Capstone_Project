@@ -39,7 +39,6 @@
     <!-- Error Alert Banner -->
     <div x-show="errorMessage" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#FEF2F2] text-[#991B1B] text-sm flex items-start justify-between gap-3 shadow-2xs">
         <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-[#FF3B3C] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <span x-text="errorMessage"></span>
         </div>
         <button @click="errorMessage = ''" class="text-[#991B1B] font-bold text-sm">✕</button>
@@ -67,7 +66,7 @@
         <!-- ========================================================================= -->
         <div x-show="currentStep === 1" x-cloak class="space-y-6">
             <div class="border-b border-[#E5E5EA] pb-4">
-                <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">1. Choose Your Freediving Class</h2>
+                <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Freediving Class</h2>
                 <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select the course or dive experience you want to join. Beginners and non-swimmers are welcome!</p>
             </div>
 
@@ -172,7 +171,7 @@
             <div class="border-b border-[#E5E5EA] pb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">2. Choose Your 2D1N Dive Dates</h2>
+                        <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your 2D1N Dive Dates</h2>
                         <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select your preferred weekend or trip dates for your Batangas freediving experience.</p>
                     </div>
 
@@ -295,9 +294,6 @@
                                 <h4 class="text-base sm:text-lg font-extrabold" x-text="forecast.title"></h4>
                                 <p class="text-xs sm:text-sm opacity-90" x-text="forecast.location"></p>
                             </div>
-                            <div class="font-bold px-3 py-1 rounded-full uppercase bg-white/85 shadow-2xs text-xs inline-block"
-                                 :style="'color: ' + forecast.text_color"
-                                 x-text="forecast.is_bookable ? 'Safe to Book' : 'Booking Suspended'"></div>
                         </div>
 
                         <p class="text-xs sm:text-sm leading-relaxed" x-text="forecast.description"></p>
@@ -346,10 +342,6 @@
                                 </div>
                             </div>
                         </template>
-
-                        <div class="text-[11px] opacity-80 pt-1.5 border-t border-black/10 italic">
-                            * Marine safety models are updated hourly using live Open-Meteo coastal telemetry. Departure is subject to final Camp FreedivePH operator confirmation.
-                        </div>
 
                         <!-- Critical Risk Alternate Dates -->
                         <template x-if="!forecast.is_bookable">
@@ -602,7 +594,7 @@
                 <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-6">
                     
                     <!-- Itemized Invoice Card -->
-                    <div class="border border-[#E5E5EA] rounded-2xl bg-white shadow-xs overflow-hidden">
+                    <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden">
                         <div class="bg-[#FAFAFC] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F] text-sm">Booking Summary</span>
                             <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize" x-text="form.class_type"></span>
@@ -680,7 +672,7 @@
                         </h4>
                         <div class="space-y-2 text-[11px] text-[#6E6E73]">
                             <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                                <div class="flex items-center gap-1.5 font-bold text-[#065F46] text-xs">
+                                <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
                                     <span>Notice Given More than 2 Weeks (> 14 Days)</span>
                                 </div>
                                 <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
@@ -688,7 +680,7 @@
                                 </p>
                             </div>
                             <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                                <div class="flex items-center gap-1.5 font-bold text-[#92400E] text-xs">
+                                <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
                                     <span>Notice Given 7 to 14 Days Before Trip</span>
                                 </div>
                                 <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
@@ -696,7 +688,7 @@
                                 </p>
                             </div>
                             <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                                <div class="flex items-center gap-1.5 font-bold text-[#B91C1C] text-xs">
+                                <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
                                     <span>Notice Given Less than 7 Days (Locked Window)</span>
                                 </div>
                                 <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">

@@ -55,7 +55,6 @@
 
     @if(session('error'))
         <div class="bg-[#FEF2F2] border-b border-[#FECACA] text-[#991B1B] py-3.5 px-4 text-sm text-center font-medium flex items-center justify-center gap-2">
-            <svg class="w-5 h-5 text-[#FF3B3C] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <span>{{ session('error') }}</span>
         </div>
     @endif

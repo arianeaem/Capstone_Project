@@ -88,17 +88,15 @@
             
             <!-- Search Query -->
             <div class="lg:col-span-2">
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Search Reservations</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
-                       placeholder="Booking #, Name, Phone, Email (Enter)..." 
+                       placeholder="Search Booking #, Name, Phone, Email (Enter)..." 
                        class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white">
             </div>
 
             <!-- Status Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Lifecycle Status</label>
                 <select name="status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Statuses</option>
                     <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
@@ -114,7 +112,6 @@
 
             <!-- Batch Status Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Batch Assignment</label>
                 <select name="batch_status" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Batches</option>
                     <option value="unassigned" {{ request('batch_status') === 'unassigned' || request('unassigned') === '1' ? 'selected' : '' }}>No Batch (Unassigned)</option>
@@ -124,7 +121,6 @@
 
             <!-- Class Type Filter -->
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Class Package</label>
                 <select name="class_type" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Classes</option>
                     <option value="discovery" {{ request('class_type') === 'discovery' ? 'selected' : '' }}>Discovery</option>
@@ -136,7 +132,6 @@
             <!-- Sort By / Reset -->
             <div class="flex items-center gap-2">
                 <div class="flex-1">
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1">Sort Order</label>
                     <select name="sort" onchange="this.form.submit()" class="w-full px-3.5 pr-10 py-2 rounded-xl border border-[#D1D1D6] text-xs sm:text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest</option>
                         <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest</option>
@@ -144,11 +139,6 @@
                         <option value="dive_date_asc" {{ request('sort') === 'dive_date_asc' ? 'selected' : '' }}>Dive Date (Soonest)</option>
                     </select>
                 </div>
-                @if(request()->hasAny(['search', 'status', 'class_type', 'sort', 'batch_status', 'unassigned', 'date_from', 'date_to', 'payment_status']))
-                    <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-3.5 py-2 text-xs shrink-0 self-end mb-0.5" title="Clear all filters">
-                        Reset
-                    </a>
-                @endif
             </div>
         </form>
     </div>

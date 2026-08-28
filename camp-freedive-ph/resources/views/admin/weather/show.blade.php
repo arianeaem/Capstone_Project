@@ -35,10 +35,6 @@
                     <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <span>{{ $batch->start_date->format('F d, Y (l)') }} to {{ $batch->end_date->format('F d, Y (l)') }}</span>
                 </div>
-                <div class="flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5 text-[#008E98]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    <span>Mabini / Anilao, Batangas (13.7481° N, 120.9408° E)</span>
-                </div>
             </div>
         </div>
 
@@ -173,7 +169,7 @@
     <!-- ========================================================================= -->
     <!-- 2. DAY 1 & DAY 2 COMPARATIVE DASHBOARD (SIDE-BY-SIDE) -->
     <!-- ========================================================================= -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <!-- ===================================================================== -->
         <!-- DAY 1 SECTION -->
@@ -298,6 +294,13 @@
                             @endforeach
                         </tbody>
                     </table>
+                </div>
+            </div>
+            @else
+            <div class="pt-3">
+                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
+                    <span class="font-bold text-[#1D1D1F] block">Hourly Telemetry Not Yet Available</span>
+                    <span>High-resolution marine model telemetry unlocks 16 days prior to the dive date (unlocks on {{ $batch->start_date->copy()->subDays(16)->format('M d, Y') }}).</span>
                 </div>
             </div>
             @endif
@@ -429,6 +432,13 @@
                     </table>
                 </div>
             </div>
+            @else
+            <div class="pt-3">
+                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
+                    <span class="font-bold text-[#1D1D1F] block">Hourly Telemetry Not Yet Available</span>
+                    <span>High-resolution marine model telemetry unlocks 16 days prior to the dive date (unlocks on {{ ($batch->end_date ?? $batch->start_date->copy()->addDay())->copy()->subDays(16)->format('M d, Y') }}).</span>
+                </div>
+            </div>
             @endif
 
         </div>
@@ -443,7 +453,7 @@
                 @click="openAuditTrail = !openAuditTrail" 
                 class="w-full p-5 sm:p-6 flex items-center justify-between text-left hover:bg-[#FAFAFC] transition-colors cursor-pointer select-none">
             <div class="flex items-center gap-3">
-                <span class="text-base font-extrabold text-[#1D1D1F]">📋 Assessment Audit Trail & History</span>
+                <span class="text-base font-extrabold text-[#1D1D1F]">Assessment Audit Trail & History</span>
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
                     {{ count($assessmentRuns) }} run(s)
                 </span>
