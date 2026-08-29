@@ -12,7 +12,7 @@
 }">
     
     <!-- Top Breadcrumb & Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#D1D1D6] pb-5">
         <div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
@@ -75,66 +75,18 @@
         </div>
     </div>
 
-    <!-- Batch Summary Banner -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div class="space-y-2">
-            <div class="flex items-center gap-3 flex-wrap">
-                <span class="px-3 py-1 rounded-full text-xs font-extrabold border {{ $batch->status_badge['class'] }}">
-                    Batch Status: {{ $batch->status_badge['label'] }}
-                </span>
-            </div>
-
-            @if($batch->capacity_note)
-                <p class="text-xs text-[#6E6E73] font-medium italic">
-                    Note: {{ $batch->capacity_note }}
-                </p>
-            @endif
-
-            @if($batch->status === 'cancelled_by_camp' && $batch->cancellation_reason)
-                <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-[#991B1B]">
-                    <strong>Camp Cancellation Advisory:</strong> {{ $batch->cancellation_reason }} (Logged at {{ $batch->cancelled_at ? $batch->cancelled_at->format('M d, Y h:i A') : 'N/A' }})
-                </div>
-            @endif
-        </div>
-
-        <!-- Honest Occupancy Display -->
-        <div class="p-5 rounded-xl text-right space-y-1.5 shrink-0 min-w-[260px]">
-            <span class="text-xs uppercase font-bold text-[#6E6E73] tracking-wider block">Staffing & Occupancy</span>
-            
-            @if($batch->is_coach_pending)
-                <div class="p-2.5 bg-[#FFFBEB] rounded-xl border border-[#FDE68A] text-left text-xs text-[#92400E]">
-                    <strong class="block">Instructor Pending</strong>
-                    <span class="text-xs opacity-90">Occupancy not yet calculable until at least 1 coach is assigned.</span>
-                </div>
-            @else
-                <div class="text-2xl font-extrabold text-[#1D1D1F]">
-                    {{ $batch->total_participants_count }} <span class="text-sm font-semibold text-[#6E6E73]">/ {{ $batch->computed_capacity }} Pax Capacity</span>
-                </div>
-                
-                <div class="w-full bg-[#E5E5EA] rounded-full h-2 overflow-hidden">
-                    <div class="h-2 rounded-full {{ ($batch->occupancy_percentage ?? 0) >= 100 ? 'bg-[#FF3B3C]' : (($batch->occupancy_percentage ?? 0) > 70 ? 'bg-[#FF8D28]' : 'bg-[#34C759]') }}" 
-                         style="width: {{ min(100, $batch->occupancy_percentage ?? 0) }}%"></div>
-                </div>
-
-                <div class="flex items-center justify-between text-xs font-bold text-[#6E6E73]">
-                    <span>{{ $batch->assigned_coaches_count }} Coach(es) Assigned</span>
-                    <span>{{ $batch->occupancy_percentage }}% Full</span>
-                </div>
-            @endif
-        </div>
-    </div>
-
     <!-- 2 COLUMN LAYOUT -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- LEFT 2 COLUMNS: CONNECTED BOOKINGS -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- Connected Bookings Table -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <!-- Connected Bookings Section -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Connected Customer Bookings</h3>
+                        <p class="text-xs text-[#6E6E73] mt-0.5">Guest reservations and assigned coaching groups in this batch.</p>
                     </div>
 
                     <div class="text-xs font-bold text-[#780000] text-right">
@@ -143,75 +95,101 @@
                     </div>
                 </div>
 
-                <div class="divide-y divide-[#E5E5EA]">
+                <!-- Bookings Card Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @forelse($batch->bookings as $booking)
-                    <div class="py-4 space-y-2.5 text-xs sm:text-sm bg-[#FAFAFC] p-3 rounded-xl border border-[#E5E5EA]">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-[#780000] hover:underline text-sm">
-                                        {{ $booking->booking_number }}
-                                    </a>
-                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]">
-                                        {{ ucfirst($booking->class_type ?? 'Discovery') }}
+                    <div class="bg-white rounded-2xl border border-[#D1D1D6] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
+                        <!-- Top Details -->
+                        <div class="space-y-3">
+                            <div class="flex items-start justify-between gap-2 border-b border-[#D1D1D6] pb-3">
+                                <div>
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-sm text-[#780000] hover:underline">
+                                            {{ $booking->booking_number }}
+                                        </a>
+                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]">
+                                            {{ ucfirst($booking->class_type ?? 'Discovery') }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="text-right shrink-0">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border {{ $booking->status_badge['class'] }}">
+                                        {{ $booking->status_badge['label'] }}
                                     </span>
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-3">
-                                <div class="text-right">
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $booking->status_badge['class'] }}">
-                                        {{ $booking->status_badge['label'] }}
-                                    </span>
-                                    <span class="text-xs font-bold text-[#1D1D1F] block mt-1">
-                                        ₱{{ number_format($booking->total_amount, 2) }}
-                                    </span>
+                            <!-- Financial Mini Summary -->
+                            <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#FAFAFC] border border-[#D1D1D6] text-xs">
+                                <div>
+                                    <span class="text-[#6E6E73] text-[10px] block">Total Amount</span>
+                                    <strong class="text-[#1D1D1F] font-bold text-xs">₱{{ number_format($booking->total_amount, 2) }}</strong>
                                 </div>
+                                <div class="text-right">
+                                    <span class="text-[#6E6E73] text-[10px] block">
+                                        {{ $booking->balance_amount > 0 ? 'Balance Due' : 'Payment Status' }}
+                                    </span>
+                                    @if($booking->balance_amount > 0)
+                                        <strong class="text-[#D97706] font-bold text-xs">₱{{ number_format($booking->balance_amount, 2) }}</strong>
+                                    @else
+                                        <strong class="text-[#065F46] font-bold text-xs">Fully Paid</strong>
+                                    @endif
+                                </div>
+                            </div>
 
-                                <button type="button" 
-                                        @click="selectedBookingId = {{ $booking->id }}; selectedBookingNumber = '{{ $booking->booking_number }}'; openMoveModal = true"
-                                        class="btn-secondary px-2.5 py-1 text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] shrink-0"
-                                        title="Move to another batch">
-                                    Move ⇄
-                                </button>
+                            <!-- Participants & Assigned Coaches -->
+                            <div class="space-y-1.5 pt-1">
+                                <div class="text-[11px] font-bold uppercase tracking-wider text-[#6E6E73] flex items-center justify-between">
+                                    <span>Students ({{ $booking->participants->count() }})</span>
+                                    <span>Assigned Coach</span>
+                                </div>
+                                <div class="space-y-1.5">
+                                    @foreach($booking->participants as $p)
+                                        @php $coach = $p->coach; @endphp
+                                        <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#FAFAFC] border border-[#F2F2F7] text-xs">
+                                            <span class="font-semibold text-[#1D1D1F] truncate">{{ $p->name }}</span>
+                                            @if($coach)
+                                                <span class="text-[11px] font-bold text-[#1d1d1f] px-2 py-0.5 rounded-md shrink-0">
+                                                    {{ $coach->name }}
+                                                </span>
+                                            @else
+                                                <span class="text-[11px] font-bold text-[#1d1d1f] px-2 py-0.5 rounded-md shrink-0">
+                                                    Unassigned
+                                                </span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Participants List with Assigned Coach -->
-                        <div class="text-xs space-y-1.5">
-                            <div class="text-[#6E6E73] font-bold uppercase text-xs">
-                                Participants ({{ $booking->participants->count() }}):
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                @foreach($booking->participants as $p)
-                                    @php $coach = $p->coach; @endphp
-                                    <div class="text-[#1D1D1F] flex items-center justify-between">
-                                        <span><strong>{{ $p->name }}</strong></span>
-                                        @if($coach)
-                                            <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-2 py-0.5 rounded-md border border-[#A7F3D0]">
-                                                Coach {{ $coach->name }}
-                                            </span>
-                                        @else
-                                            <span class="text-xs font-bold text-[#92400E] bg-[#FEF3C7] px-2 py-0.5 rounded-md border border-[#FDE68A]">
-                                                Unassigned
-                                            </span>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
+                        <!-- Card Action Footer -->
+                        <div class="flex items-center gap-2 pt-3 border-t border-[#D1D1D6]">
+                            <button type="button" 
+                                    @click="selectedBookingId = {{ $booking->id }}; selectedBookingNumber = '{{ $booking->booking_number }}'; openMoveModal = true"
+                                    class="flex-1 py-2 px-3 rounded-xl border border-[#D1D1D6] hover:bg-[#F2F2F7] text-xs font-bold text-[#6E6E73] hover:text-[#1D1D1F] transition-colors text-center"
+                                    title="Move to another batch">
+                                Move Batch ⇄
+                            </button>
+
+                            <a href="{{ route('admin.bookings.show', $booking) }}" 
+                               class="flex-1 py-2 px-3 rounded-xl btn-secondary hover:bg-[#F2F2F7] text-xs font-bold text-center">
+                                View Details
+                            </a>
                         </div>
                     </div>
                     @empty
-                    <p class="text-xs text-[#6E6E73] py-6 text-center">
+                    <div class="col-span-full bg-white rounded-2xl border border-[#D1D1D6] p-8 text-center text-xs text-[#8E8E93]">
                         No customer bookings connected to this batch yet.
-                    </p>
+                    </div>
                     @endforelse
                 </div>
             </div>
 
             <!-- Batch Status Timeline / History -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Batch Status History</h3>
+            <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 shadow-sm space-y-4">
+                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-3">Batch Status History</h3>
 
                 <div class="space-y-4">
                     @forelse($batch->statusLogs as $log)
@@ -240,12 +218,61 @@
 
         </div>
 
-        <!-- RIGHT 1 COLUMN: COACHES & PAYMENTS SUMMARY -->
+        <!-- RIGHT 1 COLUMN: STATUS, OCCUPANCY, COACHES & PAYMENTS SUMMARY -->
         <div class="space-y-6">
             
+            <!-- Batch Status & Occupancy Card -->
+            <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-3">
+                    <h3 class="text-base font-bold text-[#1D1D1F]">Batch Status & Capacity</h3>
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $batch->status_badge['class'] }}">
+                        {{ $batch->status_badge['label'] }}
+                    </span>
+                </div>
+
+                @if($batch->capacity_note)
+                    <p class="text-xs text-[#6E6E73] font-medium italic">
+                        Note: {{ $batch->capacity_note }}
+                    </p>
+                @endif
+
+                @if($batch->status === 'cancelled_by_camp' && $batch->cancellation_reason)
+                    <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-[#991B1B]">
+                        <strong>Camp Cancellation Advisory:</strong> {{ $batch->cancellation_reason }} (Logged at {{ $batch->cancelled_at ? $batch->cancelled_at->format('M d, Y h:i A') : 'N/A' }})
+                    </div>
+                @endif
+
+                <!-- Occupancy & Capacity Meter -->
+                <div class="space-y-2 pt-1">
+                    @if($batch->total_participants_count > 0 && $batch->is_coach_pending)
+                        <div class="p-2.5 bg-[#FFFBEB] rounded-xl border border-[#FDE68A] text-left text-xs text-[#92400E]">
+                            <strong class="block">Instructor Pending</strong>
+                            <span class="text-xs opacity-90">Occupancy not yet calculable until at least 1 coach is assigned.</span>
+                        </div>
+                    @else
+                        <div class="flex items-baseline justify-between">
+                            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider">Occupancy</span>
+                            <div class="text-xl font-extrabold text-[#1D1D1F]">
+                                {{ $batch->total_participants_count }} <span class="text-xs font-semibold text-[#6E6E73]">/ {{ $batch->computed_capacity }} Pax</span>
+                            </div>
+                        </div>
+                        
+                        <div class="w-full bg-[#D1D1D6] rounded-full h-2 overflow-hidden">
+                            <div class="h-2 rounded-full {{ ($batch->occupancy_percentage ?? 0) >= 100 ? 'bg-[#FF3B3C]' : (($batch->occupancy_percentage ?? 0) > 70 ? 'bg-[#FF8D28]' : 'bg-[#34C759]') }}" 
+                                 style="width: {{ min(100, $batch->occupancy_percentage ?? 0) }}%"></div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs font-bold text-[#6E6E73]">
+                            <span>{{ $batch->assigned_coaches_count }} Coach(es) Assigned</span>
+                            <span>{{ $batch->occupancy_percentage ?? 0 }}% Full</span>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             <!-- Connected Coaches Card -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-3">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Coaches</h3>
                     </div>
@@ -267,7 +294,7 @@
                     @php
                         $coachLoad = $coach->assignedCountForDate($batch->start_date);
                     @endphp
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between text-xs">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#D1D1D6] flex items-center justify-between text-xs">
                         <div class="flex items-center gap-2.5">
                             <div class="w-8 h-8 rounded-xl bg-[#780000] text-white flex items-center justify-center font-bold text-xs">
                                 {{ substr($coach->name, 0, 1) }}
@@ -294,8 +321,8 @@
             </div>
 
             <!-- Payments & Refunds Summary (Read-Only) -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-3">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Payments & Refunds Summary</h3>
                         <p class="text-xs text-[#6E6E73] mt-0.5">Aggregate financial overview for this batch.</p>
@@ -307,21 +334,21 @@
                 </div>
 
                 <div class="space-y-3 text-xs">
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#FAFAFC] border border-[#D1D1D6]">
                         <span class="text-[#6E6E73]">Total Collected:</span>
                         <strong class="font-mono text-sm font-extrabold text-[#1D1D1F]">
                             ₱{{ number_format($batch->total_collected_amount, 2) }}
                         </strong>
                     </div>
 
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#FAFAFC] border border-[#D1D1D6]">
                         <span class="text-[#6E6E73]">Bookings with Balance:</span>
                         <strong class="text-sm font-extrabold text-[#FF8D28]">
                             {{ $batch->outstanding_balance_bookings_count }} Booking(s)
                         </strong>
                     </div>
 
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-[#FAFAFC] border border-[#D1D1D6]">
                         <span class="text-[#6E6E73]">Pending Refund Requests:</span>
                         <strong class="text-sm font-extrabold text-[#FF3B3C]">
                             {{ $batch->pending_refunds_count }} Pending
@@ -338,7 +365,7 @@
     <!-- MODAL 1: CANCEL BATCH BY CAMP (CASCADES TO REFUNDS & NOTIFICATIONS) -->
     <!-- ========================================================================= -->
     <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#D1D1D6]" @click.outside="openCancelModal = false">
             <h3 class="text-lg font-bold text-[#FF3B3C]">Cancel Batch (by Camp)</h3>
             <p class="text-xs text-[#6E6E73]">
                 Cancelling <strong class="text-[#1D1D1F]">{{ $batch->display_name }}</strong> will automatically cascade to all connected bookings, set them to <strong>Cancelled by Camp</strong>, trigger <strong>100% force majeure refund eligibility</strong>, and send custom cancellation emails to all customers.
@@ -355,7 +382,7 @@
                     <textarea name="note" required rows="3" placeholder="e.g. Typhoon storm signal #2 in Batangas / Severe localized marine surge" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#D1D1D6]">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
                     <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold bg-[#FF3B3C] hover:bg-[#D32F2F] shadow-sm">
                         Confirm Whole-Batch Cancellation
@@ -369,7 +396,7 @@
     <!-- MODAL 2: RESCHEDULE BATCH (CASCADES TO CUSTOMER DATE SELECTION NOTIFICATIONS) -->
     <!-- ========================================================================= -->
     <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#D1D1D6]" @click.outside="openRescheduleModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedule Batch (by Camp)</h3>
             <p class="text-xs text-[#6E6E73]">
                 Rescheduling <strong class="text-[#1D1D1F]">{{ $batch->display_name }}</strong> will set connected bookings to <strong>Rescheduled</strong> and send a custom email notifying customers to pick their preferred new date through the <strong>Manage Booking</strong> portal.
@@ -386,7 +413,7 @@
                     <textarea name="note" required rows="3" placeholder="e.g. Venue maintenance on resort / Weather shift. Please choose a new weekend." class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#D1D1D6]">
                     <button type="button" @click="openRescheduleModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
                     <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-sm">
                         Confirm Batch Reschedule
@@ -400,7 +427,7 @@
     <!-- MODAL 3: MOVE BOOKING TO ANOTHER BATCH -->
     <!-- ========================================================================= -->
     <div x-show="openMoveModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openMoveModal = false">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#D1D1D6]" @click.outside="openMoveModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Move Booking to Another Batch</h3>
             <p class="text-xs text-[#6E6E73]">
                 Reassign booking <strong class="text-[#780000] font-mono" x-text="selectedBookingNumber"></strong> to another scheduled 2D1N batch or unbatch it.
@@ -427,7 +454,7 @@
                     <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#D1D1D6]">
                     <button type="button" @click="openMoveModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
                     <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-sm">
                         Confirm Move

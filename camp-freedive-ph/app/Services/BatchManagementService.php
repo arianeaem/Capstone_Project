@@ -242,8 +242,12 @@ class BatchManagementService
     {
         return Booking::with('participants')
             ->whereDate('start_date', $date->format('Y-m-d'))
-            ->whereNull('batch_id')
-            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show'])
+            ->where(function ($q) {
+                $q->whereNull('batch_id')
+                  ->orWhere('batch_id', 0);
+            })
+            ->whereDoesntHave('batch')
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show', 'cancellation_requested'])
             ->get();
     }
 }

@@ -150,10 +150,14 @@ class Batch extends Model
     }
 
     /**
-     * Check if coach staffing is pending (0 coaches).
+     * Check if coach staffing is pending (has participants/bookings but 0 coaches assigned).
      */
     public function getIsCoachPendingAttribute(): bool
     {
+        if ($this->total_participants_count === 0) {
+            return false;
+        }
+
         return $this->assigned_coaches_count === 0;
     }
 

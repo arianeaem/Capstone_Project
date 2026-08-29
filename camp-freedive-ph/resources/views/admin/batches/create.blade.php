@@ -6,7 +6,7 @@
 <div class="max-w-4xl mx-auto space-y-6 text-sm" x-data="batchCreateForm()">
     
     <!-- Top Breadcrumb & Header -->
-    <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
+    <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-4">
         <div>
             <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
@@ -20,13 +20,13 @@
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8">
+    <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 sm:p-8">
         <form action="{{ route('admin.batches.store') }}" method="POST" class="space-y-6">
             @csrf
 
             <!-- Section 1: Date & Auto-Generated Identifiers -->
             <div class="space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">1. 2D1N Dive Dates & Batch Identifier</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">1. 2D1N Dive Dates & Batch Identifier</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -110,7 +110,7 @@
 
             <!-- Section 2: Auto-Grouping Confirmed Unbatched Bookings -->
             <div class="space-y-4 pt-2">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-2">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">2. Group Confirmed Bookings for this Date</h3>
                         <p class="text-xs text-[#6E6E73] mt-0.5">
@@ -128,9 +128,9 @@
                 </div>
 
                 <!-- Bookings Table Container -->
-                <div x-show="!loadingBookings && unbatchedBookings.length > 0" class="border border-[#E5E5EA] rounded-xl overflow-hidden">
+                <div x-show="!loadingBookings && unbatchedBookings.length > 0" class="border border-[#D1D1D6] rounded-xl overflow-hidden">
                     <table class="w-full text-left text-xs">
-                        <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+                        <thead class="bg-[#FAFAFC] border-b border-[#D1D1D6] text-[#6E6E73] font-bold">
                             <tr>
                                 <th class="py-2.5 px-3 w-8">
                                     <input type="checkbox" @change="toggleAll($event.target.checked)" checked class="w-3.5 h-3.5 rounded text-[#780000] focus:ring-[#780000]">
@@ -142,7 +142,7 @@
                                 <th class="py-2.5 px-3 text-right">Total</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#E5E5EA]">
+                        <tbody class="divide-y divide-[#D1D1D6]">
                             <template x-for="b in paginatedBookings" :key="b.id">
                                 <tr class="hover:bg-[#FAFAFC]">
                                     <td class="py-2.5 px-3">
@@ -163,7 +163,7 @@
                     </table>
 
                     <!-- Pagination Controls -->
-                    <div x-show="totalPages > 1" class="bg-[#FAFAFC] px-3 py-2 border-t border-[#E5E5EA] flex items-center justify-between text-xs text-[#6E6E73]">
+                    <div x-show="totalPages > 1" class="bg-[#FAFAFC] px-3 py-2 border-t border-[#D1D1D6] flex items-center justify-between text-xs text-[#6E6E73]">
                         <div>
                             Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span> to <span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span>
                         </div>
@@ -194,7 +194,7 @@
 
             <!-- Section 3: Operational Capacity & Notes -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">3. Operational Notes & Overrides</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">3. Operational Notes & Overrides</h3>
 
                 <div>
                     <label for="capacity_note" class="block font-bold text-[#1D1D1F] text-xs mb-2">
@@ -220,7 +220,7 @@
             </div>
 
             <!-- Submit Buttons -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E5EA]">
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#D1D1D6]">
                 <a href="{{ route('admin.batches.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
                 <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold">
                     Create & Confirm Batch
