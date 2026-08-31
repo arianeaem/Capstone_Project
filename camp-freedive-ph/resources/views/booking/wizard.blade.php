@@ -47,12 +47,11 @@
     <!-- Draft Restored Notification Banner -->
     <div x-show="draftRestored" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#F0FDF4] text-[#166534] text-xs sm:text-sm flex items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-center gap-2">
-            <svg class="w-4 h-4 text-[#16A34A] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>
             <span>Your saved booking progress has been automatically restored.</span>
         </div>
         <div class="flex items-center gap-3 shrink-0">
             <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-xs">
-                Clear & Start Over
+                Clear
             </button>
             <button type="button" @click="draftRestored = false" class="text-[#166534] font-bold text-sm">✕</button>
         </div>

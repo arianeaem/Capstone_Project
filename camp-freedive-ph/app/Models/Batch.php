@@ -62,6 +62,11 @@ class Batch extends Model
         return $this->hasMany(ParticipantAssignment::class, 'batch_id');
     }
 
+    public function coachAssignments(): HasMany
+    {
+        return $this->hasMany(ParticipantAssignment::class, 'batch_id');
+    }
+
     public function activeParticipantAssignments(): HasMany
     {
         return $this->hasMany(ParticipantAssignment::class, 'batch_id')->where('status', 'assigned');
@@ -82,6 +87,11 @@ class Batch extends Model
         return $this->hasMany(BatchRiskAssessment::class, 'batch_id')->orderBy('assessed_at', 'desc');
     }
 
+    public function riskAssessment()
+    {
+        return $this->hasOne(BatchRiskAssessment::class, 'batch_id')->latestOfMany('assessed_at');
+    }
+
     public function manualOverrides(): HasMany
     {
         return $this->hasMany(ManualOverride::class, 'batch_id')->orderBy('created_at', 'desc');
@@ -90,6 +100,11 @@ class Batch extends Model
     public function notificationLogs(): HasMany
     {
         return $this->hasMany(NotificationLog::class, 'batch_id')->orderBy('sent_at', 'desc');
+    }
+
+    public function releaseRequests(): HasMany
+    {
+        return $this->hasMany(AssignmentReleaseRequest::class, 'batch_id')->orderBy('requested_at', 'desc');
     }
 
     public function getLatestDay1AssessmentAttribute(): ?BatchRiskAssessment

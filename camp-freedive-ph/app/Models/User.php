@@ -64,6 +64,11 @@ class User extends Authenticatable
         return $this->hasMany(CoachRequest::class, 'coach_id');
     }
 
+    public function releaseRequests(): HasMany
+    {
+        return $this->hasMany(AssignmentReleaseRequest::class, 'coach_id');
+    }
+
     /**
      * Get assigned students count for a specific dive date.
      */

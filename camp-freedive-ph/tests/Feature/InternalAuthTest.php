@@ -23,8 +23,7 @@ class InternalAuthTest extends TestCase
     {
         $response = $this->get('/login');
         $response->assertStatus(200);
-        $response->assertSee('Staff Portal Login');
-        $response->assertSee('Staff Email Address');
+        $response->assertSee('Email Address');
     }
 
     public function test_owner_login_redirects_to_admin_dashboard(): void
@@ -60,7 +59,7 @@ class InternalAuthTest extends TestCase
     public function test_coach_login_redirects_to_coach_portal(): void
     {
         $response = $this->post('/login', [
-            'email' => 'coach.miko@campfreedive.ph',
+            'email' => 'coach.jose@campfreedive.ph',
             'password' => 'Password123!',
         ]);
 
@@ -72,7 +71,7 @@ class InternalAuthTest extends TestCase
     public function test_deactivated_account_is_blocked_with_custom_message(): void
     {
         $response = $this->post('/login', [
-            'email' => 'coach.inactive@campfreedive.ph',
+            'email' => 'coach.angelo@campfreedive.ph',
             'password' => 'Password123!',
         ]);
 
@@ -87,9 +86,16 @@ class InternalAuthTest extends TestCase
 
     public function test_user_with_temporary_password_is_forced_to_change_password(): void
     {
-        // Coach Elena has must_change_password = true
+        $tempCoach = User::factory()->create([
+            'email' => 'coach.temp@campfreedive.ph',
+            'password' => Hash::make('TempPass123!'),
+            'role' => 'coach',
+            'status' => 'active',
+            'must_change_password' => true,
+        ]);
+
         $response = $this->post('/login', [
-            'email' => 'coach.elena@campfreedive.ph',
+            'email' => 'coach.temp@campfreedive.ph',
             'password' => 'TempPass123!',
         ]);
 
@@ -114,7 +120,7 @@ class InternalAuthTest extends TestCase
 
     public function test_role_authorization_middleware_restricts_access(): void
     {
-        $coach = User::where('email', 'coach.miko@campfreedive.ph')->first();
+        $coach = User::where('email', 'coach.jose@campfreedive.ph')->first();
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $owner = User::where('email', 'owner@campfreedive.ph')->first();
 

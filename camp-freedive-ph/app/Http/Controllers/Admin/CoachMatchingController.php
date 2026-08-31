@@ -274,4 +274,59 @@ class CoachMatchingController extends Controller
             return back()->with('error', $e->getMessage());
         }
     }
+
+    /**
+     * Approve an emergency assignment release request.
+     */
+    public function approveReleaseRequest(Request $request, \App\Models\AssignmentReleaseRequest $releaseRequest): RedirectResponse
+    {
+        try {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($releaseRequest, $request) {
+                $releaseRequest->update([
+                    'status' => 'approved',
+                    'reviewed_by' => auth()->id(),
+                    'reviewed_at' => now(),
+                    'review_notes' => $request->input('notes', 'Approved by Camp Administration.'),
+                ]);
+
+                // Unassign the coach's students for that batch
+                \App\Models\ParticipantAssignment::where('coach_id', $releaseRequest->coach_id)
+                    ->where('batch_id', $releaseRequest->batch_id)
+                    ->delete();
+
+                // Set coach availability for that date to unavailable
+                \App\Models\CoachAvailability::where('coach_id', $releaseRequest->coach_id)
+                    ->where('date', $releaseRequest->dive_date)
+                    ->update(['status' => 'unavailable']);
+
+                // Pair date
+                $pairDate = $releaseRequest->dive_date->isSaturday() 
+                    ? $releaseRequest->dive_date->copy()->addDay() 
+                    : $releaseRequest->dive_date->copy()->subDay();
+
+                \App\Models\CoachAvailability::where('coach_id', $releaseRequest->coach_id)
+                    ->where('date', $pairDate)
+                    ->update(['status' => 'unavailable']);
+            });
+
+            return back()->with('success', "✓ Approved release request for Coach {$releaseRequest->coach->name}. Students have been moved back to the matching queue.");
+        } catch (Exception $e) {
+            return back()->with('error', 'Failed to approve release request: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reject an emergency assignment release request.
+     */
+    public function rejectReleaseRequest(Request $request, \App\Models\AssignmentReleaseRequest $releaseRequest): RedirectResponse
+    {
+        $releaseRequest->update([
+            'status' => 'rejected',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+            'review_notes' => $request->input('notes', 'Request could not be accommodated due to staffing constraints.'),
+        ]);
+
+        return back()->with('success', "Release request for Coach {$releaseRequest->coach->name} has been rejected.");
+    }
 }

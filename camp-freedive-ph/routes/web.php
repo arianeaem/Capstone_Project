@@ -15,7 +15,10 @@ use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\Coach\AvailabilityController;
 use App\Http\Controllers\Coach\PortalController as CoachPortalController;
+use App\Http\Controllers\Coach\RequestController as CoachRequestController;
+use App\Http\Controllers\Coach\ScheduleController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\ManageBookingController;
 use Illuminate\Support\Facades\Route;
@@ -137,6 +140,8 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:owner,admin']
         Route::post('/coaches/matching/broadcast', [CoachMatchingController::class, 'broadcastOpening'])->name('coaches.matching.broadcast');
         Route::get('/coaches/requests', [CoachMatchingController::class, 'requests'])->name('coaches.requests');
         Route::post('/coaches/requests/{coachRequest}/approve', [CoachMatchingController::class, 'approveRequest'])->name('coaches.requests.approve');
+        Route::post('/coaches/release-requests/{releaseRequest}/approve', [CoachMatchingController::class, 'approveReleaseRequest'])->name('coaches.release_requests.approve');
+        Route::post('/coaches/release-requests/{releaseRequest}/reject', [CoachMatchingController::class, 'rejectReleaseRequest'])->name('coaches.release_requests.reject');
         Route::get('/coaches/{coach}', [CoachRosterController::class, 'show'])->name('coaches.show');
         Route::post('/coaches/{coach}/reassign-student', [CoachRosterController::class, 'reassignStudent'])->name('coaches.reassign_student');
 
@@ -182,5 +187,20 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:coach'])
     ->prefix('coach')
     ->name('coach.')
     ->group(function () {
+        // Page 1: Dashboard
         Route::get('/', [CoachPortalController::class, 'index'])->name('dashboard');
+
+        // Page 2: Availability Calendar
+        Route::get('/availability', [AvailabilityController::class, 'index'])->name('availability.index');
+        Route::post('/availability/toggle', [AvailabilityController::class, 'toggle'])->name('availability.toggle');
+        Route::post('/availability/bulk', [AvailabilityController::class, 'bulkUpdate'])->name('availability.bulk');
+        Route::post('/availability/release', [AvailabilityController::class, 'requestRelease'])->name('availability.release');
+
+        // Page 3: My Assigned Schedule (Upcoming & History)
+        Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+
+        // Page 4: Open Requests Board
+        Route::get('/open-requests', [CoachRequestController::class, 'index'])->name('requests.index');
+        Route::post('/open-requests/{opening}/apply', [CoachRequestController::class, 'store'])->name('requests.store');
+        Route::delete('/open-requests/{coachRequest}/withdraw', [CoachRequestController::class, 'withdraw'])->name('requests.withdraw');
     });

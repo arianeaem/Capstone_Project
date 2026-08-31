@@ -77,6 +77,54 @@
         padding-right: 2.5rem !important;
         cursor: pointer;
     }
+
+    /* Clean input focus to eliminate double borders */
+    input:focus, select:focus, textarea:focus, .form-input:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+}
+
+/* Feature & Table Card Utilities */
+.feature-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #E5E5EA;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: all 150ms ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.feature-card:hover {
+    border-color: #780000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.icon-tile {
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    background-color: #F8EAEA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.icon-tile svg {
+    width: 1.35rem;
+    height: 1.35rem;
+    stroke: #780000;
+}
+
+.table-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #E5E5EA;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 /* ========================================================================= */

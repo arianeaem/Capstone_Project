@@ -87,7 +87,7 @@
             </div>
 
             <!-- Assign Coach Button -->
-            <div class="pt-2 border-t border-[#E5E5EA]">
+            <div class="pt-2">
                 <button type="button" 
                         @click="selectedBatchId = {{ $batch->id }}; assignBatchCode = '{{ $batch->batch_code }}'; assignBatchDate = '{{ $batch->start_date->format('M d, Y') }}'; openAssignModal = true"
                         class="btn-primary w-full py-2 text-xs font-bold shadow-sm flex items-center justify-center gap-1.5">

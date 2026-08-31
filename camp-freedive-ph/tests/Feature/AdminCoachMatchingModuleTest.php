@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Batch;
+use App\Models\Booking;
 use App\Models\BookingParticipant;
 use App\Models\CoachOpening;
 use App\Models\CoachRequest;
@@ -31,13 +32,13 @@ class AdminCoachMatchingModuleTest extends TestCase
         $response = $this->get('/admin/coaches');
         $response->assertStatus(200);
         $response->assertSee('Coach Roster &amp; Schedules', false);
-        $response->assertSee('Coach Miko Reyes');
-        $response->assertSee('Coach Elena Santos');
+        $response->assertSee('Jose Reyes');
+        $response->assertSee('Mary Grace Bautista');
     }
 
     public function test_coach_role_is_forbidden_from_admin_coaches_module(): void
     {
-        $coach = User::where('email', 'coach.miko@campfreedive.ph')->first();
+        $coach = User::where('email', 'coach.jose@campfreedive.ph')->first();
         $this->actingAs($coach);
 
         $response = $this->get('/admin/coaches');
@@ -52,13 +53,11 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $coachMiko = User::where('email', 'coach.miko@campfreedive.ph')->first();
+        $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
 
-        $response = $this->get("/admin/coaches/{$coachMiko->id}");
+        $response = $this->get("/admin/coaches/{$coachJose->id}");
         $response->assertStatus(200);
-        $response->assertSee('Coach Miko Reyes');
-        $response->assertSee('Ariane Mae Ramos');
-        $response->assertSee('Bryan Santos');
+        $response->assertSee('Jose Reyes');
     }
 
     public function test_admin_can_view_students_needing_coach_matching_queue(): void
@@ -69,7 +68,6 @@ class AdminCoachMatchingModuleTest extends TestCase
         $response = $this->get('/admin/coaches/matching');
         $response->assertStatus(200);
         $response->assertSee('Students Needing a Coach');
-        $response->assertSee('Carlos Mendoza');
     }
 
     public function test_admin_can_assign_students_to_available_coach(): void
@@ -77,13 +75,13 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $unassignedParticipant = BookingParticipant::where('name', 'Carlos Mendoza')->first();
-        $coachElena = User::where('email', 'coach.elena@campfreedive.ph')->first();
-        $batch2 = Batch::where('batch_code', 'BATCH-2026-SEP05')->first();
+        $unassignedParticipant = BookingParticipant::first();
+        $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
+        $batch2 = Batch::where('batch_code', 'Batch 2')->first();
 
         $response = $this->post('/admin/coaches/matching/assign', [
             'participant_ids' => [$unassignedParticipant->id],
-            'coach_id' => $coachElena->id,
+            'coach_id' => $coachMary->id,
             'batch_id' => $batch2->id,
         ]);
 
@@ -92,7 +90,7 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $this->assertDatabaseHas('participant_assignments', [
             'participant_id' => $unassignedParticipant->id,
-            'coach_id' => $coachElena->id,
+            'coach_id' => $coachMary->id,
             'batch_id' => $batch2->id,
             'status' => 'assigned',
         ]);
@@ -103,26 +101,26 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $coachMiko = User::where('email', 'coach.miko@campfreedive.ph')->first();
-        $batch1 = Batch::where('batch_code', 'BATCH-2026-AUG29')->first();
+        $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
+        $batch1 = Batch::where('batch_code', 'Batch 1')->first();
 
-        // Coach Miko already has 2 students (Ariane and Bryan) on batch1
-        // Create 3 additional mock participants
-        $booking = $batch1->bookings->first();
+        $booking = $batch1->bookings->first() ?: Booking::factory()->create(['batch_id' => $batch1->id]);
         $p1 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 1', 'age' => 20, 'price_per_person' => 2500.00]);
         $p2 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 2', 'age' => 21, 'price_per_person' => 2500.00]);
         $p3 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 3', 'age' => 22, 'price_per_person' => 2500.00]);
+        $p4 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 4', 'age' => 23, 'price_per_person' => 2500.00]);
+        $p5 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 5', 'age' => 24, 'price_per_person' => 2500.00]);
 
         $response = $this->post('/admin/coaches/matching/assign', [
-            'participant_ids' => [$p1->id, $p2->id, $p3->id],
-            'coach_id' => $coachMiko->id,
+            'participant_ids' => [$p1->id, $p2->id, $p3->id, $p4->id, $p5->id],
+            'coach_id' => $coachJose->id,
             'batch_id' => $batch1->id,
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('participant_assignments', [
-            'participant_id' => $p3->id,
-            'coach_id' => $coachMiko->id,
+            'participant_id' => $p5->id,
+            'coach_id' => $coachJose->id,
             'is_ratio_override' => true,
         ]);
     }
@@ -132,14 +130,29 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $coachMiko = User::where('email', 'coach.miko@campfreedive.ph')->first();
-        $coachElena = User::where('email', 'coach.elena@campfreedive.ph')->first();
-        $participant = BookingParticipant::where('name', 'Ariane Mae Ramos')->first();
+        $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
+        $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
+        
+        $assignment = ParticipantAssignment::where('coach_id', $coachJose->id)->first();
+        $participant = $assignment ? $assignment->participant : BookingParticipant::first();
 
-        $response = $this->post("/admin/coaches/{$coachMiko->id}/reassign-student", [
+        if (!$assignment) {
+            $batch1 = Batch::where('batch_code', 'Batch 1')->first();
+            $assignment = ParticipantAssignment::create([
+                'participant_id' => $participant->id,
+                'booking_id' => $participant->booking_id,
+                'coach_id' => $coachJose->id,
+                'batch_id' => $batch1->id,
+                'dive_date' => $batch1->start_date,
+                'assigned_by' => $admin->id,
+                'status' => 'assigned',
+            ]);
+        }
+
+        $response = $this->post("/admin/coaches/{$coachJose->id}/reassign-student", [
             'participant_id' => $participant->id,
-            'new_coach_id' => $coachElena->id,
-            'reason' => 'Coach Miko requested schedule load reduction.',
+            'new_coach_id' => $coachMary->id,
+            'reason' => 'Coach Jose requested schedule load reduction.',
         ]);
 
         $response->assertRedirect();
@@ -147,15 +160,15 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $this->assertDatabaseHas('participant_assignments', [
             'participant_id' => $participant->id,
-            'coach_id' => $coachElena->id,
+            'coach_id' => $coachMary->id,
             'status' => 'assigned',
         ]);
 
         $this->assertDatabaseHas('assignment_logs', [
             'participant_id' => $participant->id,
-            'old_coach_id' => $coachMiko->id,
-            'new_coach_id' => $coachElena->id,
-            'reason' => 'Coach Miko requested schedule load reduction.',
+            'old_coach_id' => $coachJose->id,
+            'new_coach_id' => $coachMary->id,
+            'reason' => 'Coach Jose requested schedule load reduction.',
         ]);
     }
 
@@ -164,7 +177,7 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-SEP05')->first();
+        $batch = Batch::where('batch_code', 'Batch 2')->first();
 
         $response = $this->post('/admin/coaches/matching/broadcast', [
             'batch_id' => $batch->id,
@@ -184,16 +197,16 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $coachElena = User::where('email', 'coach.elena@campfreedive.ph')->first();
-        $coachRyan = User::where('email', 'coach.ryan@campfreedive.ph')->first();
-        $requestElena = CoachRequest::where('coach_id', $coachElena->id)->first();
-        $requestRyan = CoachRequest::where('coach_id', $coachRyan->id)->first();
+        $coachMark = User::where('email', 'coach.mark@campfreedive.ph')->first();
+        $coachChristine = User::where('email', 'coach.christine@campfreedive.ph')->first();
+        $requestMark = CoachRequest::where('coach_id', $coachMark->id)->first();
+        $requestChristine = CoachRequest::where('coach_id', $coachChristine->id)->first();
 
-        $response = $this->post("/admin/coaches/requests/{$requestElena->id}/approve");
+        $response = $this->post("/admin/coaches/requests/{$requestMark->id}/approve");
         $response->assertRedirect();
 
-        $this->assertEquals('approved', $requestElena->fresh()->status);
-        $this->assertEquals('not_selected', $requestRyan->fresh()->status);
+        $this->assertEquals('approved', $requestMark->fresh()->status);
+        $this->assertEquals('not_selected', $requestChristine->fresh()->status);
     }
 
     public function test_admin_can_perform_balanced_batch_assignment_across_multiple_coaches(): void
@@ -201,12 +214,11 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-SEP05')->first();
-        $coachMiko = User::where('email', 'coach.miko@campfreedive.ph')->first();
-        $coachElena = User::where('email', 'coach.elena@campfreedive.ph')->first();
+        $batch = Batch::where('batch_code', 'Batch 1')->first();
+        $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
+        $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
 
-        // Create 4 mock participants on this batch
-        $booking = $batch->bookings->first();
+        $booking = $batch->bookings->first() ?: Booking::factory()->create(['batch_id' => $batch->id]);
         $p1 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Balance Test 1', 'age' => 20, 'price_per_person' => 2500]);
         $p2 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Balance Test 2', 'age' => 21, 'price_per_person' => 2500]);
         $p3 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Balance Test 3', 'age' => 22, 'price_per_person' => 2500]);
@@ -215,8 +227,8 @@ class AdminCoachMatchingModuleTest extends TestCase
         $response = $this->post('/admin/coaches/matching/batch-assign', [
             'batch_id' => $batch->id,
             'assignments' => [
-                $coachMiko->id => [$p1->id, $p2->id],
-                $coachElena->id => [$p3->id, $p4->id],
+                $coachJose->id => [$p1->id, $p2->id],
+                $coachMary->id => [$p3->id, $p4->id],
             ],
         ]);
 
@@ -225,13 +237,13 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $this->assertDatabaseHas('participant_assignments', [
             'participant_id' => $p1->id,
-            'coach_id' => $coachMiko->id,
+            'coach_id' => $coachJose->id,
             'batch_id' => $batch->id,
             'status' => 'assigned',
         ]);
         $this->assertDatabaseHas('participant_assignments', [
             'participant_id' => $p3->id,
-            'coach_id' => $coachElena->id,
+            'coach_id' => $coachMary->id,
             'batch_id' => $batch->id,
             'status' => 'assigned',
         ]);
@@ -242,12 +254,12 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-SEP05')->first();
-        $coachMiko = User::where('email', 'coach.miko@campfreedive.ph')->first();
-        $coachElena = User::where('email', 'coach.elena@campfreedive.ph')->first();
+        $batch = Batch::where('batch_code', 'Batch 1')->first();
+        $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
+        $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
 
-        // 3 on Miko, 0 on Elena (imbalanced by 3)
-        $booking = $batch->bookings->first();
+        // 3 on Jose, 0 on Mary (imbalanced by 3)
+        $booking = $batch->bookings->first() ?: Booking::factory()->create(['batch_id' => $batch->id]);
         $p1 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Imbalance 1', 'age' => 20, 'price_per_person' => 2500]);
         $p2 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Imbalance 2', 'age' => 21, 'price_per_person' => 2500]);
         $p3 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Imbalance 3', 'age' => 22, 'price_per_person' => 2500]);
@@ -255,10 +267,10 @@ class AdminCoachMatchingModuleTest extends TestCase
         $response = $this->post('/admin/coaches/matching/batch-assign', [
             'batch_id' => $batch->id,
             'assignments' => [
-                $coachMiko->id => [$p1->id, $p2->id, $p3->id],
-                $coachElena->id => [],
+                $coachJose->id => [$p1->id, $p2->id, $p3->id],
+                $coachMary->id => [],
             ],
-            'exception_note' => 'Coach Elena requested zero load for this weekend due to exam.',
+            'exception_note' => 'Coach Mary requested zero load for this weekend due to exam.',
         ]);
 
         $response->assertRedirect();

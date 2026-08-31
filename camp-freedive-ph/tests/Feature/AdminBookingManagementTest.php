@@ -34,7 +34,7 @@ class AdminBookingManagementTest extends TestCase
 
     public function test_coach_is_forbidden_from_booking_management(): void
     {
-        $coach = User::where('email', 'coach.miko@campfreedive.ph')->first();
+        $coach = User::where('email', 'coach.jose@campfreedive.ph')->first();
         $this->actingAs($coach);
 
         $response = $this->get('/admin/bookings');

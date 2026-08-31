@@ -6,128 +6,208 @@
 <div class="space-y-8">
     
     <!-- Top Greeting Banner -->
-    <div class="bg-gradient-to-r from-[#780000] to-[#5E0000] rounded-xl p-6 sm:p-8 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div>
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/10 border border-white/20 text-[#F8EAEA] uppercase tracking-wider mb-2">
-                <span class="w-2 h-2 rounded-full bg-[#34C759]"></span>
-                <span>Camp Operational Overview</span>
+    <div class="bg-gradient-to-r from-[#780000] via-[#650000] to-[#470000] rounded-2xl p-6 sm:p-8 text-white shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
+        <div class="space-y-1 relative z-10">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-white/15 backdrop-blur-xs text-[#F8EAEA] uppercase tracking-wider mb-1 border border-white/20">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Camp Operations Management</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Welcome back, {{ $user->name }}</h1>
-            <div class="text-sm text-[#F8EAEA]/90 mt-1">
-                <span>Role: {{ $user->role_badge['label'] }}</span>
-                <span class="block text-xs text-[#F8EAEA]/75">Anilao, Mabini Base Camp</span>
-            </div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">Welcome back, {{ $user->name }}</h1>
+            <p class="text-xs sm:text-sm text-[#F8EAEA]/90">
+                <span>Role: <strong class="text-white">{{ $user->role_badge['label'] }}</strong></span>
+                <span class="mx-2">•</span>
+                <span>Anilao, Mabini Base Operations</span>
+            </p>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
-            <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-4 py-2.5 text-xs sm:text-sm font-semibold">
-                View All Bookings
+        <div class="flex items-center gap-3 flex-wrap relative z-10">
+            <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-4 py-2.5 text-xs font-bold bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-xs">
+                View Bookings
             </a>
-            <a href="{{ route('admin.bookings.create') }}" class="btn-primary px-4 py-2.5 text-xs sm:text-sm font-bold shadow-sm bg-white text-[#780000] hover:bg-[#F8EAEA] border-none">
-                Add Booking
+            <a href="{{ route('admin.bookings.create') }}" class="btn-primary px-4 py-2.5 text-xs font-bold shadow-sm bg-white text-[#780000] hover:bg-[#F8EAEA] border-none">
+                + New Reservation
             </a>
         </div>
     </div>
 
-    <!-- Quick Stats Grid (Single Box with Vertical Dividers with Top/Bottom Margin) -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-4">
-            <!-- Total Reservations -->
-            <div class="px-4 sm:px-6 py-1">
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Reservations</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['total_bookings'] }}</div>
-                <span class="text-xs text-[#34C759] font-semibold block mt-1 flex items-center gap-1.5">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#34C759]"></span>
-                    {{ $stats['confirmed_bookings'] }} Confirmed
-                </span>
-            </div>
+    <!-- Spotlight: Next Upcoming Dive Batch -->
+    @if($nextBatch)
+        @php
+            $risk = $nextBatch->riskAssessment;
+            $riskRating = $risk?->overall_risk_rating ?? $nextBatch->risk_classification ?? 'safe';
+            $diverCount = $nextBatch->bookings->sum(fn($b) => $b->participants->count());
+            $assignedCoaches = $nextBatch->coachAssignments->pluck('coach')->unique('id');
+        @endphp
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs relative overflow-hidden">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                
+                <div class="space-y-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#780000]/10 text-[#780000] border border-[#780000]/20 font-mono">
+                            {{ $nextBatch->batch_number }}
+                        </span>
+                        <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#008E98]/10 text-[#008E98] border border-[#008E98]/20">
+                            Next Upcoming Batch
+                        </span>
 
-            <!-- Pending Staff Actions -->
-            <div class="relative px-4 sm:px-6 py-1">
-                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Pending Actions</span>
-                <div class="text-2xl font-extrabold text-[#FF8D28] mt-1">
-                    {{ $stats['pending_reschedules'] + $stats['pending_cancellations'] }}
+                        @if($nextBatch->is_coach_pending)
+                            <span class="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-300">
+                                Instructor Pending
+                            </span>
+                        @endif
+                    </div>
+
+                    <h2 class="text-xl font-black text-[#1D1D1F]">{{ $nextBatch->name }}</h2>
+
+                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs text-[#6E6E73] pt-1">
+                        <div>
+                            <strong>Departure Date:</strong> {{ $nextBatch->start_date->format('M d, Y') }} ({{ $nextBatch->start_date->diffForHumans() }})
+                        </div>
+                        <div>
+                            <strong>Registered Divers:</strong> {{ $diverCount }} pax ({{ $nextBatch->bookings->count() }} bookings)
+                        </div>
+                        <div>
+                            <strong>Assigned Coaches:</strong> {{ $assignedCoaches->count() }} coach(es)
+                        </div>
+                    </div>
                 </div>
-                <span class="text-xs text-[#6E6E73] block mt-1">
-                    {{ $stats['pending_reschedules'] }} Resched / {{ $stats['pending_cancellations'] }} Cancel
-                </span>
-            </div>
 
-            <!-- Verified Revenue -->
-            <div class="relative px-4 sm:px-6 py-1">
-                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Verified Revenue</span>
-                <div class="text-2xl font-extrabold text-[#780000] mt-1">
-                    ₱{{ number_format($stats['total_revenue'], 2) }}
+                <div class="flex items-center gap-3 shrink-0 flex-wrap">
+                    <a href="{{ route('admin.weather.show', $nextBatch) }}" 
+                       class="px-4 py-2.5 rounded-xl border border-[#E5E5EA] hover:bg-[#F2F2F7] text-xs font-bold text-[#1D1D1F] transition-all flex items-center gap-2">
+                        <span>Weather Safety</span>
+                    </a>
+                    <a href="{{ route('admin.batches.show', $nextBatch) }}" 
+                       class="px-5 py-2.5 rounded-xl bg-[#780000] hover:bg-[#5E0000] text-white text-xs font-bold shadow-xs transition-all flex items-center gap-2">
+                        <span>Batch Details</span>
+                        <span>→</span>
+                    </a>
                 </div>
-                <span class="text-xs text-[#6E6E73] block mt-1">PayMongo Gateway Sync</span>
-            </div>
 
-            <!-- Active Coaches -->
-            <div class="relative px-4 sm:px-6 py-1">
-                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Active Coaches</span>
-                <div class="text-2xl font-extrabold text-[#008E98] mt-1">
-                    {{ $stats['active_coaches'] }}
-                </div>
-                <span class="text-xs text-[#6E6E73] block mt-1">Total Staff: {{ $stats['total_users'] }}</span>
             </div>
         </div>
-    </div>
+    @endif
 
-    <!-- PayMongo Feature Cards Quick Launch -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <!-- Card 1: Bookings Management -->
-        <div class="feature-card">
-            <div class="icon-tile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            </div>
-            <h4 class="text-base font-bold text-[#1D1D1F]">Manage Reservations</h4>
-            <p class="text-xs text-[#6E6E73] leading-relaxed">View confirmed diver rosters, modify schedules, or record manual walk-in reservations.</p>
-            <div class="mt-4 pt-3 border-t border-[#E5E5EA]">
-                <a href="{{ route('admin.bookings.index') }}" class="text-xs font-bold text-[#780000] hover:underline flex items-center gap-1">
-                    Open Bookings List →
-                </a>
-            </div>
-        </div>
-
-        <!-- Card 2: Payments & Refunds -->
-        <div class="feature-card">
-            <div class="icon-tile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
-            </div>
-            <h4 class="text-base font-bold text-[#1D1D1F]">Payments & Refunds</h4>
-            <p class="text-xs text-[#6E6E73] leading-relaxed">Track PayMongo transactions, execute policy refunds, and collect balance settlements.</p>
-            <div class="mt-4 pt-3 border-t border-[#E5E5EA]">
-                <a href="{{ route('admin.payments.index') }}" class="text-xs font-bold text-[#780000] hover:underline flex items-center gap-1">
-                    Open Payments Ledger →
-                </a>
-            </div>
-        </div>
-
-        <!-- Card 3: User Provisioning -->
-        <div class="feature-card">
-            <div class="icon-tile">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-            </div>
-            <h4 class="text-base font-bold text-[#1D1D1F]">Staff & Coaches</h4>
-            <p class="text-xs text-[#6E6E73] leading-relaxed">Provision staff accounts, manage roles, and review immutable security audit logs.</p>
-            <div class="mt-4 pt-3 border-t border-[#E5E5EA]">
-                <a href="{{ route('admin.users.index') }}" class="text-xs font-bold text-[#780000] hover:underline flex items-center gap-1">
-                    Manage Accounts →
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Bookings & Audit Trail -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Operational KPI Metrics Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         
-        <!-- Recent Bookings Table -->
-        <div class="table-card p-6">
-            <div class="flex items-center justify-between mb-4 border-b border-[#E5E5EA] pb-3">
-                <h3 class="text-base font-bold text-[#1D1D1F]">Recent Reservations</h3>
+        <!-- Total Reservations -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 shadow-xs space-y-2">
+            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Reservations</span>
+            <div class="text-3xl font-black text-[#1D1D1F]">{{ $stats['total_bookings'] }}</div>
+            <div class="text-xs text-emerald-600 font-semibold flex items-center gap-1.5 pt-1">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>{{ $stats['confirmed_bookings'] }} Confirmed Active</span>
+            </div>
+        </div>
+
+        <!-- Pending Staff Actions -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 shadow-xs space-y-2">
+            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Pending Actions</span>
+            <div class="text-3xl font-black text-amber-600">
+                {{ $stats['pending_reschedules'] + $stats['pending_cancellations'] + $stats['pending_refunds'] }}
+            </div>
+            <div class="text-xs text-[#6E6E73] pt-1">
+                {{ $stats['pending_reschedules'] }} Resched • {{ $stats['pending_cancellations'] }} Cancel • {{ $stats['pending_refunds'] }} Refund
+            </div>
+        </div>
+
+        <!-- Verified Revenue -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 shadow-xs space-y-2">
+            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Verified Gross Revenue</span>
+            <div class="text-3xl font-black text-[#780000]">
+                ₱{{ number_format($stats['total_revenue'], 2) }}
+            </div>
+            <div class="text-xs text-[#6E6E73] pt-1">
+                Collected via GCash / Maya / Card
+            </div>
+        </div>
+
+        <!-- Active Coaches & Queue -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 shadow-xs space-y-2">
+            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Coach Staffing Pool</span>
+            <div class="text-3xl font-black text-[#008E98]">
+                {{ $stats['active_coaches'] }}
+            </div>
+            <div class="text-xs text-[#6E6E73] pt-1">
+                {{ $stats['unmatched_students'] }} student(s) in matching queue
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Operations Command Center Quick Launch Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Module 1: Batches & 2D1N Schedules -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs hover:border-[#780000] hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-[#780000]/10 text-[#780000] flex items-center justify-center font-bold text-lg">
+                    📅
+                </div>
+                <h3 class="text-base font-extrabold text-[#1D1D1F]">Batches & 2D1N Schedules</h3>
+                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                    Organize weekend dive batches, manage auto-linked reservations, and trigger force majeure cascading actions.
+                </p>
+            </div>
+            <div class="pt-3 border-t border-[#E5E5EA]">
+                <a href="{{ route('admin.batches.index') }}" class="text-xs font-bold text-[#780000] hover:underline flex items-center justify-between">
+                    <span>Manage Batches</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Module 2: Coach Matching Queue -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs hover:border-[#008E98] hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-[#008E98]/10 text-[#008E98] flex items-center justify-center font-bold text-lg">
+                    👥
+                </div>
+                <h3 class="text-base font-extrabold text-[#1D1D1F]">Coach Roster & Matching</h3>
+                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                    Assign coaches with 4:1 safety ratios, review emergency release requests, and broadcast unstaffed slots.
+                </p>
+            </div>
+            <div class="pt-3 border-t border-[#E5E5EA]">
+                <a href="{{ route('admin.coaches.matching') }}" class="text-xs font-bold text-[#008E98] hover:underline flex items-center justify-between">
+                    <span>Open Matching Queue</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Module 3: Marine Weather Safety -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs hover:border-emerald-600 hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-lg">
+                    🌊
+                </div>
+                <h3 class="text-base font-extrabold text-[#1D1D1F]">Weather & Safety Monitoring</h3>
+                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                    Real-time marine telemetric models, multi-parameter risk assessments, hard-gate ceilings, and PAGASA gale overrides.
+                </p>
+            </div>
+            <div class="pt-3 border-t border-[#E5E5EA]">
+                <a href="{{ route('admin.weather.index') }}" class="text-xs font-bold text-emerald-700 hover:underline flex items-center justify-between">
+                    <span>Safety Monitoring</span>
+                    <span>→</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Recent Reservations & Audit Trail -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        
+        <!-- Recent Reservations Table -->
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div>
+                    <h3 class="text-base font-extrabold text-[#1D1D1F]">Recent Reservations</h3>
+                    <span class="text-xs text-[#8E8E93]">Latest customer booking activity</span>
+                </div>
                 <a href="{{ route('admin.bookings.index') }}" class="text-xs font-bold text-[#780000] hover:underline">
                     View All →
                 </a>
@@ -135,36 +215,42 @@
 
             <div class="divide-y divide-[#E5E5EA]">
                 @forelse($recentBookings as $b)
-                <div class="py-3 flex items-center justify-between gap-3 text-xs sm:text-sm">
-                    <div>
+                <div class="py-3.5 flex items-center justify-between gap-3 text-xs">
+                    <div class="space-y-1">
                         <div class="flex items-center gap-2">
-                            <a href="{{ route('admin.bookings.show', $b) }}" class="font-mono font-bold text-[#780000] hover:underline">
+                            <a href="{{ route('admin.bookings.show', $b) }}" class="font-mono font-bold text-[#780000] hover:underline text-xs sm:text-sm">
                                 {{ $b->booking_number }}
                             </a>
-                            <span class="px-2 py-0.5 rounded-full text-xs font-bold border {{ $b->status_badge['bg'] }}">
+                            <span class="px-2 py-0.5 rounded-full text-[11px] font-bold border {{ $b->status_badge['bg'] }}">
                                 {{ $b->status_badge['label'] }}
                             </span>
                         </div>
-                        <div class="text-xs text-[#6E6E73] mt-0.5 space-y-0.5">
-                            <div class="font-medium text-[#1D1D1F]">{{ $b->contact_name }}</div>
-                            <div>{{ $b->formatted_class_type }} ({{ $b->start_date->format('M d, Y') }})</div>
+                        <div class="text-xs text-[#6E6E73]">
+                            <span class="font-bold text-[#1D1D1F]">{{ $b->contact_name }}</span>
+                            <span>•</span>
+                            <span>{{ $b->formatted_class_type }}</span>
+                            <span>•</span>
+                            <span>{{ $b->start_date->format('M d, Y') }}</span>
                         </div>
                     </div>
                     <div class="text-right shrink-0">
-                        <span class="font-bold text-xs text-[#1D1D1F] block">₱{{ number_format($b->downpayment_amount, 2) }}</span>
-                        <span class="text-xs text-[#34C759] font-semibold">Downpayment</span>
+                        <span class="font-black text-xs sm:text-sm text-[#1D1D1F] block">₱{{ number_format($b->total_amount, 2) }}</span>
+                        <span class="text-[11px] text-[#8E8E93]">Paid: ₱{{ number_format($b->downpayment_amount, 2) }}</span>
                     </div>
                 </div>
                 @empty
-                <p class="text-xs text-[#6E6E73] py-4 text-center">No bookings recorded yet.</p>
+                <p class="text-xs text-[#6E6E73] py-6 text-center">No bookings recorded yet.</p>
                 @endforelse
             </div>
         </div>
 
         <!-- Recent Audit Trail (Owner & Admin) -->
-        <div class="table-card p-6">
-            <div class="flex items-center justify-between mb-4 border-b border-[#E5E5EA] pb-3">
-                <h3 class="text-base font-bold text-[#1D1D1F]">Recent Security & Staff Activity</h3>
+        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs space-y-4">
+            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div>
+                    <h3 class="text-base font-extrabold text-[#1D1D1F]">Security & Operational Audit Log</h3>
+                    <span class="text-xs text-[#8E8E93]">Immutable system event trail</span>
+                </div>
                 @if($user->isOwner())
                     <a href="{{ route('admin.audit_logs.index') }}" class="text-xs font-bold text-[#780000] hover:underline">
                         View All Logs →
@@ -176,19 +262,19 @@
                 @forelse($recentAuditLogs as $log)
                 <div class="py-3 text-xs space-y-1">
                     <div class="flex items-center justify-between gap-2">
-                        <span class="px-2 py-0.5 rounded text-xs font-bold border {{ $log->action_badge['class'] }}">
+                        <span class="px-2 py-0.5 rounded text-[11px] font-bold border {{ $log->action_badge['class'] }}">
                             {{ $log->action_badge['label'] }}
                         </span>
-                        <span class="text-[#8E8E93]">{{ $log->created_at->diffForHumans() }}</span>
+                        <span class="text-[#8E8E93] text-[11px]">{{ $log->created_at->diffForHumans() }}</span>
                     </div>
-                    <p class="text-[#1D1D1F] leading-snug">{{ $log->description }}</p>
-                    <div class="text-xs text-[#6E6E73] space-y-0.5 pt-0.5">
-                        <div>Actor: <strong>{{ $log->actor_name }}</strong></div>
-                        <div class="text-[#8E8E93]">IP: {{ $log->ip_address ?: '127.0.0.1' }}</div>
+                    <p class="text-[#1D1D1F] leading-snug text-xs font-medium">{{ $log->description }}</p>
+                    <div class="text-[11px] text-[#6E6E73] flex items-center justify-between pt-0.5">
+                        <span>Actor: <strong class="text-[#1D1D1F]">{{ $log->actor_name }}</strong></span>
+                        <span class="text-[#8E8E93]">IP: {{ $log->ip_address ?: '127.0.0.1' }}</span>
                     </div>
                 </div>
                 @empty
-                <p class="text-xs text-[#6E6E73] py-4 text-center">No security logs recorded yet.</p>
+                <p class="text-xs text-[#6E6E73] py-6 text-center">No security logs recorded yet.</p>
                 @endforelse
             </div>
         </div>

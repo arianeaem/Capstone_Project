@@ -42,7 +42,9 @@ class DatabaseSeeder extends Seeder
         // =========================================================================
         // 0. CLEAN RESET OF ALL PRODUCTION & OPERATIONAL TABLES
         // =========================================================================
-        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        }
 
         $tables = [
             'audit_logs',
@@ -60,6 +62,7 @@ class DatabaseSeeder extends Seeder
             'payment_status_logs',
             'participant_assignments',
             'assignment_logs',
+            'assignment_release_requests',
             'coach_availabilities',
             'coach_openings',
             'coach_requests',
@@ -76,7 +79,9 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+        }
 
         // =========================================================================
         // 1. SEED AUTHENTIC STAFF & COACH USERS

@@ -104,11 +104,33 @@
                         </a>
                     @endif
                 @else
-                    <!-- Coach Portal -->
+                    <!-- Coach Portal Navigation -->
+                    <!-- 1. Dashboard -->
                     <a href="{{ route('coach.dashboard') }}" 
                        class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
-                        <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <span>My Schedule & Students</span>
+                        <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
+                        <span>Dashboard</span>
+                    </a>
+
+                    <!-- 2. Availability Calendar -->
+                    <a href="{{ route('coach.availability.index') }}" 
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <svg class="w-5 h-5 shrink-0 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span>Availability Calendar</span>
+                    </a>
+
+                    <!-- 3. My Schedule & Students -->
+                    <a href="{{ route('coach.schedule.index') }}" 
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('coach.schedule.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Schedule">
+                        <span>My Schedule & History</span>
+                    </a>
+
+                    <!-- 4. Open Requests Board -->
+                    <a href="{{ route('coach.requests.index') }}" 
+                       class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold transition-all {{ request()->routeIs('coach.requests.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}">
+                        <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="OpenRequests">
+                        <span>Open Slot Requests</span>
                     </a>
                 @endif
             </nav>
@@ -210,9 +232,22 @@
                             </a>
                         @endif
                     @else
+                        <!-- Coach Portal Mobile Navigation -->
                         <a href="{{ route('coach.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                            <span>My Schedule & Students</span>
+                            <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="{{ route('coach.availability.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <svg class="w-5 h-5 shrink-0 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <span>Availability Calendar</span>
+                        </a>
+                        <a href="{{ route('coach.schedule.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('coach.schedule.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Schedule">
+                            <span>My Schedule & History</span>
+                        </a>
+                        <a href="{{ route('coach.requests.index') }}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-semibold {{ request()->routeIs('coach.requests.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="OpenRequests">
+                            <span>Open Slot Requests</span>
                         </a>
                     @endif
                 </nav>

@@ -34,6 +34,11 @@ class BookingParticipant extends Model
         return $this->hasMany(ParticipantAssignment::class, 'participant_id');
     }
 
+    public function assignment()
+    {
+        return $this->hasOne(ParticipantAssignment::class, 'participant_id');
+    }
+
     public function activeAssignment()
     {
         return $this->hasOne(ParticipantAssignment::class, 'participant_id')->where('status', 'assigned');

@@ -45,7 +45,7 @@
             <!-- Email -->
             <div>
                 <label for="email" class="block font-bold text-[#1D1D1F] mb-2">
-                    Staff Email Address <span class="text-[#780000]">*</span>
+                    Email Address <span class="text-[#780000]">*</span>
                 </label>
                 <input type="email" 
                        name="email" 

@@ -180,8 +180,8 @@ class WeatherSafetyModuleTest extends TestCase
         $responseShow->assertStatus(200);
         $responseShow->assertSee($batch->batch_code);
         $responseShow->assertSee('Overall Batch Assessment');
-        $responseShow->assertSee('OPEN WATER AM');
-        $responseShow->assertSee('OPEN WATER PM');
+        $responseShow->assertSee('DAY 1');
+        $responseShow->assertSee('DAY 2');
     }
 
     public function test_coach_is_forbidden_from_admin_weather_module(): void

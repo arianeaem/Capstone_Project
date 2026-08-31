@@ -29,8 +29,8 @@ class AdminBatchModuleTest extends TestCase
         $response = $this->get('/admin/batches');
         $response->assertStatus(200);
         $response->assertSee('Batches &amp; 2D1N Schedules', false);
-        $response->assertSee('Batch #2026-AUG29');
-        $response->assertSee('Batch #2026-SEP05');
+        $response->assertSee('Batch 1');
+        $response->assertSee('Batch 2');
     }
 
     public function test_admin_can_access_create_batch_page(): void
@@ -47,18 +47,18 @@ class AdminBatchModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-AUG29')->first();
+        $batch = Batch::where('batch_code', 'Batch 1')->first();
         $this->assertNotEmpty($batch->bookings);
 
         $response = $this->get("/admin/batches/{$batch->id}");
         $response->assertStatus(200);
-        $response->assertSee('Batch #2026-AUG29');
+        $response->assertSee('Batch 1');
         $response->assertSee('CFP-2026-1001');
     }
 
     public function test_coach_role_is_forbidden_from_admin_batches(): void
     {
-        $coach = User::where('email', 'coach.miko@campfreedive.ph')->first();
+        $coach = User::where('email', 'coach.jose@campfreedive.ph')->first();
         $this->actingAs($coach);
 
         $response = $this->get('/admin/batches');
@@ -71,7 +71,7 @@ class AdminBatchModuleTest extends TestCase
         $this->actingAs($admin);
 
         // Batch 2 has 0 assigned coaches in seeder
-        $batch2 = Batch::where('batch_code', 'BATCH-2026-SEP05')->first();
+        $batch2 = Batch::where('batch_code', 'Batch 2')->first();
         $this->assertTrue($batch2->is_coach_pending);
 
         $response = $this->get('/admin/batches');
@@ -90,7 +90,7 @@ class AdminBatchModuleTest extends TestCase
 
         $response = $this->post('/admin/batches', [
             'name' => 'Oct 10–11 Custom Batch',
-            'batch_code' => 'BATCH-TEST-AUTO',
+            'batch_code' => 'Batch 99',
             'start_date' => $startDate,
             'end_date' => $endDate,
             'risk_classification' => 'safe',
@@ -101,7 +101,7 @@ class AdminBatchModuleTest extends TestCase
         $response->assertRedirect();
         $this->assertDatabaseHas('batches', [
             'name' => 'Oct 10–11 Custom Batch',
-            'batch_code' => 'BATCH-TEST-AUTO',
+            'batch_code' => 'Batch 99',
             'status' => 'confirmed',
         ]);
 
@@ -129,7 +129,7 @@ class AdminBatchModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-AUG29')->first();
+        $batch = Batch::where('batch_code', 'Batch 1')->first();
         $booking = $batch->bookings->first();
 
         $response = $this->post("/admin/batches/{$batch->id}/status", [
@@ -160,7 +160,7 @@ class AdminBatchModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-AUG29')->first();
+        $batch = Batch::where('batch_code', 'Batch 1')->first();
         $booking = $batch->bookings->first();
 
         $response = $this->post("/admin/batches/{$batch->id}/status", [
@@ -178,7 +178,7 @@ class AdminBatchModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch = Batch::where('batch_code', 'BATCH-2026-AUG29')->first();
+        $batch = Batch::where('batch_code', 'Batch 1')->first();
         $booking = $batch->bookings->first();
 
         $response = $this->post("/admin/batches/{$batch->id}/status", [
@@ -196,8 +196,8 @@ class AdminBatchModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
-        $batch1 = Batch::where('batch_code', 'BATCH-2026-AUG29')->first();
-        $batch2 = Batch::where('batch_code', 'BATCH-2026-SEP05')->first();
+        $batch1 = Batch::where('batch_code', 'Batch 1')->first();
+        $batch2 = Batch::where('batch_code', 'Batch 2')->first();
         $booking = $batch1->bookings->first();
 
         $response = $this->post("/admin/batches/{$batch1->id}/move-booking", [

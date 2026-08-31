@@ -48,7 +48,6 @@
     <!-- Flash Messages -->
     @if(session('success'))
         <div class="bg-[#ECFDF5] border-b border-[#A7F3D0] text-[#065F46] py-3.5 px-4 text-sm text-center font-medium flex items-center justify-center gap-2">
-            <svg class="w-5 h-5 text-[#34C759] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
             <span>{{ session('success') }}</span>
         </div>
     @endif
