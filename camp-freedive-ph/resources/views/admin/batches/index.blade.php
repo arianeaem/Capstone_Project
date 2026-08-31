@@ -140,15 +140,15 @@
     <!-- Batches Cards Grid -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         @forelse($batches as $batch)
-        <div class="bg-white rounded-2xl border border-[#D1D1D6] p-5 hover:border-[#008E98]/40 transition-all flex flex-col justify-between space-y-4 {{ $batch->needs_attention ? 'border-[#FDE68A] bg-[#FFFDF7]' : '' }}">
+        <div onclick="window.location='{{ route('admin.batches.show', $batch) }}'" class="bg-white rounded-2xl border border-[#D1D1D6] p-5 hover:border-[#780000]/40 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between space-y-4 group {{ $batch->needs_attention ? 'border-[#FDE68A] bg-[#FFFDF7]' : '' }}">
             
             <!-- Card Header: Title & Status -->
             <div>
                 <div class="flex items-start justify-between gap-3">
                     <div>
-                        <a href="{{ route('admin.batches.show', $batch) }}" class="font-extrabold text-[#1D1D1F] hover:text-[#780000] text-base block leading-tight">
+                        <span class="font-extrabold text-[#1D1D1F] group-hover:text-[#780000] text-base block leading-tight transition-colors">
                             {{ $batch->batch_number }}
-                        </a>
+                        </span>
                     </div>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border shrink-0 {{ $batch->status_badge['class'] }}">
                         {{ $batch->status_badge['label'] }}
@@ -197,14 +197,6 @@
                     </div>
 
                 </div>
-            </div>
-
-            <!-- Card Footer: View Batch Button (Inline flex with guaranteed no-wrap) -->
-            <div class="pt-2]">
-                <a href="{{ route('admin.batches.show', $batch) }}" 
-                   class="w-full py-2.5 px-4 rounded-xl font-bold text-xs text-center flex items-center justify-center gap-1.5 whitespace-nowrap btn-secondary hover:bg-[#F2F2F7] transition-all">
-                    <span>View Batch</span>
-                </a>
             </div>
 
         </div>

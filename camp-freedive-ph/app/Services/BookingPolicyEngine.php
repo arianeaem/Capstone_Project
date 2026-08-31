@@ -23,120 +23,64 @@ class BookingPolicyEngine
         // Check if there is an active storm / typhoon warning for that dive date
         $isForceMajeure = $this->weatherService->isStormSignalActive($booking->start_date);
 
-        // Policy evaluations
-        if ($booking->status === 'cancelled') {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => $isForceMajeure,
-                'reschedule_allowed' => false,
-                'reschedule_message' => 'This booking is already cancelled.',
-                'cancel_allowed' => false,
-                'cancel_message' => 'This booking is already cancelled.',
-                'refund_percentage' => 0,
-                'calculated_refund' => 0.00,
-                'policy_tier' => 'cancelled',
-            ];
-        }
-
-        if ($booking->status === 'reschedule_requested') {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => $isForceMajeure,
-                'reschedule_allowed' => false,
-                'reschedule_message' => 'You already have a pending reschedule request under review by the camp.',
-                'cancel_allowed' => false,
-                'cancel_message' => 'Please wait for your pending reschedule request to be processed before requesting cancellation.',
-                'refund_percentage' => 0,
-                'calculated_refund' => 0.00,
-                'policy_tier' => 'pending_reschedule',
-            ];
-        }
-
-        if ($booking->status === 'cancellation_requested') {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => $isForceMajeure,
-                'reschedule_allowed' => false,
-                'reschedule_message' => 'A cancellation request is already pending approval for this booking.',
-                'cancel_allowed' => false,
-                'cancel_message' => 'Your cancellation request is currently under review by the camp.',
-                'refund_percentage' => 0,
-                'calculated_refund' => 0.00,
-                'policy_tier' => 'pending_cancellation',
-            ];
-        }
-
-        // Dive date in past
-        if ($daysUntilDive < 0) {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => false,
-                'reschedule_allowed' => false,
-                'reschedule_message' => 'This dive trip has already taken place.',
-                'cancel_allowed' => false,
-                'cancel_message' => 'Past bookings cannot be cancelled or refunded.',
-                'refund_percentage' => 0,
-                'calculated_refund' => 0.00,
-                'policy_tier' => 'past',
-            ];
-        }
-
-        // Force Majeure (Typhoon / Gale warning override)
+        // Base policy tier calculation based on days until dive & force majeure
         if ($isForceMajeure) {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => true,
-                'reschedule_allowed' => true,
-                'reschedule_message' => 'Storm/Typhoon Warning Active: Free reschedule granted due to marine safety advisory.',
-                'cancel_allowed' => true,
-                'cancel_message' => 'Storm/Typhoon Warning Active: 100% full refund available due to force majeure.',
-                'refund_percentage' => 100,
-                'calculated_refund' => (float) $booking->downpayment_amount,
-                'policy_tier' => 'force_majeure',
-            ];
+            $policyTier = 'force_majeure';
+            $refundPercentage = 100;
+            $calculatedRefund = (float) $booking->downpayment_amount;
+            $rescheduleAllowed = true;
+            $cancelAllowed = true;
+            $rescheduleMessage = 'Storm/Typhoon Warning Active: Free reschedule granted due to marine safety advisory.';
+            $cancelMessage = 'Storm/Typhoon Warning Active: 100% full refund available due to force majeure.';
+        } elseif ($daysUntilDive > 14) {
+            $policyTier = 'more_than_two_weeks';
+            $refundPercentage = 100;
+            $calculatedRefund = (float) $booking->downpayment_amount;
+            $rescheduleAllowed = true;
+            $cancelAllowed = true;
+            $rescheduleMessage = 'Allowed: More than 14 days before dive date. Free reschedule to any available safe batch.';
+            $cancelMessage = 'Eligible for 100% Full Downpayment Refund (₱' . number_format($booking->downpayment_amount, 2) . ') or Free Reschedule.';
+        } elseif ($daysUntilDive >= 7 && $daysUntilDive <= 14) {
+            $policyTier = 'within_two_weeks';
+            $refundPercentage = 0;
+            $calculatedRefund = 0.00;
+            $rescheduleAllowed = true;
+            $cancelAllowed = true;
+            $rescheduleMessage = 'Allowed: Within 7–14 days window. Free reschedule to another available date.';
+            $cancelMessage = '0% Refund (Downpayment Forfeited): Cancellations made within 7–14 days forfeit downpayment (free reschedule is permitted).';
+        } else {
+            // < 7 days
+            $policyTier = 'within_one_week';
+            $refundPercentage = 0;
+            $calculatedRefund = 0.00;
+            $rescheduleAllowed = false;
+            $cancelAllowed = true;
+            $rescheduleMessage = 'Not Allowed: Rescheduling closes 7 days before the dive date as coach, boat, and resort commitments are locked in.';
+            $cancelMessage = 'Non-Refundable & Non-Reschedulable: Cancellations within 7 days forfeit downpayment unless an official Typhoon/Coast Guard Gale warning is active.';
         }
 
-        // Tier 1: More than 2 weeks (> 14 days)
-        if ($daysUntilDive > 14) {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => false,
-                'reschedule_allowed' => true,
-                'reschedule_message' => 'Allowed: More than 14 days before dive date. You may reschedule to any available safe batch.',
-                'cancel_allowed' => true,
-                'cancel_message' => 'Eligible for 100% Full Downpayment Refund (₱' . number_format($booking->downpayment_amount, 2) . ').',
-                'refund_percentage' => 100,
-                'calculated_refund' => (float) $booking->downpayment_amount,
-                'policy_tier' => 'more_than_two_weeks',
-            ];
-        }
+        // Status-specific overrides for self-service submission limits
+        $hasPendingReschedule = ($booking->status === 'reschedule_requested');
+        $hasPendingCancellation = ($booking->status === 'cancellation_requested');
+        $isCancelled = in_array($booking->status, ['cancelled', 'cancelled_by_camp', 'cancelled_by_guest']);
 
-        // Tier 2: Within 2 weeks (7 to 14 days)
-        if ($daysUntilDive >= 7 && $daysUntilDive <= 14) {
-            return [
-                'days_until_dive' => $daysUntilDive,
-                'is_force_majeure' => false,
-                'reschedule_allowed' => true,
-                'reschedule_message' => 'Allowed: Within 7–14 days window. You may move your slot to another future date once.',
-                'cancel_allowed' => false,
-                'cancel_message' => 'Not Eligible for Refund: Under camp policy, cancellations made within 14 days of the dive date forfeit the downpayment (rescheduling is permitted).',
-                'refund_percentage' => 0,
-                'calculated_refund' => 0.00,
-                'policy_tier' => 'within_two_weeks',
-            ];
-        }
-
-        // Tier 3: Within 1 week (< 7 days)
         return [
             'days_until_dive' => $daysUntilDive,
-            'is_force_majeure' => false,
-            'reschedule_allowed' => false,
-            'reschedule_message' => 'Not Allowed: Rescheduling closes 7 days before the dive date as coach, boat, and lodging commitments are locked in.',
-            'cancel_allowed' => false,
-            'cancel_message' => 'Not Eligible for Refund: Cancellations within 7 days forfeit downpayment unless a formal Typhoon/Coast Guard Gale warning is issued.',
-            'refund_percentage' => 0,
-            'calculated_refund' => 0.00,
-            'policy_tier' => 'within_one_week',
+            'is_force_majeure' => $isForceMajeure,
+            'reschedule_allowed' => $isCancelled ? false : ($hasPendingReschedule ? false : $rescheduleAllowed),
+            'reschedule_message' => $hasPendingReschedule 
+                ? 'You already have a pending reschedule request under review by the camp.' 
+                : ($isCancelled ? 'This booking is already cancelled.' : $rescheduleMessage),
+            'cancel_allowed' => $isCancelled ? false : ($hasPendingCancellation ? false : $cancelAllowed),
+            'cancel_message' => $hasPendingCancellation 
+                ? 'A cancellation request is currently under review by the camp.' 
+                : ($isCancelled ? 'This booking is already cancelled.' : $cancelMessage),
+            'refund_percentage' => $refundPercentage,
+            'calculated_refund' => $calculatedRefund,
+            'policy_tier' => $policyTier,
+            'has_pending_reschedule' => $hasPendingReschedule,
+            'has_pending_cancellation' => $hasPendingCancellation,
+            'is_cancelled' => $isCancelled,
         ];
     }
 }

@@ -227,18 +227,17 @@
                     <th class="p-4">Dive Dates</th>
                     <th class="p-4">Batch Assignment</th>
                     <th class="p-4">Status</th>
-                    <th class="p-4">Payment Status</th>
-                    <th class="p-4 text-right pr-6">Action</th>
+                    <th class="p-4 pr-6">Payment Status</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-[#E5E5EA]">
                 @forelse($bookings as $b)
-                <tr class="hover:bg-[#FAFAFC]/60 transition-colors text-xs sm:text-sm">
+                <tr onclick="window.location='{{ route('admin.bookings.show', $b) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors text-xs sm:text-sm group">
                     <!-- Booking Number & PIN -->
                     <td class="p-4 pl-6 font-mono">
-                        <a href="{{ route('admin.bookings.show', $b) }}" class="font-bold text-[#780000] hover:underline block text-sm">
+                        <span class="font-bold text-[#780000] group-hover:underline block text-sm">
                             {{ $b->booking_number }}
-                        </a>
+                        </span>
                         <span class="text-xs text-[#8E8E93]">PIN: {{ $b->pin }}</span>
                         @if($b->createdBy)
                             <span class="text-xs text-[#6E6E73] block">Manual: {{ $b->createdBy->name }}</span>
@@ -264,7 +263,7 @@
                     </td>
 
                     <!-- Batch Assignment -->
-                    <td class="p-4">
+                    <td class="p-4" onclick="event.stopPropagation()">
                         @if($b->batch)
                             <a href="{{ route('admin.batches.show', $b->batch) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[#166534] text-xs font-semibold hover:underline">
                                 <span>{{ $b->batch->batch_code }}</span>
@@ -288,23 +287,16 @@
                     </td>
 
                     <!-- Payment Status -->
-                    <td class="p-4">
+                    <td class="p-4 pr-6">
                         <span class="px-2 py-0.5 rounded text-xs font-bold {{ $b->payment_status_badge['class'] }}">
                             {{ $b->payment_status_badge['label'] }}
                         </span>
                         <span class="text-xs font-bold text-[#1D1D1F] block mt-0.5">₱{{ number_format($b->downpayment_amount, 2) }}</span>
                     </td>
-
-                    <!-- Actions -->
-                    <td class="p-4 text-right pr-6 whitespace-nowrap">
-                        <a href="{{ route('admin.bookings.show', $b) }}" class="btn-primary px-3.5 py-1.5 text-xs font-bold flex items-center justify-center gap-1.5 whitespace-nowrap">
-                            <span>Manage</span>
-                        </a>
-                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="p-8 text-center text-[#6E6E73]">
+                    <td colspan="7" class="p-8 text-center text-[#6E6E73]">
                         No bookings found matching your search or filters.
                     </td>
                 </tr>

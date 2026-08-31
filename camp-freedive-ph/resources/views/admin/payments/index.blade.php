@@ -195,22 +195,21 @@
             <table class="w-full text-left text-xs">
                 <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                     <tr>
-                        <th class="py-3 px-4">Transaction ID</th>
-                        <th class="py-3 px-4">Booking #</th>
-                        <th class="py-3 px-4">Lead Guest</th>
-                        <th class="py-3 px-4">Stage</th>
-                        <th class="py-3 px-4">Method</th>
-                        <th class="py-3 px-4 text-right">Amount</th>
-                        <th class="py-3 px-4 text-center">Status</th>
-                        <th class="py-3 px-4">Date</th>
-                        <th class="py-3 px-4 text-right">Action</th>
+                        <th class="py-3 px-4 text-left">Transaction ID</th>
+                        <th class="py-3 px-4 text-left">Booking #</th>
+                        <th class="py-3 px-4 text-left">Lead Guest</th>
+                        <th class="py-3 px-4 text-left">Stage</th>
+                        <th class="py-3 px-4 text-left">Method</th>
+                        <th class="py-3 px-4 text-left">Amount</th>
+                        <th class="py-3 px-4 text-left">Status</th>
+                        <th class="py-3 px-4 text-left pr-6">Date</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($payments as $payment)
-                    <tr class="hover:bg-[#FAFAFC] transition-colors">
+                    <tr onclick="window.location='{{ route('admin.payments.show', $payment) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group">
                         <!-- Transaction ID -->
-                        <td class="py-3 px-4 font-mono font-bold text-[#1D1D1F]">
+                        <td class="py-3 px-4 text-left font-mono font-bold text-[#1D1D1F] group-hover:text-[#780000]">
                             {{ $payment->transaction_id ?? ('TXN-' . $payment->id) }}
                             @if($payment->paymongo_payment_id)
                                 <span class="block text-[10px] font-normal text-[#6E6E73]">{{ $payment->paymongo_payment_id }}</span>
@@ -218,7 +217,7 @@
                         </td>
 
                         <!-- Booking Link -->
-                        <td class="py-3 px-4">
+                        <td class="py-3 px-4 text-left" onclick="event.stopPropagation()">
                             @if($payment->booking)
                                 <a href="{{ route('admin.bookings.show', $payment->booking) }}" class="font-mono font-bold text-[#780000] hover:underline">
                                     {{ $payment->booking->booking_number }}
@@ -229,7 +228,7 @@
                         </td>
 
                         <!-- Lead Guest Contact -->
-                        <td class="py-3 px-4">
+                        <td class="py-3 px-4 text-left">
                             @if($payment->booking)
                                 <strong class="text-[#1D1D1F] block">{{ $payment->booking->contact_name }}</strong>
                                 <span class="text-[#6E6E73] text-[11px] block">{{ $payment->booking->contact_phone }}</span>
@@ -239,44 +238,37 @@
                         </td>
 
                         <!-- Payment Stage -->
-                        <td class="py-3 px-4">
+                        <td class="py-3 px-4 text-left">
                             <span class="px-2 py-0.5 rounded-md bg-[#F2F2F7] text-[#1D1D1F] font-semibold text-[11px]">
                                 {{ $payment->payment_stage_label }}
                             </span>
                         </td>
 
                         <!-- Method -->
-                        <td class="py-3 px-4 font-medium text-[#1D1D1F]">
+                        <td class="py-3 px-4 text-left font-medium text-[#1D1D1F]">
                             {{ $payment->formatted_payment_method }}
                         </td>
 
                         <!-- Gross Amount -->
-                        <td class="py-3 px-4 text-right font-bold text-sm text-[#1D1D1F]">
+                        <td class="py-3 px-4 text-left font-bold text-sm text-[#1D1D1F]">
                             ₱{{ number_format($payment->amount, 2) }}
                         </td>
 
                         <!-- Status Badge -->
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-3 px-4 text-left">
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block {{ $payment->status_badge['class'] }}">
                                 {{ $payment->status_badge['label'] }}
                             </span>
                         </td>
 
                         <!-- Date -->
-                        <td class="py-3 px-4 text-[#6E6E73] whitespace-nowrap">
+                        <td class="py-3 px-4 text-left pr-6 text-[#6E6E73] whitespace-nowrap">
                             {{ $payment->paid_at ? $payment->paid_at->format('M d, Y g:i A') : $payment->created_at->format('M d, Y g:i A') }}
-                        </td>
-
-                        <!-- Action -->
-                        <td class="py-3 px-4 text-right whitespace-nowrap">
-                            <a href="{{ route('admin.payments.show', $payment) }}" class="px-3 py-1.5 rounded-lg border border-[#D1D1D6] hover:bg-[#F2F2F7] font-semibold text-xs text-[#1D1D1F] transition-colors">
-                                View Details →
-                            </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="9" class="py-8 text-center text-xs text-[#8E8E93]">
+                        <td colspan="8" class="py-8 text-center text-xs text-[#8E8E93]">
                             No payment transactions matching your search criteria found.
                         </td>
                     </tr>

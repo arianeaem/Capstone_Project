@@ -147,30 +147,30 @@
                 <table class="w-full text-left text-xs">
                     <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                         <tr>
-                            <th class="py-3 px-4">Booking #</th>
-                            <th class="py-3 px-4">Lead Guest</th>
-                            <th class="py-3 px-4 text-right">Amount</th>
-                            <th class="py-3 px-4 text-center">Status</th>
-                            <th class="py-3 px-4">Reviewed By</th>
-                            <th class="py-3 px-4">Reviewed At</th>
-                            <th class="py-3 px-4">Gateway Reference</th>
+                            <th class="py-3 px-4 text-left">Booking #</th>
+                            <th class="py-3 px-4 text-left">Lead Guest</th>
+                            <th class="py-3 px-4 text-left">Amount</th>
+                            <th class="py-3 px-4 text-left">Status</th>
+                            <th class="py-3 px-4 text-left">Reviewed By</th>
+                            <th class="py-3 px-4 text-left">Reviewed At</th>
+                            <th class="py-3 px-4 text-left">Gateway Reference</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#E5E5EA]">
                         @forelse($processedRefunds as $pr)
                         <tr class="hover:bg-[#FAFAFC] transition-colors">
-                            <td class="py-3 px-4">
+                            <td class="py-3 px-4 text-left">
                                 <a href="{{ route('admin.bookings.show', $pr->booking) }}" class="font-mono font-bold text-[#780000] hover:underline">
                                     {{ $pr->booking->booking_number }}
                                 </a>
                             </td>
-                            <td class="py-3 px-4 font-medium text-[#1D1D1F]">
+                            <td class="py-3 px-4 text-left font-medium text-[#1D1D1F]">
                                 {{ $pr->booking->contact_name }}
                             </td>
-                            <td class="py-3 px-4 text-right font-bold text-[#1D1D1F]">
+                            <td class="py-3 px-4 text-left font-bold text-[#1D1D1F]">
                                 ₱{{ number_format($pr->payment->amount ?? 0, 2) }}
                             </td>
-                            <td class="py-3 px-4 text-center">
+                            <td class="py-3 px-4 text-left">
                                 @if($pr->status === 'approved')
                                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                         Refunded

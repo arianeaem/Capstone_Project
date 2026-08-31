@@ -71,30 +71,30 @@
             <table class="w-full text-left text-xs">
                 <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                     <tr>
-                        <th class="py-3 px-4">Timestamp</th>
-                        <th class="py-3 px-4">Event Type</th>
-                        <th class="py-3 px-4">Actor</th>
-                        <th class="py-3 px-4">Details / Summary</th>
-                        <th class="py-3 px-4 text-right">IP Address</th>
+                        <th class="py-3 px-4 text-left">Timestamp</th>
+                        <th class="py-3 px-4 text-left">Event Type</th>
+                        <th class="py-3 px-4 text-left">Actor</th>
+                        <th class="py-3 px-4 text-left">Details / Summary</th>
+                        <th class="py-3 px-4 text-left">IP Address</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($logs as $log)
                     <tr class="hover:bg-[#FAFAFC] transition-colors">
                         <!-- Timestamp -->
-                        <td class="py-3 px-4 text-[#6E6E73] whitespace-nowrap font-mono text-[11px]">
+                        <td class="py-3 px-4 text-left text-[#6E6E73] whitespace-nowrap font-mono text-[11px]">
                             {{ $log->created_at ? $log->created_at->format('M d, Y g:i:s A') : '—' }}
                         </td>
 
                         <!-- Action Badge -->
-                        <td class="py-3 px-4 whitespace-nowrap">
+                        <td class="py-3 px-4 text-left whitespace-nowrap">
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block {{ $log->action_badge['class'] ?? 'bg-gray-100 text-gray-700 border-gray-200' }}">
                                 {{ $log->action_badge['label'] ?? $log->action }}
                             </span>
                         </td>
 
                         <!-- Actor -->
-                        <td class="py-3 px-4 whitespace-nowrap">
+                        <td class="py-3 px-4 text-left whitespace-nowrap">
                             <strong class="text-[#1D1D1F] block">{{ $log->actor_name ?? 'System' }}</strong>
                             @if($log->user)
                                 <span class="text-[11px] text-[#6E6E73]">{{ $log->user->email }} ({{ ucfirst($log->user->role) }})</span>
@@ -102,12 +102,12 @@
                         </td>
 
                         <!-- Description -->
-                        <td class="py-3 px-4 text-[#1D1D1F] max-w-md">
+                        <td class="py-3 px-4 text-left text-[#1D1D1F] max-w-md">
                             <p class="leading-relaxed">{{ $log->description }}</p>
                         </td>
 
                         <!-- IP Address -->
-                        <td class="py-3 px-4 text-right font-mono text-[11px] text-[#6E6E73] whitespace-nowrap">
+                        <td class="py-3 px-4 text-left font-mono text-[11px] text-[#6E6E73] whitespace-nowrap">
                             {{ $log->ip_address ?? '127.0.0.1' }}
                         </td>
                     </tr>

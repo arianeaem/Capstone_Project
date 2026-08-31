@@ -156,19 +156,19 @@
             $markedAvailableCount = $coach->coachAvailabilities->where('status', 'available')->where('date', '>=', now()->toDateString())->count();
         @endphp
         
-        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 hover:border-[#008E98]/40 transition-all flex flex-col justify-between space-y-4">
+        <div onclick="window.location='{{ route('admin.coaches.show', $coach) }}'" class="bg-white rounded-2xl border border-[#E5E5EA] p-5 hover:border-[#780000]/40 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between space-y-4 group">
             
             <!-- Card Header: Avatar, Name & Status -->
             <div>
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#780000] to-[#A00000] text-white flex items-center justify-center font-bold text-lg shrink-0">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#780000] to-[#A00000] text-white flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
                             {{ substr($coach->name, 0, 1) }}
                         </div>
                         <div>
-                            <a href="{{ route('admin.coaches.show', $coach) }}" class="font-extrabold text-[#1D1D1F] hover:text-[#780000] text-base block leading-tight">
+                            <span class="font-extrabold text-[#1D1D1F] group-hover:text-[#780000] text-base block leading-tight transition-colors">
                                 {{ $coach->name }}
-                            </a>
+                            </span>
                             @if($coach->nickname)
                                 <span class="text-xs font-semibold text-[#008E98]">"{{ $coach->nickname }}"</span>
                             @endif
@@ -181,42 +181,36 @@
                     </span>
                 </div>
 
-                <!-- Contact Details -->
-                <div class="mt-4 pt-3 border-t border-[#F2F2F7] space-y-1 text-xs text-[#6E6E73]">
-                    <div class="flex items-center gap-2 truncate">
-                        <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span class="truncate">{{ $coach->email }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span>{{ $coach->phone ?: 'No phone recorded' }}</span>
-                    </div>
+                <!-- Info Badges: Cert Level, Focus & Ratio -->
+                <div class="flex flex-wrap items-center gap-2 mt-4">
+                    <span class="px-2.5 py-1 rounded-lg bg-[#F2F2F7] text-[#1D1D1F] text-xs font-bold">
+                        {{ $coach->certification_level ? str_replace('_', ' ', strtoupper($coach->certification_level)) : 'Certified Coach' }}
+                    </span>
+                    <span class="px-2.5 py-1 rounded-lg bg-[#EBF5FF] text-[#1E40AF] text-xs font-semibold">
+                        Max Ratio 1:{{ $coach->max_ratio ?? 4 }}
+                    </span>
                 </div>
 
-                <!-- Schedule & Student Load Stats -->
-                <div class="mt-4 p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2.5 text-xs">
-                    <!-- Upcoming Dives -->
+                <!-- Metrics & Details -->
+                <div class="mt-4 pt-3 border-t border-[#E5E5EA] space-y-2 text-xs">
                     <div class="flex items-center justify-between">
-                        <span class="text-[#6E6E73]">Upcoming Dive Dates:</span>
-                        @if($upcomingCount > 0)
-                            <span class="font-bold text-[#1D1D1F]">{{ $upcomingCount }} Date(s)</span>
-                        @else
-                            <span class="text-[#8E8E93] italic">None scheduled</span>
-                        @endif
+                        <span class="text-[#6E6E73]">Upcoming Active Dates:</span>
+                        <strong class="text-[#1D1D1F]">{{ $upcomingCount }} scheduled</strong>
                     </div>
 
-                    <!-- Next Student Load -->
                     @if($nextAssignment)
-                        <div class="space-y-1 pt-1 border-t border-[#E5E5EA]">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[#6E6E73]">Next Assignment ({{ $nextAssignment->dive_date->format('M d') }}):</span>
-                                <span class="font-bold text-[#1D1D1F]">{{ $loadOnNext }} / 4 Pax</span>
-                            </div>
-                            <div class="w-full bg-[#E5E5EA] rounded-full h-1.5 overflow-hidden">
-                                <div class="h-1.5 rounded-full {{ $loadOnNext > 4 ? 'bg-[#FF3B3C]' : ($loadOnNext === 4 ? 'bg-[#34C759]' : 'bg-[#0088FF]') }}" 
-                                     style="width: {{ min(100, ($loadOnNext / 4) * 100) }}%"></div>
-                            </div>
-                            @if($loadOnNext > 4)
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#6E6E73]">Next Dive Batch:</span>
+                            <span class="font-bold text-[#1D1D1F]">
+                                {{ \Carbon\Carbon::parse($nextAssignment->dive_date)->format('M d, Y') }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#6E6E73]">Next Batch Load:</span>
+                            <span class="font-semibold {{ $loadOnNext > ($coach->max_ratio ?? 4) ? 'text-[#FF3B3C]' : 'text-[#065F46]' }}">
+                                {{ $loadOnNext }} / {{ $coach->max_ratio ?? 4 }} Students
+                            </span>
+                            @if($loadOnNext > ($coach->max_ratio ?? 4))
                                 <span class="text-[11px] font-bold text-[#FF3B3C] block">Override Exception</span>
                             @endif
                         </div>
@@ -234,14 +228,6 @@
                         @endif
                     </div>
                 </div>
-            </div>
-
-            <!-- Card Footer Actions -->
-            <div class="pt-2 flex items-center justify-between gap-2">
-                <a href="{{ route('admin.coaches.show', $coach) }}" 
-                   class="w-full py-2 px-3 rounded-xl font-bold text-xs text-center flex items-center justify-center gap-1.5 whitespace-nowrap btn-secondary hover:bg-[#F2F2F7] transition-all">
-                    <span>View Profile</span>
-                </a>
             </div>
 
         </div>

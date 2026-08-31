@@ -167,20 +167,20 @@
             <table class="w-full text-left text-xs">
                 <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                     <tr>
-                        <th class="py-3 px-4">Staff Member</th>
-                        <th class="py-3 px-4">Contact Phone</th>
-                        <th class="py-3 px-4">Role</th>
-                        <th class="py-3 px-4 text-center">Status</th>
-                        <th class="py-3 px-4">Last Login</th>
-                        <th class="py-3 px-4 text-right">Actions</th>
+                        <th class="py-3 px-4 text-left">Staff Member</th>
+                        <th class="py-3 px-4 text-left">Contact Phone</th>
+                        <th class="py-3 px-4 text-left">Role</th>
+                        <th class="py-3 px-4 text-left">Status</th>
+                        <th class="py-3 px-4 text-left">Last Login</th>
+                        <th class="py-3 px-4 text-right pr-6">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($users as $user)
-                    <tr class="hover:bg-[#FAFAFC] transition-colors">
+                    <tr onclick="window.location='{{ route('admin.users.edit', $user) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group">
                         <!-- Staff Name & Email -->
-                        <td class="py-3 px-4">
-                            <div class="font-bold text-sm text-[#1D1D1F]">
+                        <td class="py-3 px-4 text-left">
+                            <div class="font-bold text-sm text-[#1D1D1F] group-hover:text-[#780000]">
                                 {{ $user->name }}
                                 @if($user->id === $currentUser->id)
                                     <span class="text-[10px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 font-bold ml-1">You</span>
@@ -190,19 +190,19 @@
                         </td>
 
                         <!-- Phone -->
-                        <td class="py-3 px-4 text-[#1D1D1F]">
+                        <td class="py-3 px-4 text-left text-[#1D1D1F]">
                             {{ $user->phone ?? '—' }}
                         </td>
 
                         <!-- Role Badge -->
-                        <td class="py-3 px-4">
+                        <td class="py-3 px-4 text-left">
                             <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block {{ $user->role_badge['class'] }}">
                                 {{ $user->role_badge['label'] }}
                             </span>
                         </td>
 
                         <!-- Status Badge -->
-                        <td class="py-3 px-4 text-center">
+                        <td class="py-3 px-4 text-left">
                             @if($user->isActive())
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -217,32 +217,53 @@
                         </td>
 
                         <!-- Last Login -->
-                        <td class="py-3 px-4 text-[#6E6E73] whitespace-nowrap">
+                        <td class="py-3 px-4 text-left text-[#6E6E73] whitespace-nowrap">
                             {{ $user->last_login_at ? $user->last_login_at->format('M d, Y g:i A') : 'Never logged in' }}
                         </td>
 
-                        <!-- Actions -->
-                        <td class="py-3 px-4 text-right whitespace-nowrap space-x-1.5">
+                        <!-- 3-Dots Action Menu -->
+                        <td class="py-3 px-4 text-right pr-6 whitespace-nowrap" onclick="event.stopPropagation()">
                             @if($currentUser->isOwner() || ($currentUser->isAdmin() && $user->isCoach()))
-                                <!-- Edit Profile -->
-                                <a href="{{ route('admin.users.edit', $user) }}" class="btn-secondary px-3 py-1.5 text-xs inline-block">
-                                    Edit
-                                </a>
+                                <div class="relative inline-block text-left" x-data="{ openMenu: false }">
+                                    <button type="button" 
+                                            @click="openMenu = !openMenu" 
+                                            class="w-8 h-8 rounded-lg flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+                                            title="Actions">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                            <circle cx="12" cy="5" r="2"></circle>
+                                            <circle cx="12" cy="12" r="2"></circle>
+                                            <circle cx="12" cy="19" r="2"></circle>
+                                        </svg>
+                                    </button>
 
-                                <!-- Status Toggle (Cannot toggle self) -->
-                                @if($user->id !== $currentUser->id)
-                                    <form action="{{ route('admin.users.toggle_status', $user) }}" method="POST" class="inline-block">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" 
-                                                onclick="return confirm('Are you sure you want to {{ $user->isActive() ? 'deactivate' : 'activate' }} this account?')"
-                                                class="{{ $user->isActive() ? 'btn-danger' : 'btn-secondary' }} px-3 py-1.5 text-xs font-semibold">
-                                            {{ $user->isActive() ? 'Deactivate' : 'Activate' }}
-                                        </button>
-                                    </form>
-                                @endif
+                                    <!-- Dropdown Menu -->
+                                    <div x-show="openMenu" 
+                                         @click.outside="openMenu = false" 
+                                         x-cloak 
+                                         class="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-[#D1D1D6] shadow-lg p-1.5 z-50 space-y-1 text-left">
+                                        
+                                        <!-- Edit Profile -->
+                                        <a href="{{ route('admin.users.edit', $user) }}" 
+                                           class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
+                                            <span>Edit Account</span>
+                                        </a>
+
+                                        <!-- Status Toggle -->
+                                        @if($user->id !== $currentUser->id)
+                                            <form action="{{ route('admin.users.toggle_status', $user) }}" method="POST" class="block w-full">
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" 
+                                                        onclick="return confirm('Are you sure you want to {{ $user->isActive() ? 'deactivate' : 'activate' }} this account?')"
+                                                        class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold {{ $user->isActive() ? 'text-[#FF3B3C] hover:bg-[#FEF2F2]' : 'text-[#008E98] hover:bg-[#F0FDFA]' }} rounded-lg transition-colors text-left cursor-pointer">
+                                                    <span>{{ $user->isActive() ? 'Deactivate' : 'Activate' }}</span>
+                                                </button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </div>
                             @else
-                                <span class="text-[11px] text-[#8E8E93] italic">Managed by Owner</span>
+                                <span class="text-[11px] text-[#8E8E93] italic">Owner only</span>
                             @endif
                         </td>
                     </tr>

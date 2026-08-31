@@ -164,104 +164,118 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-[#E5E5EA] bg-[#FAFAFC] text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider">
-                        <th class="py-3 px-4">Priority</th>
-                        <th class="py-3 px-4">Rule Name</th>
-                        <th class="py-3 px-4">Type</th>
-                        <th class="py-3 px-4">Condition</th>
-                        <th class="py-3 px-4">Adjustment</th>
-                        <th class="py-3 px-4">Applies To</th>
-                        <th class="py-3 px-4">Status</th>
-                        <th class="py-3 px-4 text-center">Bookings Triggered</th>
-                        <th class="py-3 px-4 text-right">Actions</th>
+                        <th class="py-3 px-4 text-left">Priority</th>
+                        <th class="py-3 px-4 text-left">Rule Name</th>
+                        <th class="py-3 px-4 text-left">Type</th>
+                        <th class="py-3 px-4 text-left">Condition</th>
+                        <th class="py-3 px-4 text-left">Adjustment</th>
+                        <th class="py-3 px-4 text-left">Applies To</th>
+                        <th class="py-3 px-4 text-left">Status</th>
+                        <th class="py-3 px-4 text-left">Bookings Triggered</th>
+                        <th class="py-3 px-4 text-right pr-6">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($rules as $rule)
-                    <tr class="hover:bg-[#F2F2F7]/50 transition-colors {{ $rule->status === 'inactive' ? 'opacity-65' : '' }}">
-                        <!-- Priority -->
-                        <td class="py-3.5 px-4">
-                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#F2F2F7] text-xs font-bold text-[#1D1D1F]">
+                    <tr onclick="window.location='{{ route('admin.pricing.edit', $rule) }}'" class="hover:bg-[#F2F2F7]/60 cursor-pointer transition-colors group {{ $rule->status === 'inactive' ? 'opacity-65' : '' }}">
+                        <!-- Priority Handle -->
+                        <td class="py-3.5 px-4 text-left">
+                            <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#F2F2F7] group-hover:bg-[#780000] group-hover:text-white font-mono text-xs font-bold text-[#1D1D1F] transition-colors">
                                 {{ $rule->priority }}
                             </span>
                         </td>
 
                         <!-- Rule Name & Description -->
-                        <td class="py-3.5 px-4">
-                            <div class="font-bold text-[#1D1D1F]">{{ $rule->name }}</div>
+                        <td class="py-3.5 px-4 text-left max-w-xs">
+                            <span class="font-bold text-sm text-[#1D1D1F] group-hover:text-[#780000] block transition-colors">
+                                {{ $rule->name }}
+                            </span>
                             @if($rule->description)
-                                <div class="text-xs text-[#6E6E73] truncate max-w-xs">{{ $rule->description }}</div>
+                                <span class="text-xs text-[#6E6E73] line-clamp-1 mt-0.5">{{ $rule->description }}</span>
                             @endif
                         </td>
 
                         <!-- Rule Type Badge -->
-                        <td class="py-3.5 px-4">
-                            @if($rule->rule_type === 'demand')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
-                                    Demand
-                                </span>
-                            @elseif($rule->rule_type === 'seasonality')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">
-                                    Seasonality
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800">
-                                    Lead Time
-                                </span>
-                            @endif
+                        <td class="py-3.5 px-4 text-left">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block {{ $rule->type_badge['class'] }}">
+                                {{ $rule->type_badge['label'] }}
+                            </span>
                         </td>
 
-                        <!-- Condition Summary -->
-                        <td class="py-3.5 px-4 font-medium text-[#1D1D1F]">
+                        <!-- Human Readable Condition -->
+                        <td class="py-3.5 px-4 text-left font-mono text-xs text-[#1D1D1F]">
                             {{ $rule->condition_summary }}
                         </td>
 
-                        <!-- Adjustment -->
-                        <td class="py-3.5 px-4">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold {{ $rule->adjustment_type === 'increase' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200' }}">
+                        <!-- Adjustment Value -->
+                        <td class="py-3.5 px-4 text-left font-bold text-xs whitespace-nowrap">
+                            <span class="{{ $rule->adjustment_type === 'increase' ? 'text-emerald-700' : 'text-rose-700' }}">
                                 {{ $rule->formatted_adjustment }}
                             </span>
                         </td>
 
                         <!-- Applies To -->
-                        <td class="py-3.5 px-4 text-xs font-medium text-[#6E6E73]">
+                        <td class="py-3.5 px-4 text-left text-xs font-semibold text-[#6E6E73] capitalize">
                             {{ $rule->formatted_applies_to }}
                         </td>
 
-                        <!-- Inline Status Toggle -->
-                        <td class="py-3.5 px-4">
+                        <!-- Status Toggle (AJAX) -->
+                        <td class="py-3.5 px-4 text-left" onclick="event.stopPropagation()">
                             <form action="{{ route('admin.pricing.toggle_status', $rule) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" 
-                                        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-bold cursor-pointer transition-all {{ $rule->status === 'active' ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
-                                    <span class="w-1.5 h-1.5 rounded-full {{ $rule->status === 'active' ? 'bg-emerald-600' : 'bg-gray-400' }}"></span>
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border transition-colors cursor-pointer {{ $rule->status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100' : 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200' }}">
+                                    <span class="w-1.5 h-1.5 rounded-full {{ $rule->status === 'active' ? 'bg-emerald-500' : 'bg-gray-400' }}"></span>
                                     <span>{{ ucfirst($rule->status) }}</span>
                                 </button>
                             </form>
                         </td>
 
                         <!-- Bookings Triggered Count -->
-                        <td class="py-3.5 px-4 text-center">
+                        <td class="py-3.5 px-4 text-left" onclick="event.stopPropagation()">
                             <a href="{{ route('admin.pricing.triggered', $rule) }}" 
                                class="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-[#F2F2F7] hover:bg-[#E5E5EA] text-[#780000] font-extrabold text-xs transition-colors"
-                               title="Click to view triggered bookings">
+                                title="Click to view triggered bookings">
                                 <span>{{ number_format($rule->adjustments_count) }}</span>
                                 <svg class="w-3.5 h-3.5 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                             </a>
                         </td>
 
-                        <!-- Actions -->
-                        <td class="py-3.5 px-4 text-right space-x-2">
-                            <a href="{{ route('admin.pricing.edit', $rule) }}" 
-                               class="inline-flex items-center px-2.5 py-1 rounded-lg bg-white border border-[#D1D1D6] hover:bg-[#F2F2F7] text-xs font-bold text-[#1D1D1F] transition-colors">
-                                Edit
-                            </a>
+                        <!-- 3-Dots Action Menu -->
+                        <td class="py-3.5 px-4 text-right pr-6" onclick="event.stopPropagation()">
+                            <div class="relative inline-block text-left" x-data="{ openMenu: false }">
+                                <button type="button" 
+                                        @click="openMenu = !openMenu" 
+                                        class="w-8 h-8 rounded-lg flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors cursor-pointer"
+                                        title="Actions">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                                        <circle cx="12" cy="5" r="2"></circle>
+                                        <circle cx="12" cy="12" r="2"></circle>
+                                        <circle cx="12" cy="19" r="2"></circle>
+                                    </svg>
+                                </button>
 
-                            <button type="button"
-                                    @click="deleteModal = true; deleteUrl = '{{ route('admin.pricing.destroy', $rule) }}'; ruleName = '{{ addslashes($rule->name) }}'; triggeredCount = {{ $rule->adjustments_count }};"
-                                    class="inline-flex items-center px-2.5 py-1 rounded-lg bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold transition-colors">
-                                Delete
-                            </button>
+                                <!-- Dropdown Menu -->
+                                <div x-show="openMenu" 
+                                     @click.outside="openMenu = false" 
+                                     x-cloak 
+                                     class="absolute right-0 mt-1 w-40 bg-white rounded-xl border border-[#D1D1D6] shadow-lg p-1.5 z-50 space-y-1 text-left">
+                                    
+                                    <!-- Edit Rule -->
+                                    <a href="{{ route('admin.pricing.edit', $rule) }}" 
+                                       class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
+                                        <span>Edit Rule</span>
+                                    </a>
+
+                                    <!-- Delete Rule -->
+                                    <button type="button"
+                                            @click="openMenu = false; deleteModal = true; deleteUrl = '{{ route('admin.pricing.destroy', $rule) }}'; ruleName = '{{ addslashes($rule->name) }}'; triggeredCount = {{ $rule->adjustments_count }};"
+                                            class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#FF3B3C] hover:bg-[#FEF2F2] rounded-lg transition-colors text-left cursor-pointer">
+                                        <span>Delete Rule</span>
+                                    </button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     @empty
