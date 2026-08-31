@@ -28,18 +28,17 @@ class WeatherForecastService
     public const TIMEZONE = 'Asia/Manila';
     public const MAX_FORECAST_DAYS = 16;
 
-    // Weight table incorporating direct wind speed and compound synergies
+    // 9 Environmental Feature Weights (Tide Height removed; total = 1.000 / 100%)
     public const WEIGHTS = [
-        'wave_height' => 0.150,
-        'wind_speed' => 0.140,
-        'ocean_current' => 0.130,
-        'swell_height' => 0.120,
-        'wave_period' => 0.110,
+        'wave_height' => 0.160,
+        'wind_speed' => 0.150,
+        'ocean_current' => 0.140,
+        'swell_height' => 0.125,
+        'wave_period' => 0.115,
         'wind_wave_height' => 0.100,
         'rain' => 0.080,
         'sea_level_pressure' => 0.070,
-        'tide_height' => 0.050,
-        'wind_direction' => 0.050,
+        'wind_direction' => 0.060,
     ];
 
     public const MEANING_MAP = [
@@ -61,6 +60,52 @@ class WeatherForecastService
     ];
 
     /**
+     * Determine Forecast Reliability Category based on Lead Time Horizon.
+     *
+     * Range         | Reliability Category      | Operational Impact
+     * Days 1–3      | 🟢 High Reliability       | Highly actionable. Use directly for operational safety window greenlighting.
+     * Days 4–7      | 🟡 Medium Reliability     | Excellent for spotting long-range trends, shifting winds, or monsoon setups.
+     * Days 8–16     | 🔴 Low Reliability        | Climatological trend only. Do not use for safety-critical go/no-go logic.
+     */
+    public static function getReliabilityCategory(int|float $daysOut): array
+    {
+        if ($daysOut <= 3) {
+            return [
+                'level' => 'high',
+                'range' => 'Days 1–3',
+                'label' => 'High Reliability',
+                'badge_class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'dot_color' => 'bg-emerald-500',
+                'icon' => '🟢',
+                'description' => 'Highly actionable. Use directly for operational safety window greenlighting.',
+                'actionable' => true,
+            ];
+        } elseif ($daysOut <= 7) {
+            return [
+                'level' => 'medium',
+                'range' => 'Days 4–7',
+                'label' => 'Medium Reliability',
+                'badge_class' => 'bg-amber-50 text-amber-700 border-amber-200',
+                'dot_color' => 'bg-amber-500',
+                'icon' => '🟡',
+                'description' => 'Excellent for spotting long-range trends, shifting winds, or monsoon setups.',
+                'actionable' => true,
+            ];
+        } else {
+            return [
+                'level' => 'low',
+                'range' => 'Days 8–16',
+                'label' => 'Low Reliability',
+                'badge_class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'dot_color' => 'bg-rose-500',
+                'icon' => '🔴',
+                'description' => 'Climatological trend only. Do not use for safety-critical go/no-go logic.',
+                'actionable' => false,
+            ];
+        }
+    }
+
+    /**
      * Run full risk assessment for a 2D1N Batch across all 4 fixed windows:
      * - Day 1 AM (09:30–12:00) & PM (15:30–17:30)
      * - Day 2 AM (09:30–12:00) & PM (15:30–17:30)
@@ -70,6 +115,49 @@ class WeatherForecastService
         return DB::transaction(function () use ($batch, $overrides, $assessedBy) {
             $startDate = $batch->start_date->copy()->startOfDay();
             $endDate = $batch->end_date ? $batch->end_date->copy()->startOfDay() : $startDate->copy()->addDay();
+
+            // If the batch is already completed / finished and has existing assessments, lock and return the last identified assessment
+            $isFinished = in_array($batch->status, ['completed', 'cancelled', 'cancelled_by_camp']) || 
+                          in_array($batch->lifecycle_status, ['completed', 'cancelled', 'cancelled_by_camp']) ||
+                          $endDate->isPast();
+
+            $existingDay1 = $batch->riskAssessments()->where('day_number', 1)->first();
+            $existingDay2 = $batch->riskAssessments()->where('day_number', 2)->first();
+
+            if ($isFinished && $existingDay1 && $existingDay2 && empty($overrides)) {
+                $overallClassification = $batch->risk_classification 
+                    ? ucfirst(str_replace('_', ' ', $batch->risk_classification)) 
+                    : $existingDay1->overall_classification;
+
+                return [
+                    'batch' => $batch,
+                    'overall_classification' => $overallClassification,
+                    'day1' => [
+                        'assessment_id' => $existingDay1->id,
+                        'day_number' => 1,
+                        'date' => $existingDay1->dive_date->format('Y-m-d'),
+                        'classification' => $existingDay1->overall_classification,
+                        'weighted_score_pct' => $existingDay1->weighted_score_pct,
+                        'recommended_action' => $existingDay1->recommended_action,
+                        'worst_hour' => $existingDay1->worst_hour ? $existingDay1->worst_hour->format('g:i A') : 'N/A',
+                        'worst_window' => $existingDay1->worst_window ?? 'N/A',
+                        'am' => ['classification' => $existingDay1->overall_classification, 'hourly' => []],
+                        'pm' => ['classification' => $existingDay1->overall_classification, 'hourly' => []],
+                    ],
+                    'day2' => [
+                        'assessment_id' => $existingDay2->id,
+                        'day_number' => 2,
+                        'date' => $existingDay2->dive_date->format('Y-m-d'),
+                        'classification' => $existingDay2->overall_classification,
+                        'weighted_score_pct' => $existingDay2->weighted_score_pct,
+                        'recommended_action' => $existingDay2->recommended_action,
+                        'worst_hour' => $existingDay2->worst_hour ? $existingDay2->worst_hour->format('g:i A') : 'N/A',
+                        'worst_window' => $existingDay2->worst_window ?? 'N/A',
+                        'am' => ['classification' => $existingDay2->overall_classification, 'hourly' => []],
+                        'pm' => ['classification' => $existingDay2->overall_classification, 'hourly' => []],
+                    ],
+                ];
+            }
 
             $assessedAt = now();
 
@@ -126,12 +214,62 @@ class WeatherForecastService
         $leadTimeHours = max(0, Carbon::now(self::TIMEZONE)->diffInHours($date->copy()->setTime(9, 30), false));
         $overrideTriggered = $this->checkOverrideConditions($overrides);
 
-        // Check if date is outside the 16-day forecast model horizon (or in past >1 day)
-        if (!$overrideTriggered && ($daysOut > self::MAX_FORECAST_DAYS || $daysOut < -1)) {
+        // Check if date is in past (> 1 day ago) for finished/completed batches
+        if (!$overrideTriggered && $daysOut < -1) {
+            $finalClass = match ($batch->risk_classification) {
+                'very_safe' => 'Very Safe',
+                'safe' => 'Safe',
+                'moderate' => 'Moderate',
+                'high_risk' => 'High Risk',
+                'critical_risk' => 'Critical Risk',
+                default => ($batch->status === 'completed' ? 'Very Safe' : 'Safe'),
+            };
+
+            $recommendedAction = self::MEANING_MAP[$finalClass] ?? 'Concluded batch operations.';
+            $defaultScore = match ($finalClass) {
+                'Very Safe' => 15.0,
+                'Safe' => 30.0,
+                'Moderate' => 50.0,
+                'High Risk' => 70.0,
+                'Critical Risk' => 100.0,
+                default => 25.0,
+            };
+
+            $riskAssessment = BatchRiskAssessment::create([
+                'batch_id' => $batch->id,
+                'day_number' => $dayNumber,
+                'dive_date' => $date->format('Y-m-d'),
+                'lead_time_hours' => 0,
+                'overall_classification' => $finalClass,
+                'weighted_score_pct' => $defaultScore,
+                'recommended_action' => $recommendedAction,
+                'worst_window' => '10:00-12:00',
+                'worst_hour' => $date->copy()->setTime(11, 0),
+                'override_triggered' => false,
+                'override_details' => $overrides,
+                'assessed_by' => $assessedBy?->id,
+                'assessed_at' => $assessedAt,
+            ]);
+
+            return [
+                'assessment_id' => $riskAssessment->id,
+                'day_number' => $dayNumber,
+                'date' => $date->format('Y-m-d'),
+                'lead_time_hours' => 0,
+                'classification' => $finalClass,
+                'weighted_score_pct' => $defaultScore,
+                'recommended_action' => $recommendedAction,
+                'worst_window' => '10:00-12:00',
+                'worst_hour' => '11:00 AM',
+                'am' => ['classification' => $finalClass, 'hourly' => []],
+                'pm' => ['classification' => $finalClass, 'hourly' => []],
+            ];
+        }
+
+        // Check if date is outside the 16-day forecast model horizon
+        if (!$overrideTriggered && $daysOut > self::MAX_FORECAST_DAYS) {
             $dayClassification = 'Not Available';
-            $recommendedAction = $daysOut > self::MAX_FORECAST_DAYS
-                ? "Forecast model is not yet available beyond 16 days out. Assessment will unlock on " . $date->copy()->subDays(16)->format('M d, Y') . " (16 days before dive date)."
-                : "Past date - live forecast no longer active.";
+            $recommendedAction = "Forecast model is not yet available beyond 16 days out. Assessment will unlock on " . $date->copy()->subDays(16)->format('M d, Y') . " (16 days before dive date).";
 
             $riskAssessment = BatchRiskAssessment::create([
                 'batch_id' => $batch->id,
@@ -170,41 +308,33 @@ class WeatherForecastService
         // Evaluate PM Window (15:30 - 17:30)
         $pmData = $this->assessWindow($date->format('Y-m-d'), '15:30', '17:30', 'pm', $overrides);
 
-        // Worst Window Wins
+        // Retrieve whole-day daytime baseline (06:00 - 18:00)
+        $cachedDay = $this->getCachedDayForecast($date->format('Y-m-d'));
+        if (!$cachedDay && !$overrideTriggered) {
+            try {
+                $this->updateAllForecasts(16);
+                $cachedDay = $this->getCachedDayForecast($date->format('Y-m-d'));
+            } catch (\Throwable $e) {}
+        }
+
         $amRank = self::RISK_RANK[$amData['classification']] ?? 1;
         $pmRank = self::RISK_RANK[$pmData['classification']] ?? 1;
+        $daytimeRank = self::RISK_RANK[$cachedDay['daytime_classification'] ?? 'Safe'] ?? 1;
 
-        if ($pmRank > $amRank) {
-            $worstWindow = '15:30-17:30';
-            $dayClassification = $pmData['classification'];
-            $weightedScorePct = $pmData['weighted_score_pct'];
-            $worstHour = $pmData['worst_hour'];
+        if ($overrideTriggered || $amRank === 5 || $pmRank === 5 || $daytimeRank === 5) {
+            $dayClassification = 'Critical Risk';
+            $weightedScorePct = 100.0;
+            $worstWindow = ($pmRank >= $amRank) ? '15:30-17:30' : '09:30-12:00';
+            $worstHour = ($pmRank >= $amRank) ? $pmData['worst_hour'] : $amData['worst_hour'];
+            $recommendedAction = self::MEANING_MAP['Critical Risk'];
         } else {
-            $worstWindow = '09:30-12:00';
-            $dayClassification = $amData['classification'];
-            $weightedScorePct = $amData['weighted_score_pct'];
-            $worstHour = $amData['worst_hour'];
+            $dayRank = max($amRank, $pmRank, $daytimeRank);
+            $dayClassification = array_search($dayRank, self::RISK_RANK) ?: 'Safe';
+            $weightedScorePct = max($amData['weighted_score_pct'] ?? 0, $pmData['weighted_score_pct'] ?? 0, $cachedDay['daytime_score_pct'] ?? 0);
+            $worstWindow = ($pmRank >= $amRank) ? '15:30-17:30' : '09:30-12:00';
+            $worstHour = ($pmRank >= $amRank) ? $pmData['worst_hour'] : $amData['worst_hour'];
+            $recommendedAction = self::MEANING_MAP[$dayClassification] ?? 'Proceed with caution.';
         }
-
-        // Incorporate 24-Hour Day Peak if worse than window assessments
-        $cachedDay = $this->getCachedDayForecast($date->format('Y-m-d'));
-        if ($cachedDay && !$overrideTriggered) {
-            $cachedRank = self::RISK_RANK[$cachedDay['overall_classification']] ?? 1;
-            $currentRank = self::RISK_RANK[$dayClassification] ?? 1;
-            if ($cachedRank > $currentRank) {
-                $dayClassification = $cachedDay['overall_classification'];
-                $weightedScorePct = $cachedDay['overall_score_pct'];
-                foreach ($cachedDay['hourly'] as $h) {
-                    if (($h['weighted_score_pct'] ?? 0) >= $weightedScorePct) {
-                        $worstHour = $h['iso_time'];
-                        $worstWindow = sprintf('%02d:00', $h['hour']);
-                        break;
-                    }
-                }
-            }
-        }
-
-        $recommendedAction = self::MEANING_MAP[$dayClassification] ?? 'Proceed with caution.';
 
         // Persist BatchRiskAssessment
         $riskAssessment = BatchRiskAssessment::create([
@@ -322,6 +452,8 @@ class WeatherForecastService
                 }
             }
 
+            $reliability = self::getReliabilityCategory($daysOut);
+
             return [
                 'available' => true,
                 'start_date' => $startDate->format('Y-m-d'),
@@ -330,6 +462,8 @@ class WeatherForecastService
                 'end_date_formatted' => $endDate->format('M d, Y (l)'),
                 'overall_classification' => $overallClass,
                 'data_source' => 'Live Open-Meteo Marine & Weather Radar (Anilao, Batangas)',
+                'days_out' => $daysOut,
+                'reliability' => $reliability,
                 'day1' => [
                     'date' => $startDate->format('M d, Y'),
                     'classification' => $day1Class,
@@ -578,7 +712,7 @@ class WeatherForecastService
     }
 
     /**
-     * Native evaluation pipeline using live Open-Meteo APIs and exact Python scoring rules.
+     * Native evaluation pipeline using live Open-Meteo APIs and sustained window scoring.
      */
     protected function evaluateWindowNatively(string $plannedDate, string $diveStart, string $diveEnd, string $windowType, ?array $overrides): array
     {
@@ -589,12 +723,21 @@ class WeatherForecastService
         $hours = $windowType === 'am' ? [10, 11, 12] : [16, 17];
         
         $hourlyList = [];
-        $maxScore = -1;
-        $worstHour = null;
 
         // Fetch live marine & weather data from Open-Meteo
         $marineData = $this->fetchOpenMeteoMarine($plannedDate);
         $weatherData = $this->fetchOpenMeteoWeather($plannedDate);
+
+        $windowWindSpeeds = [];
+        $windowWindGusts = [];
+        $windowWaveHeights = [];
+        $windowWavePeriods = [];
+        $windowSwellHeights = [];
+        $windowWindWaveHeights = [];
+        $windowOceanCurrents = [];
+        $windowRains = [];
+        $windowPressures = [];
+        $windowWindDirections = [];
 
         foreach ($hours as $hour) {
             $timeStr = sprintf('%sT%02d:00:00+08:00', $plannedDate, $hour);
@@ -617,21 +760,21 @@ class WeatherForecastService
             $pressure = isset($weatherData['pressure_msl'][$idx]) ? (float)$weatherData['pressure_msl'][$idx] : 1010.5;
             $rawWindSpeed = isset($weatherData['wind_speed_10m'][$idx]) ? (float)$weatherData['wind_speed_10m'][$idx] : 12.5;
             $windGusts = isset($weatherData['wind_gusts_10m'][$idx]) ? (float)$weatherData['wind_gusts_10m'][$idx] : 0.0;
-            $windSpeed = max($rawWindSpeed, $windGusts * 0.75);
-
             $windDir = isset($weatherData['wind_direction_10m'][$idx]) ? (float)$weatherData['wind_direction_10m'][$idx] : 245.0;
 
-            // Deterministic Physical Hard-Gates (PCG Small Craft / Marine Ceilings)
-            $isPhysicalBreach = (
-                $rawWindSpeed >= 38.0 || $windGusts >= 48.0 ||
-                $waveHeight >= 1.80 || $swellHeight >= 1.80 ||
-                $oceanCurrent >= 0.80 ||
-                $rain >= 25.0 ||
-                $pressure <= 998.0
-            );
+            $windowWindSpeeds[] = $rawWindSpeed;
+            $windowWindGusts[] = $windGusts;
+            $windowWaveHeights[] = $waveHeight;
+            $windowWavePeriods[] = $wavePeriod;
+            $windowSwellHeights[] = $swellHeight;
+            $windowWindWaveHeights[] = $windWaveHeight;
+            $windowOceanCurrents[] = $oceanCurrent;
+            $windowRains[] = $rain;
+            $windowPressures[] = $pressure;
+            $windowWindDirections[] = $windDir;
 
-            // Score variables (0-4)
-            $scores = [
+            // Hourly point scores for granular breakdown
+            $hourScores = [
                 'wave_height' => $this->scoreWaveHeight($waveHeight),
                 'wind_speed' => $this->scoreWindSpeed($rawWindSpeed, $windGusts),
                 'ocean_current' => $this->scoreOceanCurrent($oceanCurrent),
@@ -640,17 +783,10 @@ class WeatherForecastService
                 'wind_wave_height' => $this->scoreWindWaveHeight($windWaveHeight),
                 'rain' => $this->scoreRain($rain),
                 'sea_level_pressure' => $this->scoreSeaLevelPressure($pressure),
-                'tide_height' => 0, // placeholder
                 'wind_direction' => $this->scoreWindDirection($windDir),
             ];
-
-            $weightedScorePct = $isPhysicalBreach ? 100.0 : $this->computeWeightedScore($scores);
-            $hourClass = ($overrideTriggered || $isPhysicalBreach) ? 'Critical Risk' : $this->classifyScore($weightedScorePct);
-
-            if ($weightedScorePct > $maxScore) {
-                $maxScore = $weightedScorePct;
-                $worstHour = $timeStr;
-            }
+            $hourWeightedPct = $this->computeWeightedScore($hourScores);
+            $hourClass = $this->classifyScore($hourWeightedPct);
 
             $hourlyList[] = [
                 'forecast_time' => Carbon::parse($timeStr),
@@ -661,25 +797,79 @@ class WeatherForecastService
                 'ocean_current' => $oceanCurrent,
                 'rain' => $rain,
                 'sea_level_pressure' => $pressure,
-                'wind_speed' => $windSpeed,
+                'wind_speed' => $rawWindSpeed,
+                'wind_gusts' => $windGusts,
                 'wind_direction' => $windDir,
-                'tide_height' => 0.0,
-                'tide_score' => 0,
-                'weighted_score_pct' => $overrideTriggered ? null : $weightedScorePct,
-                'classification' => $hourClass,
-                'recommended_action' => self::MEANING_MAP[$hourClass] ?? 'Proceed with caution.',
+                'weighted_score_pct' => $overrideTriggered ? null : $hourWeightedPct,
+                'classification' => $overrideTriggered ? 'Critical Risk' : $hourClass,
+                'recommended_action' => self::MEANING_MAP[$overrideTriggered ? 'Critical Risk' : $hourClass] ?? 'Proceed with caution.',
                 'is_worst_hour_in_window' => false,
             ];
         }
 
-        // Mark worst hour
+        $count = count($hours);
+        $meanWindSpeed = $count ? array_sum($windowWindSpeeds) / $count : 12.0;
+        $maxWindGust = !empty($windowWindGusts) ? max($windowWindGusts) : 0.0;
+        $meanWaveHeight = $count ? array_sum($windowWaveHeights) / $count : 0.70;
+        $meanSwellHeight = $count ? array_sum($windowSwellHeights) / $count : 0.60;
+        $meanOceanCurrent = $count ? array_sum($windowOceanCurrents) / $count : 0.20;
+        $totalRain = array_sum($windowRains);
+        $maxRainRate = !empty($windowRains) ? max($windowRains) : 0.0;
+        $meanPressure = $count ? array_sum($windowPressures) / $count : 1010.5;
+        $meanWavePeriod = $count ? array_sum($windowWavePeriods) / $count : 6.0;
+        $meanWindWaveHeight = $count ? array_sum($windowWindWaveHeights) / $count : 0.35;
+        $meanWindDirection = $count ? array_sum($windowWindDirections) / $count : 245.0;
+
+        // Desensitized Sustained Window Physical Hard-Gates:
+        // 1. Sustained Wind >= 42.0 km/h (10-Min Rolling Mean; PCG gale/banca safety limit)
+        // 2. Peak Squall Gust >= 48.0 km/h (Instant single telemetric spike)
+        // 3. Significant Wave >= 1.80 m (30-Min Rolling Mean)
+        // 4. Swell Wave Height >= 1.80 m (30-Min Rolling Mean)
+        // 5. Ocean Current Velocity >= 0.80 m/s (10-Min Rolling Mean)
+        // 6. Precipitation >= 25.0 mm accumulation OR >= 25.0 mm/hr rate (15-Min Window)
+        // 7. Severe Low Pressure <= 998.0 hPa OR delta P >= 2.0 hPa / 3 hrs
+        $isPhysicalBreach = (
+            $meanWindSpeed >= 42.0 ||
+            $maxWindGust >= 48.0 ||
+            $meanWaveHeight >= 1.80 ||
+            $meanSwellHeight >= 1.80 ||
+            $meanOceanCurrent >= 0.80 ||
+            $totalRain >= 25.0 ||
+            $maxRainRate >= 25.0 ||
+            $meanPressure <= 998.0
+        );
+
+        $windowScores = [
+            'wave_height' => $this->scoreWaveHeight($meanWaveHeight),
+            'wind_speed' => $this->scoreWindSpeed($meanWindSpeed, $maxWindGust),
+            'ocean_current' => $this->scoreOceanCurrent($meanOceanCurrent),
+            'swell_height' => $this->scoreSwellHeight($meanSwellHeight),
+            'wave_period' => $this->scoreWavePeriod($meanWavePeriod),
+            'wind_wave_height' => $this->scoreWindWaveHeight($meanWindWaveHeight),
+            'rain' => $this->scoreRain($maxRainRate),
+            'sea_level_pressure' => $this->scoreSeaLevelPressure($meanPressure),
+            'wind_direction' => $this->scoreWindDirection($meanWindDirection),
+        ];
+
+        $windowWeightedScorePct = $isPhysicalBreach ? 100.0 : $this->computeWeightedScore($windowScores);
+        $windowClass = ($overrideTriggered || $isPhysicalBreach) ? 'Critical Risk' : $this->classifyScore($windowWeightedScorePct);
+
+        // Find worst hour in window
+        $worstScore = -1;
+        $worstHour = null;
+        foreach ($hourlyList as $item) {
+            $s = $item['weighted_score_pct'] ?? 0;
+            if ($s > $worstScore) {
+                $worstScore = $s;
+                $worstHour = $item['forecast_time']->format('Y-m-d\TH:i:sP');
+            }
+        }
+
         foreach ($hourlyList as &$item) {
             if ($item['forecast_time']->format('Y-m-d\TH:i:sP') === $worstHour || count($hourlyList) === 1) {
                 $item['is_worst_hour_in_window'] = true;
             }
         }
-
-        $windowClass = $overrideTriggered ? 'Critical Risk' : $this->classifyScore($maxScore);
 
         return [
             'planned_date' => $plannedDate,
@@ -687,7 +877,11 @@ class WeatherForecastService
             'dive_start' => $diveStart,
             'dive_end' => $diveEnd,
             'classification' => $windowClass,
-            'weighted_score_pct' => $overrideTriggered ? null : $maxScore,
+            'weighted_score_pct' => $overrideTriggered ? null : $windowWeightedScorePct,
+            'sustained_wind_speed' => round($meanWindSpeed, 1),
+            'max_wind_gust' => round($maxWindGust, 1),
+            'mean_wave_height' => round($meanWaveHeight, 2),
+            'mean_ocean_current' => round($meanOceanCurrent, 2),
             'worst_hour' => $worstHour,
             'hourly' => $hourlyList,
         ];
@@ -873,7 +1067,8 @@ class WeatherForecastService
                 'wind_wave_height' => $wwHeight,
                 'rain' => $rainVal,
                 'sea_level_pressure' => $pressVal,
-                'wind_speed' => $windSpd,
+                'wind_speed' => $rawWindSpd,
+                'wind_gusts' => $windGustsVal,
                 'wind_direction' => $windDir,
                 'tide_height' => 0.0,
             ];
@@ -884,18 +1079,83 @@ class WeatherForecastService
             Cache::put("forecast:marine_cache:{$dateKey}", $bucket['marine'], now()->addMinutes(60));
             Cache::put("forecast:weather_cache:{$dateKey}", $bucket['weather'], now()->addMinutes(60));
 
-            $scores24h = array_column($bucket['hourly_scores'], 'weighted_score_pct');
-            $maxScore24h = !empty($scores24h) ? max($scores24h) : 0.0;
-            $overall24hClass = $this->classifyScore($maxScore24h);
+            // Calculate daytime sustained operational metrics (06:00 - 18:00)
+            $daytimeHours = range(6, 18);
+            $daytimeWinds = [];
+            $daytimeGusts = [];
+            $daytimeWaves = [];
+            $daytimeSwells = [];
+            $daytimeCurrents = [];
+            $daytimeRains = [];
+            $daytimePressures = [];
+            $daytimePeriods = [];
+            $daytimeWindWaves = [];
+            $daytimeWindDirs = [];
 
-            $daytimeScores = [];
-            for ($h = 6; $h <= 18; $h++) {
-                if (isset($bucket['hourly_scores'][$h])) {
-                    $daytimeScores[] = $bucket['hourly_scores'][$h]['weighted_score_pct'];
+            foreach ($daytimeHours as $dh) {
+                if (isset($bucket['weather']['wind_speed_10m'][$dh])) {
+                    $daytimeWinds[] = $bucket['weather']['wind_speed_10m'][$dh];
+                    $daytimeGusts[] = $bucket['weather']['wind_gusts_10m'][$dh] ?? 0.0;
+                    $daytimeWaves[] = $bucket['marine']['wave_height'][$dh] ?? 0.70;
+                    $daytimeSwells[] = $bucket['marine']['swell_wave_height'][$dh] ?? 0.60;
+                    $daytimeCurrents[] = ($bucket['marine']['ocean_current_velocity'][$dh] ?? 1.1) * 0.27778;
+                    $daytimeRains[] = $bucket['weather']['rain'][$dh] ?? 0.0;
+                    $daytimePressures[] = $bucket['weather']['pressure_msl'][$dh] ?? 1010.5;
+                    $daytimePeriods[] = $bucket['marine']['wave_period'][$dh] ?? 6.0;
+                    $daytimeWindWaves[] = $bucket['marine']['wind_wave_height'][$dh] ?? 0.35;
+                    $daytimeWindDirs[] = $bucket['weather']['wind_direction_10m'][$dh] ?? 245.0;
                 }
             }
-            $maxDaytimeScore = !empty($daytimeScores) ? max($daytimeScores) : $maxScore24h;
-            $daytimeClass = $this->classifyScore($maxDaytimeScore);
+
+            $dayCount = count($daytimeWinds) ?: 1;
+            $meanDaytimeWind = array_sum($daytimeWinds) / $dayCount;
+            $maxDaytimeGust = !empty($daytimeGusts) ? max($daytimeGusts) : 0.0;
+            $meanDaytimeWave = array_sum($daytimeWaves) / $dayCount;
+            $meanDaytimeSwell = array_sum($daytimeSwells) / $dayCount;
+            $meanDaytimeCurrent = array_sum($daytimeCurrents) / $dayCount;
+            $daytimeRainTotal = array_sum($daytimeRains);
+            $daytimeMaxRainRate = !empty($daytimeRains) ? max($daytimeRains) : 0.0;
+            $meanDaytimePressure = array_sum($daytimePressures) / $dayCount;
+            $meanDaytimePeriod = array_sum($daytimePeriods) / $dayCount;
+            $meanDaytimeWindWave = array_sum($daytimeWindWaves) / $dayCount;
+            $meanDaytimeWindDir = array_sum($daytimeWindDirs) / $dayCount;
+
+            // 3-hour Barometric Tendency check across daytime hours
+            $maxPressureDrop3h = 0.0;
+            for ($i = 0; $i < count($daytimePressures) - 3; $i++) {
+                $drop = $daytimePressures[$i] - $daytimePressures[$i + 3];
+                if ($drop > $maxPressureDrop3h) {
+                    $maxPressureDrop3h = $drop;
+                }
+            }
+
+            // Desensitized Whole-Day Physical Hard-Gates
+            $isDaytimePhysicalBreach = (
+                $meanDaytimeWind >= 42.0 ||
+                $maxDaytimeGust >= 48.0 ||
+                $meanDaytimeWave >= 1.80 ||
+                $meanDaytimeSwell >= 1.80 ||
+                $meanDaytimeCurrent >= 0.80 ||
+                $daytimeRainTotal >= 25.0 ||
+                $daytimeMaxRainRate >= 25.0 ||
+                $meanDaytimePressure <= 998.0 ||
+                $maxPressureDrop3h >= 2.0
+            );
+
+            $daytimeScores = [
+                'wave_height' => $this->scoreWaveHeight($meanDaytimeWave),
+                'wind_speed' => $this->scoreWindSpeed($meanDaytimeWind, $maxDaytimeGust),
+                'ocean_current' => $this->scoreOceanCurrent($meanDaytimeCurrent),
+                'swell_height' => $this->scoreSwellHeight($meanDaytimeSwell),
+                'wave_period' => $this->scoreWavePeriod($meanDaytimePeriod),
+                'wind_wave_height' => $this->scoreWindWaveHeight($meanDaytimeWindWave),
+                'rain' => $this->scoreRain($daytimeMaxRainRate),
+                'sea_level_pressure' => $this->scoreSeaLevelPressure($meanDaytimePressure),
+                'wind_direction' => $this->scoreWindDirection($meanDaytimeWindDir),
+            ];
+
+            $daytimeScorePct = $isDaytimePhysicalBreach ? 100.0 : $this->computeWeightedScore($daytimeScores);
+            $daytimeClass = $isDaytimePhysicalBreach ? 'Critical Risk' : $this->classifyScore($daytimeScorePct);
 
             $amScores = array_filter($bucket['hourly_scores'], fn($i) => in_array($i['hour'], [10, 11, 12]));
             $amMax = !empty($amScores) ? max(array_column($amScores, 'weighted_score_pct')) : 0.0;
@@ -905,21 +1165,18 @@ class WeatherForecastService
             $pmMax = !empty($pmScores) ? max(array_column($pmScores, 'weighted_score_pct')) : 0.0;
             $pmClass = $this->classifyScore($pmMax);
 
-            $waves = $bucket['marine']['wave_height'];
-            $winds = $bucket['weather']['wind_speed_10m'];
-
             $summary = [
                 'date' => $dateKey,
-                'overall_classification' => $overall24hClass,
-                'overall_score_pct' => $maxScore24h,
+                'overall_classification' => $daytimeClass,
+                'overall_score_pct' => $daytimeScorePct,
                 'daytime_classification' => $daytimeClass,
-                'daytime_score_pct' => $maxDaytimeScore,
+                'daytime_score_pct' => $daytimeScorePct,
                 'am_classification' => $amClass,
                 'pm_classification' => $pmClass,
-                'avg_wave_height' => !empty($waves) ? round(array_sum($waves) / count($waves), 2) : 0.0,
-                'max_wave_height' => !empty($waves) ? max($waves) : 0.0,
-                'avg_wind_speed' => !empty($winds) ? round(array_sum($winds) / count($winds), 1) : 0.0,
-                'max_wind_speed' => !empty($winds) ? max($winds) : 0.0,
+                'avg_wave_height' => round($meanDaytimeWave, 2),
+                'max_wave_height' => !empty($daytimeWaves) ? max($daytimeWaves) : 0.0,
+                'avg_wind_speed' => round($meanDaytimeWind, 1),
+                'max_wind_speed' => round($maxDaytimeGust, 1),
                 'hourly' => $bucket['hourly_scores'],
             ];
 

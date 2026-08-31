@@ -298,6 +298,27 @@
 
                         <p class="text-xs sm:text-sm leading-relaxed" x-text="forecast.description"></p>
 
+                        <!-- Forecast Reliability Category Card -->
+                        <template x-if="forecast.reliability">
+                            <div class="p-3 rounded-xl bg-white/90 border border-black/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#1D1D1F]">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm" x-text="forecast.reliability.icon"></span>
+                                    <div class="space-y-0.5">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="font-extrabold text-[#1D1D1F]" x-text="forecast.reliability.label"></span>
+                                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 font-semibold text-[#6E6E73]" x-text="forecast.reliability.range"></span>
+                                        </div>
+                                        <p class="text-[11px] text-[#6E6E73] leading-snug" x-text="forecast.reliability.description"></p>
+                                    </div>
+                                </div>
+                                <div class="shrink-0 sm:text-right">
+                                    <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg border"
+                                          :class="forecast.reliability.badge_class"
+                                          x-text="forecast.reliability.actionable ? 'Operational Window' : 'Advisory / Trend'"></span>
+                                </div>
+                            </div>
+                        </template>
+
                         <!-- Day 1 & Day 2 Cards -->
                         <template x-if="forecast.day1 && forecast.day2">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">

@@ -209,7 +209,7 @@ class DatabaseSeeder extends Seeder
         $batch1Start = Carbon::now()->next(Carbon::SATURDAY)->startOfDay();
         $batch1 = Batch::create([
             'name' => $batch1Start->format('M d') . '–' . $batch1Start->copy()->addDay()->format('d') . ' Discovery & Open Water Batch',
-            'batch_code' => 'BATCH-2026-' . strtoupper($batch1Start->format('M')) . $batch1Start->format('d'),
+            'batch_code' => 'Batch 1',
             'start_date' => $batch1Start,
             'end_date' => $batch1Start->copy()->addDay(),
             'status' => 'confirmed',
@@ -233,7 +233,7 @@ class DatabaseSeeder extends Seeder
         $batch2Start = $batch1Start->copy()->addDays(7);
         $batch2 = Batch::create([
             'name' => $batch2Start->format('M d') . '–' . $batch2Start->copy()->addDay()->format('d') . ' Open Water & Beginner Batch',
-            'batch_code' => 'BATCH-2026-' . strtoupper($batch2Start->format('M')) . $batch2Start->format('d'),
+            'batch_code' => 'Batch 2',
             'start_date' => $batch2Start,
             'end_date' => $batch2Start->copy()->addDay(),
             'status' => 'confirmed',
@@ -257,7 +257,7 @@ class DatabaseSeeder extends Seeder
         $batch3Start = $batch1Start->copy()->addDays(14);
         $batch3 = Batch::create([
             'name' => $batch3Start->format('M d') . '–' . $batch3Start->copy()->addDay()->format('d') . ' Advance & Refinement Weekend',
-            'batch_code' => 'BATCH-2026-' . strtoupper($batch3Start->format('M')) . $batch3Start->format('d'),
+            'batch_code' => 'Batch 3',
             'start_date' => $batch3Start,
             'end_date' => $batch3Start->copy()->addDay(),
             'status' => 'confirmed',
@@ -281,7 +281,7 @@ class DatabaseSeeder extends Seeder
         $batch4Start = $batch1Start->copy()->addDays(21);
         $batch4 = Batch::create([
             'name' => $batch4Start->format('M d') . '–' . $batch4Start->copy()->addDay()->format('d') . ' Rescheduled Freediving Batch',
-            'batch_code' => 'BATCH-2026-' . strtoupper($batch4Start->format('M')) . $batch4Start->format('d'),
+            'batch_code' => 'Batch 4',
             'start_date' => $batch4Start,
             'end_date' => $batch4Start->copy()->addDay(),
             'status' => 'rescheduled',
@@ -305,7 +305,7 @@ class DatabaseSeeder extends Seeder
         $batch5Start = $batch1Start->copy()->subDays(7);
         $batch5 = Batch::create([
             'name' => $batch5Start->format('M d') . '–' . $batch5Start->copy()->addDay()->format('d') . ' Completed Summer Dive Camp',
-            'batch_code' => 'BATCH-2026-' . strtoupper($batch5Start->format('M')) . $batch5Start->format('d'),
+            'batch_code' => 'Batch 5',
             'start_date' => $batch5Start,
             'end_date' => $batch5Start->copy()->addDay(),
             'status' => 'completed',
@@ -329,7 +329,7 @@ class DatabaseSeeder extends Seeder
         $batch6Start = $batch1Start->copy()->subDays(14);
         $batch6 = Batch::create([
             'name' => $batch6Start->format('M d') . '–' . $batch6Start->copy()->addDay()->format('d') . ' Storm Advisory Batch',
-            'batch_code' => 'BATCH-2026-' . strtoupper($batch6Start->format('M')) . $batch6Start->format('d'),
+            'batch_code' => 'Batch 6',
             'start_date' => $batch6Start,
             'end_date' => $batch6Start->copy()->addDay(),
             'status' => 'cancelled_by_camp',

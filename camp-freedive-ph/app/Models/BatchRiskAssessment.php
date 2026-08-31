@@ -106,4 +106,10 @@ class BatchRiskAssessment extends Model
             ],
         };
     }
+
+    public function getReliabilityAttribute(): array
+    {
+        $daysOut = max(0, (float) ($this->lead_time_hours / 24.0));
+        return \App\Services\WeatherForecastService::getReliabilityCategory($daysOut);
+    }
 }

@@ -194,7 +194,7 @@
                 </div>
 
                 <!-- Day 1 Quick Stat Chips -->
-                <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
                         <div>
                             <span class="text-[#6E6E73] block text-xs uppercase font-bold">Worst Hour</span>
@@ -212,11 +212,28 @@
                             </strong>
                         </div>
                     </div>
+
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                        <div>
+                            <span class="text-[#6E6E73] block text-xs uppercase font-bold">Reliability Category</span>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span>{{ $day1Assessment->reliability['icon'] }}</span>
+                                <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border {{ $day1Assessment->reliability['badge_class'] }}">
+                                    {{ $day1Assessment->reliability['label'] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs text-[#1D1D1F]">
-                    <span class="font-bold text-[#6E6E73]">Recommended Action:</span>
-                    <span class="italic font-medium ml-1">{{ $day1Assessment->recommended_action }}</span>
+                <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs text-[#1D1D1F] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <span class="font-bold text-[#6E6E73]">Recommended Action:</span>
+                        <span class="italic font-medium ml-1">{{ $day1Assessment->recommended_action }}</span>
+                    </div>
+                    <div class="text-[11px] text-[#6E6E73] font-medium shrink-0">
+                        <span class="font-bold text-[#1D1D1F]">Reliability Scope:</span> {{ $day1Assessment->reliability['description'] }}
+                    </div>
                 </div>
             </div>
 
@@ -330,7 +347,7 @@
                 </div>
 
                 <!-- Day 2 Quick Stat Chips -->
-                <div class="grid grid-cols-2 gap-3 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
                         <div>
                             <span class="text-[#6E6E73] block text-xs uppercase font-bold">Worst Hour</span>
@@ -348,11 +365,28 @@
                             </strong>
                         </div>
                     </div>
+
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                        <div>
+                            <span class="text-[#6E6E73] block text-xs uppercase font-bold">Reliability Category</span>
+                            <div class="flex items-center gap-1.5 mt-0.5">
+                                <span>{{ $day2Assessment->reliability['icon'] }}</span>
+                                <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border {{ $day2Assessment->reliability['badge_class'] }}">
+                                    {{ $day2Assessment->reliability['label'] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs text-[#1D1D1F]">
-                    <span class="font-bold text-[#6E6E73]">Recommended Action:</span>
-                    <span class="italic font-medium ml-1">{{ $day2Assessment->recommended_action }}</span>
+                <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs text-[#1D1D1F] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                        <span class="font-bold text-[#6E6E73]">Recommended Action:</span>
+                        <span class="italic font-medium ml-1">{{ $day2Assessment->recommended_action }}</span>
+                    </div>
+                    <div class="text-[11px] text-[#6E6E73] font-medium shrink-0">
+                        <span class="font-bold text-[#1D1D1F]">Reliability Scope:</span> {{ $day2Assessment->reliability['description'] }}
+                    </div>
                 </div>
             </div>
 

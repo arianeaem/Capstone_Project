@@ -251,13 +251,16 @@ class Batch extends Model
     public function getBatchNumberAttribute(): string
     {
         if (!empty($this->batch_code)) {
+            if (preg_match('/^batch\s*#?\s*(\d+)/i', $this->batch_code, $matches)) {
+                return 'Batch ' . $matches[1];
+            }
             $cleaned = preg_replace('/^BATCH[-#\s]*/i', '', $this->batch_code);
-            return 'Batch #' . $cleaned;
+            return is_numeric($cleaned) ? 'Batch ' . $cleaned : $this->batch_code;
         }
-        if (!empty($this->name) && preg_match('/^Batch\s*#?/i', $this->name)) {
-            return $this->name;
+        if (!empty($this->name) && preg_match('/^Batch\s*(\d+)/i', $this->name, $matches)) {
+            return 'Batch ' . $matches[1];
         }
-        return 'Batch #' . $this->id;
+        return 'Batch ' . $this->id;
     }
 
     public function getStatusBadgeAttribute(): array

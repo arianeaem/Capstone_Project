@@ -29,6 +29,15 @@ class WeatherSafetyController extends Controller
             'manualOverrides',
         ]);
 
+        // Filter out batches that do not yet have forecast data (beyond 16-day model horizon and no recorded assessment)
+        $maxForecastHorizon = Carbon::today(WeatherForecastService::TIMEZONE)->addDays(WeatherForecastService::MAX_FORECAST_DAYS);
+        $query->where(function ($q) use ($maxForecastHorizon) {
+            $q->whereDate('start_date', '<=', $maxForecastHorizon)
+              ->orWhereHas('riskAssessments', function ($sub) {
+                  $sub->whereNotIn('overall_classification', ['Not Available']);
+              });
+        });
+
         // Filter: Risk Classification
         if ($request->filled('risk')) {
             $query->where('risk_classification', $request->input('risk'));
@@ -47,12 +56,12 @@ class WeatherSafetyController extends Controller
             $query->whereDate('start_date', '<=', $request->input('date_to'));
         }
 
-        // Critical and High Risk count
-        $criticalCount = Batch::whereIn('risk_classification', ['high_risk', 'critical_risk'])->count();
+        // Critical and High Risk count (within active monitoring horizon)
+        $criticalCount = (clone $query)->whereIn('risk_classification', ['high_risk', 'critical_risk'])->count();
 
-        // Paginate by soonest dive date
+        // Sort safety monitoring to latest first
         $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
-        $batches = $query->orderBy('start_date', 'asc')->paginate($perPage)->withQueryString();
+        $batches = $query->orderBy('start_date', 'desc')->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
         // 24-Hour Master Continuous Cache Info
         $lastUpdatedAt = Cache::get('forecast:last_updated_at');
