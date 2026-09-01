@@ -203,7 +203,7 @@
                     </div>
 
                     <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 leading-relaxed">
-                        ℹ️ Submitting interest notifies Camp Admin. If selected, students will be automatically matched to your roster.
+                        Submitting interest notifies Camp Admin. If selected, students will be automatically matched to your roster.
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-2">

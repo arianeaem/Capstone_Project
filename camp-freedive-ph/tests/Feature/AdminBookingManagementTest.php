@@ -146,6 +146,16 @@ class AdminBookingManagementTest extends TestCase
         $booking = Booking::where('booking_number', 'CFP-2026-1001')->first();
         $participant = $booking->participants->first();
 
+        $participantsData = $booking->participants->map(function ($p, $index) {
+            return [
+                'id' => $p->id,
+                'name' => $index === 0 ? 'Ariane Mae Ramos-Updated' : $p->name,
+                'age' => $p->age,
+                'swimmer_status' => $p->swimmer_status,
+                'health_condition' => $index === 0 ? 'Cleared by physician for equalizing' : ($p->health_condition ?? 'None'),
+            ];
+        })->toArray();
+
         $response = $this->put("/admin/bookings/{$booking->id}", [
             'start_date' => $booking->start_date->format('Y-m-d'),
             'end_date' => $booking->end_date->format('Y-m-d'),
@@ -157,15 +167,7 @@ class AdminBookingManagementTest extends TestCase
             'contact_phone' => '0917 123 4567',
             'contact_facebook' => 'https://facebook.com/ariane',
             'edit_reason' => 'Updated surname and corrected medical notes per guest consent form',
-            'participants' => [
-                [
-                    'id' => $participant->id,
-                    'name' => 'Ariane Mae Ramos-Updated',
-                    'age' => 26,
-                    'swimmer_status' => 'swimmer',
-                    'health_condition' => 'Cleared by physician for equalizing',
-                ],
-            ],
+            'participants' => $participantsData,
         ]);
 
         $response->assertRedirect(route('admin.bookings.show', $booking));
@@ -180,6 +182,8 @@ class AdminBookingManagementTest extends TestCase
 
     public function test_admin_can_approve_and_reject_reschedule_request(): void
     {
+        \Illuminate\Support\Facades\Mail::fake();
+
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
@@ -193,12 +197,16 @@ class AdminBookingManagementTest extends TestCase
 
         $response->assertRedirect();
         $this->assertEquals('approved', $reschedule->fresh()->status);
-        $this->assertEquals('rescheduled', $booking->fresh()->status);
+        $this->assertEquals('confirmed', $booking->fresh()->status);
         $this->assertEquals($reschedule->requested_start_date->format('Y-m-d'), $booking->fresh()->start_date->format('Y-m-d'));
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\RescheduleApprovedMail::class);
     }
 
     public function test_admin_can_approve_and_reject_cancellation_request(): void
     {
+        \Illuminate\Support\Facades\Mail::fake();
+
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
@@ -213,6 +221,8 @@ class AdminBookingManagementTest extends TestCase
         $response->assertRedirect();
         $this->assertEquals('approved', $cancellation->fresh()->status);
         $this->assertEquals('cancelled_by_guest', $booking->fresh()->status);
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\CancellationApprovedMail::class);
     }
 
     public function test_editing_booking_disallows_adding_or_removing_participants(): void
@@ -221,9 +231,25 @@ class AdminBookingManagementTest extends TestCase
         $this->actingAs($admin);
 
         $booking = Booking::where('booking_number', 'CFP-2026-1001')->first();
-        $participant = $booking->participants->first();
+        $originalCount = $booking->participants()->count();
 
-        // Attempt to add a 2nd participant
+        $participantsData = $booking->participants->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'age' => $p->age,
+                'swimmer_status' => $p->swimmer_status,
+            ];
+        })->toArray();
+
+        // Attempt to add an extra participant
+        $participantsData[] = [
+            'id' => null,
+            'name' => 'Extra Person',
+            'age' => 22,
+            'swimmer_status' => 'swimmer',
+        ];
+
         $response = $this->put("/admin/bookings/{$booking->id}", [
             'start_date' => $booking->start_date->format('Y-m-d'),
             'end_date' => $booking->end_date->format('Y-m-d'),
@@ -231,24 +257,11 @@ class AdminBookingManagementTest extends TestCase
             'contact_email' => $booking->contact_email,
             'contact_phone' => $booking->contact_phone,
             'edit_reason' => 'Attempting to add unauthorized new participant',
-            'participants' => [
-                [
-                    'id' => $participant->id,
-                    'name' => $participant->name,
-                    'age' => $participant->age,
-                    'swimmer_status' => $participant->swimmer_status,
-                ],
-                [
-                    'id' => null,
-                    'name' => 'Extra Person',
-                    'age' => 22,
-                    'swimmer_status' => 'swimmer',
-                ],
-            ],
+            'participants' => $participantsData,
         ]);
 
         $response->assertSessionHas('error', 'Adding or removing participants is not permitted when editing booking details. Only existing participants can be modified.');
-        $this->assertEquals(1, $booking->fresh()->participants()->count());
+        $this->assertEquals($originalCount, $booking->fresh()->participants()->count());
     }
 
     public function test_editing_booking_allows_updating_carpool_pickup_location(): void
@@ -257,7 +270,14 @@ class AdminBookingManagementTest extends TestCase
         $this->actingAs($admin);
 
         $booking = Booking::where('booking_number', 'CFP-2026-1001')->first();
-        $participant = $booking->participants->first();
+        $participantsData = $booking->participants->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'age' => $p->age,
+                'swimmer_status' => $p->swimmer_status,
+            ];
+        })->toArray();
 
         $response = $this->put("/admin/bookings/{$booking->id}", [
             'start_date' => $booking->start_date->format('Y-m-d'),
@@ -267,14 +287,7 @@ class AdminBookingManagementTest extends TestCase
             'contact_email' => $booking->contact_email,
             'contact_phone' => $booking->contact_phone,
             'edit_reason' => 'Guest requested pickup hub change to BGC',
-            'participants' => [
-                [
-                    'id' => $participant->id,
-                    'name' => $participant->name,
-                    'age' => $participant->age,
-                    'swimmer_status' => $participant->swimmer_status,
-                ],
-            ],
+            'participants' => $participantsData,
         ]);
 
         $response->assertRedirect(route('admin.bookings.show', $booking));

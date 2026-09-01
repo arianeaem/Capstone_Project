@@ -17,6 +17,65 @@ use Illuminate\Support\Facades\DB;
 class BatchManagementService
 {
     /**
+     * Find an existing active batch covering the date, or automatically create a new sequential Batch.
+     */
+    public function findOrCreateBatchForDates(Carbon|string|\DateTimeInterface $startDate, Carbon|string|\DateTimeInterface|null $endDate = null, ?User $creator = null): Batch
+    {
+        $startDate = Carbon::parse($startDate)->startOfDay();
+        $endDate = $endDate ? Carbon::parse($endDate)->startOfDay() : $startDate->copy()->addDay();
+
+        // Check if an open/confirmed batch already exists for this exact start date
+        $existing = Batch::whereDate('start_date', $startDate->toDateString())
+            ->whereIn('status', ['confirmed', 'open'])
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        // Determine next sequential batch number
+        $maxNum = 0;
+        foreach (Batch::pluck('batch_code') as $code) {
+            if (preg_match('/(?:Batch|BATCH)[- ]*(\d+)/i', (string) $code, $m)) {
+                $maxNum = max($maxNum, (int) $m[1]);
+            }
+        }
+        $nextBatchNum = $maxNum + 1;
+        $batchCode = "Batch {$nextBatchNum}";
+        $batchName = "{$batchCode} ({$startDate->format('M d')} - {$endDate->format('d, Y')})";
+
+        $creatorId = $creator?->id ?? \Illuminate\Support\Facades\Auth::id() ?? null;
+
+        $batch = Batch::create([
+            'name' => $batchName,
+            'batch_code' => $batchCode,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'status' => 'confirmed',
+            'lifecycle_status' => 'confirmed',
+            'risk_classification' => 'safe',
+            'created_by' => $creatorId,
+        ]);
+
+        BatchStatusLog::create([
+            'batch_id' => $batch->id,
+            'old_status' => null,
+            'new_status' => 'confirmed',
+            'changed_by' => $creatorId,
+            'note' => "Auto-created {$batchCode} for dive date {$startDate->format('M d, Y')}.",
+        ]);
+
+        try {
+            $weatherService = app(\App\Services\WeatherForecastService::class);
+            $weatherService->assessBatch($batch, null, $creator);
+        } catch (\Throwable $e) {
+            // Weather service gracefully proceeds if outside 16 days or API is offline
+        }
+
+        return $batch;
+    }
+
+    /**
      * Create a new Batch and attach selected bookings.
      */
     public function createBatch(array $data, array $bookingIds, User $creator): Batch

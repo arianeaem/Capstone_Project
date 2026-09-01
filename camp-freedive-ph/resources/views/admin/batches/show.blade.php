@@ -46,7 +46,6 @@
                 <button type="button" 
                         @click="openRescheduleModal = true"
                         class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-[#FF8D28]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     <span>Reschedule Batch</span>
                 </button>
 
@@ -54,7 +53,6 @@
                 <button type="button" 
                         @click="openCancelModal = true"
                         class="px-3.5 py-2 text-xs sm:text-sm font-bold text-[#FF3B3C] bg-[#FEF2F2] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-colors flex items-center gap-1.5">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                     <span>Cancel Batch (by Camp)</span>
                 </button>
 
@@ -101,7 +99,7 @@
                     <div class="bg-white rounded-2xl border border-[#D1D1D6] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
                         <!-- Top Details -->
                         <div class="space-y-3">
-                            <div class="flex items-start justify-between gap-2 border-b border-[#D1D1D6] pb-3">
+                            <div class="flex items-start justify-between gap-2 ">
                                 <div>
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-sm text-[#780000] hover:underline">
@@ -165,12 +163,12 @@
                         </div>
 
                         <!-- Card Action Footer -->
-                        <div class="flex items-center gap-2 pt-3 border-t border-[#D1D1D6]">
+                        <div class="flex items-center gap-2 pt-3">
                             <button type="button" 
                                     @click="selectedBookingId = {{ $booking->id }}; selectedBookingNumber = '{{ $booking->booking_number }}'; openMoveModal = true"
                                     class="flex-1 py-2 px-3 rounded-xl border border-[#D1D1D6] hover:bg-[#F2F2F7] text-xs font-bold text-[#6E6E73] hover:text-[#1D1D1F] transition-colors text-center"
                                     title="Move to another batch">
-                                Move Batch ⇄
+                                Move Batch
                             </button>
 
                             <a href="{{ route('admin.bookings.show', $booking) }}" 
@@ -247,7 +245,6 @@
                     @if($batch->total_participants_count > 0 && $batch->is_coach_pending)
                         <div class="p-2.5 bg-[#FFFBEB] rounded-xl border border-[#FDE68A] text-left text-xs text-[#92400E]">
                             <strong class="block">Instructor Pending</strong>
-                            <span class="text-xs opacity-90">Occupancy not yet calculable until at least 1 coach is assigned.</span>
                         </div>
                     @else
                         <div class="flex items-baseline justify-between">
@@ -278,14 +275,14 @@
                     </div>
 
                     <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-3 py-1.5 text-xs font-bold shadow-sm">
-                        Matching Queue →
+                        Matching Queue
                     </a>
                 </div>
 
                 @if($unassignedStudentsCount > 0)
                     <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-[#991B1B] flex items-center justify-between gap-2">
                         <span><strong>{{ $unassignedStudentsCount }} student(s)</strong> need a coach!</span>
-                        <a href="{{ route('admin.coaches.matching') }}" class="font-bold underline shrink-0">Assign →</a>
+                        <a href="{{ route('admin.coaches.matching') }}" class="font-bold underline shrink-0">Assign</a>
                     </div>
                 @endif
 
@@ -309,7 +306,6 @@
 
                         <div class="text-right">
                             <span class="font-bold text-[#065F46] block">{{ $coachLoad }} / 4 Pax</span>
-                            <span class="text-xs text-[#6E6E73]">+4 Cap</span>
                         </div>
                     </div>
                     @empty
@@ -385,7 +381,7 @@
                 <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#D1D1D6]">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
                     <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold bg-[#FF3B3C] hover:bg-[#D32F2F] shadow-sm">
-                        Confirm Whole-Batch Cancellation
+                        Confirm Cancellation
                     </button>
                 </div>
             </form>

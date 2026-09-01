@@ -162,7 +162,7 @@
             <div>
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#780000] to-[#A00000] text-white flex items-center justify-center font-bold text-lg shrink-0 group-hover:scale-105 transition-transform">
+                        <div class="w-12 h-12 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-extrabold text-lg shrink-0 group-hover:scale-105 transition-transform shadow-2xs">
                             {{ substr($coach->name, 0, 1) }}
                         </div>
                         <div>
@@ -178,16 +178,6 @@
                     <!-- Status Pill -->
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border shrink-0 {{ $coach->status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' }}">
                         {{ ucfirst($coach->status) }}
-                    </span>
-                </div>
-
-                <!-- Info Badges: Cert Level, Focus & Ratio -->
-                <div class="flex flex-wrap items-center gap-2 mt-4">
-                    <span class="px-2.5 py-1 rounded-lg bg-[#F2F2F7] text-[#1D1D1F] text-xs font-bold">
-                        {{ $coach->certification_level ? str_replace('_', ' ', strtoupper($coach->certification_level)) : 'Certified Coach' }}
-                    </span>
-                    <span class="px-2.5 py-1 rounded-lg bg-[#EBF5FF] text-[#1E40AF] text-xs font-semibold">
-                        Max Ratio 1:{{ $coach->max_ratio ?? 4 }}
                     </span>
                 </div>
 

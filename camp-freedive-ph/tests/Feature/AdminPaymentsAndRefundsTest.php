@@ -28,7 +28,7 @@ class AdminPaymentsAndRefundsTest extends TestCase
         $response = $this->get('/admin/payments');
         $response->assertStatus(200);
         $response->assertSee('Payments & Refunds');
-        $response->assertSee('PAYM-TXN-1001A');
+        $response->assertSee('PAYM-20260831-GCASH-9821');
     }
 
     public function test_coach_is_forbidden_from_payments_module(): void

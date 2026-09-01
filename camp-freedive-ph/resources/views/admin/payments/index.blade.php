@@ -61,7 +61,7 @@
             <!-- Forfeited -->
             <div class="relative px-4 sm:px-6 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Forfeited (Policy Locked)</span>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Forfeited</span>
                 <div class="text-2xl font-extrabold text-purple-700 mt-1">₱{{ number_format($stats['total_forfeited'] ?? 0, 2) }}</div>
                 <span class="text-xs text-[#6E6E73] block mt-0.5">Non-refundable cancellations</span>
             </div>

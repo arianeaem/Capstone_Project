@@ -63,9 +63,9 @@ class WeatherForecastService
      * Determine Forecast Reliability Category based on Lead Time Horizon.
      *
      * Range         | Reliability Category      | Operational Impact
-     * Days 1–3      | 🟢 High Reliability       | Highly actionable. Use directly for operational safety window greenlighting.
-     * Days 4–7      | 🟡 Medium Reliability     | Excellent for spotting long-range trends, shifting winds, or monsoon setups.
-     * Days 8–16     | 🔴 Low Reliability        | Climatological trend only. Do not use for safety-critical go/no-go logic.
+     * Days 1–3      | High Reliability       | Highly actionable. Use directly for operational safety window greenlighting.
+     * Days 4–7      | Medium Reliability     | Excellent for spotting long-range trends, shifting winds, or monsoon setups.
+     * Days 8–16     | Low Reliability        | Climatological trend only. Do not use for safety-critical go/no-go logic.
      */
     public static function getReliabilityCategory(int|float $daysOut): array
     {
@@ -76,7 +76,6 @@ class WeatherForecastService
                 'label' => 'High Reliability',
                 'badge_class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                 'dot_color' => 'bg-emerald-500',
-                'icon' => '🟢',
                 'description' => 'Highly actionable. Use directly for operational safety window greenlighting.',
                 'actionable' => true,
             ];
@@ -87,7 +86,6 @@ class WeatherForecastService
                 'label' => 'Medium Reliability',
                 'badge_class' => 'bg-amber-50 text-amber-700 border-amber-200',
                 'dot_color' => 'bg-amber-500',
-                'icon' => '🟡',
                 'description' => 'Excellent for spotting long-range trends, shifting winds, or monsoon setups.',
                 'actionable' => true,
             ];
@@ -98,7 +96,6 @@ class WeatherForecastService
                 'label' => 'Low Reliability',
                 'badge_class' => 'bg-rose-50 text-rose-700 border-rose-200',
                 'dot_color' => 'bg-rose-500',
-                'icon' => '🔴',
                 'description' => 'Climatological trend only. Do not use for safety-critical go/no-go logic.',
                 'actionable' => false,
             ];

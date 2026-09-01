@@ -26,13 +26,6 @@
         </a>
     </div>
 
-    <!-- Human Decision Rule Banner -->
-    <div class="p-4 bg-[#EFF6FF] rounded-xl border border-[#BFDBFE] flex items-start gap-3 text-xs text-[#1E40AF]">
-        <div>
-            <strong>Admin/Owner Final Decision:</strong> When multiple coaches apply for the same open batch, all applicants are listed for your review. Approving one coach assigns them to the slot and automatically marks other applicants as <em>Not Selected</em>.
-        </div>
-    </div>
-
     <!-- PENDING REQUESTS GROUPED BY BATCH -->
     <div class="space-y-6">
         <h2 class="text-base font-bold text-[#1D1D1F]">Pending Open Slot Applications</h2>

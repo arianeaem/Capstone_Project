@@ -138,9 +138,14 @@
             <!-- Bottom User Info & Sign Out -->
             <div class="p-3 border-t border-[#E5E5EA] bg-white">
                 <div class="flex items-center justify-between gap-2.5 p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                    <div class="min-w-0 flex-1">
-                        <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                        <div class="text-[11px] text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                            <div class="text-[11px] text-[#6E6E73] truncate">{{ auth()->user()->email }}</div>
+                        </div>
                     </div>
 
                     <form action="{{ route('logout') }}" method="POST" class="shrink-0">
@@ -255,10 +260,13 @@
 
             <div class="p-3 border-t border-[#E5E5EA] bg-white">
                 <div class="flex items-center justify-between gap-2.5 p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                    <div class="min-w-0 flex-1">
-                        <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                        <div class="text-[11px] text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
-                        <div class="mt-1">
+                    <div class="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                            <div class="text-[11px] text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
                         </div>
                     </div>
 

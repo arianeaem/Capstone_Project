@@ -59,9 +59,6 @@
                             <h2 class="font-extrabold text-lg text-[#1D1D1F]">
                                 {{ $batch->batch_number }}
                             </h2>
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-                                {{ $group['unassigned_count'] }} Student(s) Unassigned
-                            </span>
                         </div>
                         <p class="text-xs text-[#6E6E73] mt-1">
                             {{ $batch->start_date->format('M d') }} – {{ $batch->end_date->format('M d, Y') }}

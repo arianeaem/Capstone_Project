@@ -181,8 +181,8 @@ class BookingController extends Controller
         $downpaymentAmount = min($totalAmount, 3000.00 * $paxCount);
         $balanceAmount = max(0, $totalAmount - $downpaymentAmount);
 
-        // Find or associate existing batch for this date if exists
-        $existingBatch = Batch::whereDate('start_date', $startDate)->first();
+        // Find or auto-create batch for this date
+        $batch = app(\App\Services\BatchManagementService::class)->findOrCreateBatchForDates($startDate, $endDate);
 
         // Generate Unique Booking Number and 4-Digit Security PIN
         $bookingNumber = 'CFP-' . date('Y') . '-' . strtoupper(Str::random(5));
@@ -193,7 +193,7 @@ class BookingController extends Controller
             $booking = Booking::create([
                 'booking_number' => $bookingNumber,
                 'pin' => $pin,
-                'batch_id' => $existingBatch ? $existingBatch->id : null,
+                'batch_id' => $batch->id,
                 'class_type' => $validated['class_type'],
                 'is_certified_diver' => $isCertified,
                 'start_date' => $startDate,

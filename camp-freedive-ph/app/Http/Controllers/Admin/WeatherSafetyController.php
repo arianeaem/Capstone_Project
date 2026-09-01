@@ -244,7 +244,7 @@ class WeatherSafetyController extends Controller
     {
         try {
             $this->forecastService->assessBatch($batch, null, auth()->user());
-            return back()->with('success', "✓ Weather risk assessed across all 4 fixed windows for batch {$batch->batch_code}.");
+            return back()->with('success', "Weather risk assessed for batch {$batch->batch_code}.");
         } catch (Exception $e) {
             return back()->with('error', "Assessment failed: " . $e->getMessage());
         }

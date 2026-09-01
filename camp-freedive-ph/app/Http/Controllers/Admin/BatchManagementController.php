@@ -233,7 +233,7 @@ class BatchManagementController extends Controller
             );
 
             return redirect()->route('admin.batches.show', $batch)
-                ->with('success', "✓ Batch {$batch->name} ({$batch->batch_code}) created with " . count($request->input('booking_ids', [])) . " linked booking(s).");
+                ->with('success', "Batch {$batch->name} ({$batch->batch_code}) created with " . count($request->input('booking_ids', [])) . " linked booking(s).");
         } catch (Exception $e) {
             return back()->withInput()->with('error', 'Batch creation failed: ' . $e->getMessage());
         }

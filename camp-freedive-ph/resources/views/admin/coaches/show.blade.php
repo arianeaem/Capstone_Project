@@ -36,7 +36,7 @@
     <!-- Coach Header Overview Card -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-xl bg-[#780000] text-white flex items-center justify-center font-extrabold text-2xl shadow-sm shrink-0">
+            <div class="w-16 h-16 rounded-full bg-[#F8EAEA] text-[#780000] border-2 border-[#780000] flex items-center justify-center font-black text-2xl shadow-xs shrink-0">
                 {{ substr($coach->name, 0, 1) }}
             </div>
             <div>
@@ -74,7 +74,7 @@
         <!-- LEFT 2 COLUMNS: ASSIGNED STUDENTS & SCHEDULE -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- Assigned Students Table -->
+            <!-- Assigned Students Card Grid -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <div>
@@ -82,71 +82,104 @@
                         <p class="text-xs text-[#6E6E73] mt-0.5">Students currently placed under Coach {{ $coach->name }}'s guidance.</p>
                     </div>
 
-                    <span class="text-xs font-bold text-[#780000]">
+                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#780000]/10 text-[#780000] border border-[#780000]/20">
                         {{ $activeAssignments->count() }} Student(s) Total
                     </span>
                 </div>
 
-                <div class="divide-y divide-[#E5E5EA]">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @forelse($activeAssignments as $assignment)
-                    @php $p = $assignment->participant; @endphp
-                    <div class="py-4 space-y-2 text-xs sm:text-sm">
-                        <div class="flex items-center justify-between gap-3">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <strong class="font-bold text-[#1D1D1F] text-sm">{{ $p->name }}</strong>
-                                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE]">
-                                        {{ ucfirst($p->booking->class_type ?? 'Discovery') }}
-                                    </span>
-                                    @if($assignment->is_ratio_override)
-                                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]">
-                                            Ratio Override
-                                        </span>
-                                    @endif
+                    @php 
+                        $p = $assignment->participant; 
+                        $classType = $p->booking?->formatted_class_type ?? ucfirst($p->booking?->class_type ?? 'Discovery');
+                    @endphp
+                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FDFDFD] hover:border-[#780000]/40 transition-all flex flex-col justify-between space-y-3 shadow-2xs">
+                        <div class="space-y-2">
+                            <!-- Student Header & Course Badge -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h4 class="font-bold text-sm text-[#1D1D1F]">{{ $p->name }}</h4>
+                                    <span class="text-[11px] text-[#8E8E93]">Age {{ $p->age }} • {{ ucfirst($p->swimmer_status ?? 'Swimmer') }}</span>
                                 </div>
-                                <div class="text-xs text-[#6E6E73] mt-1 space-y-0.5">
-                                    <div>Booking: <a href="{{ route('admin.bookings.show', $p->booking) }}" class="font-mono font-bold text-[#780000] hover:underline">{{ $p->booking->booking_number }}</a></div>
-                                    <div>Batch: <strong>{{ $assignment->batch?->batch_code ?? 'Ad-hoc' }}</strong></div>
-                                    <div>Dive Date: <strong>{{ $assignment->dive_date->format('M d, Y (l)') }}</strong></div>
-                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE] shrink-0">
+                                    {{ $p->booking?->class_type === 'discovery' ? 'Discovery' : ($p->booking?->class_type === 'fundive' ? 'Fundive' : 'Refinement') }}
+                                </span>
                             </div>
 
+                            @if($assignment->is_ratio_override)
+                                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]">
+                                    ⚠️ Ratio Override Active
+                                </div>
+                            @endif
+
+                            @if($p->health_condition)
+                                <div class="p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-snug">
+                                    <strong>Medical:</strong> {{ $p->health_condition }}
+                                </div>
+                            @endif
+
+                            <!-- Assignment Details -->
+                            <div class="pt-1 text-xs text-[#6E6E73] space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span>Booking Ref:</span>
+                                    <a href="{{ route('admin.bookings.show', $p->booking) }}" class="font-mono font-bold text-[#780000] hover:underline">
+                                        {{ $p->booking->booking_number }}
+                                    </a>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Batch:</span>
+                                    <strong class="text-[#1D1D1F]">{{ $assignment->batch?->batch_code ?? 'Ad-hoc' }}</strong>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span>Dive Date:</span>
+                                    <strong class="text-[#1D1D1F]">{{ $assignment->dive_date->format('M d, Y (D)') }}</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Footer -->
+                        <div class="pt-2 border-t border-[#E5E5EA] flex items-center justify-end">
                             <button type="button" 
                                     @click="selectedParticipantId = {{ $p->id }}; selectedParticipantName = '{{ addslashes($p->name) }}'; openReassignModal = true"
-                                    class="btn-secondary px-3 py-1.5 text-xs font-semibold text-[#FF3B3C] hover:bg-[#FEF2F2] shrink-0">
-                                Reassign Away
+                                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-[#FF3B3C] hover:bg-[#FEF2F2] border border-[#FECACA] transition-colors">
+                                Reassign Away →
                             </button>
                         </div>
                     </div>
                     @empty
-                    <p class="text-xs text-[#6E6E73] py-6 text-center">
-                        No students currently assigned to this coach. Use the <a href="{{ route('admin.coaches.matching') }}" class="text-[#780000] font-bold underline">Matching Queue</a> to assign students.
-                    </p>
+                    <div class="col-span-full py-8 text-center bg-[#F9F9FB] rounded-xl border border-dashed border-[#D1D1D6]">
+                        <p class="text-xs text-[#6E6E73]">
+                            No students currently assigned to this coach. Use the <a href="{{ route('admin.coaches.matching') }}" class="text-[#780000] font-bold underline">Matching Queue</a> to assign students.
+                        </p>
+                    </div>
                     @endforelse
                 </div>
             </div>
 
             <!-- Past Completed History -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Completed Dive History</h3>
+                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                    <h3 class="text-base font-bold text-[#1D1D1F]">Completed Dive History</h3>
+                    <span class="text-xs text-[#8E8E93]">{{ $pastAssignments->count() }} past assignment(s)</span>
+                </div>
 
-                <div class="divide-y divide-[#E5E5EA]">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @forelse($pastAssignments as $past)
-                    <div class="py-3 flex items-center justify-between text-xs">
-                        <div>
-                            <strong class="text-[#1D1D1F]">{{ $past->participant->name }}</strong>
-                            <span class="text-[#6E6E73] ml-2">({{ ucfirst($past->participant->booking->class_type ?? 'Class') }})</span>
-                            <div class="text-xs text-[#8E8E93] mt-0.5 space-y-0.5">
-                                <div>Batch: {{ $past->batch?->batch_code }}</div>
-                                <div>{{ $past->dive_date->format('M d, Y') }}</div>
+                    <div class="p-3 rounded-xl border border-[#E5E5EA] bg-[#F9F9FB] flex items-center justify-between text-xs">
+                        <div class="space-y-0.5">
+                            <strong class="text-[#1D1D1F] block text-xs">{{ $past->participant->name }}</strong>
+                            <div class="text-[11px] text-[#8E8E93]">
+                                <span>Batch {{ $past->batch?->batch_code }}</span>
+                                <span class="mx-1">•</span>
+                                <span>{{ $past->dive_date->format('M d, Y') }}</span>
                             </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73]">
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             Completed
                         </span>
                     </div>
                     @empty
-                    <p class="text-xs text-[#6E6E73] py-2 text-center">No past dive records logged yet.</p>
+                    <p class="col-span-full text-xs text-[#6E6E73] py-4 text-center">No past dive records logged yet.</p>
                     @endforelse
                 </div>
             </div>

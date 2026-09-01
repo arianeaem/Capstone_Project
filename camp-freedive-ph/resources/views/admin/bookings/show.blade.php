@@ -18,7 +18,7 @@
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Reservation Details</h1>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2.5 flex-wrap">
             <a href="{{ route('admin.bookings.edit', $booking) }}" class="btn-secondary px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                 <span>Edit Details</span>
@@ -34,23 +34,23 @@
     </div>
 
     <!-- Booking Overview Banner -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="space-y-2">
             <h2 class="text-xl font-bold text-[#1D1D1F]">{{ $booking->formatted_class_type }}</h2>
             <div class="text-xs text-[#6E6E73]">
                 <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> to <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 flex-wrap">
                 <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $booking->status_badge['bg'] }}">
                     {{ $booking->status_badge['label'] }}
                 </span>
-                <span class="text-xs px-2 py-0.5 rounded font-bold border {{ $booking->payment_status_badge['class'] }}">
+                <span class="text-xs px-2.5 py-1 rounded-full font-bold border {{ $booking->payment_status_badge['class'] }}">
                     {{ $booking->payment_status_badge['label'] }}
                 </span>
             </div>
         </div>
 
-        <div class="bg-[#FAFAFC] p-4 rounded-xl text-right space-y-1 shrink-0">
+        <div class="bg-[#FAFAFC] border border-[#E5E5EA] p-4 rounded-xl text-left md:text-right space-y-1 shrink-0">
             <span class="text-xs text-[#6E6E73] block">Downpayment Required / Paid</span>
             <div class="text-2xl font-extrabold text-[#780000]">₱{{ number_format($booking->downpayment_amount, 2) }}</div>
             <span class="text-xs text-[#6E6E73] block">Total Amount: ₱{{ number_format($booking->total_amount, 2) }}</span>

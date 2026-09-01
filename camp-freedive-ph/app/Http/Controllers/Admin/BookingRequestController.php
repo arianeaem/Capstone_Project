@@ -3,24 +3,32 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Mail\CancellationApprovedMail;
+use App\Mail\CancellationRejectedMail;
+use App\Mail\RescheduleApprovedMail;
+use App\Mail\RescheduleRejectedMail;
 use App\Models\Booking;
 use App\Models\BookingStatusLog;
 use App\Models\CancellationRequest;
 use App\Models\RefundRequest;
 use App\Models\RescheduleRequest;
 use App\Services\AuditLogger;
+use App\Services\BatchManagementService;
 use App\Services\BookingPolicyEngine;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
 class BookingRequestController extends Controller
 {
     public function __construct(
-        protected BookingPolicyEngine $policyEngine
+        protected BookingPolicyEngine $policyEngine,
+        protected BatchManagementService $batchService
     ) {}
 
     /**
@@ -80,17 +88,26 @@ class BookingRequestController extends Controller
         $currentUser = Auth::user();
         $booking = $rescheduleRequest->booking;
 
-        $validated = $request->validate([
+        $request->validate([
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
-        DB::transaction(function () use ($rescheduleRequest, $booking, $validated, $currentUser) {
+        $adminNotes = $request->input('admin_notes');
+
+        DB::transaction(function () use ($rescheduleRequest, $booking, $adminNotes, $currentUser) {
             $oldDates = "{$booking->start_date->format('M d, Y')} - {$booking->end_date->format('M d, Y')}";
             $newDates = "{$rescheduleRequest->requested_start_date->format('M d, Y')} - {$rescheduleRequest->requested_end_date->format('M d, Y')}";
 
-            // Update booking dates and detach from existing batch so it can be assigned to new date
+            // Find or auto-create batch for the requested date
+            $batch = $this->batchService->findOrCreateBatchForDates(
+                $rescheduleRequest->requested_start_date,
+                $rescheduleRequest->requested_end_date,
+                $currentUser
+            );
+
+            // Update booking dates and attach to the target batch
             $booking->update([
-                'batch_id' => null,
+                'batch_id' => $batch->id,
                 'start_date' => $rescheduleRequest->requested_start_date,
                 'end_date' => $rescheduleRequest->requested_end_date,
                 'status' => 'confirmed',
@@ -99,7 +116,7 @@ class BookingRequestController extends Controller
             // Mark request approved
             $rescheduleRequest->update([
                 'status' => 'approved',
-                'admin_notes' => $validated['admin_notes'] ?? 'Reschedule request approved by camp staff.',
+                'admin_notes' => $adminNotes ?: 'Reschedule request approved by camp staff.',
                 'reviewed_by' => $currentUser->id,
                 'reviewed_at' => now(),
             ]);
@@ -110,7 +127,7 @@ class BookingRequestController extends Controller
                 'old_status' => 'reschedule_requested',
                 'new_status' => 'confirmed',
                 'changed_by' => $currentUser->id,
-                'note' => "Reschedule approved ({$oldDates} → {$newDates})" . ($validated['admin_notes'] ? " - {$validated['admin_notes']}" : ''),
+                'note' => "Reschedule approved ({$oldDates} → {$newDates}, attached to {$batch->batch_code})" . ($adminNotes ? " - {$adminNotes}" : ''),
                 'created_at' => now(),
             ]);
         });
@@ -123,6 +140,15 @@ class BookingRequestController extends Controller
             $request
         );
 
+        // Send email notification to guest
+        if ($booking->contact_email) {
+            try {
+                Mail::to($booking->contact_email)->send(new RescheduleApprovedMail($booking->fresh(), $rescheduleRequest));
+            } catch (\Throwable $e) {
+                Log::warning("Failed to send RescheduleApprovedMail to {$booking->contact_email}: " . $e->getMessage());
+            }
+        }
+
         return back()->with('success', "Reschedule request for Booking #{$booking->booking_number} has been approved! Booking moved to {$rescheduleRequest->requested_start_date->format('M d, Y')}.");
     }
 
@@ -134,11 +160,11 @@ class BookingRequestController extends Controller
         $currentUser = Auth::user();
         $booking = $rescheduleRequest->booking;
 
-        $validated = $request->validate([
+        $request->validate([
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
-        $reason = $validated['admin_notes'] ?? 'Reschedule request rejected by camp administration.';
+        $reason = $request->input('admin_notes') ?: 'Reschedule request rejected by camp administration.';
 
         DB::transaction(function () use ($rescheduleRequest, $booking, $reason, $currentUser) {
             // Restore booking status to confirmed
@@ -169,6 +195,15 @@ class BookingRequestController extends Controller
             $request
         );
 
+        // Send email notification to guest
+        if ($booking->contact_email) {
+            try {
+                Mail::to($booking->contact_email)->send(new RescheduleRejectedMail($booking->fresh(), $rescheduleRequest, $reason));
+            } catch (\Throwable $e) {
+                Log::warning("Failed to send RescheduleRejectedMail to {$booking->contact_email}: " . $e->getMessage());
+            }
+        }
+
         return back()->with('info', "Reschedule request for Booking #{$booking->booking_number} was rejected.");
     }
 
@@ -186,6 +221,7 @@ class BookingRequestController extends Controller
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
+        $adminNotes = $request->input('admin_notes');
         $policy = $this->policyEngine->evaluate($booking);
         $actionType = $validated['action_type'] ?? 'policy_refund';
 
@@ -204,7 +240,7 @@ class BookingRequestController extends Controller
             $isForfeited = ($refundAmount <= 0);
         }
 
-        DB::transaction(function () use ($cancellationRequest, $booking, $validated, $currentUser, $policy, $refundAmount, $refundPercentage, $isForfeited) {
+        DB::transaction(function () use ($cancellationRequest, $booking, $adminNotes, $currentUser, $policy, $refundAmount, $refundPercentage, $isForfeited) {
             $booking->update([
                 'status' => 'cancelled_by_guest',
                 'batch_id' => null,
@@ -213,13 +249,13 @@ class BookingRequestController extends Controller
             $cancellationRequest->update([
                 'status' => 'approved',
                 'calculated_refund_amount' => $refundAmount,
-                'admin_notes' => $validated['admin_notes'] ?? ($isForfeited ? 'Cancellation approved (Downpayment forfeited per policy).' : 'Cancellation approved. Refund queued for processing.'),
+                'admin_notes' => $adminNotes ?: ($isForfeited ? 'Cancellation approved (Downpayment forfeited per policy).' : 'Cancellation approved. Refund queued for processing.'),
                 'reviewed_by' => $currentUser->id,
                 'reviewed_at' => now(),
             ]);
 
             // Create RefundRequest records for completed payments
-            $completedPayments = $booking->payments()->where('status', 'completed')->get();
+            $completedPayments = $booking->payments()->whereIn('status', ['completed', 'paid'])->get();
             foreach ($completedPayments as $payment) {
                 RefundRequest::create([
                     'payment_id' => $payment->id,
@@ -235,7 +271,7 @@ class BookingRequestController extends Controller
                     ],
                     'status' => $isForfeited ? 'forfeited' : 'pending',
                     'forfeit_reason' => $isForfeited ? 'cancellation_outside_policy_window' : null,
-                    'notes' => "Approved from Guest Cancellation Request. " . ($validated['admin_notes'] ?? ''),
+                    'notes' => "Approved from Guest Cancellation Request. " . ($adminNotes ?? ''),
                 ]);
             }
 
@@ -244,7 +280,7 @@ class BookingRequestController extends Controller
                 'old_status' => 'cancellation_requested',
                 'new_status' => 'cancelled_by_guest',
                 'changed_by' => $currentUser->id,
-                'note' => "Cancellation approved by {$currentUser->name} (" . ($isForfeited ? "Forfeited" : "Refund due: ₱" . number_format($refundAmount, 2)) . ")" . ($validated['admin_notes'] ? " - {$validated['admin_notes']}" : ''),
+                'note' => "Cancellation approved by {$currentUser->name} (" . ($isForfeited ? "Forfeited" : "Refund due: ₱" . number_format($refundAmount, 2)) . ")" . ($adminNotes ? " - {$adminNotes}" : ''),
                 'created_at' => now(),
             ]);
         });
@@ -256,6 +292,15 @@ class BookingRequestController extends Controller
             $currentUser->name,
             $request
         );
+
+        // Send email notification to guest
+        if ($booking->contact_email) {
+            try {
+                Mail::to($booking->contact_email)->send(new CancellationApprovedMail($booking->fresh(), $cancellationRequest, $refundAmount, $isForfeited));
+            } catch (\Throwable $e) {
+                Log::warning("Failed to send CancellationApprovedMail to {$booking->contact_email}: " . $e->getMessage());
+            }
+        }
 
         if (!$isForfeited && $refundAmount > 0) {
             return redirect()->route('admin.payments.refunds')->with('success', "Cancellation for Booking #{$booking->booking_number} approved! Refund of ₱" . number_format($refundAmount, 2) . " is now queued below in Pending Refunds.");
@@ -272,11 +317,11 @@ class BookingRequestController extends Controller
         $currentUser = Auth::user();
         $booking = $cancellationRequest->booking;
 
-        $validated = $request->validate([
+        $request->validate([
             'admin_notes' => 'nullable|string|max:500',
         ]);
 
-        $reason = $validated['admin_notes'] ?? 'Cancellation request rejected by camp administration.';
+        $reason = $request->input('admin_notes') ?: 'Cancellation request rejected by camp administration.';
 
         DB::transaction(function () use ($cancellationRequest, $booking, $reason, $currentUser) {
             $booking->update(['status' => 'confirmed']);
@@ -305,6 +350,15 @@ class BookingRequestController extends Controller
             $currentUser->name,
             $request
         );
+
+        // Send email notification to guest
+        if ($booking->contact_email) {
+            try {
+                Mail::to($booking->contact_email)->send(new CancellationRejectedMail($booking->fresh(), $cancellationRequest, $reason));
+            } catch (\Throwable $e) {
+                Log::warning("Failed to send CancellationRejectedMail to {$booking->contact_email}: " . $e->getMessage());
+            }
+        }
 
         return back()->with('info', "Cancellation request for Booking #{$booking->booking_number} was rejected.");
     }

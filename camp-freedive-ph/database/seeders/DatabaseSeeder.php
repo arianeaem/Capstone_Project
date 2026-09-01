@@ -532,7 +532,7 @@ class DatabaseSeeder extends Seeder
             'batch_id' => $batch1->id,
             'booking_number' => 'CFP-2026-1002',
             'pin' => '1002',
-            'class_type' => 'level1',
+            'class_type' => 'discovery',
             'is_certified_diver' => false,
             'start_date' => $batch1Start,
             'end_date' => $batch1Start->copy()->addDay(),
