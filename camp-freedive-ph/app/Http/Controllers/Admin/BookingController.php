@@ -31,6 +31,13 @@ class BookingController extends Controller
     {
         $query = Booking::with('participants', 'payments');
 
+        // By default, exclude unpaid downpayment draft bookings unless explicitly requested
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        } else {
+            $query->where('status', '!=', 'pending_downpayment');
+        }
+
         // Search filter (Booking #, Contact Name, Contact Phone, Email)
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -40,11 +47,6 @@ class BookingController extends Controller
                   ->orWhere('contact_phone', 'like', "%{$search}%")
                   ->orWhere('contact_email', 'like', "%{$search}%");
             });
-        }
-
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
         }
 
         // Class type filter
@@ -84,8 +86,12 @@ class BookingController extends Controller
         match ($sort) {
             'created_desc' => $query->latest('created_at'),
             'created_asc' => $query->oldest('created_at'),
-            'dive_date_desc' => $query->orderBy('start_date', 'desc'),
-            'dive_date_asc' => $query->orderBy('start_date', 'asc'),
+            'dive_date_asc' => $query->orderBy('start_date', 'asc')->latest('created_at'),
+            'dive_date_desc' => $query->orderBy('start_date', 'desc')->latest('created_at'),
+            'amount_desc' => $query->orderBy('total_amount', 'desc'),
+            'amount_asc' => $query->orderBy('total_amount', 'asc'),
+            'guest_asc' => $query->orderBy('contact_name', 'asc'),
+            'guest_desc' => $query->orderBy('contact_name', 'desc'),
             'status' => $query->orderBy('status'),
             default => $query->latest('created_at'),
         };
@@ -94,7 +100,7 @@ class BookingController extends Controller
         $bookings = $query->paginate($perPage)->withQueryString();
 
         $stats = [
-            'total' => Booking::count(),
+            'total' => Booking::where('status', '!=', 'pending_downpayment')->count(),
             'confirmed' => Booking::where('status', 'confirmed')->count(),
             'rescheduled' => Booking::where('status', 'rescheduled')->count(),
             'completed' => Booking::where('status', 'completed')->count(),
@@ -396,19 +402,19 @@ class BookingController extends Controller
         // Track changes for immutable audit trail (RA 10173)
         $diffs = [];
         if ($booking->start_date->format('Y-m-d') !== $validated['start_date']) {
-            $diffs[] = "Dates: {$booking->start_date->format('Y-m-d')} → {$validated['start_date']}";
+            $diffs[] = "Dates: {$booking->start_date->format('Y-m-d')} {$validated['start_date']}";
         }
         if ($booking->contact_name !== $validated['contact_name']) {
-            $diffs[] = "Contact Name: {$booking->contact_name} → {$validated['contact_name']}";
+            $diffs[] = "Contact Name: {$booking->contact_name} {$validated['contact_name']}";
         }
         if ($booking->contact_email !== $validated['contact_email']) {
-            $diffs[] = "Contact Email: {$booking->contact_email} → {$validated['contact_email']}";
+            $diffs[] = "Contact Email: {$booking->contact_email} {$validated['contact_email']}";
         }
         if ($booking->contact_phone !== $validated['contact_phone']) {
-            $diffs[] = "Contact Phone: {$booking->contact_phone} → {$validated['contact_phone']}";
+            $diffs[] = "Contact Phone: {$booking->contact_phone} {$validated['contact_phone']}";
         }
         if ($pickupOption === 'carpool' && $booking->pickup_location !== $pickupLocation) {
-            $diffs[] = "Carpool Hub: " . ($booking->pickup_location ?: 'None') . " → " . ($pickupLocation ?: 'None');
+            $diffs[] = "Carpool Hub: " . ($booking->pickup_location ?: 'None') . " " . ($pickupLocation ?: 'None');
         }
 
         DB::transaction(function () use (
@@ -532,7 +538,7 @@ class BookingController extends Controller
 
         AuditLogger::log(
             'BOOKING_STATUS_CHANGED',
-            "Booking #{$booking->booking_number} status transitioned: {$oldStatus} → {$newStatus} by {$currentUser->name}. Note: {$note}",
+            "Booking #{$booking->booking_number} status transitioned: {$oldStatus} {$newStatus} by {$currentUser->name}. Note: {$note}",
             $currentUser,
             $currentUser->name,
             $request

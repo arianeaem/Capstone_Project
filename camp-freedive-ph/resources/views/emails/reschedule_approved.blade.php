@@ -54,7 +54,7 @@
             </div>
         </div>
         <div class="footer">
-            Camp FreedivePH<br>Mabini, Batangas Base Camp
+            Camp FreedivePH<br>The Shack Hideaway by Mayumi Resorts, Sitio Bagalangit Road, Barangay Bagalangit, Anilao, Mabini, 4202 Batangas, Philippines
         </div>
     </div>
 </body>

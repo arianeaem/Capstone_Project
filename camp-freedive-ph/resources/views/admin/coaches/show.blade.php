@@ -12,18 +12,19 @@
     <!-- Top Breadcrumb & Controls -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-4">
         <div>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('admin.coaches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                    ← Back to Coach Roster
+            <div class="flex items-center gap-2 mb-1.5">
+                <a href="{{ route('admin.coaches.index') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                    <span>Coach Roster</span>
                 </a>
                 <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000]">{{ $coach->name }}</span>
+                <span class="font-bold text-[#780000] text-xs">{{ $coach->name }}</span>
             </div>
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $coach->name }}</h1>
+            <h1 class="text-2xl font-extrabold text-[#1D1D1F] tracking-tight">{{ $coach->name }}</h1>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
-            <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-sm">
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-2xs">
                 + Assign Students
             </a>
             <a href="{{ route('admin.users.edit', $coach) }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
@@ -34,18 +35,18 @@
     </div>
 
     <!-- Coach Header Overview Card -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="flex items-center gap-4">
-            <div class="w-16 h-16 rounded-full bg-[#F8EAEA] text-[#780000] border-2 border-[#780000] flex items-center justify-center font-black text-2xl shadow-xs shrink-0">
+            <div class="w-14 h-14 rounded-full bg-[#F8EAEA] text-[#780000] border-2 border-[#780000] flex items-center justify-center font-black text-xl shadow-2xs shrink-0">
                 {{ substr($coach->name, 0, 1) }}
             </div>
             <div>
-                <div class="flex items-center gap-2.5 flex-wrap">
-                    <h2 class="text-xl font-bold text-[#1D1D1F]">{{ $coach->name }}</h2>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $coach->status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' }}">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h2 class="text-lg font-bold text-[#1D1D1F]">{{ $coach->name }}</h2>
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold border {{ $coach->status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' }}">
                         {{ ucfirst($coach->status) }}
                     </span>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                         Freediving Coach
                     </span>
                 </div>
@@ -57,7 +58,7 @@
             </div>
         </div>
 
-        <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-right space-y-1 shrink-0">
+        <div class="p-3.5 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] text-right space-y-0.5 shrink-0">
             <span class="text-xs uppercase font-bold text-[#6E6E73] tracking-wider block">Assigned Workload</span>
             <div class="text-xl font-extrabold text-[#1D1D1F]">
                 {{ $activeAssignments->count() }} Active Student(s)
@@ -75,14 +76,14 @@
         <div class="lg:col-span-2 space-y-6">
             
             <!-- Assigned Students Card Grid -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Students & Participants</h3>
                         <p class="text-xs text-[#6E6E73] mt-0.5">Students currently placed under Coach {{ $coach->name }}'s guidance.</p>
                     </div>
 
-                    <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#780000]/10 text-[#780000] border border-[#780000]/20">
+                    <span class="text-xs font-bold px-2.5 py-1 rounded-md bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                         {{ $activeAssignments->count() }} Student(s) Total
                     </span>
                 </div>
@@ -93,27 +94,27 @@
                         $p = $assignment->participant; 
                         $classType = $p->booking?->formatted_class_type ?? ucfirst($p->booking?->class_type ?? 'Discovery');
                     @endphp
-                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FDFDFD] hover:border-[#780000]/40 transition-all flex flex-col justify-between space-y-3 shadow-2xs">
+                    <div class="p-4 rounded-lg border border-[#E5E5EA] bg-[#FAFAFC] hover:border-[#780000] transition-all flex flex-col justify-between space-y-3 shadow-2xs">
                         <div class="space-y-2">
                             <!-- Student Header & Course Badge -->
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <h4 class="font-bold text-sm text-[#1D1D1F]">{{ $p->name }}</h4>
-                                    <span class="text-[11px] text-[#8E8E93]">Age {{ $p->age }} • {{ ucfirst($p->swimmer_status ?? 'Swimmer') }}</span>
+                                    <span class="text-xs text-[#6E6E73]">Age {{ $p->age }} • {{ ucfirst($p->swimmer_status ?? 'Swimmer') }}</span>
                                 </div>
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#EFF6FF] text-[#1E40AF] border border-[#BFDBFE] shrink-0">
+                                <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5] shrink-0">
                                     {{ $p->booking?->class_type === 'discovery' ? 'Discovery' : ($p->booking?->class_type === 'fundive' ? 'Fundive' : 'Refinement') }}
                                 </span>
                             </div>
 
                             @if($assignment->is_ratio_override)
-                                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]">
+                                <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
                                     ⚠️ Ratio Override Active
                                 </div>
                             @endif
 
                             @if($p->health_condition)
-                                <div class="p-2 rounded-lg bg-amber-50 border border-amber-200 text-[11px] text-amber-900 leading-snug">
+                                <div class="p-2 rounded-md bg-amber-50 border border-amber-200 text-xs text-amber-900 leading-snug">
                                     <strong>Medical:</strong> {{ $p->health_condition }}
                                 </div>
                             @endif
@@ -141,13 +142,13 @@
                         <div class="pt-2 border-t border-[#E5E5EA] flex items-center justify-end">
                             <button type="button" 
                                     @click="selectedParticipantId = {{ $p->id }}; selectedParticipantName = '{{ addslashes($p->name) }}'; openReassignModal = true"
-                                    class="px-3 py-1.5 rounded-lg text-xs font-bold text-[#FF3B3C] hover:bg-[#FEF2F2] border border-[#FECACA] transition-colors">
-                                Reassign Away →
+                                    class="btn-secondary px-2.5 py-1 text-xs font-semibold">
+                                Reassign Away
                             </button>
                         </div>
                     </div>
                     @empty
-                    <div class="col-span-full py-8 text-center bg-[#F9F9FB] rounded-xl border border-dashed border-[#D1D1D6]">
+                    <div class="col-span-full py-8 text-center bg-[#FAFAFC] rounded-xl border border-dashed border-[#D1D1D6]">
                         <p class="text-xs text-[#6E6E73]">
                             No students currently assigned to this coach. Use the <a href="{{ route('admin.coaches.matching') }}" class="text-[#780000] font-bold underline">Matching Queue</a> to assign students.
                         </p>
@@ -157,24 +158,24 @@
             </div>
 
             <!-- Past Completed History -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Completed Dive History</h3>
-                    <span class="text-xs text-[#8E8E93]">{{ $pastAssignments->count() }} past assignment(s)</span>
+                    <span class="text-xs text-[#6E6E73]">{{ $pastAssignments->count() }} past assignment(s)</span>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     @forelse($pastAssignments as $past)
-                    <div class="p-3 rounded-xl border border-[#E5E5EA] bg-[#F9F9FB] flex items-center justify-between text-xs">
+                    <div class="p-3 rounded-lg border border-[#E5E5EA] bg-[#FAFAFC] flex items-center justify-between text-xs">
                         <div class="space-y-0.5">
                             <strong class="text-[#1D1D1F] block text-xs">{{ $past->participant->name }}</strong>
-                            <div class="text-[11px] text-[#8E8E93]">
+                            <div class="text-xs text-[#6E6E73]">
                                 <span>Batch {{ $past->batch?->batch_code }}</span>
                                 <span class="mx-1">•</span>
                                 <span>{{ $past->dive_date->format('M d, Y') }}</span>
                             </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             Completed
                         </span>
                     </div>
@@ -190,7 +191,7 @@
         <div class="space-y-6">
             
             <!-- Availability Calendar Card -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Availability Calendar</h3>
                     <p class="text-xs text-[#6E6E73] mt-0.5">Dates marked by the coach in the Coach Portal.</p>
@@ -198,7 +199,7 @@
 
                 <div class="space-y-2">
                     @forelse($coach->coachAvailabilities as $avail)
-                    <div class="p-3 rounded-xl border flex items-center justify-between text-xs {{ $avail->status_badge['class'] }}">
+                    <div class="p-3 rounded-lg border flex items-center justify-between text-xs {{ $avail->status_badge['class'] }}">
                         <div>
                             <strong class="block">{{ $avail->date->format('F d, Y (l)') }}</strong>
                             @if($avail->notes)
@@ -206,7 +207,7 @@
                             @endif
                         </div>
 
-                        <span class="px-2 py-0.5 rounded-full text-xs font-extrabold border bg-white shadow-xs">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold border bg-white shadow-2xs">
                             {{ $avail->status_badge['label'] }}
                         </span>
                     </div>
@@ -237,8 +238,8 @@
                 <input type="hidden" name="participant_id" :value="selectedParticipantId">
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">Select New Coach <span class="text-[#780000]">*</span></label>
-                    <select name="new_coach_id" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] mb-1">Select New Coach <span class="text-[#780000]">*</span></label>
+                    <select name="new_coach_id" required class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                         <option value="">-- Choose Active Coach --</option>
                         @foreach($otherCoaches as $c)
                             <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->email }})</option>
@@ -247,13 +248,13 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">Reassignment Reason <span class="text-[#780000]">*</span></label>
-                    <textarea name="reason" required rows="3" placeholder="e.g. Original coach reported sick / Schedule balance adjustment" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
+                    <label class="block font-bold text-[#1D1D1F] mb-1">Reassignment Reason <span class="text-[#780000]">*</span></label>
+                    <textarea name="reason" required rows="3" placeholder="e.g. Original coach reported sick / Schedule balance adjustment" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
                     <button type="button" @click="openReassignModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-sm">
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
                         Confirm Reassignment
                     </button>
                 </div>

@@ -139,10 +139,10 @@ class UserManagementController extends Controller
         ]);
 
         $changes = [];
-        if ($user->name !== $validated['name']) $changes[] = "Name: {$user->name} → {$validated['name']}";
-        if ($user->email !== $validated['email']) $changes[] = "Email: {$user->email} → {$validated['email']}";
-        if ($user->role !== $validated['role']) $changes[] = "Role: {$user->role} → {$validated['role']}";
-        if ($user->status !== $validated['status']) $changes[] = "Status: {$user->status} → {$validated['status']}";
+        if ($user->name !== $validated['name']) $changes[] = "Name: {$user->name} {$validated['name']}";
+        if ($user->email !== $validated['email']) $changes[] = "Email: {$user->email} {$validated['email']}";
+        if ($user->role !== $validated['role']) $changes[] = "Role: {$user->role} {$validated['role']}";
+        if ($user->status !== $validated['status']) $changes[] = "Status: {$user->status} {$validated['status']}";
 
         $updateData = [
             'name' => $validated['name'],

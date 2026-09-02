@@ -26,9 +26,9 @@ class PortalController extends Controller
     public function index(): View
     {
         $coach = Auth::user();
-        $today = Carbon::today();
+        $today = Carbon::today('Asia/Manila');
 
-        // 1. Next Upcoming Assignment
+        // 1. Next Immediate Dive Assignment & Mission Card
         $nextAssignment = ParticipantAssignment::with(['batch.riskAssessments', 'participant', 'booking'])
             ->where('coach_id', $coach->id)
             ->where('status', 'assigned')
@@ -64,7 +64,7 @@ class PortalController extends Controller
 
             // Check if within 48 hours of dive date (09:30 AM start)
             $diveStart = $batch->start_date->copy()->setTime(9, 30);
-            $hoursUntilDive = max(0, Carbon::now()->diffInHours($diveStart, false));
+            $hoursUntilDive = max(0, Carbon::now('Asia/Manila')->diffInHours($diveStart, false));
             $canRequestRelease = $hoursUntilDive > 48;
 
             $nextSessionData = [
@@ -100,7 +100,12 @@ class PortalController extends Controller
             ->whereDate('dive_date', '>=', $today)
             ->count();
 
-        // 3. Upcoming Schedule Preview (Next 3 upcoming batches)
+        $totalStudentsMentored = ParticipantAssignment::where('coach_id', $coach->id)
+            ->where('status', 'assigned')
+            ->distinct('participant_id')
+            ->count('participant_id');
+
+        // 3. Upcoming Schedule Pipeline (Next 3 upcoming batches)
         $upcomingAssignments = ParticipantAssignment::with(['batch.riskAssessments', 'participant', 'booking'])
             ->where('coach_id', $coach->id)
             ->where('status', 'assigned')
@@ -110,6 +115,41 @@ class PortalController extends Controller
             ->groupBy('batch_id')
             ->take(3);
 
+        // 4. Open Broadcast Volunteer Openings
+        $openCoachOpenings = CoachOpening::where('status', 'open')
+            ->whereDate('dive_date', '>=', $today)
+            ->with(['batch', 'requests' => fn($q) => $q->where('coach_id', $coach->id)])
+            ->orderBy('dive_date', 'asc')
+            ->take(3)
+            ->get();
+
+        // 5. Quick Weekend Calendar Status (Next 3 weekends: 6 weekend days)
+        $quickWeekendDays = [];
+        $cursor = $today->copy();
+        while (count($quickWeekendDays) < 6) {
+            if ($cursor->isWeekend()) {
+                $dateStr = $cursor->format('Y-m-d');
+                $isAssigned = ParticipantAssignment::where('coach_id', $coach->id)
+                    ->where('status', 'assigned')
+                    ->whereDate('dive_date', $dateStr)
+                    ->exists();
+
+                $isAvailable = CoachAvailability::where('coach_id', $coach->id)
+                    ->where('status', 'available')
+                    ->whereDate('date', $dateStr)
+                    ->exists();
+
+                $status = $isAssigned ? 'assigned' : ($isAvailable ? 'available' : 'not_set');
+
+                $quickWeekendDays[] = [
+                    'date' => $cursor->copy(),
+                    'date_str' => $dateStr,
+                    'status' => $status,
+                ];
+            }
+            $cursor->addDay();
+        }
+
         return view('coach.dashboard', compact(
             'coach',
             'nextSessionData',
@@ -117,7 +157,10 @@ class PortalController extends Controller
             'pendingRequestsCount',
             'upcomingConfirmedDivesCount',
             'activeOpeningsCount',
-            'upcomingAssignments'
+            'totalStudentsMentored',
+            'upcomingAssignments',
+            'openCoachOpenings',
+            'quickWeekendDays'
         ));
     }
 }

@@ -10,7 +10,7 @@
         <div>
             <div class="flex items-center gap-2.5">
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">System Audit Logs</h1>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                     Owner Exclusive
                 </span>
             </div>
@@ -21,20 +21,20 @@
     </div>
 
     <!-- Filter Bar -->
-    <div class="bg-white p-4 rounded-xl border border-[#E5E5EA]">
+    <div class="bg-white p-4 rounded-xl border border-[#E5E5EA] shadow-2xs">
         <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
             <div class="lg:col-span-2">
-                <label class="block font-bold text-[#1D1D1F] mb-2">Search Logs</label>
+                <label class="block font-semibold text-[#6E6E73] mb-1">Search Logs</label>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}" 
                        placeholder="Actor name, description details, IP..." 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-1.5 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
             </div>
 
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-2">Event Action</label>
-                <select name="action" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                <label class="block font-semibold text-[#6E6E73] mb-1">Event Action</label>
+                <select name="action" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                     <option value="">All Actions</option>
                     @foreach($actions as $act)
                         <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
@@ -45,19 +45,19 @@
             </div>
 
             <div>
-                <label class="block font-bold text-[#1D1D1F] mb-2">Date From</label>
+                <label class="block font-semibold text-[#6E6E73] mb-1">Date From</label>
                 <input type="date" 
                        name="date_from" 
                        value="{{ request('date_from') }}" 
-                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
             </div>
 
             <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold w-full">
+                <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold w-full shadow-2xs">
                     Filter
                 </button>
                 @if(request()->anyFilled(['search', 'action', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.audit_logs.index') }}" class="btn-secondary px-3 py-2 text-xs text-center">
+                    <a href="{{ route('admin.audit_logs.index') }}" class="btn-secondary px-3 py-1.5 text-xs text-center">
                         Reset
                     </a>
                 @endif
@@ -82,13 +82,13 @@
                     @forelse($logs as $log)
                     <tr class="hover:bg-[#FAFAFC] transition-colors">
                         <!-- Timestamp -->
-                        <td class="py-3 px-4 text-left text-[#6E6E73] whitespace-nowrap font-mono text-[11px]">
+                        <td class="py-3 px-4 text-left text-[#6E6E73] whitespace-nowrap font-mono text-xs">
                             {{ $log->created_at ? $log->created_at->format('M d, Y g:i:s A') : '—' }}
                         </td>
 
                         <!-- Action Badge -->
                         <td class="py-3 px-4 text-left whitespace-nowrap">
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block {{ $log->action_badge['class'] ?? 'bg-gray-100 text-gray-700 border-gray-200' }}">
+                            <span class="px-2 py-0.5 rounded-md text-xs font-bold border inline-block {{ $log->action_badge['class'] ?? 'bg-gray-100 text-gray-700 border-gray-200' }}">
                                 {{ $log->action_badge['label'] ?? $log->action }}
                             </span>
                         </td>
@@ -97,7 +97,7 @@
                         <td class="py-3 px-4 text-left whitespace-nowrap">
                             <strong class="text-[#1D1D1F] block">{{ $log->actor_name ?? 'System' }}</strong>
                             @if($log->user)
-                                <span class="text-[11px] text-[#6E6E73]">{{ $log->user->email }} ({{ ucfirst($log->user->role) }})</span>
+                                <span class="text-xs text-[#6E6E73]">{{ $log->user->email }} ({{ ucfirst($log->user->role) }})</span>
                             @endif
                         </td>
 
@@ -107,7 +107,7 @@
                         </td>
 
                         <!-- IP Address -->
-                        <td class="py-3 px-4 text-left font-mono text-[11px] text-[#6E6E73] whitespace-nowrap">
+                        <td class="py-3 px-4 text-left font-mono text-xs text-[#6E6E73] whitespace-nowrap">
                             {{ $log->ip_address ?? '127.0.0.1' }}
                         </td>
                     </tr>

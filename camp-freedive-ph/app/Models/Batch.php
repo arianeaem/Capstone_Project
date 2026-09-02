@@ -129,11 +129,11 @@ class Batch extends Model
     }
 
     /**
-     * Display name of the batch.
+     * Display name of the batch (Batch Number as primary).
      */
     public function getDisplayNameAttribute(): string
     {
-        return $this->name ?: $this->batch_code;
+        return $this->batch_number;
     }
 
     /**
@@ -177,12 +177,12 @@ class Batch extends Model
     }
 
     /**
-     * Total participants in active bookings.
+     * Total participants in active confirmed bookings.
      */
     public function getTotalParticipantsCountAttribute(): int
     {
         return (int) $this->bookings()
-            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
             ->withCount('participants')
             ->get()
             ->sum('participants_count');
@@ -224,7 +224,7 @@ class Batch extends Model
     public function getOutstandingBalanceBookingsCountAttribute(): int
     {
         return $this->bookings()
-            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
             ->where('balance_amount', '>', 0)
             ->count();
     }

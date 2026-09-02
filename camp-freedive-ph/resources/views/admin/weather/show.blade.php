@@ -43,17 +43,16 @@
             <!-- Refresh / Run Live Assessment -->
             <form action="{{ route('admin.weather.assess', $batch) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn-secondary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-sm transition-all hover:border-[#780000]">
+                <button type="submit" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
                     <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     <span>Run Live Assessment</span>
                 </button>
             </form>
 
-
             <!-- Manual Override Modal Trigger -->
             <button type="button" 
                     @click="openOverrideModal = true"
-                    class="px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 text-[#92400E] border border-[#FDE68A] bg-[#FFFBEB] hover:bg-[#FEF3C7] rounded-xl transition-all shadow-sm">
+                    class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
                 <span>Manual Override</span>
             </button>
 
@@ -61,8 +60,8 @@
             @if($batch->status !== 'cancelled_by_camp')
                 <button type="button" 
                         @click="openCancelModal = true"
-                        class="px-4 py-2 text-xs sm:text-sm font-bold text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] rounded-xl border border-[#FECACA] transition-all flex items-center gap-2 shadow-sm">
-                        <span>Cancel Batch</span>
+                        class="btn-danger px-3.5 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                    <span>Cancel Batch</span>
                 </button>
             @endif
 
@@ -483,7 +482,7 @@
                     {{ count($assessmentRuns) }} run(s)
                 </span>
             </div>
-            <div class="flex items-center gap-2 text-xs font-bold text-[#008E98]">
+            <div class="flex items-center gap-2 text-xs font-bold text-[#780000]">
                 <span x-text="openAuditTrail ? 'Hide History' : 'View Audit History'"></span>
                 <svg class="w-4 h-4 transition-transform duration-200" :class="openAuditTrail ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
@@ -679,7 +678,7 @@ You can select your preferred option by entering your booking number and PIN in 
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold bg-[#FF3B3C] hover:bg-[#D32F2F] shadow-sm">
+                    <button type="submit" class="btn-danger px-4 py-2 text-xs font-bold shadow-2xs">
                         Confirm Cancellation & Send Emails
                     </button>
                 </div>

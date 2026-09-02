@@ -51,15 +51,9 @@
                 <!-- Batch Card Header -->
                 <div class="p-6 border-b border-[#E5E5EA] bg-[#FAFAFC] flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="space-y-1">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#008E98]/10 text-[#008E98] border border-[#008E98]/20 font-mono">
-                                {{ $batch->batch_number }}
-                            </span>
-                            <span class="text-xs text-[#8E8E93]">• 2D1N Weekend Camp</span>
-                        </div>
-                        <h3 class="text-lg font-black text-[#1D1D1F]">{{ $batch->name }}</h3>
+                        <h3 class="text-xl font-black text-[#1D1D1F]">{{ $batch->batch_number }}</h3>
                         <p class="text-xs text-[#6E6E73]">
-                            Dates: <strong>{{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}</strong> (Mabini Coastline Base)
+                            Dates: <strong>{{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}</strong> • Mabini Coastline Base
                         </p>
                     </div>
 
@@ -259,14 +253,8 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-xs overflow-hidden opacity-95">
                 <div class="p-5 border-b border-[#E5E5EA] bg-[#FAFAFC] flex flex-col md:flex-row md:items-center justify-between gap-3">
                     <div>
-                        <div class="flex items-center gap-2">
-                            <span class="text-xs font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-700 font-mono">
-                                {{ $batch->batch_number }}
-                            </span>
-                            <span class="text-xs text-[#8E8E93]">• Completed</span>
-                        </div>
-                        <h3 class="text-base font-extrabold text-[#1D1D1F] mt-0.5">{{ $batch->name }}</h3>
-                        <p class="text-xs text-[#6E6E73]">
+                        <h3 class="text-base font-extrabold text-[#1D1D1F]">{{ $batch->batch_number }}</h3>
+                        <p class="text-xs text-[#6E6E73] mt-0.5">
                             Concluded: {{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}
                         </p>
                     </div>

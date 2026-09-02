@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PasswordResetMail;
 use App\Models\User;
 use App\Services\AuditLogger;
 use Carbon\Carbon;
@@ -10,6 +11,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -34,6 +37,7 @@ class PasswordResetController extends Controller
         ]);
 
         $user = User::where('email', $request->email)->first();
+        $resetUrl = null;
 
         if ($user && $user->isActive()) {
             $token = Str::random(64);
@@ -46,14 +50,27 @@ class PasswordResetController extends Controller
                 ]
             );
 
+            $resetUrl = route('password.reset', ['token' => $token, 'email' => $user->email]);
+
+            try {
+                Mail::to($user->email)->send(new PasswordResetMail($resetUrl, $user));
+            } catch (\Throwable $e) {
+                Log::warning("Failed sending password reset email to {$user->email}: " . $e->getMessage());
+            }
+
             AuditLogger::log('PASSWORD_RESET_LINK_SENT', "Password reset link requested for: {$user->email}", $user, $user->name, $request);
 
-            // In local/staging development environment or simulation, log token and link
-            \Illuminate\Support\Facades\Log::info("Password Reset Link for {$user->email}: " . route('password.reset', ['token' => $token, 'email' => $user->email]));
+            Log::info("Password Reset Link for {$user->email}: {$resetUrl}");
         }
 
-        // Return same message regardless to avoid email enumeration
-        return back()->with('status', 'If an active account exists with that email, we have sent a password reset link.');
+        $redirect = back()->with('status', 'If an active account exists with that email, we have sent a password reset link.');
+
+        // In local development, provide direct link so developers/admins can easily test password reset
+        if (app()->environment('local') && $resetUrl) {
+            $redirect->with('dev_reset_link', $resetUrl);
+        }
+
+        return $redirect;
     }
 
     /**

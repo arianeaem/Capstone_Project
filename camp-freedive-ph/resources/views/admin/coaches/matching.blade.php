@@ -14,19 +14,19 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
-            <a href="{{ route('admin.coaches.requests') }}" class="btn-secondary px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#FF3B3C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('admin.coaches.requests') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
                 <span>Coach Requests</span>
                 @if(isset($pendingRequestsCount) && $pendingRequestsCount > 0)
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FF3B3C] text-white">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#780000] text-white">
                         {{ $pendingRequestsCount }}
                     </span>
                 @endif
             </a>
 
-            <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <span>Coach Roster</span>
             </a>
         </div>
@@ -34,7 +34,7 @@
 
     <!-- Batch Groups Queue -->
     @if(isset($batchGroups) && count($batchGroups) > 0)
-        <div class="space-y-8">
+        <div class="space-y-6">
             @foreach($batchGroups as $group)
             @php
                 $batch = $group['batch'];
@@ -42,7 +42,7 @@
                 $availableCoaches = $group['available_coaches'];
                 $neededCoaches = max(1, (int) ceil($group['unassigned_count'] / 4));
             @endphp
-            <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 space-y-6 shadow-2xs"
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-5 shadow-2xs"
                  x-data="batchMatcher({
                      batchId: {{ $batch->id }},
                      unassignedCount: {{ $group['unassigned_count'] }},
@@ -73,8 +73,8 @@
                     <div class="flex flex-col items-end gap-2">
                         <!-- Broadcast Slot Button -->
                         @if($group['open_broadcast'])
-                            <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-green-50 text-green-800 border border-green-200 inline-flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></span>
+                            <span class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                                 Slot Shared to Portal
                             </span>
                         @else
@@ -90,17 +90,17 @@
                         @endif
                         
                         <!-- Mode Selector Toggle -->
-                        <div class="inline-flex rounded-xl bg-[#F2F2F7] p-1 border border-[#E5E5EA]">
+                        <div class="inline-flex rounded-lg bg-[#F2F2F7] p-1 border border-[#E5E5EA]">
                             <button type="button" 
                                     @click="mode = 'balanced'"
                                     :class="mode === 'balanced' ? 'bg-white text-[#780000] font-bold shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]'"
-                                    class="px-3 py-1.5 rounded-lg text-xs transition-all">
+                                    class="px-3 py-1.5 rounded-md text-xs transition-all">
                                 Balanced Multi-Coach
                             </button>
                             <button type="button" 
                                     @click="mode = 'single'"
                                     :class="mode === 'single' ? 'bg-white text-[#780000] font-bold shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]'"
-                                    class="px-3 py-1.5 rounded-lg text-xs transition-all">
+                                    class="px-3 py-1.5 rounded-md text-xs transition-all">
                                 Single Coach
                             </button>
                         </div>
@@ -142,14 +142,14 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             <template x-for="(coachSlot, index) in coachSlots" :key="index">
-                                <div class="rounded-2xl border-2 transition-all p-4.5 space-y-4 bg-white flex flex-col justify-between"
+                                <div class="rounded-xl border transition-all p-4.5 space-y-4 bg-white flex flex-col justify-between shadow-2xs"
                                      :class="coachSlot.students.length > 4 ? 'border-amber-400 bg-amber-50/20' : 'border-[#E5E5EA]'">
                                     
                                     <!-- Slot Header & Coach Dropdown -->
                                     <div class="space-y-3">
                                         <div class="flex items-center justify-between">
                                             <span class="text-xs font-bold uppercase tracking-wider text-[#6E6E73]" x-text="'Coach Slot #' + (index + 1)"></span>
-                                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold"
+                                            <span class="px-2 py-0.5 rounded-md text-xs font-bold"
                                                   :class="coachSlot.students.length > 4 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'"
                                                   x-text="coachSlot.students.length + ' / 4 Pax'">
                                             </span>
@@ -299,8 +299,8 @@
         </div>
     @else
         <!-- Empty State -->
-        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-12 text-center space-y-3">
-            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto text-xl font-bold">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-12 text-center space-y-3 shadow-2xs">
+            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto text-xl font-bold">
                 ✓
             </div>
             <h3 class="text-base font-extrabold text-[#1D1D1F]">All Students Are Assigned!</h3>
@@ -308,8 +308,8 @@
                 There are currently no unassigned students in upcoming confirmed batches. All active participants are matched with certified instructors.
             </p>
             <div class="pt-2">
-                <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-5 py-2 text-xs font-semibold inline-block">
-                    View Coach Roster →
+                <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2 text-xs font-semibold inline-block">
+                    View Coach Roster
                 </a>
             </div>
         </div>

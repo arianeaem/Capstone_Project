@@ -67,7 +67,7 @@ class CoachRosterController extends Controller
 
         // Calculate unassigned students count for matching banner
         $unassignedStudentsCount = BookingParticipant::whereHas('booking', function ($q) {
-            $q->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show']);
+            $q->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show', 'pending_downpayment']);
         })->whereDoesntHave('activeAssignment')->count();
 
         // Paginate coaches collection

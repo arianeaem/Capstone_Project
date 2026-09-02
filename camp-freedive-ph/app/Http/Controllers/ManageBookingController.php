@@ -106,6 +106,10 @@ class ManageBookingController extends Controller
             ->where('pin', trim($validated['pin']))
             ->firstOrFail();
 
+        if ($booking->status === 'pending_downpayment') {
+            return back()->with('error', 'Your booking cannot be rescheduled because the required downpayment has not been paid.');
+        }
+
         $policy = $this->policyEngine->evaluate($booking);
         if (!$policy['reschedule_allowed']) {
             return back()->with('error', 'Rescheduling is not allowed: ' . $policy['reschedule_message']);
@@ -155,6 +159,10 @@ class ManageBookingController extends Controller
         $booking = Booking::where('booking_number', strtoupper(trim($booking_number)))
             ->where('pin', trim($validated['pin']))
             ->firstOrFail();
+
+        if ($booking->status === 'pending_downpayment') {
+            return back()->with('error', 'Your booking cannot be cancelled because the required downpayment has not been paid.');
+        }
 
         $policy = $this->policyEngine->evaluate($booking);
         if ($booking->status === 'cancelled' || $booking->status === 'cancellation_requested') {

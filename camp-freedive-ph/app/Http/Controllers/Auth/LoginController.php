@@ -79,11 +79,27 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $authenticatedUser = Auth::user();
-            $authenticatedUser->update([
-                'last_login_at' => now(),
-            ]);
+            
+            // Check if user has never logged in before or has must_change_password flag set
+            $isFirstLogin = is_null($authenticatedUser->last_login_at);
+            $needsPasswordChange = $authenticatedUser->must_change_password || $isFirstLogin;
+
+            if ($needsPasswordChange) {
+                $authenticatedUser->update([
+                    'must_change_password' => true,
+                ]);
+            } else {
+                $authenticatedUser->update([
+                    'last_login_at' => now(),
+                ]);
+            }
 
             AuditLogger::log('LOGIN_SUCCESS', "User logged in: {$authenticatedUser->email} (Role: {$authenticatedUser->role})", $authenticatedUser, $authenticatedUser->name, $request);
+
+            if ($needsPasswordChange) {
+                return redirect()->route('password.force_change')
+                    ->with('warning', 'Please change your temporary password before accessing your dashboard.');
+            }
 
             return $this->authenticatedRedirect($authenticatedUser);
         }

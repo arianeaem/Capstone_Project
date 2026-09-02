@@ -14,18 +14,18 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-3 flex-wrap">
-            <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#FF3B3C]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M3 14h18M5 6h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg>
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
+                <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M3 14h18M5 6h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg>
                 <span>Pending Refunds</span>
                 @if(isset($stats['pending_refunds']) && $stats['pending_refunds'] > 0)
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FF3B3C] text-white">
+                    <span class="px-2 py-0.2 rounded-full text-xs font-bold bg-[#780000] text-white">
                         {{ $stats['pending_refunds'] }}
                     </span>
                 @endif
             </a>
 
-            <a href="{{ route('admin.payments.create') }}" class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold shadow-sm flex items-center gap-2">
+            <a href="{{ route('admin.payments.create') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Record Payment</span>
             </a>
@@ -33,64 +33,64 @@
     </div>
 
     <!-- Quick Stats Grid (Single Box with Vertical Dividers with Top/Bottom Margin) -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-4">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
             <!-- Total Collections -->
-            <div class="px-4 sm:px-6 py-1">
+            <div class="px-4 py-1">
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Collections</span>
-                <div class="text-2xl font-extrabold text-emerald-700 mt-1">₱{{ number_format($stats['total_gross'] ?? 0, 2) }}</div>
+                <div class="text-2xl font-extrabold text-emerald-700 mt-0.5">₱{{ number_format($stats['total_gross'] ?? 0, 2) }}</div>
                 <span class="text-xs text-[#6E6E73] block mt-0.5">Verified completed payments</span>
             </div>
 
             <!-- Net Received -->
-            <div class="relative px-4 sm:px-6 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Net Received</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">₱{{ number_format($stats['total_net'] ?? 0, 2) }}</div>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">₱{{ number_format($stats['total_net'] ?? 0, 2) }}</div>
                 <span class="text-xs text-[#6E6E73] block mt-0.5">Net of gateway processing fees</span>
             </div>
 
             <!-- Total Refunded -->
-            <div class="relative px-4 sm:px-6 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Refunded</span>
-                <div class="text-2xl font-extrabold text-blue-700 mt-1">₱{{ number_format($stats['total_refunded'] ?? 0, 2) }}</div>
+                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">₱{{ number_format($stats['total_refunded'] ?? 0, 2) }}</div>
                 <span class="text-xs text-[#6E6E73] block mt-0.5">Returned to guest accounts</span>
             </div>
 
             <!-- Forfeited -->
-            <div class="relative px-4 sm:px-6 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Forfeited</span>
-                <div class="text-2xl font-extrabold text-purple-700 mt-1">₱{{ number_format($stats['total_forfeited'] ?? 0, 2) }}</div>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">₱{{ number_format($stats['total_forfeited'] ?? 0, 2) }}</div>
                 <span class="text-xs text-[#6E6E73] block mt-0.5">Non-refundable cancellations</span>
             </div>
         </div>
     </div>
 
     <!-- Payments Ledger Table Container with Integrated Toolbar Header -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
         <!-- Integrated Toolbar Header (Stage Pills + Search + Filter Popover) -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Stage Pill Tabs (Primary: #780000) -->
+                <!-- Left: Stage Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['stage' => '']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('stage') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('stage') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Stages
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['stage' => 'downpayment']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('stage') === 'downpayment' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('stage') === 'downpayment' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Downpayment
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['stage' => 'balance_settlement']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('stage') === 'balance_settlement' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('stage') === 'balance_settlement' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Balance Settlement
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['stage' => 'full']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('stage') === 'full' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('stage') === 'full' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Full Payment
                     </a>
                 </div>
@@ -113,7 +113,7 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search booking, txn, guest..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                             <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -125,7 +125,7 @@
                     <div class="relative">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
-                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                                class="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer">
                             <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                             </svg>
@@ -139,7 +139,12 @@
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
-                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                             class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                                <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Payments</h4>
+                                <a href="{{ route('admin.payments.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
+                            </div>
+
                             <form method="GET" action="{{ route('admin.payments.index') }}" class="space-y-3 text-xs">
                                 @if(request('stage'))
                                     <input type="hidden" name="stage" value="{{ request('stage') }}">
@@ -149,8 +154,8 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-2">Payment Status</label>
-                                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                    <label class="block font-semibold text-[#6E6E73] mb-1">Payment Status</label>
+                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
                                         <option value="">All Statuses</option>
                                         <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
                                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
@@ -162,8 +167,8 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-2">Payment Method</label>
-                                    <select name="method" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                    <label class="block font-semibold text-[#6E6E73] mb-1">Payment Method</label>
+                                    <select name="method" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
                                         <option value="">All Methods</option>
                                         <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
                                         <option value="bpi_bank_transfer" {{ request('method') === 'bpi_bank_transfer' ? 'selected' : '' }}>BPI Bank Transfer</option>
@@ -172,20 +177,14 @@
                                     </select>
                                 </div>
 
-                                <div class="flex items-center justify-between pt-2">
-                                    <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
-                                    <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                                <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
+                                    <button type="submit" class="btn-primary w-full py-1.5 text-xs font-bold">
+                                        Apply Filter
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
-
-                    @if(request()->anyFilled(['search', 'status', 'method', 'date_from', 'date_to']))
-                        <a href="{{ route('admin.payments.index', ['stage' => request('stage')]) }}" 
-                           class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
-                            Reset
-                        </a>
-                    @endif
                 </div>
 
             </div>
@@ -256,7 +255,7 @@
 
                         <!-- Status Badge -->
                         <td class="py-3 px-4 text-left">
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border inline-block {{ $payment->status_badge['class'] }}">
+                            <span class="px-2 py-0.5 rounded-md text-xs font-bold border inline-block {{ $payment->status_badge['class'] }}">
                                 {{ $payment->status_badge['label'] }}
                             </span>
                         </td>

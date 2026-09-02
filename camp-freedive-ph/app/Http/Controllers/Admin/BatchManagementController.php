@@ -49,8 +49,19 @@ class BatchManagementController extends Controller
             });
         }
 
-        // Default Sort by newest to oldest dive date & creation
-        $batches = $query->orderBy('start_date', 'desc')->orderBy('created_at', 'desc')->get();
+        // Sort options
+        $sort = $request->input('sort', 'date_asc');
+        match ($sort) {
+            'date_desc' => $query->orderBy('start_date', 'desc')->orderBy('created_at', 'desc'),
+            'date_asc' => $query->orderBy('start_date', 'asc')->orderBy('created_at', 'desc'),
+            'batch_asc' => $query->orderBy('batch_code', 'asc'),
+            'batch_desc' => $query->orderBy('batch_code', 'desc'),
+            'created_desc' => $query->latest('created_at'),
+            'created_asc' => $query->oldest('created_at'),
+            default => $query->orderBy('start_date', 'asc')->orderBy('created_at', 'desc'),
+        };
+
+        $batches = $query->get();
 
         // Staffing Status Filter (in-memory computed)
         if ($request->filled('staffing')) {
@@ -59,6 +70,13 @@ class BatchManagementController extends Controller
             } elseif ($request->input('staffing') === 'staffed') {
                 $batches = $batches->filter(fn($b) => !$b->is_coach_pending);
             }
+        }
+
+        // Capacity-based sorting (in-memory computed)
+        if ($sort === 'capacity_desc') {
+            $batches = $batches->sortByDesc(fn($b) => $b->total_participants_count)->values();
+        } elseif ($sort === 'capacity_asc') {
+            $batches = $batches->sortBy(fn($b) => $b->total_participants_count)->values();
         }
 
         // Needs Attention count

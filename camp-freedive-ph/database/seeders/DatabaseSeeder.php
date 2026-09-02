@@ -97,6 +97,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 2. Lead Camp Admin & Operations Coordinator (Maria Santos)
@@ -109,6 +110,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 2b. Peer Reviewer / Tester Account (Group 8)
@@ -121,6 +123,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 3. Senior Freediving Coach (Jose Reyes - AIDA 4 / Molchanovs W2)
@@ -133,6 +136,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 4. Freediving Coach (Mary Grace Bautista - Wave 2 Coach)
@@ -145,6 +149,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 5. Freediving Coach & Safety Diver (Michael Cruz - AIDA 3)
@@ -157,6 +162,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 6. Freediving Coach (Christine Villamayor - Equalization Coach)
@@ -169,6 +175,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 7. Freediving Coach (Mark Garcia - Wave 1 Coach)
@@ -181,6 +188,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'active',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // 8. Inactive Coach (Angelo Fernandez - Leave of Absence)
@@ -193,6 +201,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'inactive',
             'must_change_password' => false,
             'email_verified_at' => now(),
+            'last_login_at' => now(),
         ]);
 
         // Log Initial Account Provisioning Audits

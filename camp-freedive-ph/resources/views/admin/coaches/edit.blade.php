@@ -27,13 +27,14 @@
 
                 <div>
                     <label for="full_name" class="block font-bold text-[#1D1D1F] text-xs mb-2">
-                        Full Name <span class="text-[#780000]">*</span>
+                        First & Last Name <span class="text-[#780000]">*</span>
                     </label>
                     <input type="text" 
                            name="full_name" 
                            id="full_name" 
                            value="{{ old('full_name', $coach->full_name) }}" 
                            required 
+                           placeholder="First & Last Name"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                     @error('full_name')
                         <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>

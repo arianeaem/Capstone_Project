@@ -35,10 +35,10 @@ class PayMongoService
     }
 
     /**
-     * Create a PayMongo Checkout Session for hosted checkout (GCash, Maya, Card, QR Ph).
+     * Create a PayMongo Checkout Session for hosted checkout (QR Ph, GCash, BPI, Cards, Maya).
      *
      * @param array $lineItems Array of items [['name' => ..., 'amount' => in centavos, 'quantity' => ..., 'currency' => 'PHP']]
-     * @param array $options Description, success_url, cancel_url, payment_method_types, metadata
+     * @param array $options Description, success_url, cancel_url, payment_method_types, metadata, billing, reference_number
      * @return array
      */
     public function createCheckoutSession(array $lineItems, array $options = []): array
@@ -53,34 +53,49 @@ class PayMongoService
         }
 
         try {
-            $paymentMethodTypes = $options['payment_method_types'] ?? config('paymongo.payment_method_types', ['gcash', 'grab_pay', 'paymaya', 'card', 'qrph']);
+            $paymentMethodTypes = $options['payment_method_types'] ?? config('paymongo.payment_method_types', ['qrph', 'gcash', 'paymaya', 'card', 'grab_pay']);
 
-            $payload = [
-                'data' => [
-                    'attributes' => [
-                        'send_email_receipt' => true,
-                        'show_description' => true,
-                        'show_line_items' => true,
-                        'line_items' => $lineItems,
-                        'payment_method_types' => $paymentMethodTypes,
-                        'description' => $options['description'] ?? 'Camp FreedivePH Booking Downpayment',
-                    ],
-                ],
+            $attributes = [
+                'send_email_receipt' => true,
+                'show_description' => true,
+                'show_line_items' => true,
+                'line_items' => $lineItems,
+                'payment_method_types' => $paymentMethodTypes,
+                'description' => $options['description'] ?? 'Camp FreedivePH Booking Downpayment',
             ];
 
+            if (!empty($options['reference_number'])) {
+                $attributes['reference_number'] = $options['reference_number'];
+            }
+
             if (!empty($options['success_url'])) {
-                $payload['data']['attributes']['success_url'] = $options['success_url'];
+                $attributes['success_url'] = $options['success_url'];
             }
 
             if (!empty($options['cancel_url'])) {
-                $payload['data']['attributes']['cancel_url'] = $options['cancel_url'];
+                $attributes['cancel_url'] = $options['cancel_url'];
+            }
+
+            if (!empty($options['billing'])) {
+                $attributes['billing'] = array_filter([
+                    'name' => $options['billing']['name'] ?? null,
+                    'email' => $options['billing']['email'] ?? null,
+                    'phone' => $options['billing']['phone'] ?? null,
+                ]);
             }
 
             if (!empty($options['metadata'])) {
-                $payload['data']['attributes']['metadata'] = $options['metadata'];
+                $attributes['metadata'] = $options['metadata'];
             }
 
-            $response = $this->client()->post("{$this->baseUrl}/checkout_sessions", $payload);
+            $payload = [
+                'data' => [
+                    'attributes' => $attributes,
+                ],
+            ];
+
+            // Use PayMongo v2 checkout_sessions endpoint for deferred payment intent and modern payment channels
+            $response = $this->client()->post("https://api.paymongo.com/v2/checkout_sessions", $payload);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -92,7 +107,21 @@ class PayMongoService
                 ];
             }
 
-            Log::warning('PayMongo Create Checkout Session Failed: ' . $response->body());
+            // If v2 returned an error, log details
+            Log::warning('PayMongo Create v2 Checkout Session Failed: ' . $response->body());
+            
+            // Attempt fallback to v1 if necessary
+            $responseV1 = $this->client()->post("https://api.paymongo.com/v1/checkout_sessions", $payload);
+            if ($responseV1->successful()) {
+                $dataV1 = $responseV1->json();
+                return [
+                    'success' => true,
+                    'checkout_id' => $dataV1['data']['id'] ?? null,
+                    'checkout_url' => $dataV1['data']['attributes']['checkout_url'] ?? null,
+                    'data' => $dataV1,
+                ];
+            }
+
             return [
                 'success' => false,
                 'error' => $response->json() ?? $response->body(),

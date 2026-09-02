@@ -24,6 +24,27 @@
         </div>
     </div>
 
+    @if($booking->status === 'pending_downpayment')
+    <!-- Downpayment Required Banner -->
+    <div class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+        <div class="space-y-1">
+            <div class="flex items-center gap-2 font-bold text-sm sm:text-base text-amber-900">
+                <svg class="w-5 h-5 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <span>Downpayment Required — Unconfirmed Reservation</span>
+            </div>
+            <p class="text-xs text-amber-800 leading-relaxed">
+                Your reservation has not gone through the system yet because the required reservation downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is unpaid. Please complete your payment via PayMongo to confirm your slots.
+            </p>
+        </div>
+        <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST" class="shrink-0">
+            @csrf
+            <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#780000] text-white font-bold text-xs hover:bg-[#5a0000] transition-colors shadow-2xs cursor-pointer">
+                Pay Downpayment via PayMongo
+            </button>
+        </form>
+    </div>
+    @endif
+
     <!-- Booking Overview Header -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6">
@@ -76,8 +97,13 @@
 
             <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
                 <span class="text-xs text-[#6E6E73] block mb-1">Payment Status:</span>
-                <strong class="text-sm text-[#34C759] block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Paid</strong>
-                <span class="text-xs text-[#780000] font-bold">₱{{ number_format($booking->balance_amount, 2) }} balance due at camp</span>
+                @if($booking->status === 'pending_downpayment')
+                    <strong class="text-sm text-amber-700 block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Unpaid</strong>
+                    <span class="text-xs text-rose-600 font-bold">Unconfirmed Reservation</span>
+                @else
+                    <strong class="text-sm text-[#34C759] block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Paid</strong>
+                    <span class="text-xs text-[#780000] font-bold">₱{{ number_format($booking->balance_amount, 2) }} balance due at camp</span>
+                @endif
             </div>
         </div>
     </div>
@@ -215,14 +241,31 @@
             <!-- Policy Engine Status Box -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm space-y-5">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Cancllation & Rescheduling Policy Engine</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Cancellation & Rescheduling Policy</span>
                     <p class="text-xs text-[#6E6E73] mt-1">Policy based on days before your dive date.</p>
                 </div>
 
+                @if($booking->status === 'pending_downpayment')
+                <!-- Unpaid Notice Card -->
+                <div class="p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 space-y-3">
+                    <div class="font-bold text-sm text-amber-900">
+                        Downpayment Required
+                    </div>
+                    <p class="text-xs text-amber-800 leading-relaxed">
+                        Self-service rescheduling and cancellations are enabled once your required downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is paid.
+                    </p>
+                    <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn-primary w-full py-2.5 text-xs font-bold shadow-2xs cursor-pointer">
+                            Pay ₱{{ number_format($booking->downpayment_amount, 2) }} via PayMongo
+                        </button>
+                    </form>
+                </div>
+                @else
                 <!-- Reschedule Status Card -->
                 <div class="p-4 rounded-xl border {{ $policy['reschedule_allowed'] ? 'border-[#34C759]/40 bg-[#ECFDF5]/50' : 'border-[#E5E5EA] bg-[#FAFAFC]' }} space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="font-bold text-[#1D1D1F]">Reschedule Dive Date</span>
+                        <span class="font-bold text-[#1D1D1F]">Reschedule</span>
                         <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['reschedule_allowed'] ? 'bg-[#34C759] text-white' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">
                             {{ $policy['reschedule_allowed'] ? 'Allowed' : 'Closed' }}
                         </span>
@@ -233,7 +276,7 @@
                         <button type="button" 
                                 @click="openRescheduleModal = true" 
                                 class="btn-primary w-full py-2.5 text-xs font-bold mt-2">
-                            Reschedule Booking Date →
+                            Reschedule Booking Date
                         </button>
                     @endif
                 </div>
@@ -252,10 +295,11 @@
                         <button type="button" 
                                 @click="openCancelModal = true" 
                                 class="w-full py-2.5 rounded-lg border border-[#FF3B3C] text-[#FF3B3C] hover:bg-[#FEF2F2] text-xs font-bold transition-colors mt-2">
-                            Request Cancellation →
+                            Request Cancellation
                         </button>
                     @endif
                 </div>
+                @endif
 
                 <!-- Force Majeure Notice if applicable -->
                 @if($policy['is_force_majeure'])
@@ -292,7 +336,7 @@
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedule Dive Dates</h3>
+                    <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedules</h3>
                     <p class="text-xs text-[#6E6E73]">Pick a new 2D1N date pair.</p>
                 </div>
                 <button type="button" @click="openRescheduleModal = false" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>

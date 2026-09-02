@@ -127,7 +127,7 @@ class BookingRequestController extends Controller
                 'old_status' => 'reschedule_requested',
                 'new_status' => 'confirmed',
                 'changed_by' => $currentUser->id,
-                'note' => "Reschedule approved ({$oldDates} → {$newDates}, attached to {$batch->batch_code})" . ($adminNotes ? " - {$adminNotes}" : ''),
+                'note' => "Reschedule approved ({$oldDates} {$newDates}, attached to {$batch->batch_code})" . ($adminNotes ? " - {$adminNotes}" : ''),
                 'created_at' => now(),
             ]);
         });

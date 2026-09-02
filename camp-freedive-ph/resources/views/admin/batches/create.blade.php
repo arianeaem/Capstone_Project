@@ -63,7 +63,7 @@
 
                 <!-- Duplicate Batch Date Warning Alert & Direct Redirect -->
                 <template x-if="duplicateBatches.length > 0">
-                    <div class="p-4 sm:p-5 rounded-2xl bg-[#FFFBEB] text-[#92400E] space-y-3">
+                    <div class="p-4 rounded-xl bg-[#FFFBEB] border border-amber-200 text-[#92400E] space-y-3">
                         <div class="flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2 font-extrabold text-sm text-[#B45309]">
                                 <span>Batch Already Exists for this Date Range!</span>

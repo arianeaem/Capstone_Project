@@ -123,11 +123,15 @@ class BookingController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date|after_or_equal:start_date',
             'participants' => 'required|array|min:1|max:10',
-            'participants.*.name' => 'required|string|max:255',
-            'participants.*.age' => 'required|integer|min:10|max:80',
+            'participants.*.name' => 'nullable|string|max:255',
+            'participants.*.first_name' => 'nullable|string|max:255',
+            'participants.*.last_name' => 'nullable|string|max:255',
+            'participants.*.age' => 'required|integer|min:8|max:85',
             'participants.*.health_condition' => 'nullable|string|max:500',
-            'participants.*.swimmer_status' => 'nullable|string|in:non_swimmer,beginner,intermediate,advanced,swimmer',
-            'contact_name' => 'required|string|max:255',
+            'participants.*.swimmer_status' => 'nullable|string|in:non_swimmer,beginner,intermediate,advanced,swimmer,casual_swimmer,confident_swimmer',
+            'contact_name' => 'nullable|string|max:255',
+            'contact_first_name' => 'nullable|string|max:255',
+            'contact_last_name' => 'nullable|string|max:255',
             'contact_email' => 'required|email|max:255',
             'contact_phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
             'contact_facebook' => 'nullable|string|max:255',
@@ -135,20 +139,24 @@ class BookingController extends Controller
             'pickup_location' => 'nullable|string|max:255',
             'boat_dive' => 'nullable|boolean',
             'confirmation_ack' => 'nullable|boolean',
-            'payment_method' => 'required|string|in:gcash,bpi,dob,bpi_bank_transfer,paymongo,card,qrph,paymaya,grab_pay,paymongo_gcash,paymongo_card',
+            'payment_method' => 'nullable|string',
         ], [
             'contact_phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
         ]);
+
+        $contactName = !empty($validated['contact_name']) 
+            ? $validated['contact_name'] 
+            : trim(($validated['contact_first_name'] ?? '') . ' ' . ($validated['contact_last_name'] ?? ''));
 
         $paxCount = count($validated['participants']);
         $startDate = Carbon::parse($validated['start_date'])->format('Y-m-d');
         $endDate = Carbon::parse($validated['end_date'])->format('Y-m-d');
         $isCertified = !empty($validated['is_certified_diver']);
 
-        // Check 45-pax Capacity per weekend date
+        // Total pax count check on batch start date (max 45 pax per weekend trip across all batches)
         $existingPaxOnDate = BookingParticipant::whereHas('booking', function ($q) use ($startDate) {
             $q->whereDate('start_date', $startDate)
-              ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled']);
+              ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']);
         })->count();
 
         if (($existingPaxOnDate + $paxCount) > 45) {
@@ -209,17 +217,21 @@ class BookingController extends Controller
                 'total_amount' => $totalAmount,
                 'downpayment_amount' => $downpaymentAmount,
                 'balance_amount' => $balanceAmount,
-                'contact_name' => $validated['contact_name'],
+                'contact_name' => $contactName ?: 'Guest',
                 'contact_email' => $validated['contact_email'],
                 'contact_phone' => $validated['contact_phone'],
                 'contact_facebook' => $validated['contact_facebook'] ?? null,
-                'status' => 'confirmed',
+                'status' => 'pending_downpayment',
             ]);
 
             // Save Participants
             foreach ($validated['participants'] as $pData) {
+                $pName = !empty($pData['name'])
+                    ? $pData['name']
+                    : trim(($pData['first_name'] ?? '') . ' ' . ($pData['last_name'] ?? ''));
+
                 $booking->participants()->create([
-                    'name' => $pData['name'],
+                    'name' => $pName ?: 'Participant',
                     'age' => (int) $pData['age'],
                     'health_condition' => $pData['health_condition'] ?? 'None',
                     'swimmer_status' => $pData['swimmer_status'] ?? 'beginner',
@@ -240,45 +252,51 @@ class BookingController extends Controller
                 ]);
             }
 
-            // Create Payment Record
-            $paymentMethod = $validated['payment_method'];
+            // Create Initial Pending Payment Record
+            $paymentMethod = $validated['payment_method'] ?? 'paymongo';
             $transactionId = 'PAY-' . strtoupper(Str::random(10));
 
             $payment = Payment::create([
                 'booking_id' => $booking->id,
-                'payment_method' => $paymentMethod,
+                'payment_method' => 'paymongo',
                 'transaction_id' => $transactionId,
                 'amount' => $downpaymentAmount,
                 'fee_amount' => 0.00,
                 'net_amount' => $downpaymentAmount,
                 'payment_type' => 'downpayment',
-                'status' => 'paid',
-                'paid_at' => now(),
+                'status' => 'pending',
+                'expires_at' => now()->addHours(24),
+            ]);
+
+            // Create Checkout Session via PayMongo Gateway (v2 Hosted Checkout)
+            $payMongoGateway = app(\App\Services\Gateways\PayMongoGateway::class);
+            $checkoutResult = $payMongoGateway->createCheckoutSession($booking, $downpaymentAmount);
+
+            if (!$checkoutResult['success']) {
+                $errMsg = is_array($checkoutResult['error'] ?? null)
+                    ? ($checkoutResult['error']['errors'][0]['detail'] ?? 'PayMongo session creation failed.')
+                    : ($checkoutResult['error'] ?? 'Unable to connect to PayMongo.');
+                throw new Exception("PayMongo Error: " . $errMsg);
+            }
+
+            // Update payment with PayMongo Checkout Session Resource ID
+            $payment->update([
+                'paymongo_resource_id' => $checkoutResult['checkout_id'],
             ]);
 
             // Booking Status Log
             BookingStatusLog::create([
                 'booking_id' => $booking->id,
-                'old_status' => 'pending',
-                'new_status' => 'confirmed',
+                'old_status' => 'initiated',
+                'new_status' => 'pending_downpayment',
                 'changed_by' => null,
-                'note' => "Online reservation completed. Downpayment of ₱" . number_format($downpaymentAmount, 2) . " verified via {$paymentMethod}.",
-                'created_at' => now(),
-            ]);
-
-            // Payment Status Log
-            PaymentStatusLog::create([
-                'payment_id' => $payment->id,
-                'old_status' => 'pending',
-                'new_status' => 'paid',
-                'changed_by' => null,
-                'note' => "Downpayment of ₱" . number_format($downpaymentAmount, 2) . " captured via {$paymentMethod}.",
+                'note' => "Reservation created. Awaiting downpayment of ₱" . number_format($downpaymentAmount, 2) . " via PayMongo Hosted Checkout.",
                 'created_at' => now(),
             ]);
 
             AuditLogger::log(
                 'BOOKING_CREATED',
-                "New booking #{$booking->booking_number} created for {$booking->contact_name} ({$paxCount} pax, {$booking->class_type})",
+                "New booking #{$booking->booking_number} created for {$booking->contact_name} ({$paxCount} pax, {$booking->class_type}). Awaiting PayMongo checkout.",
                 null,
                 $booking->contact_name,
                 $request
@@ -286,30 +304,23 @@ class BookingController extends Controller
 
             DB::commit();
 
-            // Send Confirmation Email to Guest
-            try {
-                \Illuminate\Support\Facades\Mail::to($booking->contact_email)->send(
-                    new \App\Mail\BookingConfirmedMail($booking->fresh()->load('participants', 'payments'))
-                );
-            } catch (\Throwable $mailEx) {
-                \Illuminate\Support\Facades\Log::warning("Booking confirmation email could not be sent to {$booking->contact_email}: " . $mailEx->getMessage());
-            }
-
             return response()->json([
                 'success' => true,
+                'is_paymongo_redirect' => true,
+                'checkout_url' => $checkoutResult['checkout_url'],
+                'checkout_id' => $checkoutResult['checkout_id'],
                 'booking_number' => $booking->booking_number,
                 'pin' => $booking->pin,
                 'booking_id' => $booking->id,
-                'downpayment_paid' => $downpaymentAmount,
+                'downpayment_due' => $downpaymentAmount,
                 'balance_due' => $balanceAmount,
                 'manage_url' => route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]),
-                'redirect_url' => route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]),
             ]);
         } catch (Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while saving your reservation: ' . $e->getMessage(),
+                'message' => 'An error occurred while setting up your PayMongo payment: ' . $e->getMessage(),
             ], 500);
         }
     }

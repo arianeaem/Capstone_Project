@@ -111,8 +111,8 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Full Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                             </div>
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Age <span class="text-[#780000]">*</span></label>

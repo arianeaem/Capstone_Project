@@ -297,27 +297,6 @@
 
                         <p class="text-xs sm:text-sm leading-relaxed" x-text="forecast.description"></p>
 
-                        <!-- Forecast Reliability Category Card -->
-                        <template x-if="forecast.reliability">
-                            <div class="p-3 rounded-xl bg-white/90 border border-black/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-[#1D1D1F]">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-sm" x-text="forecast.reliability.icon"></span>
-                                    <div class="space-y-0.5">
-                                        <div class="flex items-center gap-1.5">
-                                            <span class="font-extrabold text-[#1D1D1F]" x-text="forecast.reliability.label"></span>
-                                            <span class="text-[10px] px-1.5 py-0.5 rounded bg-black/5 font-semibold text-[#6E6E73]" x-text="forecast.reliability.range"></span>
-                                        </div>
-                                        <p class="text-[11px] text-[#6E6E73] leading-snug" x-text="forecast.reliability.description"></p>
-                                    </div>
-                                </div>
-                                <div class="shrink-0 sm:text-right">
-                                    <span class="text-[11px] font-bold px-2.5 py-1 rounded-lg border"
-                                          :class="forecast.reliability.badge_class"
-                                          x-text="forecast.reliability.actionable ? 'Operational Window' : 'Advisory / Trend'"></span>
-                                </div>
-                            </div>
-                        </template>
-
                         <!-- Day 1 & Day 2 Cards -->
                         <template x-if="forecast.day1 && forecast.day2">
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
@@ -372,10 +351,6 @@
         <!-- STEP 3: BOOKING DETAILS (LEFT) + LIVE SUMMARY (RIGHT) [5-STEP COMBINED] -->
         <!-- ========================================================================= -->
         <div x-show="currentStep === 3" x-cloak class="space-y-6">
-            <div class="border-b border-[#E5E5EA] pb-4">
-                <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">3. Guest Details, Add-ons & Summary</h2>
-                <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Fill in the contact info for all divers joining and review your live pricing breakdown.</p>
-            </div>
 
             <!-- 2-COLUMN RESPONSIVE LAYOUT -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -403,25 +378,42 @@
                                         <button type="button" 
                                                 x-show="form.participants.length > 1" 
                                                 @click="removeParticipant(index)"
-                                                class="text-xs font-semibold text-[#FF3B3C] hover:underline">
+                                                class="text-xs font-semibold text-[#FF3B3C] hover:underline cursor-pointer">
                                             Remove
                                         </button>
                                     </div>
 
+                                    <!-- Participant Name: Separate First Name & Last Name -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Full Name <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
-                                                   x-model="participant.name" 
-                                                   @input="participant.name = participant.name.replace(/[^a-zA-Z\s\.\'\-]/g, '')"
-                                                   placeholder="e.g. Maria Santos" 
+                                                   x-model="participant.first_name" 
+                                                   @input="participant.first_name = participant.first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = (participant.first_name + ' ' + (participant.last_name || '')).trim()"
+                                                   placeholder="e.g. Maria" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                                   :class="touchedStep3 && !validateName(participant.name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
-                                                Please enter a valid full name (letters only, min 2 characters).
+                                                   :class="touchedStep3 && !validateName(participant.first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                            <span x-show="touchedStep3 && !validateName(participant.first_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                                Please enter a valid first name (letters only, min 2 chars).
                                             </span>
                                         </div>
 
+                                        <div>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Last Name <span class="text-[#780000]">*</span></label>
+                                            <input type="text" 
+                                                   x-model="participant.last_name" 
+                                                   @input="participant.last_name = participant.last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = ((participant.first_name || '') + ' ' + participant.last_name).trim()"
+                                                   placeholder="e.g. Santos" 
+                                                   class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
+                                                   :class="touchedStep3 && !validateName(participant.last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                            <span x-show="touchedStep3 && !validateName(participant.last_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                                Please enter a valid last name (letters only, min 2 chars).
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Age & Swimming Ability -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Age (8–85 yrs) <span class="text-[#780000]">*</span></label>
                                             <input type="number" 
@@ -437,10 +429,8 @@
                                                 Age must be between 8 and 85 years old.
                                             </span>
                                         </div>
-                                    </div>
 
-                                    <div x-show="form.class_type === 'discovery'" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                        <div>
+                                        <div x-show="form.class_type === 'discovery'">
                                             <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Swimming Ability</label>
                                             <select x-model="participant.swimmer_status" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                                                 <option value="non_swimmer">Non-Swimmer</option>
@@ -464,21 +454,34 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 2: CONTACT DETAILS -->
+                    <!-- SECTION 2: CONTACT DETAILS (FIRST NAME & LAST NAME SEPARATE) -->
                     <div class="space-y-4 pt-2">
                         <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">2. Contact Information</h3>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Lead Contact Name <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Lead First Name <span class="text-[#780000]">*</span></label>
                                 <input type="text" 
-                                       x-model="form.contact_name" 
-                                       @input="form.contact_name = form.contact_name.replace(/[^a-zA-Z\s\.\'\-]/g, '')"
-                                       placeholder="Juan Dela Cruz" 
+                                       x-model="form.contact_first_name" 
+                                       @input="form.contact_first_name = form.contact_first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = (form.contact_first_name + ' ' + (form.contact_last_name || '')).trim()"
+                                       placeholder="Juan" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validateName(form.contact_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
-                                    Please enter a valid lead name (min 2 characters).
+                                       :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                <span x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                    Please enter a valid first name (min 2 chars).
+                                </span>
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Lead Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" 
+                                       x-model="form.contact_last_name" 
+                                       @input="form.contact_last_name = form.contact_last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = ((form.contact_first_name || '') + ' ' + form.contact_last_name).trim()"
+                                       placeholder="Dela Cruz" 
+                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
+                                       :class="touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                <span x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                    Please enter a valid last name (min 2 chars).
                                 </span>
                             </div>
 
@@ -507,7 +510,8 @@
                                     Valid 11-digit PH mobile number required (e.g. 09171234567 or +639171234567).
                                 </span>
                             </div>
-                            <div>
+
+                            <div class="sm:col-span-2">
                                 <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Facebook Profile Link (Optional)</label>
                                 <input type="text" x-model="form.contact_facebook" placeholder="facebook.com/juandelacruz" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                             </div>
@@ -705,216 +709,122 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- STEP 4: DOWNPAYMENT (PAYMONGO INTEGRATED WITH DIRECT IN-PAGE DETAIL ENTRY) -->
+        <!-- STEP 4: DOWNPAYMENT (PAYMONGO HOSTED CHECKOUT: QR PH, GCASH, BPI) -->
         <!-- ========================================================================= -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
-            <!-- SUB-STEP 1: PAYMENT METHOD SELECTOR (WITH BACK BUTTON) -->
-            <div x-show="paymentSubStep === 'select'" class="max-w-lg mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
+            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
                 <!-- Top Navigation & Header -->
                 <div class="flex items-center justify-between border-b border-[#F2F2F7] pb-4">
                     <button type="button" 
                             @click="prevStep()" 
-                            class="text-xs font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors">
+                            class="text-xs font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors cursor-pointer">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Back to Booking Details</span>
                     </button>
                     <div class="text-right">
-                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#FF3B3C] block">Reservation Lock:</span>
+                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#FF3B3C] block">Slot Hold Timer:</span>
                         <span class="text-sm sm:text-base font-mono font-black text-[#FF3B3C]" x-text="timerDisplay"></span>
                     </div>
                 </div>
 
-                <div>
+                <div class="space-y-1.5">
+                    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#F8EAEA] text-[#780000] text-[11px] font-bold uppercase tracking-wider">
+                        Official Payment Gateway
+                    </div>
                     <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">4. Secure Downpayment</h2>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select your preferred payment option to lock in your slots. The rest will be paid when you arrive at camp.</p>
-                </div>
-
-                <!-- Payment Options List: GCash and BPI only -->
-                <div class="space-y-3.5">
-
-                    <!-- Option 1: GCash -->
-                    <div @click="form.payment_method = 'gcash'"
-                         class="rounded-xl border-2 transition-all p-4.5 cursor-pointer flex items-center justify-between select-none"
-                         :class="form.payment_method === 'gcash' ? 'border-[#007DFE] bg-[#007DFE]/5 ring-1 ring-[#007DFE]' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
-                        <div class="flex items-center gap-3.5">
-                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#007DFE] text-white font-black text-sm shadow-2xs">G</span>
-                            <div>
-                                <span class="text-sm font-bold text-[#1D1D1F] block">GCash (via PayMongo)</span>
-                                <span class="text-xs text-[#6E6E73] block mt-0.5">Pay via GCash e-wallet / PayMongo gateway</span>
-                            </div>
-                        </div>
-                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
-                             :class="form.payment_method === 'gcash' ? 'border-[#007DFE] bg-[#007DFE]' : 'border-[#D1D1D6]'">
-                            <div x-show="form.payment_method === 'gcash'" class="w-2 h-2 rounded-full bg-white"></div>
-                        </div>
-                    </div>
-
-                    <!-- Option 2: BPI -->
-                    <div @click="form.payment_method = 'bpi'"
-                         class="rounded-xl border-2 transition-all p-4.5 cursor-pointer flex items-center justify-between select-none"
-                         :class="['bpi', 'dob', 'bpi_bank_transfer'].includes(form.payment_method) ? 'border-[#B30916] bg-[#B30916]/5 ring-1 ring-[#B30916]' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
-                        <div class="flex items-center gap-3.5">
-                            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-[#B30916] text-white font-black text-xs shadow-2xs">BPI</span>
-                            <div>
-                                <span class="text-sm font-bold text-[#1D1D1F] block">BPI Bank Transfer / Online</span>
-                                <span class="text-xs text-[#6E6E73] block mt-0.5">Direct transfer to Camp FreedivePH account</span>
-                            </div>
-                        </div>
-                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0"
-                             :class="['bpi', 'dob', 'bpi_bank_transfer'].includes(form.payment_method) ? 'border-[#B30916] bg-[#B30916]' : 'border-[#D1D1D6]'">
-                            <div x-show="['bpi', 'dob', 'bpi_bank_transfer'].includes(form.payment_method)" class="w-2 h-2 rounded-full bg-white"></div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Downpayment Amount Due -->
-                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between text-sm">
-                    <div>
-                        <span class="text-xs font-bold text-[#1D1D1F] block">Required Downpayment</span>
-                        <span class="text-[11px] text-[#6E6E73]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
-                    </div>
-                    <strong class="text-lg sm:text-xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
-                </div>
-
-                <!-- Primary Continue Button -->
-                <div class="space-y-2 pt-1">
-                    <button type="button" 
-                            @click="proceedToPaymentDetails()" 
-                            class="w-full py-3.5 px-6 rounded-xl font-bold text-base text-white bg-[#82C39B] hover:bg-[#68B285] active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-                        <span>Continue to Payment</span>
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                    </button>
-                </div>
-
-                <!-- Footer -->
-                <div class="pt-3 border-t border-[#F2F2F7] text-center space-y-1">
-                    <p class="text-xs text-[#6E6E73] leading-relaxed max-w-xs mx-auto">
-                        Official payment gateway powered by <strong>PayMongo Philippines</strong>.
+                    <p class="text-xs sm:text-sm text-[#6E6E73]">
+                        Pay your required reservation downpayment via PayMongo's secure hosted checkout page. The remaining balance will be settled at camp.
                     </p>
                 </div>
-            </div>
 
-            <!-- SUB-STEP 2: INTERACTIVE PAYMENT DETAILS ENTRY SCREEN -->
-            <div x-show="paymentSubStep === 'details'" class="max-w-lg mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
-                <!-- Top Navigation & Title -->
-                <div class="flex items-center justify-between border-b border-[#F2F2F7] pb-4">
+                <!-- Downpayment Breakdown Box -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-3">
+                    <div class="flex justify-between items-center text-xs text-[#6E6E73]">
+                        <span>Package: <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type"></strong> (<span x-text="form.participants.length"></span> pax)</span>
+                        <span class="font-bold text-[#1D1D1F]" x-text="'Total: ₱' + formatNumber(calculateTotal())"></span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-[#6E6E73]">
+                        <span>Remaining Balance (Payable at Camp):</span>
+                        <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                    </div>
+                    <div class="pt-3 border-t border-[#E5E5EA] flex justify-between items-center">
+                        <div>
+                            <span class="font-bold text-[#065F46] text-xs sm:text-sm block">Downpayment Due Now:</span>
+                            <span class="text-[10px] sm:text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
+                        </div>
+                        <strong class="text-xl sm:text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
+                    </div>
+                </div>
+
+                <!-- Supported Hosted Payment Channels -->
+                <div class="space-y-3">
+                    <label class="block text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
+                        Supported Payment Channels on Hosted Checkout:
+                    </label>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <!-- QR Ph -->
+                        <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-black text-xs shrink-0 border border-emerald-200">
+                                QR
+                            </div>
+                            <div>
+                                <span class="font-bold text-xs text-[#1D1D1F] block">QR Ph</span>
+                                <span class="text-[10px] text-[#6E6E73] block">Any PH Bank / App</span>
+                            </div>
+                        </div>
+
+                        <!-- GCash -->
+                        <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#007DFE] flex items-center justify-center font-black text-xs shrink-0 border border-blue-200">
+                                G
+                            </div>
+                            <div>
+                                <span class="font-bold text-xs text-[#1D1D1F] block">GCash</span>
+                                <span class="text-[10px] text-[#6E6E73] block">Direct E-Wallet</span>
+                            </div>
+                        </div>
+
+                        <!-- Maya -->
+                        <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#00D665] flex items-center justify-center font-black text-xs shrink-0 border border-emerald-200">
+                                M
+                            </div>
+                            <div>
+                                <span class="font-bold text-xs text-[#1D1D1F] block">Maya</span>
+                                <span class="text-[10px] text-[#6E6E73] block">Direct E-Wallet</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-[11px] text-[#6E6E73] text-center">
+                        Cards (Visa/Mastercard), GrabPay, and all Philippine banks (via QR Ph) are supported on the PayMongo checkout page.
+                    </p>
+                </div>
+
+                <!-- Hosted Checkout Action Button -->
+                <div class="space-y-3 pt-2">
                     <button type="button" 
-                            @click="paymentSubStep = 'select'" 
-                            class="text-xs font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                        <span>Change Method</span>
+                            @click="processPayment(false, true)" 
+                            :disabled="submittingPayment"
+                            class="w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-[#780000] hover:bg-[#5E0000] active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+                        <span x-show="!submittingPayment" class="flex items-center gap-2">
+                            <span>Proceed to PayMongo Hosted Checkout</span>
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                        </span>
+                        <span x-show="submittingPayment" class="flex items-center gap-2">
+                            <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span>Redirecting to PayMongo...</span>
+                        </span>
                     </button>
-                    <div class="text-right">
-                        <span class="text-xs font-semibold text-[#6E6E73] block">Amount to Pay:</span>
-                        <span class="text-base sm:text-lg font-black text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
+
+                    <div class="flex items-center justify-center gap-1.5 text-xs text-[#6E6E73]">
+                        <svg class="w-3.5 h-3.5 text-[#34C759]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        <span>256-Bit SSL Encrypted Hosted Checkout by PayMongo</span>
                     </div>
                 </div>
 
-                <!-- CASE 1: GCASH IN-PAGE EXPRESS CHECKOUT -->
-                <template x-if="form.payment_method === 'gcash'">
-                    <div class="space-y-5">
-                        <div class="flex items-center justify-between border-b border-[#F2F2F7] pb-3">
-                            <div>
-                                <h3 class="text-base sm:text-lg font-bold text-[#1D1D1F]">GCash Express Checkout</h3>
-                                <p class="text-xs text-[#6E6E73] mt-0.5">Direct in-page authorization powered by PayMongo.</p>
-                            </div>
-                            <span class="px-3 py-1 rounded-lg bg-[#007DFE] text-white font-black text-xs shadow-2xs">GCash</span>
-                        </div>
-
-                        <!-- Mobile Number & OTP Inputs -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Registered GCash Mobile Number <span class="text-red-500">*</span></label>
-                                <div class="relative">
-                                    <span class="absolute left-3.5 top-2.5 text-sm font-semibold text-[#6E6E73]">+63</span>
-                                    <input type="tel" 
-                                           x-model="ewalletForm.phone" 
-                                           placeholder="917 123 4567" 
-                                           class="w-full pl-12 pr-3.5 py-3 rounded-xl border border-[#D1D1D6] text-sm font-mono focus:ring-2 focus:ring-[#82C39B] focus:border-transparent outline-hidden bg-white">
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="flex items-center justify-between mb-1.5">
-                                    <label class="text-xs font-bold text-[#1D1D1F]">6-Digit Security OTP <span class="text-red-500">*</span></label>
-                                    <span class="text-[11px] text-[#6E6E73]">Test OTP: <strong class="font-mono text-[#007DFE]">123456</strong></span>
-                                </div>
-                                <input type="text" 
-                                       x-model="ewalletForm.otp" 
-                                       maxlength="6" 
-                                       placeholder="123456" 
-                                       class="w-full px-3.5 py-3 rounded-xl border border-[#D1D1D6] text-sm font-mono text-center tracking-widest focus:ring-2 focus:ring-[#82C39B] focus:border-transparent outline-hidden bg-white">
-                            </div>
-                        </div>
-
-                        <!-- Authorize Button (Direct In-Page) -->
-                        <button type="button" 
-                                @click="validateAndProcessPayment()" 
-                                :disabled="submittingPayment"
-                                class="w-full py-3.5 px-6 rounded-xl font-bold text-base text-white bg-[#007DFE] hover:bg-[#0066D6] active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
-                            <span x-show="!submittingPayment">Authorize & Pay ₱<span x-text="formatNumber(calculateDownpayment())"></span></span>
-                            <span x-show="submittingPayment" class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                                Authorizing GCash Payment...
-                            </span>
-                        </button>
-                    </div>
-                </template>
-
-                <!-- CASE 2: BPI ONLINE / BANK TRANSFER FORM -->
-                <template x-if="['bpi', 'dob', 'bpi_bank_transfer'].includes(form.payment_method)">
-                    <div class="space-y-4">
-                        <div>
-                            <h3 class="text-lg font-bold text-[#1D1D1F]">BPI Bank Transfer Details</h3>
-                            <p class="text-xs text-[#6E6E73] mt-0.5">Transfer downpayment to Camp FreedivePH official bank account.</p>
-                        </div>
-
-                        <!-- Bank Account Box -->
-                        <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs space-y-2">
-                            <div class="flex justify-between items-center">
-                                <span class="text-[#6E6E73]">Bank:</span>
-                                <strong class="text-[#1D1D1F]">Bank of the Philippine Islands (BPI)</strong>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-[#6E6E73]">Account Name:</span>
-                                <strong class="text-[#1D1D1F]">Camp FreedivePH Mabini</strong>
-                            </div>
-                            <div class="flex justify-between items-center pt-1 border-t border-[#E5E5EA]">
-                                <span class="text-[#6E6E73]">Account Number:</span>
-                                <strong class="font-mono text-sm text-[#B30916]">1234-5678-90</strong>
-                            </div>
-                        </div>
-
-                        <!-- Reference Input -->
-                        <div>
-                            <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Bank Reference Number / Transaction ID <span class="text-red-500">*</span></label>
-                            <input type="text" 
-                                   x-model="bankForm.reference_number" 
-                                   placeholder="e.g. BPI-982341" 
-                                   class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm font-mono focus:ring-2 focus:ring-[#82C39B] focus:border-transparent outline-hidden bg-white">
-                        </div>
-
-                        <!-- Confirm Button -->
-                        <button type="button" 
-                                @click="validateAndProcessPayment()" 
-                                :disabled="submittingPayment"
-                                class="w-full py-3.5 px-6 rounded-xl font-bold text-base text-white bg-[#82C39B] hover:bg-[#68B285] active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
-                            <span x-show="!submittingPayment">Confirm Payment & Finish Booking</span>
-                            <span x-show="submittingPayment" class="flex items-center gap-2">
-                                <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                                Confirming BPI Payment...
-                            </span>
-                        </button>
-                    </div>
-                </template>
-
-                <!-- Security Assurance footer -->
-                <div class="pt-3 border-t border-[#F2F2F7] flex items-center justify-center gap-1.5 text-xs text-[#8E8E93]">
-                    <svg class="w-3.5 h-3.5 text-[#34C759]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    <span>256-Bit SSL Encrypted & Secured by PayMongo</span>
-                </div>
             </div>
 
         </div>
@@ -1040,7 +950,7 @@
             <button type="button" 
                     @click="nextStep()" 
                     class="btn-primary px-5 sm:px-8 py-2.5 text-sm shadow-sm cursor-pointer active:scale-[0.99] transition-all">
-                <span x-text="currentStep === 3 ? 'Proceed to Downpayment (₱' + formatNumber(calculateDownpayment()) + ') →' : 'Continue →'"></span>
+                <span x-text="currentStep === 3 ? 'Proceed to Downpayment (₱' + formatNumber(calculateDownpayment()) + ')' : 'Continue'"></span>
             </button>
         </div>
 
@@ -1068,8 +978,10 @@ function bookingWizard(config) {
             start_date: '',
             end_date: '',
             participants: [
-                { name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
+                { first_name: '', last_name: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
             ],
+            contact_first_name: '',
+            contact_last_name: '',
             contact_name: '',
             contact_email: '',
             contact_phone: '',
@@ -1078,23 +990,7 @@ function bookingWizard(config) {
             pickup_location: config.pickupPoints[0] ? config.pickupPoints[0].name : '',
             boat_dive: false,
             confirmation_ack: false,
-            payment_method: 'gcash'
-        },
-        paymentSubStep: 'select',
-        ewalletsOpen: false,
-        bankingOpen: false,
-        cardForm: {
-            name: '',
-            number: '',
-            expiry: '',
-            cvc: ''
-        },
-        ewalletForm: {
-            phone: '',
-            otp: '123456'
-        },
-        bankForm: {
-            reference_number: ''
+            payment_method: 'paymongo'
         },
         forecast: null,
         pricingQuote: null,
@@ -1170,10 +1066,11 @@ function bookingWizard(config) {
                     const data = JSON.parse(saved);
                     if (data && data.form) {
                         const hasDetails = data.form.contact_name || 
+                                           data.form.contact_first_name ||
                                            data.form.contact_email || 
                                            data.form.contact_phone || 
                                            data.form.start_date ||
-                                           (data.form.participants && data.form.participants[0] && data.form.participants[0].name);
+                                           (data.form.participants && data.form.participants[0] && (data.form.participants[0].first_name || data.form.participants[0].name));
 
                         this.form = {
                             ...this.form,
@@ -1182,8 +1079,22 @@ function bookingWizard(config) {
 
                         if (!Array.isArray(this.form.participants) || this.form.participants.length === 0) {
                             this.form.participants = [
-                                { name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
+                                { first_name: '', last_name: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
                             ];
+                        } else {
+                            this.form.participants.forEach(p => {
+                                if (!p.first_name && p.name) {
+                                    const parts = p.name.trim().split(/\s+/);
+                                    p.first_name = parts[0] || '';
+                                    p.last_name = parts.slice(1).join(' ') || '';
+                                }
+                            });
+                        }
+
+                        if (!this.form.contact_first_name && this.form.contact_name) {
+                            const parts = this.form.contact_name.trim().split(/\s+/);
+                            this.form.contact_first_name = parts[0] || '';
+                            this.form.contact_last_name = parts.slice(1).join(' ') || '';
                         }
 
                         if (this.form.start_date) {
@@ -1221,8 +1132,10 @@ function bookingWizard(config) {
                 start_date: '',
                 end_date: '',
                 participants: [
-                    { name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
+                    { first_name: '', last_name: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
                 ],
+                contact_first_name: '',
+                contact_last_name: '',
                 contact_name: '',
                 contact_email: '',
                 contact_phone: '',
@@ -1231,10 +1144,12 @@ function bookingWizard(config) {
                 pickup_location: config.pickupPoints[0] ? config.pickupPoints[0].name : '',
                 boat_dive: false,
                 confirmation_ack: false,
-                payment_method: 'gcash'
+                payment_method: 'paymongo'
             };
             this.forecast = null;
+            this.pricingQuote = null;
             this.errorMessage = '';
+            this.touchedStep3 = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
@@ -1335,6 +1250,8 @@ function bookingWizard(config) {
 
         addParticipant() {
             this.form.participants.push({
+                first_name: '',
+                last_name: '',
                 name: '',
                 age: '',
                 health_condition: '',
@@ -1445,7 +1362,7 @@ function bookingWizard(config) {
                 for (let i = 0; i < this.form.participants.length; i++) {
                     const p = this.form.participants[i];
                     if (!p.name || !p.name.trim()) {
-                        this.errorMessage = `Please enter the Full Name for Participant #${i + 1}.`;
+                        this.errorMessage = `Please enter the First & Last Name for Participant #${i + 1}.`;
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         return;
                     }
@@ -1532,50 +1449,14 @@ function bookingWizard(config) {
             }, 1000);
         },
 
-        proceedToPaymentDetails() {
-            this.errorMessage = '';
-            if (!this.cardForm.name && this.form.contact_name) {
-                this.cardForm.name = this.form.contact_name;
-            }
-            if (!this.ewalletForm.phone && this.form.contact_phone) {
-                this.ewalletForm.phone = this.form.contact_phone.replace(/^0/, '');
-            }
-            this.paymentSubStep = 'details';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        },
-
-        validateAndProcessPayment() {
-            this.errorMessage = '';
-
-            if (this.form.payment_method === 'gcash') {
-                if (!this.ewalletForm.phone) {
-                    this.errorMessage = "Please enter your registered GCash mobile number.";
-                    return;
-                }
-            } else if (['bpi', 'dob', 'bpi_bank_transfer'].includes(this.form.payment_method)) {
-                if (!this.bankForm.reference_number) {
-                    this.errorMessage = "Please enter the Bank Reference Number / Transaction ID for verification.";
-                    return;
-                }
-            }
-
-            this.processPayment(false);
-        },
-
-        async processPayment(instantSimulation = false, hostedCheckout = false) {
+        async processPayment(instantSimulation = false, hostedCheckout = true) {
             this.submittingPayment = true;
             this.errorMessage = '';
 
             try {
                 const payload = {
                     ...this.form,
-                    instant_simulation: instantSimulation,
-                    hosted_checkout: hostedCheckout,
-                    payment_details: {
-                        phone: this.ewalletForm.phone,
-                        otp: this.ewalletForm.otp,
-                        reference_number: this.bankForm.reference_number
-                    }
+                    payment_method: 'paymongo'
                 };
 
                 const response = await fetch(config.storeBookingUrl, {

@@ -50,7 +50,7 @@
             </div>
 
             <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md mt-2">
-                Find Booking →
+                Find Booking
             </button>
         </form>
 

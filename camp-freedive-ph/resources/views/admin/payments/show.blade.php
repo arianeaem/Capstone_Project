@@ -29,7 +29,7 @@
             @endif
 
             <a href="{{ route('admin.bookings.show', $payment->booking) }}" class="btn-secondary px-4 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                <span>View Booking #{{ $payment->booking->booking_number }} →</span>
+                <span>View Booking #{{ $payment->booking->booking_number }}</span>
             </a>
         </div>
     </div>
@@ -77,7 +77,7 @@
 
                     <div>
                         <span class="text-xs text-[#6E6E73] block">PayMongo Payment ID</span>
-                        <span class="font-mono text-[#008E98] font-bold">
+                        <span class="font-mono text-[#780000] font-bold">
                             {{ $payment->paymongo_payment_id ?: 'N/A (Offline Entry)' }}
                         </span>
                     </div>
@@ -112,7 +112,7 @@
                     @forelse($payment->statusLogs as $log)
                     <div class="py-3 text-xs space-y-1">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-[#1D1D1F]">{{ ucfirst(str_replace('_', ' ', $log->old_status)) }} → {{ ucfirst(str_replace('_', ' ', $log->new_status)) }}</span>
+                            <span class="font-bold text-[#1D1D1F]">{{ ucfirst(str_replace('_', ' ', $log->old_status)) }} {{ ucfirst(str_replace('_', ' ', $log->new_status)) }}</span>
                             <span class="text-[#8E8E93]">{{ $log->created_at->format('M d, Y h:i A') }}</span>
                         </div>
                         <p class="text-[#6E6E73]">{{ $log->note }}</p>

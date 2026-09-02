@@ -124,18 +124,27 @@ class InternalAuthTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $owner = User::where('email', 'owner@campfreedive.ph')->first();
 
-        // Coach cannot access admin dashboard
+        // Coach cannot access admin dashboard, but can access coach portal
         $this->actingAs($coach);
         $this->get('/admin')->assertStatus(403);
+        $coachResponse = $this->get('/coach')->assertStatus(200);
+        $coachResponse->assertSee('Instructor Field Station');
 
         // Admin can access admin dashboard, but NOT audit logs (Owner exclusive)
         $this->actingAs($admin);
-        $this->get('/admin')->assertStatus(200);
+        $adminResponse = $this->get('/admin')->assertStatus(200);
+        $adminResponse->assertSee('Upcoming Weekend Batches');
         $this->get('/admin/settings/audit-logs')->assertStatus(403);
 
-        // Owner can access both
+        // Owner can access both executive and operations views
         $this->actingAs($owner);
-        $this->get('/admin')->assertStatus(200);
+        $ownerExecResponse = $this->get('/admin')->assertStatus(200);
+        $ownerExecResponse->assertSee('Gross Collected Revenue');
+        $ownerExecResponse->assertSee('Executive Analytics');
+
+        $ownerOpsResponse = $this->get('/admin?view=operations')->assertStatus(200);
+        $ownerOpsResponse->assertSee('Upcoming Weekend Batches');
+
         $this->get('/admin/settings/audit-logs')->assertStatus(200);
         $this->get('/admin/settings/users')->assertStatus(200);
     }

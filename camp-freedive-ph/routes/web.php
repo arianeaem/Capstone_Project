@@ -66,13 +66,12 @@ Route::get('/staff/login', [LoginController::class, 'showLoginForm']);
 Route::get('/staff', [LoginController::class, 'showLoginForm']);
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 
-Route::middleware('guest')->group(function () {
-    Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
-    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+// Password Reset Routes
+Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
 
-    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
-});
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
 
 // =========================================================================
 // 3. AUTHENTICATED STAFF ROUTES (SHARED)
@@ -92,7 +91,7 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:owner,admin']
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
-        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+        Route::get('', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         // Booking Management
         Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');

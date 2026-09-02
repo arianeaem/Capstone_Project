@@ -109,8 +109,8 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Full Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="Full Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                             </div>
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Age <span class="text-[#780000]">*</span></label>
@@ -186,7 +186,7 @@
             <!-- Boat Dive Toggle -->
             <div class="pt-2">
                 <label class="flex items-center gap-2.5 cursor-pointer">
-                    <input type="checkbox" name="boat_dive" value="1" x-model="boatDive" class="w-4 h-4 rounded text-[#008E98] focus:ring-[#00C3D0]">
+                    <input type="checkbox" name="boat_dive" value="1" x-model="boatDive" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000]">
                     <span class="font-bold text-sm text-[#1D1D1F]">Include Boat Dive Add-on (+₱600 / person)</span>
                 </label>
             </div>

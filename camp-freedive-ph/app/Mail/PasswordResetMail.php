@@ -2,32 +2,33 @@
 
 namespace App\Mail;
 
-use App\Models\Booking;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class BookingConfirmedMail extends Mailable
+class PasswordResetMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public function __construct(
-        public Booking $booking
+        public string $resetUrl,
+        public User $user
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Booking Confirmed: ' . $this->booking->booking_number . ' | Camp FreedivePH',
+            subject: 'Reset Your Password | Camp FreedivePH Staff Portal',
         );
     }
 
     public function content(): Content
     {
         return new Content(
-            view: 'emails.booking_confirmed',
+            view: 'emails.password_reset',
         );
     }
 }

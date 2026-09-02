@@ -114,11 +114,40 @@ class PayMongoController extends Controller
                     ->latest()
                     ->first();
 
+                $paymongoPaymentId = null;
+                $feeAmount = 0.00;
+                $paymentMethodType = 'paymongo';
+
+                // Query PayMongo Checkout Session to retrieve actual payment details if available
+                if ($payment && $payment->paymongo_resource_id) {
+                    $sessionData = app(\App\Services\PayMongoService::class)->getCheckoutSession($payment->paymongo_resource_id);
+                    $paymentsList = $sessionData['data']['attributes']['payments'] ?? [];
+                    if (!empty($paymentsList)) {
+                        $firstPaid = $paymentsList[0] ?? null;
+                        if ($firstPaid) {
+                            $paymongoPaymentId = $firstPaid['id'] ?? null;
+                            $paymentMethodType = $firstPaid['attributes']['source']['type'] ?? $firstPaid['attributes']['payment_method_type'] ?? 'paymongo';
+                            $feeAmount = ($firstPaid['attributes']['fee'] ?? 0) / 100;
+                        }
+                    }
+                }
+
                 if ($payment && $payment->status !== 'paid') {
                     $payment->update([
                         'status' => 'paid',
                         'paid_at' => now(),
-                        'paymongo_payment_id' => $payment->paymongo_payment_id ?: ('pay_' . bin2hex(random_bytes(8))),
+                        'payment_method' => $paymentMethodType,
+                        'paymongo_payment_id' => $paymongoPaymentId ?: ($payment->paymongo_payment_id ?: ('pay_' . bin2hex(random_bytes(8)))),
+                        'fee_amount' => $feeAmount,
+                    ]);
+
+                    \App\Models\PaymentStatusLog::create([
+                        'payment_id' => $payment->id,
+                        'old_status' => 'pending',
+                        'new_status' => 'paid',
+                        'changed_by' => null,
+                        'note' => "Downpayment paid successfully via PayMongo Hosted Checkout ({$paymentMethodType}).",
+                        'created_at' => now(),
                     ]);
                 }
 
@@ -127,11 +156,20 @@ class PayMongoController extends Controller
                     $booking->update([
                         'status' => 'confirmed',
                     ]);
+
+                    \App\Models\BookingStatusLog::create([
+                        'booking_id' => $booking->id,
+                        'old_status' => 'pending_downpayment',
+                        'new_status' => 'confirmed',
+                        'changed_by' => null,
+                        'note' => "Booking confirmed automatically upon successful PayMongo downpayment receipt.",
+                        'created_at' => now(),
+                    ]);
                 }
 
                 AuditLogger::log(
                     'PAYMONGO_PAYMENT_SUCCESS',
-                    "Payment verified and confirmed for Booking #{$booking->booking_number}",
+                    "Payment verified and confirmed for Booking #{$booking->booking_number} via PayMongo",
                     null,
                     "Customer: {$booking->contact_name}"
                 );

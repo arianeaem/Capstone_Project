@@ -29,7 +29,7 @@ class CoachMatchingController extends Controller
         // 1. Fetch unassigned participants from active bookings
         $unassignedParticipants = BookingParticipant::with(['booking.batch'])
             ->whereHas('booking', function ($q) {
-                $q->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show']);
+                $q->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show', 'pending_downpayment']);
             })
             ->whereDoesntHave('activeAssignment')
             ->get();

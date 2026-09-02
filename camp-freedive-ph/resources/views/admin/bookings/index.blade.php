@@ -18,17 +18,17 @@
             $pendingRequestsCount = \App\Models\RescheduleRequest::where('status', 'pending')->count() + \App\Models\CancellationRequest::where('status', 'pending')->count();
         @endphp
 
-        <div class="flex items-center gap-3">
-            <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-2">
+        <div class="flex items-center gap-2.5 flex-wrap">
+            <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
                 <span>Pending Requests</span>
                 @if($pendingRequestsCount > 0)
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-[#FF3B3C] text-white">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#780000] text-white">
                         {{ $pendingRequestsCount }}
                     </span>
                 @endif
             </a>
 
-            <a href="{{ route('admin.bookings.create') }}" class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2">
+            <a href="{{ route('admin.bookings.create') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Add Booking</span>
             </a>
@@ -36,74 +36,74 @@
     </div>
 
     <!-- Quick Stats (Single Box with Vertical Dividers) -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 items-center gap-y-4">
             <!-- Total -->
-            <div class="px-4 sm:px-5 py-1">
-                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Total</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['total'] }}</div>
+            <div class="px-4 py-1">
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Total</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $stats['total'] }}</div>
             </div>
 
             <!-- Confirmed -->
-            <div class="relative px-4 sm:px-5 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Confirmed</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['confirmed'] }}</div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Confirmed</span>
+                <div class="text-2xl font-extrabold text-emerald-700 mt-0.5">{{ $stats['confirmed'] }}</div>
             </div>
 
             <!-- Rescheduled -->
-            <div class="relative px-4 sm:px-5 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Rescheduled</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['rescheduled'] }}</div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Rescheduled</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $stats['rescheduled'] }}</div>
             </div>
 
             <!-- Completed -->
-            <div class="relative px-4 sm:px-5 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Completed</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['completed'] }}</div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Completed</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $stats['completed'] }}</div>
             </div>
 
             <!-- No-Show -->
-            <div class="relative px-4 sm:px-5 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">No-Show</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['no_show'] }}</div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">No-Show</span>
+                <div class="text-2xl font-extrabold text-[#6E6E73] mt-0.5">{{ $stats['no_show'] }}</div>
             </div>
 
             <!-- Cancelled -->
-            <div class="relative px-4 sm:px-5 py-1">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs text-[#1D1D1F] font-bold uppercase tracking-wider block">Cancelled</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-1">{{ $stats['cancelled'] }}</div>
+                <span class="text-xs text-[#6E6E73] font-bold uppercase tracking-wider block">Cancelled</span>
+                <div class="text-2xl font-extrabold text-rose-700 mt-0.5">{{ $stats['cancelled'] }}</div>
             </div>
         </div>
     </div>
 
     <!-- Bookings Table Container with Integrated Toolbar Header -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
         <!-- Integrated Toolbar Header (Pills + Search + Filter Popover) -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Class Package Pill Tabs (Primary: #780000) -->
+                <!-- Left: Class Package Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => '']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ !request('class_type') ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('class_type') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Classes
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => 'discovery']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'discovery' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'discovery' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Discovery
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => 'fundive']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'fundive' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'fundive' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Fundive
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => 'refinement']) }}" 
-                       class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'refinement' ? 'bg-[#780000] text-white shadow-xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'refinement' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Refinement
                     </a>
                 </div>
@@ -129,7 +129,7 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search booking #, name..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] focus:ring-1 focus:ring-[#780000]">
+                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                             <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -141,11 +141,11 @@
                     <div class="relative">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
-                                class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#D1D1D6] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] transition-all shadow-2xs cursor-pointer">
+                                class="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer">
                             <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                             </svg>
-                            <span>Filter</span>
+                            <span>Filter & Sort</span>
                             @if(request()->anyFilled(['status', 'batch_status', 'sort']))
                                 <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
                             @endif
@@ -155,7 +155,12 @@
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
-                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                             class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                                <h4 class="font-bold text-xs text-[#1D1D1F]">Filter & Sort Bookings</h4>
+                                <a href="{{ route('admin.bookings.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
+                            </div>
+
                             <form method="GET" action="{{ route('admin.bookings.index') }}" class="space-y-3 text-xs">
                                 @if(request('class_type'))
                                     <input type="hidden" name="class_type" value="{{ request('class_type') }}">
@@ -165,8 +170,22 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-2">Lifecycle Status</label>
-                                    <select name="status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                    <label class="block font-semibold text-[#6E6E73] mb-1">Sort By</label>
+                                    <select name="sort" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                        <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest Booking First (Created)</option>
+                                        <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest Booking First (Created)</option>
+                                        <option value="dive_date_asc" {{ request('sort') === 'dive_date_asc' ? 'selected' : '' }}>Upcoming Dive Date (Soonest First)</option>
+                                        <option value="dive_date_desc" {{ request('sort') === 'dive_date_desc' ? 'selected' : '' }}>Past Dive Date (Furthest First)</option>
+                                        <option value="amount_desc" {{ request('sort') === 'amount_desc' ? 'selected' : '' }}>Highest Booking Amount (₱)</option>
+                                        <option value="amount_asc" {{ request('sort') === 'amount_asc' ? 'selected' : '' }}>Lowest Booking Amount (₱)</option>
+                                        <option value="guest_asc" {{ request('sort') === 'guest_asc' ? 'selected' : '' }}>Guest Name (A Z)</option>
+                                        <option value="status" {{ request('sort') === 'status' ? 'selected' : '' }}>Booking Status</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block font-semibold text-[#6E6E73] mb-1">Status</label>
+                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
                                         <option value="">All Statuses</option>
                                         <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Confirmed</option>
                                         <option value="rescheduled" {{ request('status') === 'rescheduled' ? 'selected' : '' }}>Rescheduled</option>
@@ -180,38 +199,22 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-2">Batch Assignment</label>
-                                    <select name="batch_status" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                    <label class="block font-semibold text-[#6E6E73] mb-1">Batch Assignment</label>
+                                    <select name="batch_status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
                                         <option value="">All Batches</option>
                                         <option value="unassigned" {{ request('batch_status') === 'unassigned' || request('unassigned') === '1' ? 'selected' : '' }}>No Batch (Unassigned)</option>
                                         <option value="assigned" {{ request('batch_status') === 'assigned' ? 'selected' : '' }}>Batch Assigned</option>
                                     </select>
                                 </div>
 
-                                <div>
-                                    <label class="block font-bold text-[#1D1D1F] mb-2">Sort Order</label>
-                                    <select name="sort" onchange="this.form.submit()" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                                        <option value="created_desc" {{ request('sort', 'created_desc') === 'created_desc' ? 'selected' : '' }}>Newest</option>
-                                        <option value="created_asc" {{ request('sort') === 'created_asc' ? 'selected' : '' }}>Oldest</option>
-                                        <option value="dive_date_desc" {{ request('sort', 'dive_date_desc') === 'dive_date_desc' ? 'selected' : '' }}>Dive Date (Latest)</option>
-                                        <option value="dive_date_asc" {{ request('sort', 'dive_date_asc') === 'dive_date_asc' ? 'selected' : '' }}>Dive Date (Soonest)</option>
-                                    </select>
-                                </div>
-
-                                <div class="flex items-center justify-between pt-2">
-                                    <a href="{{ route('admin.bookings.index') }}" class="text-xs text-[#8E8E93] hover:text-[#1D1D1F]">Reset All</a>
-                                    <button type="button" @click="openFilters = false" class="btn-secondary px-3 py-1.5 text-xs font-semibold">Done</button>
+                                <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
+                                    <button type="submit" class="btn-primary w-full py-1.5 text-xs font-bold">
+                                        Apply Filter & Sort
+                                    </button>
                                 </div>
                             </form>
                         </div>
                     </div>
-
-                    @if(request()->anyFilled(['search', 'status', 'batch_status', 'sort']))
-                        <a href="{{ route('admin.bookings.index', ['class_type' => request('class_type')]) }}" 
-                           class="text-xs text-[#6E6E73] hover:text-[#780000] underline font-medium px-1.5 py-1">
-                            Reset
-                        </a>
-                    @endif
                 </div>
 
             </div>

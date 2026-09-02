@@ -139,7 +139,7 @@
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F]">
                                 @if($log->old_status && $log->old_status !== $log->new_status && $log->old_status !== 'new')
-                                    {{ ucfirst(str_replace('_', ' ', $log->old_status)) }} → {{ ucfirst(str_replace('_', ' ', $log->new_status)) }}
+                                    {{ ucfirst(str_replace('_', ' ', $log->old_status)) }} {{ ucfirst(str_replace('_', ' ', $log->new_status)) }}
                                 @elseif($log->old_status === 'new' || $log->old_status === null)
                                     Reservation Initialized ({{ ucfirst(str_replace('_', ' ', $log->new_status)) }})
                                 @else
@@ -248,7 +248,7 @@
                     <a href="javascript:void(0)" 
                        onclick="alert('Routing to Payments & Refunds Module for Booking #{{ $booking->booking_number }}')"
                        class="btn-secondary w-full py-2 text-xs font-bold text-center block">
-                        Manage Payment in Payments & Refunds →
+                        Manage Payment in Payments & Refunds
                     </a>
                 </div>
             </div>
