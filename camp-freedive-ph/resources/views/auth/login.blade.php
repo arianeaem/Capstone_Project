@@ -4,24 +4,24 @@
 @section('meta_description', 'Internal portal login for Camp FreedivePH coaches, administrators, and owner.')
 
 @section('content')
-<div class="min-h-[75vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-10">
-    <div class="max-w-md w-full space-y-6">
+<div class="min-vh-75 d-flex align-items-center justify-content-center px-3 px-sm-4 px-lg-5 py-5">
+    <div class="w-100" style="max-width: 28rem;">
         
         <!-- Header & Logo -->
-        <div class="text-center">
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F] tracking-tight">Login</h1>
+        <div class="text-center mb-4">
+            <h1 class="h2 fw-bolder tracking-tight" style="color: #8B011A;;">Log in to your account</h1>
         </div>
 
         <!-- Form Card -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 space-y-5">
+        <div class="bg-white rounded-4 border p-4 p-sm-5 shadow-sm" style="border-color: #E5E5EA !important;">
 
-            <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
+            <form action="{{ route('login.post') }}" method="POST">
                 @csrf
 
                 <!-- Email Input -->
-                <div>
-                    <label for="email" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
-                        Staff Email Address <span class="text-[#780000]">*</span>
+                <div class="mb-4">
+                    <label for="email" class="form-label fw-bold small mb-1" style="color: #1D1D1F;">
+                        Email Address <span style="color: #780000;">*</span>
                     </label>
                     <input type="email" 
                            name="email" 
@@ -30,20 +30,23 @@
                            placeholder="staff@campfreedive.ph" 
                            required 
                            autofocus
-                           class="w-full px-4 py-3 rounded-xl border {{ $errors->has('email') ? 'border-[#FF3B3C] ring-1 ring-[#FF3B3C]' : 'border-[#D1D1D6]' }} focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm text-[#1D1D1F] bg-white">
+                           class="form-control rounded-3 py-3 px-3 shadow-none @error('email') is-invalid @enderror"
+                           style="border-color: {{ $errors->has('email') ? '#FF3B3C' : '#D1D1D6' }}; font-size: 0.875rem;">
                     
                     @error('email')
-                        <p class="text-xs text-[#FF3B3C] font-semibold mt-1.5">{{ $message }}</p>
+                        <div class="invalid-feedback fw-semibold mt-1" style="font-size: 0.75rem; color: #FF3B3C;">
+                            {{ $message }}
+                        </div>
                     @enderror
                 </div>
 
                 <!-- Password Input -->
-                <div>
-                    <div class="flex items-center justify-between mb-1.5">
-                        <label for="password" class="block font-bold text-[#1D1D1F] text-sm">
-                            Password <span class="text-[#780000]">*</span>
+               <div class="mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-1">
+                        <label for="password" class="form-label fw-bold small mb-0" style="color: #1D1D1F;">
+                            Password <span style="color: #780000;">*</span>
                         </label>
-                        <a href="{{ route('password.request') }}" class="text-xs font-semibold text-[#780000] hover:underline">
+                        <a href="{{ route('password.request') }}" class="small fw-semibold text-decoration-none" style="color: #780000;">
                             Forgot password?
                         </a>
                     </div>
@@ -52,24 +55,27 @@
                            id="password" 
                            placeholder="••••••••" 
                            required
-                           class="w-full px-4 py-3 rounded-xl border {{ $errors->has('password') ? 'border-[#FF3B3C] ring-1 ring-[#FF3B3C]' : 'border-[#D1D1D6]' }} focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm text-[#1D1D1F] bg-white">
+                           class="form-control rounded-3 py-3 px-3 shadow-none @error('password') is-invalid @enderror"
+                           style="border-color: {{ $errors->has('password') ? '#FF3B3C' : '#D1D1D6' }}; font-size: 0.875rem;">
                     
                     @error('password')
-                        <p class="text-xs text-[#FF3B3C] font-semibold mt-1.5">{{ $message }}</p>
+                        <div class="invalid-feedback fw-semibold mt-1" style="font-size: 0.75rem; color: #FF3B3C;">
+                            {{ $message }}
+                        </div>
                     @enderror
                 </div>
 
                 <!-- Remember Me -->
-                <div class="flex items-center justify-between pt-1">
-                    <label class="flex items-center gap-2.5 cursor-pointer">
-                        <input type="checkbox" name="remember" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] border-[#D1D1D6]">
-                        <span class="text-sm text-[#6E6E73] font-medium">Remember my session</span>
+                <div class="mb-4 form-check">
+                    <input type="checkbox" name="remember" class="form-check-input shadow-none" id="remember" style="border-color: #D1D1D6; cursor: pointer;">
+                    <label class="form-check-label small fw-medium" for="remember" style="color: #6E6E73; cursor: pointer;">
+                        Remember my session
                     </label>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md">
-                    Sign In to Portal
+                <button type="submit" class="btn w-100 py-3 fw-bold text-white shadow-sm" style="background-color: #780000; font-size: 0.875rem; border-radius: 0.75rem;">
+                    Log In
                 </button>
             </form>
 
