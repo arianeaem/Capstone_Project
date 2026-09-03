@@ -105,7 +105,7 @@
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md hover:bg-[#5E0000] transition-all">
-                    Update Password & Sign In
+                    Update Password
                 </button>
             </form>
 

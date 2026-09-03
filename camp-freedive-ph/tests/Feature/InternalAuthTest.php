@@ -128,7 +128,6 @@ class InternalAuthTest extends TestCase
         $this->actingAs($coach);
         $this->get('/admin')->assertStatus(403);
         $coachResponse = $this->get('/coach')->assertStatus(200);
-        $coachResponse->assertSee('Instructor Field Station');
 
         // Admin can access admin dashboard, but NOT audit logs (Owner exclusive)
         $this->actingAs($admin);

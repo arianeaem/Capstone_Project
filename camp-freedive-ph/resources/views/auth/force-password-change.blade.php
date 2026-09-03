@@ -120,7 +120,7 @@
 
                 <!-- Submit Button -->
                 <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md hover:bg-[#5E0000] transition-all">
-                    Set Password & Enter Portal
+                    Set Password
                 </button>
             </form>
 
@@ -128,7 +128,7 @@
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="text-xs text-[#6E6E73] hover:text-[#780000] font-semibold underline cursor-pointer">
-                        Sign Out & Exit
+                        Sign Out
                     </button>
                 </form>
             </div>

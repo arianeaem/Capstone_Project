@@ -192,7 +192,7 @@
                        title="Availability Calendar"
                        class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
-                        <svg class="w-5 h-5 shrink-0 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <img src="{{ asset('icons/icons8-calendar-60.png') }}" class="w-5 h-5 shrink-0" alt="Availability Calendar">
                         <span x-show="!sidebarCollapsed" class="truncate">Availability Calendar</span>
                     </a>
 
@@ -307,7 +307,7 @@
                             <span>Dashboard</span>
                         </a>
                         <a href="{{ route('coach.availability.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <svg class="w-5 h-5 shrink-0 text-current" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <img src="{{ asset('icons/icons8-calendar-60.png') }}" class="w-5 h-5 shrink-0" alt="Availability Calendar">
                             <span>Availability Calendar</span>
                         </a>
                         <a href="{{ route('coach.schedule.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.schedule.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
@@ -328,13 +328,6 @@
                     <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-7 h-7 rounded-full object-contain bg-white border border-[#E5E5EA]">
                     <span class="font-extrabold text-xs text-[#1D1D1F]">Camp Freedive<span class="text-[#780000]">PH</span></span>
                 </div>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-rose-50 text-[#FF3B30] font-bold text-xs hover:bg-rose-100 transition-colors">
-                        <img src="{{ asset('icons/icons8-logout-60.png') }}" class="w-4 h-4 object-contain" alt="Sign Out">
-                        <span>Sign Out</span>
-                    </button>
-                </form>
             </div>
         </div>
 
@@ -352,20 +345,16 @@
                     <!-- Desktop Sidebar Toggle Button -->
                     <button type="button" 
                             @click="toggleSidebar()" 
-                            class="hidden md:flex items-center justify-center w-8 h-8 rounded-lg border border-[#E5E5EA] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all cursor-pointer"
+                            class="hidden md:flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] transition-all cursor-pointer"
                             :title="sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
-                        <!-- Panel Left / Sidebar Toggle Icon [|] -->
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="9" y1="3" x2="9" y2="21"></line>
-                        </svg>
+                        <img src="{{ asset('icons/icons8-sidebar-60.png') }}" class="w-5 h-5 shrink-0 opacity-80 hover:opacity-100 transition-opacity" alt="Toggle Sidebar">
                     </button>
 
                     <!-- Mobile Menu Trigger Button -->
                     <button type="button" 
                             @click="mobileMenuOpen = !mobileMenuOpen"
-                            class="md:hidden flex items-center justify-center w-8 h-8 rounded-lg border border-[#E5E5EA] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] cursor-pointer">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                            class="md:hidden flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] cursor-pointer">
+                        <img src="{{ asset('icons/icons8-sidebar-60.png') }}" class="w-5 h-5 shrink-0 opacity-80 hover:opacity-100 transition-opacity" alt="Open Menu">
                     </button>
 
                     <!-- Vertical Divider -->

@@ -120,13 +120,6 @@
                                         <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
                                         <span>Available</span>
                                     </div>
-                                @elseif($status === 'unavailable')
-                                    <div class="p-1.5 rounded-lg bg-gray-100 border border-gray-200 text-gray-600 text-[11px] font-semibold flex items-center gap-1.5">
-                                        <span class="w-2 h-2 rounded-full bg-gray-400 shrink-0"></span>
-                                        <span>Off</span>
-                                    </div>
-                                @else
-                                    <div class="text-[10px] text-[#AEAEB2] italic">Unset</div>
                                 @endif
                             </div>
 
@@ -139,7 +132,9 @@
                                         Release Request
                                     </button>
                                 @elseif(!$isPast && !$isOtherMonth)
-                                    <span class="text-[#AEAEB2] opacity-0 group-hover:opacity-100 transition-opacity">Click to toggle</span>
+                                    <span class="text-[#AEAEB2] opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {{ $status === 'available' ? 'Click to unselect' : 'Click to select' }}
+                                    </span>
                                 @endif
                             </div>
 
@@ -159,7 +154,7 @@
             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5EA] shadow-xs space-y-3">
                 <h1 class="text-xl font-black text-[#1D1D1F]">My Availability Calendar</h1>
                 <p class="text-xs text-[#6E6E73] leading-relaxed">
-                    Click any weekend or date to toggle availability. Assigned dates are locked and require an emergency release request.
+                    Click any date or weekend to select or unselect your availability. Assigned dates are locked and require an emergency release request.
                 </p>
             </div>
 
@@ -176,11 +171,6 @@
                     <div class="flex items-center gap-2.5">
                         <span class="w-3.5 h-3.5 rounded-md bg-blue-600 border border-blue-700 inline-block shrink-0"></span>
                         <span class="font-semibold text-[#1D1D1F]">Assigned</span>
-                    </div>
-
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-3.5 h-3.5 rounded-md bg-gray-200 border border-gray-300 inline-block shrink-0"></span>
-                        <span class="font-semibold text-[#6E6E73]">Unavailable</span>
                     </div>
 
                     <div class="flex items-center gap-2.5">
@@ -213,13 +203,13 @@
                     @click="applyBulk('available')"
                     :disabled="selectedDates.length === 0 || bulkSubmitting"
                     class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all">
-                Mark Available (🟢)
+                Mark Available
             </button>
             <button type="button" 
-                    @click="applyBulk('unavailable')"
+                    @click="applyBulk('remove')"
                     :disabled="selectedDates.length === 0 || bulkSubmitting"
                     class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-white font-bold text-xs shadow-xs transition-all">
-                Mark Unavailable (⚪)
+                Remove Availability
             </button>
             <button type="button" 
                     @click="clearBulkSelection()"
@@ -286,7 +276,7 @@
                                           rows="4" 
                                           required 
                                           placeholder="Please explain the emergency, illness, or unavoidable circumstance requiring reassignment..."
-                                          class="w-full text-xs rounded-xl border-[#E5E5EA] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
+                                          class="w-full text-xs rounded-xl border-1 border-[#E5E5EA] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
                                 <span class="text-[11px] text-[#8E8E93]">Your request will be submitted to Camp Admin for review and student reassignment.</span>
                             </div>
 

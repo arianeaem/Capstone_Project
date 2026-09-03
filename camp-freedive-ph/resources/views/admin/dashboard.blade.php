@@ -182,7 +182,6 @@
                         </div>
                         <a href="{{ route('admin.batches.index') }}" class="text-xs font-bold text-[#780000] hover:underline inline-flex items-center gap-0.5">
                             <span>View All Batches</span>
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                         </a>
                     </div>
 
@@ -247,7 +246,6 @@
                         </div>
                         <a href="{{ route('admin.batches.index') }}" class="text-xs font-bold text-[#780000] hover:underline inline-flex items-center gap-0.5">
                             <span>View All Batches</span>
-                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                         </a>
                     </div>
 
@@ -316,7 +314,6 @@
                 </div>
                 <a href="{{ route('admin.bookings.index') }}" class="text-xs font-bold text-[#780000] hover:underline inline-flex items-center gap-0.5">
                     <span>All Bookings ({{ $operationalStats['total_active_batches'] }} Batches)</span>
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                 </a>
             </div>
 

@@ -73,7 +73,7 @@
                             <div class="text-xs font-bold text-[#1D1D1F] mt-0.5 truncate">{{ $booking->contact_name }}</div>
                             <div class="text-xs text-[#6E6E73] truncate">{{ $booking->contact_phone }}</div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FAFAFC] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
                             Reschedule
                         </span>
                     </div>
@@ -85,17 +85,17 @@
                             <strong class="text-[#1D1D1F] font-semibold text-right">{{ $booking->start_date->format('M d') }} – {{ $booking->end_date->format('M d, Y') }}</strong>
                         </div>
                         <div class="flex items-center justify-between gap-2 border-t border-[#E5E5EA] pt-2">
-                            <span class="text-emerald-700 font-semibold text-xs">Requested:</span>
+                            <span class="text-[#1D1D1F] font-semibold text-xs">Requested:</span>
                             <strong class="text-emerald-700 font-bold text-right">{{ $req->requested_start_date->format('M d') }} – {{ $req->requested_end_date->format('M d, Y') }}</strong>
                         </div>
-                    </div>
 
-                    @if($req->reason)
-                        <div class="mt-3 text-xs text-[#6E6E73] bg-[#FAFAFC] p-2.5 rounded-lg border border-[#E5E5EA]">
-                            <strong class="text-[#1D1D1F] block text-xs mb-0.5">Guest Reason:</strong>
-                            <span class="italic text-xs">"{{ $req->reason }}"</span>
-                        </div>
-                    @endif
+                        @if($req->reason)
+                            <div class="border-t border-[#E5E5EA] pt-2 text-xs text-[#6E6E73]">
+                                <strong class="text-[#1D1D1F] text-xs">Guest Reason:</strong>
+                                <span class="italic text-xs block mt-0.5">"{{ $req->reason }}"</span>
+                            </div>
+                        @endif
+                    </div>
 
                     <div class="mt-2.5 text-xs text-[#8E8E93]">
                         Submitted: {{ $req->requested_at ? $req->requested_at->format('M d, Y g:i A') : $req->created_at->format('M d, Y') }}
@@ -160,44 +160,46 @@
                             <div class="text-xs font-bold text-[#1D1D1F] mt-0.5 truncate">{{ $booking->contact_name }}</div>
                             <div class="text-xs text-[#6E6E73] truncate">{{ $booking->contact_email }}</div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200 shrink-0">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FAFAFC] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
                             Cancel Claim
                         </span>
                     </div>
 
-                    <!-- Booking Details Box -->
-                    <div class="mt-3 space-y-2 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] text-xs">
+                    <!-- Details & Policy Section (Single Clean Box) -->
+                    <div class="mt-3 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                         <div class="flex items-center justify-between gap-2">
-                            <span class="text-[#6E6E73] text-xs">Trip Dates:</span>
+                            <span class="text-[#6E6E73]">Trip Dates:</span>
                             <strong class="text-[#1D1D1F] font-semibold text-right">{{ $booking->start_date->format('M d') }} – {{ $booking->end_date->format('M d, Y') }}</strong>
                         </div>
                         <div class="flex items-center justify-between gap-2 border-t border-[#E5E5EA] pt-2">
-                            <span class="text-[#6E6E73] text-xs">Total Paid:</span>
+                            <span class="text-[#6E6E73]">Total Paid:</span>
                             <strong class="text-[#1D1D1F] font-bold text-right">₱{{ number_format($booking->paid_amount, 2) }}</strong>
                         </div>
-                    </div>
 
-                    <!-- Cancellation Policy Recommendation Banner -->
-                    @if($policy)
-                        <div class="mt-3 p-3 rounded-lg border text-xs {{ $isFullRefund ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-amber-50 border-amber-200 text-amber-900' }}">
-                            <div class="flex items-center justify-between font-bold text-xs">
-                                <span>Policy Recommendation:</span>
-                                <span class="{{ $isFullRefund ? 'text-emerald-700 font-extrabold' : 'text-amber-800 font-extrabold' }}">
-                                    {{ $isFullRefund ? '100% Refund (₱' . number_format($recRefund, 2) . ')' : '0% Refund (Forfeited)' }}
-                                </span>
+                        @if($policy)
+                            <div class="border-t border-[#E5E5EA] pt-2 space-y-1">
+                                <div class="flex items-center justify-between font-bold text-xs">
+                                    <div class="flex items-center gap-1.5 {{ $isFullRefund ? 'text-emerald-800' : 'text-amber-900' }}">
+                                        <span class="inline-block w-2 h-2 rounded-full {{ $isFullRefund ? 'bg-emerald-600' : 'bg-amber-600' }} shrink-0"></span>
+                                        <span>Policy Recommendation:</span>
+                                    </div>
+                                    <span class="{{ $isFullRefund ? 'text-emerald-700 font-extrabold' : 'text-amber-800 font-extrabold' }}">
+                                        {{ $isFullRefund ? '100% Refund (₱' . number_format($recRefund, 2) . ')' : '0% Refund (Forfeited)' }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    {{ $policy['cancel_message'] ?? 'Cancellation evaluated under standard policy.' }}
+                                </p>
                             </div>
-                            <p class="text-xs mt-1 opacity-90 leading-relaxed">
-                                {{ $policy['cancel_message'] ?? 'Cancellation evaluated under standard policy.' }}
-                            </p>
-                        </div>
-                    @endif
+                        @endif
 
-                    @if($req->reason)
-                        <div class="mt-3 text-xs text-[#6E6E73] bg-[#FAFAFC] p-2.5 rounded-lg border border-[#E5E5EA]">
-                            <strong class="text-[#1D1D1F] block text-xs mb-0.5">Guest Reason:</strong>
-                            <span class="italic text-xs">"{{ $req->reason }}"</span>
-                        </div>
-                    @endif
+                        @if($req->reason)
+                            <div class="border-t border-[#E5E5EA] pt-2 text-xs text-[#6E6E73]">
+                                <strong class="text-[#1D1D1F] text-xs">Guest Reason:</strong>
+                                <span class="italic text-xs block mt-0.5">"{{ $req->reason }}"</span>
+                            </div>
+                        @endif
+                    </div>
 
                     <div class="mt-2.5 text-xs text-[#8E8E93]">
                         Submitted: {{ $req->requested_at ? $req->requested_at->format('M d, Y g:i A') : $req->created_at->format('M d, Y') }}

@@ -10,7 +10,7 @@
         <div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.bookings.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                    ← All Bookings
+                    ← Back to All Bookings
                 </a>
                 <span class="text-[#D1D1D6]">/</span>
                 <span class="font-mono font-bold text-[#780000]">{{ $booking->booking_number }}</span>

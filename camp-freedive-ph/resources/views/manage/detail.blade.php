@@ -263,10 +263,10 @@
                 </div>
                 @else
                 <!-- Reschedule Status Card -->
-                <div class="p-4 rounded-xl border {{ $policy['reschedule_allowed'] ? 'border-[#34C759]/40 bg-[#ECFDF5]/50' : 'border-[#E5E5EA] bg-[#FAFAFC]' }} space-y-2">
+                <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Reschedule</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['reschedule_allowed'] ? 'bg-[#34C759] text-white' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['reschedule_allowed'] ? 'bg-[#ECFDF5] text-emerald-800 border border-emerald-200' : 'bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]' }}">
                             {{ $policy['reschedule_allowed'] ? 'Allowed' : 'Closed' }}
                         </span>
                     </div>
@@ -275,17 +275,17 @@
                     @if($policy['reschedule_allowed'])
                         <button type="button" 
                                 @click="openRescheduleModal = true" 
-                                class="btn-primary w-full py-2.5 text-xs font-bold mt-2">
+                                class="btn-primary w-full py-2.5 text-xs font-bold mt-1">
                             Reschedule Booking Date
                         </button>
                     @endif
                 </div>
 
                 <!-- Cancellation Status Card -->
-                <div class="p-4 rounded-xl border {{ $policy['cancel_allowed'] ? 'border-[#FF8D28]/40 bg-[#FFFBEB]/50' : 'border-[#E5E5EA] bg-[#FAFAFC]' }} space-y-2">
+                <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Cancel / Refund</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['cancel_allowed'] ? 'bg-[#FF8D28] text-white' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">
+                        <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['cancel_allowed'] ? 'bg-[#FEF3C7] text-amber-900 border border-amber-200' : 'bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]' }}">
                             {{ $policy['cancel_allowed'] ? 'Eligible' : 'Non-Refundable' }}
                         </span>
                     </div>
@@ -294,7 +294,7 @@
                     @if($policy['cancel_allowed'] || $booking->status === 'confirmed')
                         <button type="button" 
                                 @click="openCancelModal = true" 
-                                class="w-full py-2.5 rounded-lg border border-[#FF3B3C] text-[#FF3B3C] hover:bg-[#FEF2F2] text-xs font-bold transition-colors mt-2">
+                                class="btn-secondary w-full py-2.5 text-xs font-bold mt-1">
                             Request Cancellation
                         </button>
                     @endif
@@ -406,7 +406,7 @@
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-[#FF3B3C]">Request Booking Cancellation</h3>
+                    <h3 class="text-lg font-bold text-[#1D1D1F]">Request Booking Cancellation</h3>
                     <p class="text-xs text-[#6E6E73]">Review your refund calculation according to camp policy.</p>
                 </div>
                 <button type="button" @click="openCancelModal = false" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
@@ -417,7 +417,7 @@
                 <input type="hidden" name="pin" value="{{ $booking->pin }}">
 
                 <!-- Refund calculation breakdown -->
-                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-sm">
+                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                     <div class="flex justify-between">
                         <span class="text-[#6E6E73]">Downpayment Paid:</span>
                         <span class="font-bold text-[#1D1D1F]">₱{{ number_format($booking->downpayment_amount, 2) }}</span>
@@ -426,7 +426,7 @@
                         <span class="text-[#6E6E73]">Days Before Dive Date:</span>
                         <span class="font-bold text-[#1D1D1F]">{{ $policy['days_until_dive'] }} days</span>
                     </div>
-                    <div class="flex justify-between border-t border-[#E5E5EA] pt-2 text-sm">
+                    <div class="flex justify-between border-t border-[#E5E5EA] pt-2">
                         <span class="font-bold text-[#1D1D1F]">Calculated Refund Amount:</span>
                         <span class="font-extrabold text-[#780000]">₱{{ number_format($policy['calculated_refund'], 2) }}</span>
                     </div>
@@ -434,15 +434,15 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">Reason for Cancellation</label>
+                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">Reason for Cancellation</label>
                     <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
                 <!-- 2-Step Confirmation Checkbox -->
-                <div class="p-3.5 bg-[#FEF2F2] border border-[#FECACA] rounded-xl">
+                <div class="pt-1">
                     <label class="flex items-start gap-2.5 cursor-pointer">
-                        <input type="checkbox" name="confirm_cancel_ack" required class="w-4 h-4 rounded text-[#FF3B3C] focus:ring-[#FF3B3C] mt-0.5">
-                        <span class="text-xs font-bold text-[#991B1B]">
+                        <input type="checkbox" name="confirm_cancel_ack" required class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5">
+                        <span class="text-xs text-[#1D1D1F]">
                             I confirm that I want to cancel this booking and understand the refund amount will be reviewed by the camp.
                         </span>
                     </label>
@@ -450,7 +450,7 @@
 
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary px-4 py-2 text-sm">Keep My Booking</button>
-                    <button type="submit" class="px-5 py-2 rounded-lg bg-[#FF3B3C] hover:bg-[#E02E2F] text-white text-sm font-bold shadow-sm transition-colors">
+                    <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold shadow-2xs">
                         Confirm Cancellation Request
                     </button>
                 </div>

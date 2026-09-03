@@ -20,7 +20,7 @@
     <div class="container">
         <div class="header">
             <h1>Reset Your Password</h1>
-            <p>Camp FreedivePH Staff Portal</p>
+            <p>Camp FreedivePH</p>
         </div>
         <div class="content">
             <p>Hello <strong>{{ $user->name }}</strong>,</p>

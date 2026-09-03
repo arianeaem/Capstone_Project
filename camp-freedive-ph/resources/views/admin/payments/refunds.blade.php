@@ -83,44 +83,35 @@
                                     {{ $booking->formatted_class_type }}
                                 </span>
                             </div>
-                            <div class="text-xs text-[#8E8E93] flex items-center gap-1">
-                                <span>Requested {{ $req->requested_at ? $req->requested_at->diffForHumans() : $req->created_at->diffForHumans() }}</span>
+                            <div class="text-xs text-[#8E8E93]">
+                                Requested {{ $req->requested_at ? $req->requested_at->diffForHumans() : $req->created_at->diffForHumans() }}
                             </div>
                         </div>
 
-                        <span class="px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 border border-amber-200 shrink-0">
+                        <span class="px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-[#FAFAFC] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
                             Pending
                         </span>
                     </div>
 
                     <!-- Lead Guest & Trip Details -->
-                    <div class="mt-3 space-y-2">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                                {{ substr($booking->contact_name, 0, 1) }}
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ $booking->contact_name }}</div>
-                                <div class="text-xs text-[#6E6E73] truncate">{{ $booking->contact_email }} • {{ $booking->contact_phone }}</div>
-                            </div>
+                    <div class="mt-3 space-y-1 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm text-[#1D1D1F]">{{ $booking->contact_name }}</span>
+                            <span class="text-xs text-[#6E6E73] font-medium">{{ $booking->participants->count() }} Student{{ $booking->participants->count() > 1 ? 's' : '' }}</span>
                         </div>
-
-                        <div class="p-2.5 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between text-xs">
-                            <div class="flex items-center gap-1.5 text-[#1D1D1F] font-medium">
-                                <span>Dive Date:</span>
-                                <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('M d, Y') }}</strong>
-                            </div>
-                            <span class="text-xs text-[#6E6E73] font-semibold">
-                                {{ $booking->participants->count() }} Student{{ $booking->participants->count() > 1 ? 's' : '' }}
-                            </span>
+                        <div class="text-xs text-[#6E6E73]">
+                            {{ $booking->contact_email }} • {{ $booking->contact_phone }}
+                        </div>
+                        <div class="text-xs text-[#6E6E73] pt-0.5">
+                            Dive Date: <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('M d, Y') }}</strong>
                         </div>
                     </div>
 
-                    <!-- Refund Claim Financial Box -->
-                    <div class="mt-3 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] space-y-2">
+                    <!-- Refund Claim Details (Single Clean Section) -->
+                    <div class="mt-3 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                         <div class="flex items-baseline justify-between">
                             <span class="text-xs text-[#6E6E73] font-medium">Refund Claim Amount:</span>
-                            <div class="text-lg font-extrabold text-[#1D1D1F]">
+                            <div class="text-base font-extrabold text-[#1D1D1F]">
                                 ₱{{ number_format($claimAmount, 2) }}
                             </div>
                         </div>
@@ -129,31 +120,30 @@
                             <span>Method: <strong class="text-[#1D1D1F] uppercase">{{ $payment->payment_method ?? 'GCash' }}</strong></span>
                             <span>Type: <strong class="text-[#1D1D1F] capitalize">{{ $payment->payment_type ?? 'downpayment' }}</strong></span>
                         </div>
-                    </div>
 
-                    <!-- Policy Evaluation Chip -->
-                    <div class="mt-3 p-3 rounded-lg {{ $isEligible ? 'bg-emerald-50 border border-emerald-200' : 'bg-amber-50 border border-amber-200' }} space-y-1">
-                        <div class="flex items-center gap-1.5 font-bold text-xs {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
-                            @if($isEligible)
-                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span>Eligible for 100% Full Refund</span>
-                            @else
-                                <svg class="w-3.5 h-3.5 text-amber-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                <span>Non-Refundable Policy Window</span>
+                        <div class="pt-1.5 border-t border-[#E5E5EA] space-y-1">
+                            <div class="flex items-center gap-1.5 font-bold text-xs {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
+                                @if($isEligible)
+                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
+                                    <span>Eligible for 100% Full Refund</span>
+                                @else
+                                    <span class="inline-block w-2 h-2 rounded-full bg-amber-600 shrink-0"></span>
+                                    <span>Non-Refundable Policy Window</span>
+                                @endif
+                            </div>
+                            <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                @if($isEligible)
+                                    Cancellation filed 14+ days before dive date. Qualified for online gateway reversal.
+                                @else
+                                    Cancellation filed less than 14 days before dive date. Standard policy prescribes deposit forfeiture.
+                                @endif
+                            </p>
+                            @if($req->notes)
+                                <div class="text-xs text-[#6E6E73] italic pt-0.5">
+                                    Note: "{{ $req->notes }}"
+                                </div>
                             @endif
                         </div>
-                        <p class="text-xs {{ $isEligible ? 'text-emerald-700' : 'text-amber-800' }} leading-relaxed">
-                            @if($isEligible)
-                                Cancellation filed 14 days or more before the dive date. Qualified for full online gateway reversal.
-                            @else
-                                Cancellation filed less than 14 days before the dive date. Standard policy prescribes deposit forfeiture.
-                            @endif
-                        </p>
-                        @if($req->notes)
-                            <div class="text-xs text-[#6E6E73] italic pt-1 border-t {{ $isEligible ? 'border-emerald-200' : 'border-amber-200' }}">
-                                Note: "{{ $req->notes }}"
-                            </div>
-                        @endif
                     </div>
                 </div>
 

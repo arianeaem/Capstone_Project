@@ -30,7 +30,7 @@
     @if(isset($masterForecast['daily_summaries']) && !empty($masterForecast['daily_summaries']))
     <div class="space-y-2">
         <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-[#6E6E73]">16-Day Marine Forecast Horizon</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#6E6E73]">tatanggalin din to soon</h3>
             <span class="text-xs text-[#8E8E93]">Scroll horizontally</span>
         </div>
 

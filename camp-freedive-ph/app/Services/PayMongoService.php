@@ -321,8 +321,8 @@ class PayMongoService
     {
         $amountInCentavos = (int) round($amountInPesos * 100);
 
-        // If secret key is provided and not dummy, call live/test PayMongo API
-        if (!empty($this->secretKey) && !str_contains($this->secretKey, 'your_secret_key')) {
+        // If secret key is provided and this is a real PayMongo payment identifier
+        if (!empty($this->secretKey) && !str_contains($this->secretKey, 'your_secret_key') && str_starts_with($paymentId, 'pay_')) {
             try {
                 $response = $this->client()->post("{$this->baseUrl}/refunds", [
                     'data' => [
@@ -345,20 +345,63 @@ class PayMongoService
                     ];
                 }
 
-                Log::warning('PayMongo Refund API Error Response: ' . $response->body());
+                $errorBody = $response->json();
+                $errorDetail = $errorBody['errors'][0]['detail'] ?? 'PayMongo refund API returned an error.';
+                $errorCode = $errorBody['errors'][0]['code'] ?? 'unknown_error';
+
+                Log::warning("PayMongo Refund API Error for payment {$paymentId}: {$errorDetail} (Code: {$errorCode})");
+
+                // If already refunded on PayMongo, retrieve existing refund reference
+                if (str_contains(strtolower($errorDetail), 'refundable') || str_contains(strtolower($errorDetail), 'refunded') || $errorCode === 'parameter_above_maximum') {
+                    $paymentData = $this->getPayment($paymentId);
+                    $existingRefunds = $paymentData['data']['attributes']['refunds'] ?? [];
+                    if (!empty($existingRefunds)) {
+                        $latestRef = end($existingRefunds);
+                        return [
+                            'success' => true,
+                            'refund_id' => $latestRef['id'] ?? ('ref_' . bin2hex(random_bytes(10))),
+                            'status' => $latestRef['attributes']['status'] ?? 'succeeded',
+                            'data' => $latestRef,
+                            'already_refunded' => true,
+                            'message' => 'Payment was already refunded on PayMongo.',
+                        ];
+                    }
+                }
+
+                // If payment was not found on PayMongo (e.g. test seeder ID), allow graceful offline refund
+                if ($errorCode === 'resource_not_found' || str_contains(strtolower($errorDetail), 'not found')) {
+                    $simulatedRefundId = 'ref_offline_' . strtolower(bin2hex(random_bytes(8)));
+                    return [
+                        'success' => true,
+                        'refund_id' => $simulatedRefundId,
+                        'status' => 'succeeded',
+                        'simulated' => true,
+                        'message' => 'Payment was recorded offline or in local seeder; refund recorded locally.',
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'error' => $errorDetail,
+                ];
+
             } catch (Exception $e) {
                 Log::error('PayMongo Refund Exception: ' . $e->getMessage());
+                return [
+                    'success' => false,
+                    'error' => 'Connection error communicating with PayMongo: ' . $e->getMessage(),
+                ];
             }
         }
 
-        // Fallback / Simulated Test Mode (e.g. during local tests or mock payment IDs)
-        $simulatedRefundId = 'ref_test_' . strtolower(bin2hex(random_bytes(8)));
+        // Fallback for offline transactions or test simulation
+        $simulatedRefundId = 'ref_offline_' . strtolower(bin2hex(random_bytes(8)));
         return [
             'success' => true,
             'refund_id' => $simulatedRefundId,
             'status' => 'succeeded',
             'simulated' => true,
-            'message' => 'Refund processed in PayMongo test sandbox simulation.',
+            'message' => 'Refund processed for offline / test record.',
         ];
     }
 

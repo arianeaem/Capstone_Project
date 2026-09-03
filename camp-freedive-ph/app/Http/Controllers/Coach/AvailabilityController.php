@@ -165,24 +165,31 @@ class AvailabilityController extends Controller
             ->where('date', $day1->format('Y-m-d'))
             ->first();
 
-        // If currently 'available' -> toggle to 'unavailable'; otherwise -> toggle to 'available'
-        $newStatus = ($currentRecord && $currentRecord->status === 'available') ? 'unavailable' : 'available';
+        // If currently 'available' -> remove availability (unselect); otherwise -> set to 'available'
+        if ($currentRecord && $currentRecord->status === 'available') {
+            CoachAvailability::where('coach_id', $coach->id)
+                ->whereIn('date', $datesToUpdate)
+                ->delete();
 
-        foreach ($datesToUpdate as $d) {
-            CoachAvailability::updateOrCreate(
-                [
-                    'coach_id' => $coach->id,
-                    'date' => $d,
-                ],
-                [
-                    'status' => $newStatus,
-                    'notes' => 'Updated via Coach Portal calendar 2D1N pairing.',
-                ]
-            );
+            $newStatus = 'unset';
+            $message = "Availability removed for {$day1->format('M d')} and {$day2->format('M d, Y')}.";
+        } else {
+            foreach ($datesToUpdate as $d) {
+                CoachAvailability::updateOrCreate(
+                    [
+                        'coach_id' => $coach->id,
+                        'date' => $d,
+                    ],
+                    [
+                        'status' => 'available',
+                        'notes' => 'Selected via Coach Portal availability calendar.',
+                    ]
+                );
+            }
+
+            $newStatus = 'available';
+            $message = "Availability selected for {$day1->format('M d')} and {$day2->format('M d, Y')}.";
         }
-
-        $statusLabel = $newStatus === 'available' ? 'Available' : 'Unavailable';
-        $message = "Dates {$day1->format('M d')} and {$day2->format('M d, Y')} marked as {$statusLabel}.";
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -204,7 +211,7 @@ class AvailabilityController extends Controller
         $request->validate([
             'dates' => 'required|array|min:1',
             'dates.*' => 'required|date',
-            'status' => 'required|in:available,unavailable',
+            'status' => 'required|in:available,unavailable,remove',
         ]);
 
         $coach = Auth::user();
@@ -247,16 +254,22 @@ class AvailabilityController extends Controller
                 continue; // Skip locked assigned dates
             }
 
-            CoachAvailability::updateOrCreate(
-                [
-                    'coach_id' => $coach->id,
-                    'date' => $d,
-                ],
-                [
-                    'status' => $targetStatus,
-                    'notes' => 'Updated via Coach Portal Bulk Edit.',
-                ]
-            );
+            if ($targetStatus === 'available') {
+                CoachAvailability::updateOrCreate(
+                    [
+                        'coach_id' => $coach->id,
+                        'date' => $d,
+                    ],
+                    [
+                        'status' => 'available',
+                        'notes' => 'Updated via Coach Portal Bulk Edit.',
+                    ]
+                );
+            } else {
+                CoachAvailability::where('coach_id', $coach->id)
+                    ->where('date', $d)
+                    ->delete();
+            }
             $updatedCount++;
         }
 

@@ -8,10 +8,6 @@
     <!-- Top Command Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-1">
         <div class="space-y-1">
-            <div class="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] uppercase tracking-wider border border-[#780000]/20">
-                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span>Instructor Field Station</span>
-            </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1D1D1F]">
                 <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#63a5c4] via-[#164B60] to-[#2e80a3]">Welcome back, {{ $coach->name }}!</span>
             </h1>
