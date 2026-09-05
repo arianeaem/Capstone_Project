@@ -22,7 +22,7 @@
 
             <!-- Section 1: Basic Information -->
             <div class="space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">1. Personal & Contact Details</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Personal & Contact Details</h3>
 
                 <div>
                     <label for="full_name" class="block font-bold text-[#1D1D1F] text-xs mb-2">
@@ -77,7 +77,7 @@
 
             <!-- Section 2: Certification & Credentials -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">2. Freediving Credentials & Expiry</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">2. Freediving Credentials & Expiry</h3>
 
                 <div>
                     <label for="certification_level" class="block font-bold text-[#1D1D1F] text-xs mb-2">
@@ -133,7 +133,7 @@
 
             <!-- Section 3: Status & Specialties -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">3. Status & Profile Notes</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Status & Profile Notes</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>

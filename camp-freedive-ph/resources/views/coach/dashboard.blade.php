@@ -27,42 +27,38 @@
         </div>
     </div>
 
-    <!-- Readiness & Performance KPIs -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        
-        <!-- Confirmed Upcoming Dives -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-1">
-            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Assigned Dives</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F]">{{ $upcomingConfirmedDivesCount }}</div>
-            <div class="text-[11px] text-[#6E6E73] font-medium pt-0.5">Upcoming confirmed batches</div>
-        </div>
-
-        <!-- Available Dates Offered -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-1">
-            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Available Dates</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-emerald-700">{{ $availableDaysCount }}</div>
-            <div class="text-[11px] text-emerald-700 font-semibold pt-0.5">Marked ready for matching</div>
-        </div>
-
-        <!-- Open Camp Slots -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-1">
-            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Open Camp Slots</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-amber-700">{{ $activeOpeningsCount }}</div>
-            <div class="text-[11px] text-[#6E6E73] font-medium pt-0.5">
-                <a href="{{ route('coach.requests.index') }}" class="text-[#780000] font-bold hover:underline inline-flex items-center gap-0.5">
-                    <span>Volunteer now</span>
-                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-                </a>
+    <!-- Readiness & Performance KPIs (Single Box with Vertical Line Dividers) -->
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+            
+            <!-- Confirmed Upcoming Dives -->
+            <div class="px-4 py-1">
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Assigned Dives</span>
+                <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $upcomingConfirmedDivesCount }}</div>
             </div>
-        </div>
 
-        <!-- Total Divers Mentored -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-1">
-            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Students Coached</span>
-            <div class="text-2xl sm:text-3xl font-extrabold text-[#780000]">{{ $totalStudentsMentored }}</div>
-            <div class="text-[11px] text-[#6E6E73] font-medium pt-0.5">Total diver alumni coached</div>
-        </div>
+            <!-- Available Dates Offered -->
+            <div class="relative px-4 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Available Dates</span>
+                <div class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-0.5">{{ $availableDaysCount }}</div>
+            </div>
 
+            <!-- Open Camp Slots -->
+            <div class="relative px-4 py-1">
+                <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Open Camp Slots</span>
+                <div class="text-2xl sm:text-3xl font-extrabold text-amber-700 mt-0.5">{{ $activeOpeningsCount }}</div>
+            </div>
+
+            <!-- Total Divers Mentored -->
+            <div class="relative px-4 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Students Coached</span>
+                <div class="text-2xl sm:text-3xl font-extrabold text-[#780000] mt-0.5">{{ $totalStudentsMentored }}</div>
+            </div>
+
+        </div>
     </div>
 
     <!-- Spotlight: Immediate Mission Card ("My Next Dive Session") -->

@@ -16,7 +16,6 @@
 
         <div class="flex items-center gap-2.5 flex-wrap">
             <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10h18M3 14h18M5 6h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path></svg>
                 <span>Pending Refunds</span>
                 @if(isset($stats['pending_refunds']) && $stats['pending_refunds'] > 0)
                     <span class="px-2 py-0.2 rounded-full text-xs font-bold bg-[#780000] text-white">
@@ -26,7 +25,6 @@
             </a>
 
             <a href="{{ route('admin.payments.create') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Record Payment</span>
             </a>
         </div>
@@ -140,7 +138,7 @@
                              @click.outside="openFilters = false" 
                              x-cloak 
                              class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                            <div class="flex items-center justify-between pb-2">
                                 <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Payments</h4>
                                 <a href="{{ route('admin.payments.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
                             </div>

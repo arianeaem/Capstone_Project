@@ -135,6 +135,7 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:owner,admin']
         Route::get('/coaches', [CoachRosterController::class, 'index'])->name('coaches.index');
         Route::get('/coaches/matching', [CoachMatchingController::class, 'matching'])->name('coaches.matching');
         Route::post('/coaches/matching/assign', [CoachMatchingController::class, 'assign'])->name('coaches.matching.assign');
+        Route::post('/coaches/matching/unassign', [CoachMatchingController::class, 'unassign'])->name('coaches.matching.unassign');
         Route::post('/coaches/matching/batch-assign', [CoachMatchingController::class, 'batchAssign'])->name('coaches.matching.batch_assign');
         Route::post('/coaches/matching/broadcast', [CoachMatchingController::class, 'broadcastOpening'])->name('coaches.matching.broadcast');
         Route::get('/coaches/requests', [CoachMatchingController::class, 'requests'])->name('coaches.requests');

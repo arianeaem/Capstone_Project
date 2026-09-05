@@ -20,6 +20,7 @@
 </head>
 <body class="min-h-full flex flex-col bg-[#FAFAFC] text-[#1D1D1F] antialiased text-sm overflow-x-hidden min-w-[320px]">
 
+    @unless(View::hasSection('hide_header'))
     <!-- Navigation Bar -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E5EA]">
         <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
@@ -44,6 +45,7 @@
             </div>
         </div>
     </header>
+    @endunless
 
     <!-- Flash Messages -->
     @if(session('success'))
@@ -63,6 +65,7 @@
         @yield('content')
     </main>
 
+    @unless(View::hasSection('hide_footer'))
     <!-- Footer -->
     <footer class="bg-[#1D1D1F] text-white pt-12 pb-10 border-t border-[#3A3A3C] mt-20 text-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -151,6 +154,7 @@
             </div>
         </div>
     </footer>
+    @endunless
 
     @stack('scripts')
 </body>

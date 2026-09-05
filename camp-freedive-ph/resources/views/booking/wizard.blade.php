@@ -2,6 +2,8 @@
 
 @section('title', 'Book Camp | Camp FreedivePH')
 @section('meta_description', 'Book a 2D1N freediving camp in Mabini, Batangas.')
+@section('hide_header', true)
+@section('hide_footer', true)
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 text-sm" 
@@ -14,6 +16,20 @@
          storeBookingUrl: '{{ route('booking.store') }}'
      })"
      x-init="initWizard()">
+
+    <!-- Minimal Clean Header for Booking Process -->
+    <div class="flex items-center justify-between pb-5 mb-6 sm:mb-8 border-b border-[#E5E5EA]">
+        <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
+            <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain bg-white">
+            <div>
+                <span class="font-extrabold text-base sm:text-lg tracking-tight text-[#1D1D1F] block leading-none">Camp Freedive<span class="text-[#780000]">PH</span></span>
+                <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>
+            </div>
+        </a>
+        <a href="{{ route('landing') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] flex items-center gap-1.5 transition-colors">
+            <span>← Exit to Home</span>
+        </a>
+    </div>
 
     <!-- Top Stepper Header -->
     <div class="mb-6 sm:mb-10">
@@ -164,21 +180,23 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- STEP 2: SELECT DATE (WITH APPLE HIG LOADING & FORECAST) -->
+        <!-- STEP 2: SELECT DATE (LEFT: CALENDAR & DEPART/RETURN | RIGHT: SAFETY EVALUATION) -->
         <!-- ========================================================================= -->
         <div x-show="currentStep === 2" x-cloak class="space-y-6">
+            
+            <!-- Step Header -->
             <div class="border-b border-[#E5E5EA] pb-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Dive Dates</h2>
-                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select your preferred weekend or trip dates for your Batangas freediving experience.</p>
+                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select your preferred 2D1N trip start date on the calendar. All freediving camps run for 2 consecutive days.</p>
                     </div>
 
                     <!-- Information Icon with Hover Notice -->
                     <div class="relative group inline-flex items-center self-start sm:self-center">
                         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-xs font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
                             <svg class="w-4 h-4 text-[#008E98] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                            <span>About  Forecast</span>
+                            <span>About Forecast</span>
                         </div>
 
                         <!-- Hover Popover Notice -->
@@ -195,155 +213,334 @@
                 </div>
             </div>
 
-            <!-- Date Picker Inputs -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">
-                        Trip Start Date (Day 1) <span class="text-[#780000]">*</span>
-                    </label>
-                    <input type="date" 
-                           x-model="form.start_date" 
-                           @change="onStartDateChange()"
-                           min="{{ date('Y-m-d', strtotime('+1 day')) }}"
-                           class="w-full px-4 py-3 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm font-medium text-[#1D1D1F] bg-white">
-                </div>
+            <!-- 2-COLUMN RESPONSIVE LAYOUT -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-                <div>
-                    <label class="block font-bold text-[#6E6E73] mb-1">
-                        Trip End Date (Day 2)
-                    </label>
-                    <input type="date" 
-                           x-model="form.end_date" 
-                           disabled 
-                           class="w-full px-4 py-3 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] text-sm font-medium text-[#6E6E73] cursor-not-allowed">
-                </div>
-            </div>
+                <!-- LEFT COLUMN: DEPART/RETURN CARD + INTERACTIVE CALENDAR (7 COLS) -->
+                <div class="lg:col-span-7 space-y-5">
 
-            <!-- Weather Safety Forecast Section -->
-            <div x-show="form.start_date && (weatherLoading || (forecast && !forecast.is_benchmark))" x-cloak class="pt-2 space-y-3">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-[#1D1D1F] text-sm">
-                        Dive Safety Evaluation:
-                    </span>
-                    <span x-show="weatherLoading" class="text-xs text-[#008E98] font-bold flex items-center gap-1.5">
-                        <svg class="animate-spin h-3.5 w-3.5 text-[#008E98]" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                        Evaluating Radar...
-                    </span>
-                </div>
-
-                <!-- 1. APPLE HIG DETERMINATE LOADING STATE & PLACEHOLDER SKELETON -->
-                <div x-show="weatherLoading" x-cloak class="rounded-2xl p-5 border border-[#E5E5EA] bg-[#FAFAFC] space-y-4 transition-all">
-                    <!-- Progress Bar & Status Text -->
-                    <div class="space-y-2">
-                        <div class="flex items-center justify-between text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="relative flex h-2.5 w-2.5">
-                                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#008E98] opacity-75"></span>
-                                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#008E98]"></span>
-                                </span>
-                                <span class="font-semibold text-[#1D1D1F]">Connecting to telemetry...</span>
+                    <!-- 1. DEPART / RETURN DUAL SELECTOR BOX (Image 1 Style) -->
+                    <div class="rounded-2xl border border-[#E5E5EA] bg-white p-4 sm:p-5 transition-all shadow-2xs">
+                        <div class="grid grid-cols-2 divide-x divide-[#E5E5EA]">
+                            
+                            <!-- Depart (Day 1) -->
+                            <div class="pr-3 sm:pr-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#6E6E73]">Depart</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#F8EAEA] text-[#780000]">Day 1</span>
+                                </div>
+                                <div class="mt-1.5">
+                                    <template x-if="form.start_date">
+                                        <div>
+                                            <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.start_date)"></div>
+                                            <div class="text-xs font-semibold text-[#780000] mt-0.5" x-text="formatDateDayOfWeek(form.start_date)"></div>
+                                        </div>
+                                    </template>
+                                    <template x-if="!form.start_date">
+                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                            Select start date below
+                                        </div>
+                                    </template>
+                                </div>
                             </div>
-                            <span class="font-mono font-bold text-[#008E98]" x-text="weatherProgress + '%'"></span>
-                        </div>
-                        <div class="w-full bg-[#E5E5EA] h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-gradient-to-r from-[#008E98] to-[#00C3D0] h-full transition-all duration-200 rounded-full"
-                                 :style="'width: ' + weatherProgress + '%'"></div>
+
+                            <!-- Return (Day 2) -->
+                            <div class="pl-3 sm:pl-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#6E6E73]">Return</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#008E98]">Day 2</span>
+                                </div>
+                                <div class="mt-1.5">
+                                    <template x-if="form.end_date">
+                                        <div>
+                                            <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.end_date)"></div>
+                                            <div class="text-xs font-semibold text-[#008E98] mt-0.5" x-text="formatDateDayOfWeek(form.end_date)"></div>
+                                        </div>
+                                    </template>
+                                    <template x-if="!form.end_date">
+                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                            Next day return
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
-                    <!-- Placeholder Skeleton Cards (HIG: Show layout structure immediately) -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                        <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] space-y-2.5 animate-pulse">
-                            <div class="flex justify-between items-center">
-                                <div class="h-3.5 w-14 bg-[#E5E5EA] rounded-full"></div>
-                                <div class="h-4 w-16 bg-[#E5E5EA] rounded-full"></div>
-                            </div>
-                            <div class="h-3 w-28 bg-[#F2F2F7] rounded"></div>
-                            <div class="h-3 w-36 bg-[#F2F2F7] rounded"></div>
-                            <div class="h-2.5 w-full bg-[#F2F2F7] rounded"></div>
-                        </div>
-                        <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] space-y-2.5 animate-pulse">
-                            <div class="flex justify-between items-center">
-                                <div class="h-3.5 w-14 bg-[#E5E5EA] rounded-full"></div>
-                                <div class="h-4 w-16 bg-[#E5E5EA] rounded-full"></div>
-                            </div>
-                            <div class="h-3 w-28 bg-[#F2F2F7] rounded"></div>
-                            <div class="h-3 w-36 bg-[#F2F2F7] rounded"></div>
-                            <div class="h-2.5 w-full bg-[#F2F2F7] rounded"></div>
-                        </div>
-                    </div>
-
-                    <!-- Rotating Marine Insight Tip (HIG: Informative wait-time engagement) -->
-                    <div class="p-3 rounded-xl bg-white border border-[#E5E5EA] flex items-center gap-2.5 text-xs text-[#6E6E73]">
-                        <span class="text-base shrink-0" x-text="currentTip.icon"></span>
-                        <div class="flex-1 min-w-0">
-                            <span class="font-bold text-[#1D1D1F]" x-text="currentTip.title + ': '"></span>
-                            <span x-text="currentTip.text"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. FORECAST RESULT CONTAINER (LIVE TELEMETRY ONLY, NOT BENCHMARK) -->
-                <template x-if="forecast && !weatherLoading && !forecast.is_benchmark">
-                    <div class="rounded-2xl p-5 sm:p-6 border transition-all space-y-4 shadow-2xs"
-                         :style="'background-color: ' + forecast.bg_color + '; border-color: ' + forecast.border_color + '; color: ' + forecast.text_color">
+                    <!-- 2. INTERACTIVE DUAL-MONTH CALENDAR (Clean & Borderless Image 2 Style) -->
+                    <div class="bg-white rounded-2xl p-5 sm:p-7 space-y-6">
                         
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <div>
-                                <h4 class="text-base sm:text-lg font-extrabold" x-text="forecast.title"></h4>
-                                <p class="text-xs sm:text-sm opacity-90" x-text="forecast.location"></p>
-                            </div>
-                        </div>
+                        <!-- Months Grid Container (2 Months on md+, 1 on mobile) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
+                            
+                            <!-- Month 1 (Left Month) -->
+                            <div class="space-y-4">
+                                <!-- Header for Month 1 with Prev Arrow -->
+                                <div class="flex items-center justify-between h-9">
+                                    <button type="button" 
+                                            @click="prevMonth()" 
+                                            :disabled="!canGoPrev()"
+                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] disabled:opacity-20 disabled:cursor-not-allowed transition-all text-[#1D1D1F] shrink-0"
+                                            title="Previous Month">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                                    </button>
 
-                        <p class="text-xs sm:text-sm leading-relaxed" x-text="forecast.description"></p>
+                                    <div class="font-extrabold text-sm sm:text-base text-[#1D1D1F] text-center flex-1">
+                                        <span x-text="getMonthName(month1Month) + ' ' + month1Year"></span>
+                                    </div>
 
-                        <!-- Day 1 & Day 2 Cards -->
-                        <template x-if="forecast.day1 && forecast.day2">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                                <!-- Day 1 Card -->
-                                <div class="p-3.5 rounded-xl bg-white/85 border border-black/10 space-y-1.5 text-xs text-[#1D1D1F]">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-extrabold text-[#780000] text-xs uppercase tracking-wider">Day 1</span>
-                                        <span class="font-bold px-2 py-0.5 rounded-full text-[11px]"
-                                              :class="{
-                                                  'bg-emerald-100 text-emerald-800': forecast.day1.classification === 'Very Safe' || forecast.day1.classification === 'Safe',
-                                                  'bg-amber-100 text-amber-800': forecast.day1.classification === 'Moderate',
-                                                  'bg-rose-100 text-rose-800': forecast.day1.classification === 'High Risk',
-                                                  'bg-red-100 text-red-800': forecast.day1.classification === 'Critical Risk'
-                                              }"
-                                              x-text="forecast.day1.classification"></span>
-                                    </div>
-                                    <div class="text-xs text-[#6E6E73] space-y-0.5">
-                                        <div class="font-bold text-[#1D1D1F]" x-text="forecast.day1.date"></div>
-                                        <div>Worst Hour: <span class="font-medium text-[#1D1D1F]" x-text="forecast.day1.worst_hour"></span></div>
-                                    </div>
-                                    <p class="text-xs opacity-90 leading-tight pt-0.5" x-text="forecast.day1.recommended_action"></p>
+                                    <!-- Spacer for balance on desktop, or next button on mobile -->
+                                    <div class="w-8 hidden md:block shrink-0"></div>
+                                    <button type="button" 
+                                            @click="nextMonth()" 
+                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] md:hidden shrink-0"
+                                            title="Next Month">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                    </button>
+                                </div>
+                                
+                                <!-- Weekday Headers (No borders) -->
+                                <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#6E6E73] py-1">
+                                    <span class="text-[#780000] font-bold">Sun</span>
+                                    <span>Mon</span>
+                                    <span>Tue</span>
+                                    <span>Wed</span>
+                                    <span>Thu</span>
+                                    <span>Fri</span>
+                                    <span>Sat</span>
                                 </div>
 
-                                <!-- Day 2 Card -->
-                                <div class="p-3.5 rounded-xl bg-white/85 border border-black/10 space-y-1.5 text-xs text-[#1D1D1F]">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-extrabold text-[#780000] text-xs uppercase tracking-wider">Day 2</span>
-                                        <span class="font-bold px-2 py-0.5 rounded-full text-[11px]"
-                                              :class="{
-                                                  'bg-emerald-100 text-emerald-800': forecast.day2.classification === 'Very Safe' || forecast.day2.classification === 'Safe',
-                                                  'bg-amber-100 text-amber-800': forecast.day2.classification === 'Moderate',
-                                                  'bg-rose-100 text-rose-800': forecast.day2.classification === 'High Risk',
-                                                  'bg-red-100 text-red-800': forecast.day2.classification === 'Critical Risk'
-                                              }"
-                                              x-text="forecast.day2.classification"></span>
+                                <!-- Days Grid (No borders) -->
+                                <div class="grid grid-cols-7 gap-y-2 text-center text-xs sm:text-sm">
+                                    <template x-for="(dObj, idx) in getMonthDays(month1Year, month1Month)" :key="'m1-' + idx">
+                                        <div class="h-9 flex items-center justify-center relative">
+                                            <template x-if="dObj.isBlank">
+                                                <span class="w-full h-full"></span>
+                                            </template>
+                                            <template x-if="!dObj.isBlank">
+                                                <button type="button"
+                                                        @click="!dObj.isDisabled && selectDate(dObj.dateStr)"
+                                                        :disabled="dObj.isDisabled"
+                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
+                                                        :class="{
+                                                            'bg-[#780000] text-white font-bold shadow-sm ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
+                                                            'bg-[#008E98] text-white font-bold shadow-sm ring-2 ring-[#008E98]/20': dObj.dateStr === form.end_date,
+                                                            'text-gray-300 cursor-not-allowed': dObj.isDisabled,
+                                                            'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
+                                                            'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
+                                                        }"
+                                                        x-text="dObj.day">
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Month 2 (Right Month) -->
+                            <div class="space-y-4">
+                                <!-- Header for Month 2 with Next Arrow -->
+                                <div class="flex items-center justify-between h-9">
+                                    <div class="w-8 hidden md:block shrink-0"></div>
+
+                                    <div class="font-extrabold text-sm sm:text-base text-[#1D1D1F] text-center flex-1">
+                                        <span x-text="getMonthName(month2Month) + ' ' + month2Year"></span>
                                     </div>
-                                    <div class="text-xs text-[#6E6E73] space-y-0.5">
-                                        <div class="font-bold text-[#1D1D1F]" x-text="forecast.day2.date"></div>
-                                        <div>Worst Hour: <span class="font-medium text-[#1D1D1F]" x-text="forecast.day2.worst_hour"></span></div>
+
+                                    <button type="button" 
+                                            @click="nextMonth()" 
+                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] hidden md:flex shrink-0"
+                                            title="Next Month">
+                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                    </button>
+                                </div>
+                                
+                                <!-- Weekday Headers (No borders) -->
+                                <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#6E6E73] py-1">
+                                    <span class="text-[#780000] font-bold">Sun</span>
+                                    <span>Mon</span>
+                                    <span>Tue</span>
+                                    <span>Wed</span>
+                                    <span>Thu</span>
+                                    <span>Fri</span>
+                                    <span>Sat</span>
+                                </div>
+
+                                <!-- Days Grid (No borders) -->
+                                <div class="grid grid-cols-7 gap-y-2 text-center text-xs sm:text-sm">
+                                    <template x-for="(dObj, idx) in getMonthDays(month2Year, month2Month)" :key="'m2-' + idx">
+                                        <div class="h-9 flex items-center justify-center relative">
+                                            <template x-if="dObj.isBlank">
+                                                <span class="w-full h-full"></span>
+                                            </template>
+                                            <template x-if="!dObj.isBlank">
+                                                <button type="button"
+                                                        @click="!dObj.isDisabled && selectDate(dObj.dateStr)"
+                                                        :disabled="dObj.isDisabled"
+                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
+                                                        :class="{
+                                                            'bg-[#780000] text-white font-bold shadow-sm ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
+                                                            'bg-[#008E98] text-white font-bold shadow-sm ring-2 ring-[#008E98]/20': dObj.dateStr === form.end_date,
+                                                            'text-gray-300 cursor-not-allowed': dObj.isDisabled,
+                                                            'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
+                                                            'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
+                                                        }"
+                                                        x-text="dObj.day">
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- RIGHT COLUMN: DIVE SAFETY EVALUATION (5 COLS, STICKY) -->
+                <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-8">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+                        
+                        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#008E98] animate-pulse"></span>
+                                <h3 class="font-black text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
+                            </div>
+                            
+                            <template x-if="weatherLoading">
+                                <span class="text-xs text-[#008E98] font-bold flex items-center gap-1">
+                                    <svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                    Checking...
+                                </span>
+                            </template>
+                        </div>
+
+                        <!-- 1. EMPTY STATE (When no date selected yet) -->
+                        <template x-if="!form.start_date && !weatherLoading">
+                            <div class="py-8 px-4 text-center space-y-4">
+                                <div class="w-12 h-12 rounded-2xl bg-[#EBF7F8] text-[#008E98] flex items-center justify-center mx-auto shadow-2xs">
+                                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M2 12a10 10 0 0 1 18-6M2 12a10 10 0 0 0 18 6"/><path d="M12 2v20"/></svg>
+                                </div>
+                                <div class="space-y-1 max-w-xs mx-auto">
+                                    <h4 class="font-extrabold text-sm text-[#1D1D1F]">Select Dates to View Safety</h4>
+                                    <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                        Pick your departure date on the calendar to see real-time coastal wave heights, ocean currents, and wind safety for Mabini, Batangas.
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-2 gap-2 pt-2 text-[11px] font-semibold text-[#6E6E73] text-left">
+                                    <div class="p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center gap-2">
+                                        <span class="text-base">🌊</span>
+                                        <span>Wave Heights</span>
                                     </div>
-                                    <p class="text-xs opacity-90 leading-tight pt-0.5" x-text="forecast.day2.recommended_action"></p>
+                                    <div class="p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center gap-2">
+                                        <span class="text-base">💨</span>
+                                        <span>Wind Speeds</span>
+                                    </div>
                                 </div>
                             </div>
                         </template>
 
+                        <!-- 2. LOADING PROGRESS STATE -->
+                        <div x-show="weatherLoading" x-cloak class="space-y-4 py-2">
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between text-xs">
+                                    <span class="font-semibold text-[#1D1D1F]">Checking weather & marine conditions...</span>
+                                    <span class="font-mono font-bold text-[#008E98]" x-text="weatherProgress + '%'"></span>
+                                </div>
+                                <div class="w-full bg-[#E5E5EA] h-1.5 rounded-full overflow-hidden">
+                                    <div class="bg-gradient-to-r from-[#008E98] to-[#00C3D0] h-full transition-all duration-200 rounded-full"
+                                         :style="'width: ' + weatherProgress + '%'"></div>
+                                </div>
+                            </div>
+
+                            <!-- Placeholder Skeleton Cards -->
+                            <div class="space-y-2.5 pt-1 animate-pulse">
+                                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2">
+                                    <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
+                                    <div class="h-3 w-40 bg-[#F2F2F7] rounded"></div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2">
+                                    <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
+                                    <div class="h-3 w-40 bg-[#F2F2F7] rounded"></div>
+                                </div>
+                            </div>
+
+                            <!-- Rotating Tip -->
+                            <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center gap-2.5 text-xs text-[#6E6E73]">
+                                <div class="flex-1 min-w-0">
+                                    <span class="font-bold text-[#1D1D1F]" x-text="currentTip.title + ': '"></span>
+                                    <span x-text="currentTip.text"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. FORECAST RESULT CARD -->
+                        <template x-if="forecast && !weatherLoading && !forecast.is_benchmark">
+                            <div class="space-y-4">
+                                <!-- Overall Banner -->
+                                <div class="rounded-xl p-4 border transition-all space-y-2 shadow-2xs"
+                                     :style="'background-color: ' + forecast.bg_color + '; border-color: ' + forecast.border_color + '; color: ' + forecast.text_color">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-extrabold text-sm sm:text-base" x-text="forecast.title"></h4>
+                                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-white/60" x-text="forecast.classification"></span>
+                                    </div>
+                                    <p class="text-xs leading-relaxed opacity-90" x-text="forecast.description"></p>
+                                </div>
+
+                                <!-- Day 1 & Day 2 Breakdown -->
+                                <template x-if="forecast.day1 && forecast.day2">
+                                    <div class="space-y-2.5">
+                                        <!-- Day 1 -->
+                                        <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1 text-xs">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-extrabold text-[#780000] text-xs uppercase tracking-wider">Day 1</span>
+                                                <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"
+                                                      :class="{
+                                                          'bg-emerald-100 text-emerald-800': forecast.day1.classification === 'Very Safe' || forecast.day1.classification === 'Safe',
+                                                          'bg-amber-100 text-amber-800': forecast.day1.classification === 'Moderate',
+                                                          'bg-rose-100 text-rose-800': forecast.day1.classification === 'High Risk',
+                                                          'bg-red-100 text-red-800': forecast.day1.classification === 'Critical Risk'
+                                                      }"
+                                                      x-text="forecast.day1.classification"></span>
+                                            </div>
+                                            <div class="text-[#6E6E73] text-[11px] flex items-center justify-between">
+                                                <span class="font-bold text-[#1D1D1F]" x-text="forecast.day1.date"></span>
+                                                <span>Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day1.worst_hour"></strong></span>
+                                            </div>
+                                            <p class="text-[11px] text-[#6E6E73] pt-0.5" x-text="forecast.day1.recommended_action"></p>
+                                        </div>
+
+                                        <!-- Day 2 -->
+                                        <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1 text-xs">
+                                            <div class="flex items-center justify-between">
+                                                <span class="font-extrabold text-[#008E98] text-xs uppercase tracking-wider">Day 2</span>
+                                                <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"
+                                                      :class="{
+                                                          'bg-emerald-100 text-emerald-800': forecast.day2.classification === 'Very Safe' || forecast.day2.classification === 'Safe',
+                                                          'bg-amber-100 text-amber-800': forecast.day2.classification === 'Moderate',
+                                                          'bg-rose-100 text-rose-800': forecast.day2.classification === 'High Risk',
+                                                          'bg-red-100 text-red-800': forecast.day2.classification === 'Critical Risk'
+                                                      }"
+                                                      x-text="forecast.day2.classification"></span>
+                                            </div>
+                                            <div class="text-[#6E6E73] text-[11px] flex items-center justify-between">
+                                                <span class="font-bold text-[#1D1D1F]" x-text="forecast.day2.date"></span>
+                                                <span>Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day2.worst_hour"></strong></span>
+                                            </div>
+                                            <p class="text-[11px] text-[#6E6E73] pt-0.5" x-text="forecast.day2.recommended_action"></p>
+                                        </div>
+                                    </div>
+                                </template>
+
+                            </div>
+                        </template>
+
                     </div>
-                </template>
+                </div>
+
             </div>
         </div>
 
@@ -360,7 +557,7 @@
 
                     <!-- SECTION 1: PARTICIPANTS -->
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                        <div class="flex items-center justify-between pb-2">
                             <h3 class="text-base font-bold text-[#1D1D1F]">1. Participants</h3>
                             <button type="button" 
                                     @click="addParticipant()" 
@@ -456,7 +653,7 @@
 
                     <!-- SECTION 2: CONTACT DETAILS (FIRST NAME & LAST NAME SEPARATE) -->
                     <div class="space-y-4 pt-2">
-                        <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">2. Contact Information</h3>
+                        <h3 class="text-base font-bold text-[#1D1D1F] pb-2">2. Contact Information</h3>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
@@ -520,7 +717,7 @@
 
                     <!-- SECTION 3: ADD-ONS & TRANSPORTATION -->
                     <div class="space-y-4 pt-2">
-                        <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">3. Transportation & Add-ons</h3>
+                        <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h3>
                         
                         <div class="space-y-3">
                             <label class="block font-bold text-[#1D1D1F] text-xs">Transportation Option:</label>
@@ -554,12 +751,18 @@
 
                             <!-- Pickup Hub Selection with Times -->
                             <div x-show="form.pickup_option === 'carpool'" x-cloak class="pt-1">
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Carpool Pickup Hub & Schedule:</label>
-                                <select x-model="form.pickup_location" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Carpool Pickup Hub & Schedule: <span class="text-[#780000]">*</span></label>
+                                <select x-model="form.pickup_location" 
+                                        class="w-full px-3.5 py-2.5 rounded-xl border text-xs text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer"
+                                        :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                    <option value="" disabled selected>-- Select Carpool Pickup Hub & Schedule --</option>
                                     <template x-for="p in pickupPoints" :key="p.id">
                                         <option :value="p.name" x-text="p.name"></option>
                                     </template>
                                 </select>
+                                <span x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                    Please select your preferred Carpool Pickup Hub to continue.
+                                </span>
                             </div>
                         </div>
 
@@ -596,11 +799,11 @@
 
                 </div>
 
-                <!-- RIGHT COLUMN: Live Booking Summary & Policy (5 Columns, Sticky) -->
+                <!-- RIGHT COLUMN: Live Booking Summary (5 Columns, Sticky) -->
                 <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-6">
                     
                     <!-- Itemized Invoice Card -->
-                    <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden">
+                    <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden shadow-2xs">
                         <div class="bg-[#FAFAFC] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F] text-sm">Booking Summary</span>
                             <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize" x-text="form.class_type"></span>
@@ -671,39 +874,6 @@
                         </div>
                     </div>
 
-                    <!-- Cancellation Policy Card -->
-                    <div class="p-4 rounded-2xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2.5">
-                        <h4 class="font-bold text-[#780000] text-xs">
-                            Cancellation & Reschedule Policy
-                        </h4>
-                        <div class="space-y-2 text-[11px] text-[#6E6E73]">
-                            <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                                <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
-                                    <span>Notice Given More than 2 Weeks (> 14 Days)</span>
-                                </div>
-                                <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
-                                    Eligible for 100% full downpayment refund or 1 free date reschedule to any future open schedule.
-                                </p>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                                <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
-                                    <span>Notice Given 7 to 14 Days Before Trip</span>
-                                </div>
-                                <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
-                                    Free date reschedule allowed to another available schedule. Downpayment is non-refundable.
-                                </p>
-                            </div>
-                            <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                                <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
-                                    <span>Notice Given Less than 7 Days (Locked Window)</span>
-                                </div>
-                                <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
-                                    Slot is strictly locked with resort/boat allocations. Non-refundable and cannot be rescheduled.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>
@@ -729,10 +899,6 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#F8EAEA] text-[#780000] text-[11px] font-bold uppercase tracking-wider">
-                        Official Payment Gateway
-                    </div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">4. Secure Downpayment</h2>
                     <p class="text-xs sm:text-sm text-[#6E6E73]">
                         Pay your required reservation downpayment via PayMongo's secure hosted checkout page. The remaining balance will be settled at camp.
                     </p>
@@ -766,9 +932,6 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                         <!-- QR Ph -->
                         <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-black text-xs shrink-0 border border-emerald-200">
-                                QR
-                            </div>
                             <div>
                                 <span class="font-bold text-xs text-[#1D1D1F] block">QR Ph</span>
                                 <span class="text-[10px] text-[#6E6E73] block">Any PH Bank / App</span>
@@ -777,9 +940,6 @@
 
                         <!-- GCash -->
                         <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#007DFE] flex items-center justify-center font-black text-xs shrink-0 border border-blue-200">
-                                G
-                            </div>
                             <div>
                                 <span class="font-bold text-xs text-[#1D1D1F] block">GCash</span>
                                 <span class="text-[10px] text-[#6E6E73] block">Direct E-Wallet</span>
@@ -788,9 +948,6 @@
 
                         <!-- Maya -->
                         <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-[#00D665] flex items-center justify-center font-black text-xs shrink-0 border border-emerald-200">
-                                M
-                            </div>
                             <div>
                                 <span class="font-bold text-xs text-[#1D1D1F] block">Maya</span>
                                 <span class="text-[10px] text-[#6E6E73] block">Direct E-Wallet</span>
@@ -803,6 +960,39 @@
                     </p>
                 </div>
 
+                <!-- Cancellation & Reschedule Policy Card (Moved to Step 4) -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2.5">
+                    <h4 class="font-bold text-[#780000] text-xs">
+                        Cancellation & Reschedule Policy
+                    </h4>
+                    <div class="space-y-2 text-[11px] text-[#6E6E73]">
+                        <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
+                            <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
+                                <span>Notice Given More than 2 Weeks (> 14 Days)</span>
+                            </div>
+                            <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
+                                Eligible for 100% full downpayment refund or 1 free date reschedule to any future open schedule.
+                            </p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
+                            <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
+                                <span>Notice Given 7 to 14 Days Before Trip</span>
+                            </div>
+                            <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
+                                Free date reschedule allowed to another available schedule. Downpayment is non-refundable.
+                            </p>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
+                            <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
+                                <span>Notice Given Less than 7 Days (Locked Window)</span>
+                            </div>
+                            <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
+                                Slot is strictly locked with resort/boat allocations. Non-refundable and cannot be rescheduled.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Hosted Checkout Action Button -->
                 <div class="space-y-3 pt-2">
                     <button type="button" 
@@ -811,7 +1001,6 @@
                             class="w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-[#780000] hover:bg-[#5E0000] active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
                         <span x-show="!submittingPayment" class="flex items-center gap-2">
                             <span>Proceed to PayMongo Hosted Checkout</span>
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                         </span>
                         <span x-show="submittingPayment" class="flex items-center gap-2">
                             <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
@@ -984,10 +1173,10 @@ function bookingWizard(config) {
             contact_last_name: '',
             contact_name: '',
             contact_email: '',
-            contact_phone: '',
+contact_phone: '',
             contact_facebook: '',
             pickup_option: 'carpool',
-            pickup_location: config.pickupPoints[0] ? config.pickupPoints[0].name : '',
+            pickup_location: '',
             boat_dive: false,
             confirmation_ack: false,
             payment_method: 'paymongo'
@@ -1002,7 +1191,7 @@ function bookingWizard(config) {
         weatherTips: [
             {title: 'Marine Safety', text: 'Mabini coastal waters feature sheltered coves ideal for beginner and advanced freediving.' },
             {title: 'Freediving Tip', text: 'Equalization is key: always equalize early and frequently before feeling ear pressure.' },
-            {title: 'Weather Telemetry', text: 'Open-Meteo evaluates wave height (<1.0m is ideal), surface currents, and gust velocity.' },
+            {title: 'Marine Conditions', text: 'Our forecast monitors wave height (<1.0m is ideal), ocean currents, and wind speed.' },
             {title: 'Sanctuary Dives', text: 'Camp FreedivePH operates in Mabini Marine Protected Areas with clear year-round visibility.' },
             {title: 'Carpool Hubs', text: 'Weekend carpool vans depart Manila hubs at 2:30 AM – 3:30 AM directly to camp resort.' }
         ],
@@ -1023,6 +1212,105 @@ function bookingWizard(config) {
         },
         copied: false,
         draftRestored: false,
+
+        // Dual Calendar State & Helpers
+        calendarYear: new Date().getFullYear(),
+        calendarMonth: new Date().getMonth(),
+
+        get month1Year() {
+            return this.calendarYear;
+        },
+        get month1Month() {
+            return this.calendarMonth;
+        },
+        get month2Year() {
+            return (this.calendarMonth === 11) ? this.calendarYear + 1 : this.calendarYear;
+        },
+        get month2Month() {
+            return (this.calendarMonth + 1) % 12;
+        },
+
+        getMonthName(mIndex) {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            return months[mIndex] || '';
+        },
+
+        formatDateDisplay(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const d = parts[2].padStart(2, '0');
+            const m = months[parseInt(parts[1], 10) - 1] || '';
+            const y = parts[0];
+            return `${d} ${m} ${y}`;
+        },
+
+        formatDateDayOfWeek(dateStr) {
+            if (!dateStr) return '';
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return '';
+            const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            return days[date.getDay()] || '';
+        },
+
+        canGoPrev() {
+            const now = new Date();
+            const curY = now.getFullYear();
+            const curM = now.getMonth();
+            return (this.calendarYear > curY) || (this.calendarYear === curY && this.calendarMonth > curM);
+        },
+
+        prevMonth() {
+            if (!this.canGoPrev()) return;
+            if (this.calendarMonth === 0) {
+                this.calendarMonth = 11;
+                this.calendarYear--;
+            } else {
+                this.calendarMonth--;
+            }
+        },
+
+        nextMonth() {
+            if (this.calendarMonth === 11) {
+                this.calendarMonth = 0;
+                this.calendarYear++;
+            } else {
+                this.calendarMonth++;
+            }
+        },
+
+        getMonthDays(year, month) {
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const now = new Date();
+            const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+            
+            const days = [];
+            for (let b = 0; b < firstDayIndex; b++) {
+                days.push({ isBlank: true });
+            }
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const dayOfWeek = new Date(year, month, d).getDay();
+                const isDisabled = dateStr < todayStr;
+                const isSunday = (dayOfWeek === 0);
+                days.push({
+                    day: d,
+                    dateStr: dateStr,
+                    isBlank: false,
+                    isDisabled: isDisabled,
+                    isSunday: isSunday
+                });
+            }
+            return days;
+        },
+
+        selectDate(dateStr) {
+            this.form.start_date = dateStr;
+            this.onStartDateChange();
+        },
 
         initWizard() {
             this.loadDraft();
@@ -1098,6 +1386,11 @@ function bookingWizard(config) {
                         }
 
                         if (this.form.start_date) {
+                            const p = this.form.start_date.split('-');
+                            if (p.length === 3) {
+                                this.calendarYear = parseInt(p[0], 10);
+                                this.calendarMonth = parseInt(p[1], 10) - 1;
+                            }
                             this.onStartDateChange();
                         }
 
@@ -1141,7 +1434,7 @@ function bookingWizard(config) {
                 contact_phone: '',
                 contact_facebook: '',
                 pickup_option: 'carpool',
-                pickup_location: config.pickupPoints[0] ? config.pickupPoints[0].name : '',
+                pickup_location: '',
                 boat_dive: false,
                 confirmation_ack: false,
                 payment_method: 'paymongo'
@@ -1160,10 +1453,16 @@ function bookingWizard(config) {
                 this.pricingQuote = null;
                 return;
             }
-            const start = new Date(this.form.start_date);
-            const end = new Date(start);
-            end.setDate(start.getDate() + 1);
-            this.form.end_date = end.toISOString().split('T')[0];
+            const parts = this.form.start_date.split('-');
+            if (parts.length === 3) {
+                const start = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                const end = new Date(start);
+                end.setDate(start.getDate() + 1);
+                const ey = end.getFullYear();
+                const em = String(end.getMonth() + 1).padStart(2, '0');
+                const ed = String(end.getDate()).padStart(2, '0');
+                this.form.end_date = `${ey}-${em}-${ed}`;
+            }
             this.fetchWeather();
             this.fetchPricingQuote();
         },
@@ -1348,7 +1647,7 @@ function bookingWizard(config) {
                     return;
                 }
                 if (this.weatherLoading) {
-                    this.errorMessage = "Please wait while we evaluate the marine telemetry & weather safety for your dates.";
+                    this.errorMessage = "Please wait while we evaluate the weather & marine safety for your dates.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
@@ -1409,6 +1708,11 @@ function bookingWizard(config) {
                 }
                 if (!this.validatePhone(this.form.contact_phone)) {
                     this.errorMessage = "Please enter a valid 11-digit Philippine Mobile Number (e.g. 09171234567 or +639171234567).";
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+                if (this.form.pickup_option === 'carpool' && !this.form.pickup_location) {
+                    this.errorMessage = "Please select your preferred Carpool Pickup Hub & Schedule to continue.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }

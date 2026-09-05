@@ -244,7 +244,7 @@
                     </button>
                 </div>
 
-                <!-- 8-Variable Comprehensive Telemetry Table -->
+                <!-- 8-Variable Comprehensive Weather & Marine Forecast Table -->
                 <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
@@ -309,8 +309,8 @@
             @else
             <div class="pt-3">
                 <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
-                    <span class="font-bold text-[#1D1D1F] block">Hourly Telemetry Not Yet Available</span>
-                    <span>High-resolution marine model telemetry unlocks 16 days prior to the dive date (unlocks on {{ $batch->start_date->copy()->subDays(16)->format('M d, Y') }}).</span>
+                    <span class="font-bold text-[#1D1D1F] block">Detailed Hourly Forecast Not Yet Available</span>
+                    <span>Detailed hourly marine & weather forecasts become available 16 days prior to the dive date (available on {{ $batch->start_date->copy()->subDays(16)->format('M d, Y') }}).</span>
                 </div>
             </div>
             @endif
@@ -394,7 +394,7 @@
                     </button>
                 </div>
 
-                <!-- 8-Variable Comprehensive Telemetry Table -->
+                <!-- 8-Variable Comprehensive Weather & Marine Forecast Table -->
                 <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
@@ -459,8 +459,8 @@
             @else
             <div class="pt-3">
                 <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
-                    <span class="font-bold text-[#1D1D1F] block">Hourly Telemetry Not Yet Available</span>
-                    <span>High-resolution marine model telemetry unlocks 16 days prior to the dive date (unlocks on {{ ($batch->end_date ?? $batch->start_date->copy()->addDay())->copy()->subDays(16)->format('M d, Y') }}).</span>
+                    <span class="font-bold text-[#1D1D1F] block">Detailed Hourly Forecast Not Yet Available</span>
+                    <span>Detailed hourly marine & weather forecasts become available 16 days prior to the dive date (available on {{ ($batch->end_date ?? $batch->start_date->copy()->addDay())->copy()->subDays(16)->format('M d, Y') }}).</span>
                 </div>
             </div>
             @endif

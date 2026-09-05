@@ -104,7 +104,7 @@
                          x-cloak 
                          @click.outside="openFilters = false" 
                          class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-[#E5E5EA] p-4 z-30 space-y-3">
-                        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                        <div class="flex items-center justify-between pb-2">
                             <h4 class="font-bold text-xs text-[#1D1D1F]">Filter & Sort Batches</h4>
                             <a href="{{ route('admin.batches.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
                         </div>

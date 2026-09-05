@@ -84,7 +84,7 @@
                     </div>
                 </div>
 
-                <!-- Weather Telemetry Context (Read-Only) -->
+                <!-- Weather & Marine Conditions Context (Read-Only) -->
                 @if($assessment)
                 <div class="px-6 py-3 bg-[#F2F2F7]/50 border-b border-[#E5E5EA] flex flex-wrap items-center justify-between gap-3 text-xs text-[#6E6E73]">
                     <div class="flex items-center gap-4">

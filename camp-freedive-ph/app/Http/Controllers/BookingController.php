@@ -136,11 +136,12 @@ class BookingController extends Controller
             'contact_phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
             'contact_facebook' => 'nullable|string|max:255',
             'pickup_option' => 'required|string|in:carpool,own',
-            'pickup_location' => 'nullable|string|max:255',
+            'pickup_location' => 'required_if:pickup_option,carpool|nullable|string|max:255',
             'boat_dive' => 'nullable|boolean',
             'confirmation_ack' => 'nullable|boolean',
             'payment_method' => 'nullable|string',
         ], [
+            'pickup_location.required_if' => 'Please select a carpool pickup location.',
             'contact_phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
         ]);
 

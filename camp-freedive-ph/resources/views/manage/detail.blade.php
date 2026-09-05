@@ -17,7 +17,7 @@
     <!-- Top Navigation / Breadcrumb -->
     <div class="flex items-center justify-between mb-6">
         <a href="{{ route('manage.index') }}" class="text-xs sm:text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5">
-            ← Switch Booking
+            ← Switch to another bookings
         </a>
         <div class="text-xs sm:text-sm text-[#8E8E93]">
             Booking Created: {{ $booking->created_at->format('M d, Y') }}
@@ -30,7 +30,7 @@
         <div class="space-y-1">
             <div class="flex items-center gap-2 font-bold text-sm sm:text-base text-amber-900">
                 <svg class="w-5 h-5 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                <span>Downpayment Required — Unconfirmed Reservation</span>
+                <span>Downpayment Required</span>
             </div>
             <p class="text-xs text-amber-800 leading-relaxed">
                 Your reservation has not gone through the system yet because the required reservation downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is unpaid. Please complete your payment via PayMongo to confirm your slots.
@@ -39,7 +39,7 @@
         <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST" class="shrink-0">
             @csrf
             <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#780000] text-white font-bold text-xs hover:bg-[#5a0000] transition-colors shadow-2xs cursor-pointer">
-                Pay Downpayment via PayMongo
+                Pay Downpayment
             </button>
         </form>
     </div>
@@ -193,7 +193,7 @@
                     <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
                         <span class="text-xs text-[#6E6E73] block mb-1">Boat Dive:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
-                            {{ $booking->boat_dive ? 'Included (+₱600 / person)' : 'Shore Entry Dive' }}
+                            {{ $booking->boat_dive ? 'Included (+₱600 / person)' : 'Not Included' }}
                         </strong>
                         <span class="text-xs text-[#6E6E73] block mt-1">Mabini LGU pass included</span>
                     </div>
@@ -257,7 +257,7 @@
                     <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn-primary w-full py-2.5 text-xs font-bold shadow-2xs cursor-pointer">
-                            Pay ₱{{ number_format($booking->downpayment_amount, 2) }} via PayMongo
+                            Pay ₱{{ number_format($booking->downpayment_amount, 2) }}
                         </button>
                     </form>
                 </div>

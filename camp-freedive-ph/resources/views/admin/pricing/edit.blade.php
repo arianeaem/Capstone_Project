@@ -251,17 +251,6 @@
             </div>
         </div>
 
-        <!-- Card 4: Plain-Language Live Preview Card -->
-        <div class="rounded-xl p-4 border border-[#780000]/20 bg-[#F8EAEA] space-y-1.5">
-            <div class="flex items-center gap-2 text-[#780000] font-extrabold text-xs uppercase tracking-wider">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-                <span>Live Rule Plain-Language Preview</span>
-            </div>
-            <p class="text-xs font-semibold text-[#1D1D1F] leading-relaxed" x-text="previewText"></p>
-            <div class="text-[11px] text-[#6E6E73]">
-                * Stacking safety cap: Total price adjustments across all active rules are automatically clamped within ±30% of base class rate.
-            </div>
-        </div>
 
         <!-- Submit Button -->
         <div class="flex items-center justify-end gap-2 pt-2">

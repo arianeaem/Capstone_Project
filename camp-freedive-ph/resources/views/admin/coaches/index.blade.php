@@ -18,7 +18,6 @@
             <!-- Shortcut 1: Matching Queue -->
             <a href="{{ route('admin.coaches.matching') }}" 
                class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-2xs">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 <span>Students Needing Coach</span>
                 @if($unassignedStudentsCount > 0)
                     <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-white text-[#780000]">
@@ -30,7 +29,6 @@
             <!-- Shortcut 2: Coach Requests -->
             <a href="{{ route('admin.coaches.requests') }}" 
                class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <span>Coach Requests</span>
             </a>
         </div>
@@ -98,7 +96,7 @@
                          @click.outside="openFilters = false" 
                          x-cloak 
                          class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                        <div class="flex items-center justify-between pb-2">
                             <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Coaches</h4>
                             <a href="{{ route('admin.coaches.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
                         </div>

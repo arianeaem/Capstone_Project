@@ -30,7 +30,7 @@
 
         <!-- SECTION 1: PACKAGE & DATES -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-            <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">1. Class Package & Dive Dates</h3>
+            <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Class Package & Dive Dates</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Class Package -->
@@ -89,7 +89,7 @@
 
         <!-- SECTION 2: PARTICIPANTS (RA 10173 COMPLIANT) -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+            <div class="flex items-center justify-between pb-2">
                 <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants</h3>
                 <span class="text-xs text-[#6E6E73]">Data Privacy Act (RA 10173) Protected</span>
             </div>
@@ -146,7 +146,7 @@
 
         <!-- SECTION 3: CONTACT & ADD-ONS -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-            <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">3. Primary Contact & Transportation</h3>
+            <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Primary Contact & Transportation</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
@@ -194,7 +194,7 @@
 
         <!-- SECTION 4: OFFLINE PAYMENT RECORDING -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
-            <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">4. Payment Recording (Offline Reception)</h3>
+            <h3 class="text-base font-bold text-[#1D1D1F] pb-2">4. Payment Recording (Offline Reception)</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>

@@ -18,8 +18,7 @@
             <button type="button" 
                     @click="openAddModal = true"
                     class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Provision New Account</span>
+                <span>New Account</span>
             </button>
         </div>
     </div>
@@ -127,7 +126,7 @@
                              @click.outside="openFilters = false" 
                              x-cloak 
                              class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                            <div class="flex items-center justify-between pb-2">
                                 <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Staff</h4>
                                 <a href="{{ route('admin.users.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
                             </div>

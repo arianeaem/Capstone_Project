@@ -67,7 +67,7 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $response = $this->get('/admin/coaches/matching');
         $response->assertStatus(200);
-        $response->assertSee('Students Needing a Coach');
+        $response->assertSee('Batch Coach Assignment');
     }
 
     public function test_admin_can_assign_students_to_available_coach(): void
@@ -278,6 +278,45 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $this->assertDatabaseHas('audit_logs', [
             'action' => 'BATCH_COACH_ASSIGNMENT_EXCEPTION',
+        ]);
+    }
+
+    public function test_admin_can_assign_coaches_to_batch_and_unassign_coach(): void
+    {
+        $admin = User::where('email', 'admin@campfreedive.ph')->first();
+        $this->actingAs($admin);
+
+        $batch = Batch::where('batch_code', 'Batch 2')->first();
+        $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
+
+        // 1. Assign coach to batch directly (1-click or multi-coach)
+        $response = $this->post('/admin/coaches/matching/assign', [
+            'batch_id' => $batch->id,
+            'coach_id' => $coachMary->id,
+        ]);
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('participant_assignments', [
+            'batch_id' => $batch->id,
+            'coach_id' => $coachMary->id,
+            'status' => 'assigned',
+        ]);
+
+        // 2. Unassign coach from batch
+        $responseUnassign = $this->post('/admin/coaches/matching/unassign', [
+            'batch_id' => $batch->id,
+            'coach_id' => $coachMary->id,
+        ]);
+
+        $responseUnassign->assertRedirect();
+        $responseUnassign->assertSessionHas('success');
+
+        $this->assertDatabaseMissing('participant_assignments', [
+            'batch_id' => $batch->id,
+            'coach_id' => $coachMary->id,
+            'status' => 'assigned',
         ]);
     }
 }

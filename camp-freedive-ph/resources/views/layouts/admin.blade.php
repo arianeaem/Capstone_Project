@@ -64,30 +64,27 @@
         <aside class="hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-white border-r border-[#E5E5EA] z-30 transition-all duration-300"
                :class="sidebarCollapsed ? 'md:w-20' : 'md:w-64'">
             
-            <!-- Top: User First & Last Name / Profile Info (No bottom border) -->
-            <div class="h-16 flex items-center bg-white transition-all overflow-hidden"
+            <!-- Top: Brand Logo & Company Name (Aligned with Header h-14) -->
+            <div class="h-14 flex items-center bg-white border-b border-[#E5E5EA] transition-all overflow-hidden"
                  :class="sidebarCollapsed ? 'justify-center px-2' : 'px-4'">
                 
-                <!-- Expanded State: Initials Avatar + Full First & Last Name -->
-                <div x-show="!sidebarCollapsed" class="flex items-center gap-2.5 min-w-0 flex-1">
-                    <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                        {{ $userInitials }}
-                    </div>
+                <!-- Expanded State: Logo + Camp FreedivePH Brand Name -->
+                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
+                   x-show="!sidebarCollapsed" 
+                   class="flex items-center gap-2.5 min-w-0 flex-1 group">
+                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] group-hover:scale-105 transition-transform shrink-0">
                     <div class="min-w-0 flex-1">
-                        <div class="font-bold text-xs text-[#1D1D1F] truncate leading-tight">{{ auth()->user()->name }}</div>
-                        <div class="text-[10px] font-semibold text-[#6E6E73] truncate uppercase tracking-wider mt-0.5">
-                            {{ auth()->user()->role_label ?? ucfirst(auth()->user()->role) }}
-                        </div>
+                        <span class="font-extrabold text-sm text-[#1D1D1F] block leading-tight truncate tracking-tight">Camp Freedive<span class="text-[#780000]">PH</span></span>
                     </div>
-                </div>
+                </a>
 
-                <!-- Collapsed State: Compact Initials Avatar -->
-                <div x-show="sidebarCollapsed" class="flex items-center justify-center">
-                    <div class="w-9 h-9 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shadow-2xs cursor-pointer"
-                         title="{{ auth()->user()->name }} ({{ auth()->user()->role_label ?? ucfirst(auth()->user()->role) }})">
-                        {{ $userInitials }}
-                    </div>
-                </div>
+                <!-- Collapsed State: Centered Brand Logo Icon -->
+                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
+                   x-show="sidebarCollapsed" 
+                   class="flex items-center justify-center group"
+                   title="Camp FreedivePH">
+                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] group-hover:scale-105 transition-transform">
+                </a>
             </div>
 
             <!-- Sidebar Navigation Links -->
@@ -215,19 +212,6 @@
                     </a>
                 @endif
             </nav>
-
-            <!-- Bottom: Logo & Camp FreedivePH Brand -->
-            <div class="p-3 border-t border-[#E5E5EA] bg-white transition-all overflow-hidden"
-                 :class="sidebarCollapsed ? 'flex justify-center' : 'px-4'">
-                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
-                   class="flex items-center gap-2.5 group"
-                   :class="sidebarCollapsed ? 'justify-center' : ''">
-                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] group-hover:scale-105 transition-transform shrink-0">
-                    <div x-show="!sidebarCollapsed" class="min-w-0">
-                        <span class="font-extrabold text-xs text-[#1D1D1F] block leading-tight truncate">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                    </div>
-                </a>
-            </div>
         </aside>
 
         <!-- ========================================================================= -->
@@ -243,21 +227,21 @@
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="-translate-x-full"
-             class="md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col justify-between shadow-2xl border-r border-[#E5E5EA]">
+             class="md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col shadow-2xl border-r border-[#E5E5EA]">
             
             <div>
-                <!-- Drawer Header with User Name -->
-                <div class="h-16 flex items-center justify-between px-4 border-b border-[#E5E5EA]">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
-                            {{ $userInitials }}
-                        </div>
-                        <div class="min-w-0 flex-1">
-                            <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                            <div class="text-[10px] text-[#6E6E73] truncate">{{ auth()->user()->email }}</div>
-                        </div>
-                    </div>
-                    <button type="button" @click="mobileMenuOpen = false" class="text-base font-bold text-[#8E8E93] hover:text-[#1D1D1F] p-1">✕</button>
+                <!-- Drawer Header with Brand Logo & Company Name -->
+                <div class="h-14 flex items-center justify-between px-4 border-b border-[#E5E5EA]">
+                    <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" class="flex items-center gap-2.5 min-w-0">
+                        <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] shrink-0">
+                        <span class="font-extrabold text-sm text-[#1D1D1F] tracking-tight">Camp Freedive<span class="text-[#780000]">PH</span></span>
+                    </a>
+                    <button type="button" @click="mobileMenuOpen = false" class="w-8 h-8 flex items-center justify-center text-[#8E8E93] hover:text-[#1D1D1F] rounded-lg hover:bg-[#F2F2F7] transition-colors cursor-pointer">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
                 </div>
 
                 <nav class="px-3 pt-3 space-y-1.5 overflow-y-auto">
@@ -320,14 +304,6 @@
                         </a>
                     @endif
                 </nav>
-            </div>
-
-            <!-- Bottom: Logo & Sign Out -->
-            <div class="p-3 border-t border-[#E5E5EA] bg-white space-y-2">
-                <div class="flex items-center gap-2.5 px-1 py-1">
-                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-7 h-7 rounded-full object-contain bg-white border border-[#E5E5EA]">
-                    <span class="font-extrabold text-xs text-[#1D1D1F]">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                </div>
             </div>
         </div>
 

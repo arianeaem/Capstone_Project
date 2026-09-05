@@ -10,9 +10,6 @@
         <div>
             <div class="flex items-center gap-2.5">
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">System Audit Logs</h1>
-                <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                    Owner Exclusive
-                </span>
             </div>
             <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
                 Review account activity, security logs, and changes made across the system.
@@ -20,53 +17,133 @@
         </div>
     </div>
 
-    <!-- Filter Bar -->
-    <div class="bg-white p-4 rounded-xl border border-[#E5E5EA] shadow-2xs">
-        <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs">
-            <div class="lg:col-span-2">
-                <label class="block font-semibold text-[#6E6E73] mb-1">Search Logs</label>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Actor name, description details, IP..." 
-                       class="w-full px-3 py-1.5 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-            </div>
-
-            <div>
-                <label class="block font-semibold text-[#6E6E73] mb-1">Event Action</label>
-                <select name="action" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
-                    <option value="">All Actions</option>
-                    @foreach($actions as $act)
-                        <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
-                            {{ $act }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block font-semibold text-[#6E6E73] mb-1">Date From</label>
-                <input type="date" 
-                       name="date_from" 
-                       value="{{ request('date_from') }}" 
-                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-            </div>
-
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold w-full shadow-2xs">
-                    Filter
-                </button>
-                @if(request()->anyFilled(['search', 'action', 'date_from', 'date_to']))
-                    <a href="{{ route('admin.audit_logs.index') }}" class="btn-secondary px-3 py-1.5 text-xs text-center">
-                        Reset
-                    </a>
-                @endif
-            </div>
-        </form>
-    </div>
-
-    <!-- Audit Logs Ledger Table -->
+    <!-- Audit Logs Ledger Table Container with Integrated Toolbar Header -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
+        
+        <!-- Integrated Toolbar Header (Action Pills + Search + Filter Popover) -->
+        <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                
+                <!-- Left: Action Category Pills -->
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                    <a href="{{ request()->fullUrlWithQuery(['action' => '']) }}" 
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('action') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        All Events
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['action' => 'LOGIN_SUCCESS']) }}" 
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('action') === 'LOGIN_SUCCESS' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Logins
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['action' => 'LOGIN_FAILED']) }}" 
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('action') === 'LOGIN_FAILED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Failed Logins
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['action' => 'USER_UPDATED']) }}" 
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('action') === 'USER_UPDATED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        User Updates
+                    </a>
+                    <a href="{{ request()->fullUrlWithQuery(['action' => 'USER_STATUS_TOGGLED']) }}" 
+                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('action') === 'USER_STATUS_TOGGLED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                        Status Toggles
+                    </a>
+                </div>
+
+                <!-- Right: Search Input + Filter Popover -->
+                <div class="flex items-center gap-2" x-data="{ openFilters: false }">
+                    <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-2">
+                        @if(request('action'))
+                            <input type="hidden" name="action" value="{{ request('action') }}">
+                        @endif
+                        @if(request('date_from'))
+                            <input type="hidden" name="date_from" value="{{ request('date_from') }}">
+                        @endif
+                        @if(request('date_to'))
+                            <input type="hidden" name="date_to" value="{{ request('date_to') }}">
+                        @endif
+
+                        <div class="relative w-48 sm:w-64">
+                            <input type="text" 
+                                   name="search" 
+                                   value="{{ request('search') }}" 
+                                   placeholder="Search actor, details, IP..." 
+                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
+                            <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                    </form>
+
+                    <!-- Filter Button with Popover -->
+                    <div class="relative">
+                        <button type="button" 
+                                @click="openFilters = !openFilters" 
+                                class="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer">
+                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                            </svg>
+                            <span>Filter</span>
+                            @if(request()->anyFilled(['action', 'date_from', 'date_to']))
+                                <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            @endif
+                        </button>
+
+                        <!-- Filter Popover Menu -->
+                        <div x-show="openFilters" 
+                             @click.outside="openFilters = false" 
+                             x-cloak 
+                             class="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <div class="flex items-center justify-between pb-2">
+                                <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Audit Logs</h4>
+                                <a href="{{ route('admin.audit_logs.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
+                            </div>
+
+                            <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="space-y-3 text-xs">
+                                @if(request('search'))
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
+
+                                <div>
+                                    <label class="block font-semibold text-[#6E6E73] mb-1">Event Action</label>
+                                    <select name="action" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs font-medium">
+                                        <option value="">All Actions</option>
+                                        @foreach($actions as $act)
+                                            <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
+                                                {{ str_replace('_', ' ', $act) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block font-semibold text-[#6E6E73] mb-1">Date From</label>
+                                        <input type="date" 
+                                               name="date_from" 
+                                               value="{{ request('date_from') }}" 
+                                               class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                    </div>
+                                    <div>
+                                        <label class="block font-semibold text-[#6E6E73] mb-1">Date To</label>
+                                        <input type="date" 
+                                               name="date_to" 
+                                               value="{{ request('date_to') }}" 
+                                               class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                    </div>
+                                </div>
+
+                                <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
+                                    <button type="submit" class="btn-primary w-full py-1.5 text-xs font-bold">
+                                        Apply Filters
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
                 <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">

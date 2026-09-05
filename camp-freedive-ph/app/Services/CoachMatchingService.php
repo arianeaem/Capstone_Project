@@ -17,6 +17,173 @@ use Illuminate\Support\Facades\DB;
 class CoachMatchingService
 {
     /**
+     * Assign one or multiple coaches to a batch.
+     * Maps batch participants across the assigned coaching team.
+     *
+     * @throws Exception
+     */
+    public function assignCoachesToBatch(Batch $batch, array $coachIds, User $assignedBy): array
+    {
+        return DB::transaction(function () use ($batch, $coachIds, $assignedBy) {
+            $coaches = User::where('role', 'coach')
+                ->whereIn('id', $coachIds)
+                ->get();
+
+            if ($coaches->isEmpty()) {
+                throw new Exception("No valid active coaches selected.");
+            }
+
+            // Get all active participants belonging to this batch
+            $participants = BookingParticipant::whereHas('booking', function ($q) use ($batch) {
+                $q->where('batch_id', $batch->id)
+                  ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'no_show', 'pending_downpayment']);
+            })->get();
+
+            $totalParticipants = $participants->count();
+            $existingAssignedCoaches = $batch->assigned_coaches->pluck('id')->toArray();
+            $allCoachIds = array_values(array_unique(array_merge($existingAssignedCoaches, $coaches->pluck('id')->toArray())));
+            $coachCount = count($allCoachIds);
+
+            // Re-assign / Distribute participants evenly across all assigned coaches
+            if ($totalParticipants > 0 && $coachCount > 0) {
+                // Delete previous active assignments for this batch
+                ParticipantAssignment::where('batch_id', $batch->id)
+                    ->where('status', 'assigned')
+                    ->delete();
+
+                $chunkSize = (int) ceil($totalParticipants / $coachCount);
+                $chunks = $participants->chunk($chunkSize);
+
+                foreach ($allCoachIds as $idx => $cId) {
+                    $pChunk = $chunks->get($idx) ?? collect();
+                    $isRatioOverride = $pChunk->count() > 4;
+
+                    foreach ($pChunk as $p) {
+                        ParticipantAssignment::create([
+                            'participant_id' => $p->id,
+                            'booking_id' => $p->booking_id,
+                            'coach_id' => $cId,
+                            'batch_id' => $batch->id,
+                            'dive_date' => $batch->start_date,
+                            'assigned_by' => $assignedBy->id,
+                            'assigned_at' => now(),
+                            'status' => 'assigned',
+                            'is_ratio_override' => $isRatioOverride,
+                        ]);
+                    }
+                }
+            }
+
+            // Update availability for each assigned coach
+            foreach ($coaches as $coach) {
+                $dateStr1 = $batch->start_date->format('Y-m-d');
+                $dateStr2 = $batch->end_date ? $batch->end_date->format('Y-m-d') : $batch->start_date->copy()->addDay()->format('Y-m-d');
+
+                foreach ([$dateStr1, $dateStr2] as $dStr) {
+                    CoachAvailability::updateOrCreate(
+                        ['coach_id' => $coach->id, 'date' => $dStr],
+                        ['status' => 'assigned', 'notes' => "Assigned to {$batch->batch_number}"]
+                    );
+                }
+            }
+
+            AuditLogger::log(
+                'BATCH_COACHES_ASSIGNED',
+                "Assigned " . $coaches->pluck('name')->implode(', ') . " to {$batch->batch_number}.",
+                $assignedBy,
+                $assignedBy->name
+            );
+
+            return [
+                'success' => true,
+                'coaches' => $coaches,
+                'batch' => $batch,
+                'total_assigned_coaches' => $coachCount,
+            ];
+        });
+    }
+
+    /**
+     * Unassign a coach from a batch.
+     */
+    public function unassignCoachFromBatch(Batch $batch, User $coach, User $unassignedBy): bool
+    {
+        return DB::transaction(function () use ($batch, $coach, $unassignedBy) {
+            // Delete active assignments for this coach in this batch
+            ParticipantAssignment::where('batch_id', $batch->id)
+                ->where('coach_id', $coach->id)
+                ->where('status', 'assigned')
+                ->delete();
+
+            // Revert coach availability back to 'available'
+            $dateStr1 = $batch->start_date->format('Y-m-d');
+            $dateStr2 = $batch->end_date ? $batch->end_date->format('Y-m-d') : $batch->start_date->copy()->addDay()->format('Y-m-d');
+
+            foreach ([$dateStr1, $dateStr2] as $dStr) {
+                CoachAvailability::where('coach_id', $coach->id)
+                    ->where('date', $dStr)
+                    ->where('status', 'assigned')
+                    ->update(['status' => 'available', 'notes' => 'Unassigned from batch. Available.']);
+            }
+
+            // Redistribute remaining participants among remaining coaches
+            $remainingCoachIds = ParticipantAssignment::where('batch_id', $batch->id)
+                ->where('coach_id', '!=', $coach->id)
+                ->where('status', 'assigned')
+                ->distinct()
+                ->pluck('coach_id');
+
+            $remainingCoaches = User::whereIn('id', $remainingCoachIds)->get();
+            $participants = BookingParticipant::whereHas('booking', function ($q) use ($batch) {
+                $q->where('batch_id', $batch->id)
+                  ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'no_show', 'pending_downpayment']);
+            })->get();
+
+            if ($remainingCoaches->isEmpty()) {
+                // No coaches left, clear any remaining assignments for this batch
+                ParticipantAssignment::where('batch_id', $batch->id)
+                    ->where('status', 'assigned')
+                    ->delete();
+            } elseif ($participants->isNotEmpty()) {
+                ParticipantAssignment::where('batch_id', $batch->id)
+                    ->where('status', 'assigned')
+                    ->delete();
+
+                $chunkSize = (int) ceil($participants->count() / $remainingCoaches->count());
+                $chunks = $participants->chunk($chunkSize);
+
+                foreach ($remainingCoaches->values() as $idx => $remCoach) {
+                    $pChunk = $chunks->get($idx) ?? collect();
+                    $isRatioOverride = $pChunk->count() > 4;
+
+                    foreach ($pChunk as $p) {
+                        ParticipantAssignment::create([
+                            'participant_id' => $p->id,
+                            'booking_id' => $p->booking_id,
+                            'coach_id' => $remCoach->id,
+                            'batch_id' => $batch->id,
+                            'dive_date' => $batch->start_date,
+                            'assigned_by' => $unassignedBy->id,
+                            'assigned_at' => now(),
+                            'status' => 'assigned',
+                            'is_ratio_override' => $isRatioOverride,
+                        ]);
+                    }
+                }
+            }
+
+            AuditLogger::log(
+                'BATCH_COACH_UNASSIGNED',
+                "Unassigned Coach {$coach->name} from {$batch->batch_number}.",
+                $unassignedBy,
+                $unassignedBy->name
+            );
+
+            return true;
+        });
+    }
+
+    /**
      * Assign a list of participants/students to a coach for a batch dive schedule.
      *
      * @throws Exception
@@ -433,7 +600,7 @@ class CoachMatchingService
         $opening = CoachOpening::create([
             'batch_id' => $batch->id,
             'dive_date' => $diveDate,
-            'needed_students_count' => $batch->booked_headcount ?: 4,
+            'needed_students_count' => (int) $batch->total_participants_count ?: 4,
             'status' => 'open',
             'posted_by' => $postedBy->id,
             'notes' => $notes ?: "Open slot for {$batch->batch_code} ({$diveDate->format('M d, Y')})",
@@ -466,7 +633,7 @@ class CoachMatchingService
 
             // Calculate how many coaches are needed for this batch (1:4 ratio)
             $batch = $request->batch;
-            $headcount = $batch->booked_headcount ?: ($request->opening?->needed_students_count ?: 4);
+            $headcount = (int) $batch->total_participants_count ?: ($request->opening?->needed_students_count ?: 4);
             $coachesNeeded = max(1, (int) ceil($headcount / 4));
 
             // Count how many coaches are currently approved for this batch

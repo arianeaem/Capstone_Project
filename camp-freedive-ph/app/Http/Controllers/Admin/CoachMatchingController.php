@@ -22,183 +22,196 @@ class CoachMatchingController extends Controller
     ) {}
 
     /**
-     * Page 3: Students Needing a Coach (Matching Queue & Studio).
+     * Coach Assignment & Matching Queue.
      */
     public function matching(): View
     {
-        // 1. Fetch unassigned participants from active bookings
-        $unassignedParticipants = BookingParticipant::with(['booking.batch'])
-            ->whereHas('booking', function ($q) {
-                $q->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'completed', 'no_show', 'pending_downpayment']);
-            })
-            ->whereDoesntHave('activeAssignment')
-            ->get();
-
-        // 2. Group by Batch / Dive Date
-        $batches = Batch::with(['bookings.participants'])
+        // 1. Fetch upcoming active batches
+        $batches = Batch::with(['bookings.participants', 'activeParticipantAssignments.coach'])
             ->whereNotIn('status', ['completed', 'cancelled_by_camp'])
             ->orderBy('start_date', 'asc')
             ->get();
 
-        // Fetch all active coaches
+        // 2. Fetch all active coaches with availability
         $activeCoaches = User::where('role', 'coach')
             ->where('status', 'active')
             ->with(['coachAvailabilities'])
+            ->orderBy('name', 'asc')
             ->get();
 
-        // Prepare batch matching groups with proposal options and balanced initial drafts
-        $batchGroups = $batches->map(function ($batch) use ($unassignedParticipants, $activeCoaches) {
-            $studentsInBatch = $unassignedParticipants->filter(function ($p) use ($batch) {
-                return $p->booking && ($p->booking->batch_id === $batch->id || $p->booking->start_date->isSameDay($batch->start_date));
-            })->values();
+        // 3. Build simplified batch staffing data
+        $batchData = $batches->map(function ($batch) use ($activeCoaches) {
+            $totalParticipants = (int) $batch->total_participants_count;
+            $neededCoaches = max(1, (int) ceil($totalParticipants / 4));
+            $assignedCoaches = $batch->assigned_coaches;
+            $assignedCoachIds = $assignedCoaches->pluck('id')->toArray();
 
-            $unassignedCount = $studentsInBatch->count();
-            if ($unassignedCount === 0) {
-                return null;
-            }
+            $startDateStr = $batch->start_date->format('Y-m-d');
+            $endDateStr = $batch->end_date ? $batch->end_date->format('Y-m-d') : $startDateStr;
 
-            // Class breakdown count
-            $classCounts = $studentsInBatch->groupBy(fn($p) => strtolower($p->booking->class_type ?? 'discovery'))
-                ->map(fn($group) => $group->count());
+            // Only include coaches who are available on this batch's dates (and NOT already assigned to this batch)
+            $availableCoaches = $activeCoaches->filter(function ($coach) use ($startDateStr, $endDateStr, $assignedCoachIds) {
+                if (in_array($coach->id, $assignedCoachIds)) {
+                    return false;
+                }
 
-            // Available coaches for this batch dive date
-            $availableCoaches = $activeCoaches->filter(function ($coach) use ($batch) {
-                $dateStr = $batch->start_date->format('Y-m-d');
-                $avail = $coach->coachAvailabilities->firstWhere('date', $dateStr);
-                return !$avail || in_array($avail->status, ['available', 'assigned']);
-            })->map(function ($coach) use ($batch) {
-                $currentLoad = $coach->assignedCountForDate($batch->start_date);
+                return $coach->coachAvailabilities->contains(function ($avail) use ($startDateStr, $endDateStr) {
+                    $d = $avail->date instanceof \DateTimeInterface 
+                        ? $avail->date->format('Y-m-d') 
+                        : substr((string) $avail->date, 0, 10);
+
+                    return ($d === $startDateStr || $d === $endDateStr) && $avail->status === 'available';
+                });
+            })->map(function ($coach) {
                 return [
                     'id' => $coach->id,
                     'name' => $coach->name,
                     'email' => $coach->email,
                     'phone' => $coach->phone,
-                    'current_load' => $currentLoad,
-                    'is_full' => $currentLoad >= 4,
+                    'is_assigned_here' => false,
+                    'is_available_on_calendar' => true,
                     'coach_model' => $coach,
                 ];
             })->values();
-
-            // Candidate Coach Split Options (§6.3 Step 2)
-            $coachOptions = $this->matchingService->proposeCoachCountOptions(
-                $unassignedCount,
-                $availableCoaches->count()
-            );
-
-            // Default initial balanced draft (§6.3 Step 3) using recommended coach count
-            $recommendedOption = collect($coachOptions)->firstWhere('is_recommended', true) ?? collect($coachOptions)->first();
-            $recommendedCount = $recommendedOption['coach_count'] ?? min(1, $availableCoaches->count());
-            $selectedCoachModels = $availableCoaches->take($recommendedCount)->pluck('coach_model')->all();
-
-            $draftResult = $this->matchingService->generateBalancedDraft(
-                $studentsInBatch,
-                $selectedCoachModels
-            );
 
             // Check if open broadcast exists
             $openBroadcast = CoachOpening::where('batch_id', $batch->id)
                 ->where('status', 'open')
                 ->first();
 
-            // Format students for Alpine JS interactive studio
-            $studentsData = $studentsInBatch->map(function ($p) {
-                return [
-                    'id' => $p->id,
-                    'name' => $p->name,
-                    'age' => $p->age,
-                    'class_type' => ucfirst($p->booking->class_type ?? 'Discovery'),
-                    'class_slug' => strtolower($p->booking->class_type ?? 'discovery'),
-                    'swimmer_status' => ucfirst(str_replace('_', ' ', $p->swimmer_status)),
-                    'health_condition' => $p->health_condition ?: 'None declared',
-                    'booking_number' => $p->booking->booking_number,
-                ];
-            });
-
             return [
                 'batch' => $batch,
-                'unassigned_students' => $studentsInBatch,
-                'unassigned_count' => $unassignedCount,
-                'class_counts' => $classCounts,
+                'total_participants' => $totalParticipants,
+                'needed_coaches' => $neededCoaches,
+                'assigned_coaches' => $assignedCoaches,
+                'assigned_count' => $assignedCoaches->count(),
                 'available_coaches' => $availableCoaches,
-                'coach_options' => $coachOptions,
-                'initial_draft' => $draftResult['draft'],
-                'is_balanced' => $draftResult['is_balanced'],
-                'students_data' => $studentsData,
                 'open_broadcast' => $openBroadcast,
             ];
-        })->filter()->values();
+        });
 
         // Pending Coach Requests count
         $pendingRequestsCount = CoachRequest::where('status', 'pending')->count();
 
-        return view('admin.coaches.matching', compact(
-            'batchGroups',
-            'pendingRequestsCount'
-        ));
+        return view('admin.coaches.matching', [
+            'batchData' => $batchData,
+            'batchGroups' => $batchData, // Backward compatibility
+            'pendingRequestsCount' => $pendingRequestsCount,
+        ]);
     }
 
     /**
-     * Batch Assignment: Commit balanced multi-coach distribution for a batch.
+     * Batch Assignment: Assign one or multiple coaches to a batch.
      */
     public function batchAssign(Request $request): RedirectResponse
     {
+        if ($request->has('assignments')) {
+            $validated = $request->validate([
+                'batch_id' => 'required|exists:batches,id',
+                'assignments' => 'required|array|min:1',
+                'exception_note' => 'nullable|string|max:500',
+            ]);
+
+            try {
+                $batch = Batch::findOrFail($validated['batch_id']);
+                $coachIds = array_keys($validated['assignments']);
+
+                $this->matchingService->assignCoachesToBatch(
+                    $batch,
+                    $coachIds,
+                    auth()->user()
+                );
+
+                return back()->with('success', "✓ Coaches successfully assigned to {$batch->batch_number}.");
+            } catch (Exception $e) {
+                return back()->with('error', $e->getMessage());
+            }
+        }
+
+        return $this->assign($request);
+    }
+
+    /**
+     * Assign selected coach(es) to a batch.
+     */
+    public function assign(Request $request): RedirectResponse
+    {
+        // Support legacy single-student assignment if participant_ids provided
+        if ($request->has('participant_ids')) {
+            $validated = $request->validate([
+                'participant_ids' => 'required|array|min:1',
+                'participant_ids.*' => 'exists:booking_participants,id',
+                'coach_id' => 'required|exists:users,id',
+                'batch_id' => 'required|exists:batches,id',
+            ]);
+
+            try {
+                $coach = User::findOrFail($validated['coach_id']);
+                $batch = Batch::findOrFail($validated['batch_id']);
+
+                $result = $this->matchingService->assignStudentsToCoach(
+                    $validated['participant_ids'],
+                    $coach,
+                    $batch,
+                    auth()->user()
+                );
+
+                return back()->with('success', "✓ Assigned Coach {$coach->name} to {$batch->batch_number}.");
+            } catch (Exception $e) {
+                return back()->with('error', $e->getMessage());
+            }
+        }
+
+        // New clean Batch Coach Assignment
         $validated = $request->validate([
             'batch_id' => 'required|exists:batches,id',
-            'assignments' => 'required|array|min:1', // coach_id => [participant_ids...]
-            'assignments.*' => 'nullable|array',
-            'exception_note' => 'nullable|string|max:500',
+            'coach_ids' => 'nullable|array',
+            'coach_ids.*' => 'exists:users,id',
+            'coach_id' => 'nullable|exists:users,id',
         ]);
+
+        $coachIds = $validated['coach_ids'] ?? [];
+        if (!empty($validated['coach_id'])) {
+            $coachIds[] = $validated['coach_id'];
+        }
+        $coachIds = array_values(array_unique(array_filter($coachIds)));
+
+        if (empty($coachIds)) {
+            return back()->with('error', 'Please select at least one coach to assign.');
+        }
 
         try {
             $batch = Batch::findOrFail($validated['batch_id']);
-
-            $result = $this->matchingService->saveBatchBalancedAssignments(
+            $result = $this->matchingService->assignCoachesToBatch(
                 $batch,
-                $validated['assignments'],
-                auth()->user(),
-                $validated['exception_note'] ?? null
+                $coachIds,
+                auth()->user()
             );
 
-            $msg = "✓ Balanced match confirmed: {$result['total_assigned']} student(s) successfully assigned across {$result['coaches_count']} coach(es).";
-            if ($result['is_imbalanced']) {
-                $msg .= " ℹ️ Imbalanced split recorded as an intentional exception.";
-            }
-
-            return back()->with('success', $msg);
+            $names = $result['coaches']->pluck('name')->implode(', ');
+            return back()->with('success', "✓ Assigned {$names} to {$batch->batch_number}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
     }
 
     /**
-     * Assign selected students to a single coach (Quick Single-Coach Assignment).
+     * Unassign a coach from a batch.
      */
-    public function assign(Request $request): RedirectResponse
+    public function unassign(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'participant_ids' => 'required|array|min:1',
-            'participant_ids.*' => 'exists:booking_participants,id',
-            'coach_id' => 'required|exists:users,id',
             'batch_id' => 'required|exists:batches,id',
+            'coach_id' => 'required|exists:users,id',
         ]);
 
         try {
-            $coach = User::findOrFail($validated['coach_id']);
             $batch = Batch::findOrFail($validated['batch_id']);
+            $coach = User::findOrFail($validated['coach_id']);
 
-            $result = $this->matchingService->assignStudentsToCoach(
-                $validated['participant_ids'],
-                $coach,
-                $batch,
-                auth()->user()
-            );
+            $this->matchingService->unassignCoachFromBatch($batch, $coach, auth()->user());
 
-            $msg = "✓ Assigned {$result['assigned_count']} student(s) to Coach {$coach->name}. (Current load: {$result['total_load']}/4 Pax)";
-            if ($result['is_ratio_override']) {
-                $msg .= " Note: Total load exceeds standard 4:1 ratio (logged as an Override Exception).";
-            }
-
-            return back()->with('success', $msg);
+            return back()->with('success', "✓ Unassigned Coach {$coach->name} from {$batch->batch_number}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

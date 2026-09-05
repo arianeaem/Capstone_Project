@@ -304,8 +304,8 @@
                 Join our 2D1N freedive camp. Discovery beginner classes, fundives, and refinement practice dives are open for booking.
             </p>
             <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                <a href="{{ route('booking.create') }}" class="btn-ocean w-full sm:w-auto px-8 py-3.5 sm:py-4 text-base font-bold shadow-lg">
-                    Book Your 2D1N Camp
+                <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-lg shadow-black/20 text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                    Book Your Freediving Adventure
                 </a>
                 <a href="{{ route('manage.index') }}" class="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors border border-white/20">
                     Find My Booking
