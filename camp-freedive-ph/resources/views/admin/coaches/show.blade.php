@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- Coach Header Overview Card -->
+    <!-- Coach Profile Overview -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="flex items-center gap-4">
             <div class="w-14 h-14 rounded-full bg-[#F8EAEA] text-[#780000] border-2 border-[#780000] flex items-center justify-center font-black text-xl shadow-2xs shrink-0">
@@ -69,13 +69,13 @@
         </div>
     </div>
 
-    <!-- 2 COLUMN LAYOUT -->
+    <!-- Coach Profile Content -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- LEFT 2 COLUMNS: ASSIGNED STUDENTS & SCHEDULE -->
+        <!-- Assigned Students & Schedule -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- Assigned Students Card Grid -->
+            <!-- Assigned Students -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <div>
@@ -96,7 +96,7 @@
                     @endphp
                     <div class="p-4 rounded-lg border border-[#E5E5EA] bg-[#FAFAFC] hover:border-[#780000] transition-all flex flex-col justify-between space-y-3 shadow-2xs">
                         <div class="space-y-2">
-                            <!-- Student Header & Course Badge -->
+                            <!-- Student Information -->
                             <div class="flex items-start justify-between gap-2">
                                 <div>
                                     <h4 class="font-bold text-sm text-[#1D1D1F]">{{ $p->name }}</h4>
@@ -187,10 +187,10 @@
 
         </div>
 
-        <!-- RIGHT 1 COLUMN: AVAILABILITY CALENDAR -->
+        <!-- Availability Calendar -->
         <div class="space-y-6">
             
-            <!-- Availability Calendar Card -->
+            <!-- Availability Calendar Section -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Availability Calendar</h3>
@@ -223,9 +223,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL: REASSIGN STUDENT -->
-    <!-- ========================================================================= -->
+    <!-- Reassign Student Modal -->
     <div x-show="openReassignModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openReassignModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Reassign Student Away</h3>

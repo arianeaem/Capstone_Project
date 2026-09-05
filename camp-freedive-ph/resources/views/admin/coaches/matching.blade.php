@@ -90,10 +90,10 @@
                     </div>
                 </div>
 
-                <!-- 2-Section Grid: Currently Assigned Coaches (Left) + Available Coaches to Assign (Right) -->
+                <!-- Coach Assignment Workspace -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
                     
-                    <!-- Left: Currently Assigned Coaches (4 Cols) -->
+                    <!-- Assigned Coaches -->
                     <div class="lg:col-span-4 space-y-3">
                         <div class="flex items-center justify-between">
                             <h3 class="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider flex items-center gap-1.5">
@@ -138,7 +138,7 @@
                         @endif
                     </div>
 
-                    <!-- Right: Available Coaches (8 Cols) -->
+                    <!-- Available Coaches -->
                     <div class="lg:col-span-8 space-y-3">
                         <div class="flex items-center justify-between flex-wrap gap-2">
                             <h3 class="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
@@ -158,7 +158,7 @@
                             </form>
                         </div>
 
-                        <!-- Compact Card Format Grid for Available Coaches -->
+                        <!-- Available Coach Selection -->
                         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2.5">
                             @forelse($availableCoaches as $coachItem)
                                 <label class="p-3 rounded-xl bg-[#FAFAFC] hover:bg-white hover:shadow-2xs flex items-center gap-2.5 transition-all cursor-pointer select-none">

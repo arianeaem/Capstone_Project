@@ -24,11 +24,11 @@
         </a>
     </div>
 
-    <!-- Form Card -->
+    <!-- Create Booking Form -->
     <form action="{{ route('admin.bookings.store') }}" method="POST" class="space-y-6">
         @csrf
 
-        <!-- SECTION 1: PACKAGE & DATES -->
+        <!-- Class Package & Dive Dates -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Class Package & Dive Dates</h3>
 
@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <!-- SECTION 2: PARTICIPANTS (RA 10173 COMPLIANT) -->
+        <!-- Participants Information -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
             <div class="flex items-center justify-between pb-2">
                 <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants</h3>
@@ -144,7 +144,7 @@
             </button>
         </div>
 
-        <!-- SECTION 3: CONTACT & ADD-ONS -->
+        <!-- Primary Contact & Transportation -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Primary Contact & Transportation</h3>
 
@@ -192,7 +192,7 @@
             </div>
         </div>
 
-        <!-- SECTION 4: OFFLINE PAYMENT RECORDING -->
+        <!-- Payment Recording -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">4. Payment Recording (Offline Reception)</h3>
 
@@ -228,7 +228,7 @@
             </div>
         </div>
 
-        <!-- FORM ACTIONS -->
+        <!-- Form Actions -->
         <div class="flex items-center justify-between pt-4 border-t border-[#E5E5EA]">
             <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-6 py-2.5 text-sm font-bold">
                 Cancel

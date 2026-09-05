@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-3xl mx-auto space-y-6 text-sm">
     
-    <!-- Top Breadcrumb -->
+    <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
         <div>
             <a href="{{ route('admin.coaches.show', $coach) }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
@@ -15,13 +15,13 @@
         </div>
     </div>
 
-    <!-- Form Card -->
+    <!-- Edit Coach Form -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm">
         <form action="{{ route('admin.coaches.update', $coach) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 
-            <!-- Section 1: Basic Information -->
+            <!-- Basic Information -->
             <div class="space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Personal & Contact Details</h3>
 
@@ -74,7 +74,7 @@
                 </div>
             </div>
 
-            <!-- Section 2: Certification & Credentials -->
+            <!-- Certification & Credentials -->
             <div class="space-y-4 pt-2">
                 <h3 class="text-base font-bold text-[#1D1D1F] pb-2">2. Freediving Credentials & Expiry</h3>
 
@@ -128,7 +128,7 @@
                 </div>
             </div>
 
-            <!-- Section 3: Status & Specialties -->
+            <!-- Status & Specialties -->
             <div class="space-y-4 pt-2">
                 <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Status & Profile Notes</h3>
 
@@ -168,7 +168,7 @@
                 </div>
             </div>
 
-            <!-- Submit Buttons -->
+            <!-- Form Actions -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E5EA]">
                 <a href="{{ route('admin.coaches.show', $coach) }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
                 <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold shadow-md">

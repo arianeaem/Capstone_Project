@@ -68,9 +68,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- 1. OVERALL BATCH HERO SUMMARY CARD -->
-    <!-- ========================================================================= -->
+    <!-- Batch Weather Safety Summary -->
     @php
         $overallConfig = match ($overallClassification) {
             'Very Safe' => [
@@ -162,14 +160,10 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- 2. DAY 1 & DAY 2 COMPARATIVE DASHBOARD (SIDE-BY-SIDE) -->
-    <!-- ========================================================================= -->
+    <!-- Day 1 & Day 2 Comparative Forecast -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- ===================================================================== -->
-        <!-- DAY 1 SECTION -->
-        <!-- ===================================================================== -->
+        <!-- Day 1 Forecast -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-sm space-y-5">
             
             <!-- Day 1 Header -->
@@ -230,7 +224,7 @@
                 </div>
             </div>
 
-            <!-- Day 1 Whole-Day 24-Hour Continuous Timeline with AM/PM Default & 24h Expansion -->
+            <!-- Day 1 Hourly Timeline -->
             @if(!empty($day1Continuous24h['hourly']))
             <div x-data="{ showAllHours: false }" class="pt-3 space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -244,7 +238,7 @@
                     </button>
                 </div>
 
-                <!-- 8-Variable Comprehensive Weather & Marine Forecast Table -->
+                <!-- Comprehensive Weather Forecast Table -->
                 <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
@@ -317,9 +311,7 @@
 
         </div>
 
-        <!-- ===================================================================== -->
-        <!-- DAY 2 SECTION -->
-        <!-- ===================================================================== -->
+        <!-- Day 2 Forecast -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-sm space-y-5">
             
             <!-- Day 2 Header -->
@@ -380,7 +372,7 @@
                 </div>
             </div>
 
-            <!-- Day 2 Whole-Day 24-Hour Continuous Timeline with AM/PM Default & 24h Expansion -->
+            <!-- Day 2 Hourly Timeline -->
             @if(!empty($day2Continuous24h['hourly']))
             <div x-data="{ showAllHours: false }" class="pt-3 space-y-3">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
@@ -394,7 +386,7 @@
                     </button>
                 </div>
 
-                <!-- 8-Variable Comprehensive Weather & Marine Forecast Table -->
+                <!-- Comprehensive Weather Forecast Table -->
                 <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
                     <table class="w-full text-left text-xs">
                         <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
@@ -469,9 +461,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- 3. PAST ASSESSMENT RUNS HISTORY TIMELINE (EXPANDABLE) -->
-    <!-- ========================================================================= -->
+    <!-- Assessment History -->
     <div x-data="{ openAuditTrail: false }" class="mt-8 bg-white rounded-xl border border-[#E5E5EA] shadow-sm overflow-hidden transition-all">
         <button type="button" 
                 @click="openAuditTrail = !openAuditTrail" 
@@ -543,9 +533,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 1: MANUAL OVERRIDE (PAGASA-STYLE ADVISORIES) -->
-    <!-- ========================================================================= -->
+    <!-- Manual Safety Override Modal -->
     <div x-show="openOverrideModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openOverrideModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
@@ -630,9 +618,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 2: CANCEL BATCH WITH TEMPLATED EMAIL PREVIEW (PRD SECTION 9) -->
-    <!-- ========================================================================= -->
+    <!-- Batch Cancellation Modal -->
     <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
@@ -660,7 +646,7 @@
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                 </div>
 
-                <!-- Template Preview Box (PRD Section 9) -->
+                <!-- Email Notification Preview -->
                 <div class="space-y-1.5">
                     <span class="block font-bold text-[#6E6E73] text-xs uppercase tracking-wider">Outbound Email Notification Preview</span>
                     <div class="p-4 bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] font-sans text-xs text-[#1D1D1F] whitespace-pre-line leading-relaxed">

@@ -12,14 +12,14 @@
 
 <div class="min-h-screen flex flex-col lg:flex-row">
     
-    <!-- LEFT SIDE: PICTURE CONTAINER -->
+    <!-- Auth Brand Banner -->
     <div class="hidden lg:block lg:w-1/2 relative bg-[#1D1D1F] overflow-hidden min-h-screen">
         <img src="{{ asset('images/about-hero.jpg') }}" 
              alt="Camp FreedivePH Ocean" 
              class="absolute inset-0 w-full h-full object-cover opacity-85">
     </div>
 
-    <!-- RIGHT SIDE: LOGIN FORM -->
+    <!-- Login Form -->
     <div class="w-full lg:w-1/2 flex flex-col justify-center p-8 sm:p-12 lg:p-16 xl:p-20 bg-white min-h-screen">
 
         <!-- Form Container -->

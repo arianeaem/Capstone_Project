@@ -27,7 +27,7 @@
         </div>
     </div>
 
-    <!-- Readiness & Performance KPIs (Single Box with Vertical Line Dividers) -->
+    <!-- Coach Performance KPIs -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
         <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
             
@@ -61,11 +61,11 @@
         </div>
     </div>
 
-    <!-- Spotlight: Immediate Mission Card ("My Next Dive Session") -->
+    <!-- Next Dive Session -->
     @if($nextSessionData)
         <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs space-y-0">
             
-            <!-- Mission Header -->
+            <!-- Session Header -->
             <div class="p-5 sm:p-6 bg-[#FAFAFC] border-b border-[#E5E5EA] flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div class="space-y-1">
                     <div class="flex items-center gap-2 flex-wrap">
@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <!-- Assigned Students Roster Table -->
+            <!-- Assigned Student Roster -->
             <div class="p-5 space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-sm font-bold text-[#1D1D1F]">Assigned Student Roster & Readiness Profiles</h3>
@@ -167,7 +167,7 @@
 
         </div>
     @else
-        <!-- No Immediate Dive Banner -->
+        <!-- Empty State: No Immediate Dives -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 text-center space-y-3 shadow-2xs">
             <div>
                 <h3 class="text-base font-bold text-[#1D1D1F]">No Immediate Dive Assignments</h3>
@@ -184,10 +184,10 @@
         </div>
     @endif
 
-    <!-- 2-Column Grid: Quick Weekend Availability Toggle (Left) + Open Camp Slots (Right) -->
+    <!-- Availability and Open Camp Slots -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- Left: Quick 3-Weekend Availability Status -->
+        <!-- Weekend Availability Snapshot -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div class="space-y-3">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
@@ -243,7 +243,7 @@
             </div>
         </div>
 
-        <!-- Right: Open Camp Openings Board -->
+        <!-- Open Camp Slots -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div class="space-y-3">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
@@ -304,9 +304,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- RELEASE REQUEST MODAL (IF APPLICABLE) -->
-    <!-- ========================================================================= -->
+    <!-- Release Request Modal -->
     @if($nextSessionData && $nextSessionData['can_request_release'])
     <div x-show="openReleaseModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openReleaseModal = false">

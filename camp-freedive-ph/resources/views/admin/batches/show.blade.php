@@ -73,10 +73,10 @@
         </div>
     </div>
 
-    <!-- 2 COLUMN LAYOUT -->
+    <!-- Batch Details & Operations -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- LEFT 2 COLUMNS: CONNECTED BOOKINGS -->
+        <!-- Connected Bookings -->
         <div class="lg:col-span-2 space-y-6">
             
             <!-- Connected Bookings Section -->
@@ -93,11 +93,11 @@
                     </div>
                 </div>
 
-                <!-- Bookings Card Grid -->
+                <!-- Bookings List -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     @forelse($batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']) as $booking)
                     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
-                        <!-- Top Details -->
+                        <!-- Booking Header & Status -->
                         <div class="space-y-3">
                             <div class="flex items-start justify-between gap-2">
                                 <div>
@@ -118,7 +118,7 @@
                                 </div>
                             </div>
 
-                            <!-- Financial Mini Summary -->
+                            <!-- Payment Summary -->
                             <div class="grid grid-cols-2 gap-2 p-2.5 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] text-xs">
                                 <div>
                                     <span class="text-[#6E6E73] text-xs block">Total Amount</span>
@@ -162,7 +162,7 @@
                             </div>
                         </div>
 
-                        <!-- Card Action Footer -->
+                        <!-- Booking Actions -->
                         <div class="flex items-center gap-2 pt-3 border-t border-[#E5E5EA]">
                             <button type="button" 
                                     @click="selectedBookingId = {{ $booking->id }}; selectedBookingNumber = '{{ $booking->booking_number }}'; openMoveModal = true"
@@ -185,7 +185,7 @@
                 </div>
             </div>
 
-            <!-- Batch Status Timeline / History -->
+            <!-- Batch Status History -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Batch Status History</h3>
 
@@ -216,10 +216,10 @@
 
         </div>
 
-        <!-- RIGHT 1 COLUMN: STATUS, OCCUPANCY, COACHES, CARPOOL & PAYMENTS SUMMARY -->
+        <!-- Batch Summary & Logistics -->
         <div class="space-y-6">
             
-            <!-- Batch Status & Occupancy Card -->
+            <!-- Batch Status & Occupancy -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Batch Status & Capacity</h3>
@@ -240,7 +240,7 @@
                     </div>
                 @endif
 
-                <!-- Occupancy & Capacity Meter -->
+                <!-- Occupancy & Capacity -->
                 <div class="space-y-2 pt-1">
                     @if($batch->total_participants_count > 0 && $batch->is_coach_pending)
                         <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-left text-xs text-amber-900">
@@ -278,7 +278,7 @@
                 </div>
             </div>
 
-            <!-- Carpool & Transportation Logistics Card -->
+            <!-- Transportation Logistics -->
             @php
                 $carpoolBookingsList = $batch->bookings->where('pickup_option', 'carpool');
                 $totalCarpoolPax = $carpoolBookingsList->sum(fn($b) => $b->participants->count());
@@ -326,7 +326,7 @@
                 </div>
             </div>
 
-            <!-- Financial Ledger Mini-Card -->
+            <!-- Financial Overview -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Financial Overview</h3>
@@ -370,9 +370,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 1: CANCEL BATCH BY CAMP (CASCADES TO REFUNDS & NOTIFICATIONS) -->
-    <!-- ========================================================================= -->
+    <!-- Cancel Batch Modal -->
     <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <h3 class="text-lg font-bold text-[#780000]">Cancel Batch (by Camp)</h3>
@@ -401,9 +399,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 2: RESCHEDULE BATCH (CASCADES TO CUSTOMER DATE SELECTION NOTIFICATIONS) -->
-    <!-- ========================================================================= -->
+    <!-- Reschedule Batch Modal -->
     <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedule Batch (by Camp)</h3>
@@ -432,9 +428,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 3: MOVE BOOKING TO ANOTHER BATCH -->
-    <!-- ========================================================================= -->
+    <!-- Move Booking Modal -->
     <div x-show="openMoveModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openMoveModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Move Booking to Another Batch</h3>

@@ -7,14 +7,12 @@
     
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <!-- ========================================================================= -->
-        <!-- LEFT COLUMN: CALENDAR WITH INTEGRATED MONTH NAVIGATOR -->
-        <!-- ========================================================================= -->
+        <!-- Availability Calendar -->
         <div class="lg:col-span-8 xl:col-span-9 space-y-4">
             
             <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-sm overflow-hidden">
                 
-                <!-- Calendar Header Bar: Month Navigator & Bulk Edit Toggle -->
+                <!-- Calendar Controls -->
                 <div class="p-4 sm:p-5 border-b border-[#E5E5EA] flex flex-wrap items-center justify-between gap-4 bg-[#FAFAFC]">
                     <!-- Month Navigator -->
                     <div class="flex items-center gap-2">
@@ -37,7 +35,7 @@
                         </a>
                     </div>
 
-                    <!-- Bulk Edit Toggle Button -->
+                    <!-- Bulk Edit Toggle -->
                     <button type="button" 
                             @click="toggleBulkMode()"
                             :class="bulkMode ? 'bg-[#780000] text-white border-[#780000] shadow-sm' : 'bg-white text-[#1D1D1F] border-[#E5E5EA] hover:bg-[#F2F2F7] shadow-xs'"
@@ -58,7 +56,7 @@
                     <span class="text-[#008E98]">Sat</span>
                 </div>
 
-                <!-- Days Grid -->
+                <!-- Calendar Days -->
                 <div class="grid grid-cols-7 gap-px bg-[#E5E5EA]">
                     @foreach($calendarDays as $day)
                         @php
@@ -79,7 +77,7 @@
                              }"
                              @click="handleDayClick('{{ $dateStr }}', {{ $isAssigned ? 'true' : 'false' }}, {{ $isPast ? 'true' : 'false' }}, {{ json_encode($day) }})">
                             
-                            <!-- Top Day Number & Badges -->
+                            <!-- Day Number & Indicators -->
                             <div class="flex items-center justify-between gap-1">
                                 <span class="font-extrabold text-sm {{ $day['is_today'] ? 'text-[#008E98]' : ($isOtherMonth ? 'text-gray-400' : 'text-[#1D1D1F]') }}">
                                     {{ $day['day_number'] }}
@@ -103,7 +101,7 @@
                                 </template>
                             </div>
 
-                            <!-- Middle Content: Status Badge -->
+                            <!-- Day Availability Status -->
                             <div class="my-2">
                                 @if($isAssigned)
                                     <div class="p-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 space-y-1">
@@ -123,7 +121,7 @@
                                 @endif
                             </div>
 
-                            <!-- Bottom Action / Context Hint -->
+                            <!-- Day Actions -->
                             <div class="text-[10px] text-right">
                                 @if($isAssigned && !$isPast)
                                     <button type="button" 
@@ -145,12 +143,10 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- RIGHT COLUMN: TOP HEADER & CONTROLS + STATUS LEGEND -->
-        <!-- ========================================================================= -->
+        <!-- Availability Status & Legend -->
         <div class="lg:col-span-4 xl:col-span-3 space-y-6">
             
-            <!-- Top Header & Controls Card -->
+            <!-- Calendar Overview -->
             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5EA] shadow-xs space-y-3">
                 <h1 class="text-xl font-black text-[#1D1D1F]">My Availability Calendar</h1>
                 <p class="text-xs text-[#6E6E73] leading-relaxed">
@@ -158,7 +154,7 @@
                 </p>
             </div>
 
-            <!-- Status Legend Card -->
+            <!-- Status Legend -->
             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5EA] shadow-xs space-y-4 text-xs">
                 <span class="font-bold text-[#8E8E93] uppercase tracking-wider text-[11px] block">Status Legend</span>
                 
@@ -184,7 +180,7 @@
 
     </div>
 
-    <!-- Floating Bulk Edit Action Bar -->
+    <!-- Bulk Edit Action Bar -->
     <div x-show="bulkMode" 
          x-cloak
          x-transition:enter="transition ease-out duration-300"
@@ -235,7 +231,7 @@
 
             <template x-if="selectedAssignedDay">
                 <div class="space-y-4">
-                    <!-- Session Card -->
+                    <!-- Session Details -->
                     <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F]" x-text="selectedAssignedDay.batch?.batch_number || 'Dive Batch'"></span>
@@ -245,7 +241,7 @@
                         <div x-text="'Hours until dive departure: ' + selectedAssignedDay.hours_until_dive + 'h'"></div>
                     </div>
 
-                    <!-- 48-Hour Cutoff Validation Check -->
+                    <!-- Staffing Policy Notice -->
                     <template x-if="!selectedAssignedDay.can_request_release">
                         <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-2">
                             <div class="font-bold flex items-center gap-2">
@@ -261,7 +257,7 @@
                         </div>
                     </template>
 
-                    <!-- Release Request Form (If >48 hours) -->
+                    <!-- Emergency Release Form -->
                     <template x-if="selectedAssignedDay.can_request_release">
                         <form action="{{ route('coach.availability.release') }}" method="POST" class="space-y-4">
                             @csrf

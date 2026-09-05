@@ -26,7 +26,7 @@
         </div>
     </div>
 
-    <!-- 16-Day Forecast Horizon Strip (if masterForecast cached) -->
+    <!-- 16-Day Forecast Horizon -->
     @if(isset($masterForecast['daily_summaries']) && !empty($masterForecast['daily_summaries']))
     <div class="space-y-2">
         <div class="flex items-center justify-between">
@@ -71,11 +71,11 @@
     </div>
     @endif
 
-    <!-- Integrated Toolbar (Risk Tabs + Secondary Filter Popover) -->
+    <!-- Risk Filters and Toolbar -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3 shadow-2xs">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
             
-            <!-- Left: Risk Level Tabs -->
+            <!-- Risk Level Filters -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
                 <a href="{{ request()->fullUrlWithQuery(['risk' => '']) }}" 
                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('risk') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -103,7 +103,7 @@
                 </a>
             </div>
 
-            <!-- Right: Secondary Filter Popover -->
+            <!-- Advanced Filters -->
             <div class="flex items-center gap-2 self-end md:self-auto shrink-0" x-data="{ openFilters: false }">
                 @if(request()->anyFilled(['status', 'date_from', 'date_to']))
                     <a href="{{ route('admin.weather.index', ['risk' => request('risk')]) }}" 
@@ -125,7 +125,7 @@
                         @endif
                     </button>
 
-                    <!-- Filter Dropdown Card -->
+                    <!-- Filter Dropdown -->
                     <div x-show="openFilters" 
                          @click.outside="openFilters = false" 
                          x-cloak 
@@ -157,7 +157,7 @@
         </div>
     </div>
 
-    <!-- Batches Cards Grid (Side-by-Side Day 1 & Day 2 Status) -->
+    <!-- Weekend Batches Forecast List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         @forelse($batches as $batch)
         @php
@@ -177,7 +177,7 @@
         <div onclick="window.location='{{ route('admin.weather.show', $batch) }}'" 
              class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group {{ $batchCardBg }}">
             
-            <!-- Card Header: Title, Code & Overall Risk Badge -->
+            <!-- Batch Information -->
             <div>
                 <div class="flex items-start justify-between gap-2">
                     <div>
@@ -198,7 +198,7 @@
                     </div>
                 </div>
 
-                <!-- 2-Day AM & PM Conditions Grid -->
+                <!-- Day 1 & Day 2 Forecast Conditions -->
                 <div class="mt-3 grid grid-cols-2 gap-2">
                     
                     <!-- Day 1 Assessment -->
@@ -231,7 +231,7 @@
 
                 </div>
 
-                <!-- Override Badge (if present) -->
+                <!-- Manual Override Notice -->
                 @if($override)
                     <div class="mt-2.5 p-2 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900">
                         <span class="font-bold">Manual Override:</span> {{ !empty($override->active_advisories) ? implode(', ', $override->active_advisories) : 'Advisory Active' }}

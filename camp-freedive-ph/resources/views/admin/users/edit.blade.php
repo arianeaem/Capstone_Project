@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-2xl mx-auto space-y-6 text-sm">
     
-    <!-- Top Breadcrumb -->
+    <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between">
         <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
@@ -14,7 +14,7 @@
         <span class="text-xs text-[#8E8E93]">Admin/Owner Managed Profile</span>
     </div>
 
-    <!-- Edit Profile Card -->
+    <!-- Edit User Profile Form -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-7 shadow-2xs space-y-5">
         <div class="border-b border-[#E5E5EA] pb-3">
             <h1 class="text-xl font-extrabold text-[#1D1D1F] tracking-tight">Edit Staff Profile</h1>

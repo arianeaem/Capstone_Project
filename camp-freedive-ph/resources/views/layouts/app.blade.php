@@ -33,7 +33,7 @@
                 </div>
             </a>
 
-            <!-- Actions (Text Link for Manage Booking, Staff Portal & Primary CTA) -->
+            <!-- Navigation Actions -->
             <div class="flex items-center gap-3 sm:gap-5">
                 <a href="{{ route('manage.index') }}" class="text-xs sm:text-sm font-semibold text-[#1D1D1F] hover:text-[#780000] transition-colors whitespace-nowrap">
                     Manage Booking
@@ -71,7 +71,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16 pb-10 border-b border-[#3A3A3C]">
                 
-                <!-- Left Column: Brand Logo, Name, Gmail & Clickable Google Maps Address -->
+                <!-- Contact and Location Details -->
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-11 h-11 rounded-full object-contain bg-white shadow-sm border border-white/20">
@@ -81,21 +81,21 @@
                         </div>
                     </div>
 
-                    <!-- Gmail Contact -->
+                    <!-- Email Contact -->
                     <div class="flex items-center gap-2 text-sm text-[#D1D1D6]">
                         <a href="mailto:campfreediveph@gmail.com" class="hover:text-white hover:underline transition-colors font-medium">
                             campfreediveph@gmail.com
                         </a>
                     </div>
 
-                    <!-- Number Contact -->
+                    <!-- Phone Contact -->
                     <div class="flex items-center gap-2 text-sm text-[#D1D1D6]">
                         <a href="tel:+639154069330" class="hover:text-white hover:underline transition-colors font-medium">
                             +63 000 000 0000
                         </a>
                     </div>
 
-                    <!-- Clickable Address to Google Maps -->
+                    <!-- Location Address -->
                     <div class="pt-1">
                         <div class="text-xs uppercase tracking-wider text-[#8E8E93] font-semibold mb-1">Camp Location & Resort Venue:</div>
                         <a href="https://www.google.com/maps/search/?api=1&query=The+Shack+Hideaway+by+Mayumi+Resort+Barangay+Bagalangit+Mabini+Batangas" 
@@ -109,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Partnership with The Shack Hideaway & Social Logos -->
+                <!-- Resort Partner and Social Links -->
                 <div class="space-y-5 md:text-right flex flex-col md:items-end justify-between">
                     <div>
                         <div class="text-xs uppercase tracking-wider text-[#8E8E93] font-semibold mb-1">Official Resort Partner</div>
@@ -121,7 +121,7 @@
                         </p>
                     </div>
 
-                    <!-- Social Logos (Facebook & Instagram) -->
+                    <!-- Social Media Links -->
                     <div class="space-y-2">
                         <div class="text-xs uppercase tracking-wider text-[#8E8E93] font-semibold">Follow Our Adventures</div>
                         <div class="flex items-center gap-3 md:justify-end">
@@ -148,7 +148,7 @@
 
             </div>
 
-            <!-- Bottom Copyright -->
+            <!-- Footer Copyright -->
             <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm text-[#8E8E93]">
                 <p>&copy; 2026 Camp FreedivePH. All rights reserved.</p>
             </div>

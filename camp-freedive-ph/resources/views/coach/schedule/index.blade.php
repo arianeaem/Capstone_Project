@@ -33,9 +33,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 1: UPCOMING CONFIRMED ASSIGNMENTS -->
-    <!-- ========================================================================= -->
+    <!-- Upcoming Confirmed Assignments -->
     <div x-show="activeTab === 'upcoming'" class="space-y-6">
         @forelse($upcomingBatches as $item)
             @php
@@ -48,7 +46,7 @@
 
             <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-xs overflow-hidden">
                 
-                <!-- Batch Card Header -->
+                <!-- Batch Information -->
                 <div class="p-6 border-b border-[#E5E5EA] bg-[#FAFAFC] flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div class="space-y-1">
                         <h3 class="text-xl font-black text-[#1D1D1F]">{{ $batch->batch_number }}</h3>
@@ -57,7 +55,7 @@
                         </p>
                     </div>
 
-                    <!-- Right Controls: Weather Badge & Release Action -->
+                    <!-- Batch Status and Actions -->
                     <div class="flex flex-wrap items-center gap-3">
                         <!-- Live Weather Safety Badge -->
                         <div class="px-3.5 py-2 rounded-xl border text-xs font-bold flex items-center gap-2 {{ $weatherBadge['class'] }}">
@@ -84,7 +82,7 @@
                     </div>
                 </div>
 
-                <!-- Weather & Marine Conditions Context (Read-Only) -->
+                <!-- Weather and Safety Conditions -->
                 @if($assessment)
                 <div class="px-6 py-3 bg-[#F2F2F7]/50 border-b border-[#E5E5EA] flex flex-wrap items-center justify-between gap-3 text-xs text-[#6E6E73]">
                     <div class="flex items-center gap-4">
@@ -98,7 +96,7 @@
                 </div>
                 @endif
 
-                <!-- Students Roster Table -->
+                <!-- Assigned Student Roster -->
                 <div class="p-6 space-y-4">
                     <div class="flex items-center justify-between">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-[#8E8E93]">
@@ -183,12 +181,10 @@
         @endforelse
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 2: PAST DIVE HISTORY & ARCHIVAL -->
-    <!-- ========================================================================= -->
+    <!-- Past Dive History -->
     <div x-show="activeTab === 'history'" class="space-y-6">
         
-        <!-- Filter Controls -->
+        <!-- History Filters -->
         <form method="GET" action="{{ route('coach.schedule.index') }}" class="bg-white rounded-2xl p-4 border border-[#E5E5EA] shadow-xs flex flex-wrap items-center justify-between gap-4">
             <input type="hidden" name="tab" value="history">
 
@@ -222,7 +218,7 @@
             </div>
         </form>
 
-        <!-- Summary Metric Chips -->
+        <!-- History Statistics -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] shadow-xs flex items-center justify-between">
                 <div>
@@ -244,7 +240,7 @@
             </div>
         </div>
 
-        <!-- Past Sessions Roster -->
+        <!-- Past Sessions List -->
         @forelse($historyBatches as $item)
             @php
                 $batch = $item['batch'];

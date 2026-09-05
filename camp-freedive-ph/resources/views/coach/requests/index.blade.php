@@ -33,9 +33,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 1: AVAILABLE CAMP OPENINGS (CARD FORMAT) -->
-    <!-- ========================================================================= -->
+    <!-- Available Camp Openings -->
     <div x-show="activeTab === 'open_slots'">
         @if(count($openings) > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -47,7 +45,7 @@
 
                     <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs hover:border-[#008E98] hover:shadow-md transition-all flex flex-col justify-between space-y-5">
                         
-                        <!-- Top Card Details -->
+                        <!-- Slot Opening Information -->
                         <div class="space-y-3.5">
                             <div class="flex items-center justify-between gap-2">
                                 <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#008E98]/10 text-[#008E98] border border-[#008E98]/20 font-mono">
@@ -82,7 +80,7 @@
                             @endif
                         </div>
 
-                        <!-- Card Action Button -->
+                        <!-- Request Action -->
                         <div class="pt-2">
                             @if($hasApplied)
                                 <div class="w-full py-2.5 rounded-xl bg-[#ffffff] text-[#8E8E93] border border-[#E5E5EA] text-xs font-bold text-center">
@@ -114,9 +112,7 @@
         @endif
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- TAB 2: MY SUBMITTED REQUESTS -->
-    <!-- ========================================================================= -->
+    <!-- Submitted Requests -->
     <div x-show="activeTab === 'my_requests'" class="space-y-4">
         @forelse($myRequests as $req)
             @php
@@ -148,7 +144,7 @@
                     @endif
                 </div>
 
-                <!-- Action if Pending -->
+                <!-- Request Actions -->
                 @if($req->status === 'pending')
                 <div class="shrink-0">
                     <form action="{{ route('coach.requests.withdraw', $req) }}" method="POST" onsubmit="return confirm('Withdraw your request for this slot?');">

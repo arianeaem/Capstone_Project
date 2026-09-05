@@ -19,12 +19,12 @@
         </div>
     </div>
 
-    <!-- Form Card -->
+    <!-- Create Batch Form -->
     <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 sm:p-8">
         <form action="{{ route('admin.batches.store') }}" method="POST" class="space-y-6">
             @csrf
 
-            <!-- Section 1: Date & Auto-Generated Identifiers -->
+            <!-- Batch Dates and Identification -->
             <div class="space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">1. 2D1N Dive Dates & Batch Identifier</h3>
 
@@ -108,7 +108,7 @@
 
             </div>
 
-            <!-- Section 2: Auto-Grouping Confirmed Unbatched Bookings -->
+            <!-- Auto-Grouping Confirmed Unbatched Bookings -->
             <div class="space-y-4 pt-2">
                 <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-2">
                     <div>
@@ -192,7 +192,7 @@
                 </div>
             </div>
 
-            <!-- Section 3: Operational Capacity & Notes -->
+            <!-- Operational Notes & Overrides -->
             <div class="space-y-4 pt-2">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">3. Operational Notes & Overrides</h3>
 
@@ -219,7 +219,7 @@
                 </div>
             </div>
 
-            <!-- Submit Buttons -->
+            <!-- Form Actions -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#D1D1D6]">
                 <a href="{{ route('admin.batches.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
                 <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold">

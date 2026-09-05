@@ -76,7 +76,7 @@
         @csrf
         @method('PUT')
 
-        <!-- Card 1: Rule Identification -->
+        <!-- Rule Identification & Scope -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
             <h2 class="text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">1. Rule Identification & Scope</h2>
 
@@ -117,7 +117,7 @@
             </div>
         </div>
 
-        <!-- Card 2: Rule Condition Trigger -->
+        <!-- Rule Trigger & Condition -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
             <h2 class="text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">2. Rule Trigger & Condition</h2>
 
@@ -195,7 +195,7 @@
             </div>
         </div>
 
-        <!-- Card 3: Price Adjustment -->
+        <!-- Price Adjustment Calculation -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
             <h2 class="text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">3. Price Adjustment Calculation</h2>
 
@@ -252,7 +252,7 @@
         </div>
 
 
-        <!-- Submit Button -->
+        <!-- Form Actions -->
         <div class="flex items-center justify-end gap-2 pt-2">
             <a href="{{ route('admin.pricing.index') }}" class="btn-secondary px-3.5 py-2 text-xs font-semibold">
                 Cancel

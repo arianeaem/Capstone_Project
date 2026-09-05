@@ -17,7 +17,7 @@
      })"
      x-init="initWizard()">
 
-    <!-- Minimal Clean Header for Booking Process -->
+    <!-- Booking Header -->
     <div class="flex items-center justify-between pb-5 mb-6 sm:mb-8 border-b border-[#E5E5EA]">
         <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
             <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain bg-white">
@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <!-- Stepper Progress Bar (5 Steps) -->
+        <!-- Stepper Progress Bar -->
         <div class="w-full bg-[#E5E5EA] h-2.5 rounded-full overflow-hidden">
             <div class="bg-gradient-to-r from-[#780000] to-[#00C3D0] h-full transition-all duration-300 rounded-full"
                  :style="'width: ' + ((currentStep / 5) * 100) + '%'"></div>
@@ -73,12 +73,10 @@
         </div>
     </div>
 
-    <!-- MAIN FORM CONTAINER -->
+    <!-- Wizard Form Container -->
     <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-sm p-4 sm:p-8 lg:p-10 relative text-sm">
 
-        <!-- ========================================================================= -->
-        <!-- STEP 1: SELECT CLASS -->
-        <!-- ========================================================================= -->
+        <!-- Step 1: Select Class -->
         <div x-show="currentStep === 1" x-cloak class="space-y-6">
             <div class="border-b border-[#E5E5EA] pb-4">
                 <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Freediving Class</h2>
@@ -86,7 +84,7 @@
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:gap-6">
-                <!-- Discovery Card -->
+                <!-- Discovery Package Option -->
                 <div @click="form.class_type = 'discovery'" 
                      class="p-4 sm:p-6 rounded-xl border-1 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                      :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#F8EAEA]/30 ring-1 ring-[#780000]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
@@ -107,7 +105,7 @@
                     </div>
                 </div>
 
-                <!-- Fundive Card -->
+                <!-- Fun Dive Package Option -->
                 <div @click="form.class_type = 'fundive'" 
                      class="p-4 sm:p-6 rounded-xl border-1 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                      :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#F8EAEA]/30 ring-1 ring-[#780000]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
@@ -128,7 +126,7 @@
                     </div>
                 </div>
 
-                <!-- Refinement Card -->
+                <!-- Skill Refinement Package Option -->
                 <div @click="form.class_type = 'refinement'" 
                      class="p-4 sm:p-6 rounded-xl border-1 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                      :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#F8EAEA]/30 ring-1 ring-[#780000]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
@@ -179,9 +177,7 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- STEP 2: SELECT DATE (LEFT: CALENDAR & DEPART/RETURN | RIGHT: SAFETY EVALUATION) -->
-        <!-- ========================================================================= -->
+        <!-- Step 2: Select Dates -->
         <div x-show="currentStep === 2" x-cloak class="space-y-6">
             
             <!-- Step Header -->
@@ -199,7 +195,7 @@
                             <span>About Forecast</span>
                         </div>
 
-                        <!-- Hover Popover Notice -->
+                        <!-- Interactive Date Help Tooltip -->
                         <div class="absolute right-0 sm:right-auto sm:left-0 top-full mt-2 w-80 p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
                             <div class="font-bold flex items-center gap-1 text-[#00C3D0]">
                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -213,13 +209,13 @@
                 </div>
             </div>
 
-            <!-- 2-COLUMN RESPONSIVE LAYOUT -->
+            <!-- Dates and Safety Evaluation Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-                <!-- LEFT COLUMN: DEPART/RETURN CARD + INTERACTIVE CALENDAR (7 COLS) -->
+                <!-- Calendar and Date Selection -->
                 <div class="lg:col-span-7 space-y-5">
 
-                    <!-- 1. DEPART / RETURN DUAL SELECTOR BOX (Image 1 Style) -->
+                    <!-- Selected Dates Overview -->
                     <div class="rounded-2xl border border-[#E5E5EA] bg-white p-4 sm:p-5 transition-all shadow-2xs">
                         <div class="grid grid-cols-2 divide-x divide-[#E5E5EA]">
                             
@@ -268,13 +264,13 @@
                         </div>
                     </div>
 
-                    <!-- 2. INTERACTIVE DUAL-MONTH CALENDAR (Clean & Borderless Image 2 Style) -->
+                    <!-- Interactive Dual-Month Calendar -->
                     <div class="bg-white rounded-2xl p-5 sm:p-7 space-y-6">
                         
-                        <!-- Months Grid Container (2 Months on md+, 1 on mobile) -->
+                        <!-- Months Container -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
                             
-                            <!-- Month 1 (Left Month) -->
+                            <!-- First Month -->
                             <div class="space-y-4">
                                 <!-- Header for Month 1 with Prev Arrow -->
                                 <div class="flex items-center justify-between h-9">
@@ -290,7 +286,7 @@
                                         <span x-text="getMonthName(month1Month) + ' ' + month1Year"></span>
                                     </div>
 
-                                    <!-- Spacer for balance on desktop, or next button on mobile -->
+                                    <!-- Month Navigation Controls -->
                                     <div class="w-8 hidden md:block shrink-0"></div>
                                     <button type="button" 
                                             @click="nextMonth()" 
@@ -300,7 +296,7 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Weekday Headers (No borders) -->
+                                <!-- Weekday Headers -->
                                 <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#6E6E73] py-1">
                                     <span class="text-[#780000] font-bold">Sun</span>
                                     <span>Mon</span>
@@ -311,7 +307,7 @@
                                     <span>Sat</span>
                                 </div>
 
-                                <!-- Days Grid (No borders) -->
+                                <!-- Month Calendar Days -->
                                 <div class="grid grid-cols-7 gap-y-2 text-center text-xs sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month1Year, month1Month)" :key="'m1-' + idx">
                                         <div class="h-9 flex items-center justify-center relative">
@@ -338,7 +334,7 @@
                                 </div>
                             </div>
 
-                            <!-- Month 2 (Right Month) -->
+                            <!-- Second Month -->
                             <div class="space-y-4">
                                 <!-- Header for Month 2 with Next Arrow -->
                                 <div class="flex items-center justify-between h-9">
@@ -356,7 +352,7 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Weekday Headers (No borders) -->
+                                <!-- Weekday Headers -->
                                 <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#6E6E73] py-1">
                                     <span class="text-[#780000] font-bold">Sun</span>
                                     <span>Mon</span>
@@ -367,7 +363,7 @@
                                     <span>Sat</span>
                                 </div>
 
-                                <!-- Days Grid (No borders) -->
+                                <!-- Month Calendar Days -->
                                 <div class="grid grid-cols-7 gap-y-2 text-center text-xs sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month2Year, month2Month)" :key="'m2-' + idx">
                                         <div class="h-9 flex items-center justify-center relative">
@@ -400,7 +396,7 @@
 
                 </div>
 
-                <!-- RIGHT COLUMN: DIVE SAFETY EVALUATION (5 COLS, STICKY) -->
+                <!-- Dive Safety Evaluation -->
                 <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-8">
                     <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                         
@@ -418,7 +414,7 @@
                             </template>
                         </div>
 
-                        <!-- 1. EMPTY STATE (When no date selected yet) -->
+                        <!-- Empty State -->
                         <template x-if="!form.start_date && !weatherLoading">
                             <div class="py-8 px-4 text-center space-y-4">
                                 <div class="w-12 h-12 rounded-2xl bg-[#EBF7F8] text-[#008E98] flex items-center justify-center mx-auto shadow-2xs">
@@ -443,7 +439,7 @@
                             </div>
                         </template>
 
-                        <!-- 2. LOADING PROGRESS STATE -->
+                        <!-- Forecast Loading State -->
                         <div x-show="weatherLoading" x-cloak class="space-y-4 py-2">
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between text-xs">
@@ -456,7 +452,7 @@
                                 </div>
                             </div>
 
-                            <!-- Placeholder Skeleton Cards -->
+                            <!-- Weather Assessment Loading State -->
                             <div class="space-y-2.5 pt-1 animate-pulse">
                                 <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2">
                                     <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
@@ -477,7 +473,7 @@
                             </div>
                         </div>
 
-                        <!-- 3. FORECAST RESULT CARD -->
+                        <!-- Weather Assessment Results -->
                         <template x-if="forecast && !weatherLoading && !forecast.is_benchmark">
                             <div class="space-y-4">
                                 <!-- Overall Banner -->
@@ -544,18 +540,16 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- STEP 3: BOOKING DETAILS (LEFT) + LIVE SUMMARY (RIGHT) [5-STEP COMBINED] -->
-        <!-- ========================================================================= -->
+        <!-- Step 3: Booking Details -->
         <div x-show="currentStep === 3" x-cloak class="space-y-6">
 
-            <!-- 2-COLUMN RESPONSIVE LAYOUT -->
+            <!-- Form Inputs and Summary Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-                <!-- LEFT COLUMN: Form Inputs (7 Columns) -->
+                <!-- Form Inputs -->
                 <div class="lg:col-span-7 space-y-6">
 
-                    <!-- SECTION 1: PARTICIPANTS -->
+                    <!-- Section 1: Participants -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between pb-2">
                             <h3 class="text-base font-bold text-[#1D1D1F]">1. Participants</h3>
@@ -580,7 +574,7 @@
                                         </button>
                                     </div>
 
-                                    <!-- Participant Name: Separate First Name & Last Name -->
+                                    <!-- Participant Name -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
                                             <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First Name <span class="text-[#780000]">*</span></label>
@@ -651,7 +645,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 2: CONTACT DETAILS (FIRST NAME & LAST NAME SEPARATE) -->
+                    <!-- Contact Details -->
                     <div class="space-y-4 pt-2">
                         <h3 class="text-base font-bold text-[#1D1D1F] pb-2">2. Contact Information</h3>
                         
@@ -715,7 +709,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 3: ADD-ONS & TRANSPORTATION -->
+                    <!-- Transportation and Add-ons -->
                     <div class="space-y-4 pt-2">
                         <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h3>
                         
@@ -785,7 +779,7 @@
                         </div>
                     </div>
 
-                    <!-- SECTION 4: ACCURACY VERIFICATION -->
+                    <!-- Accuracy Verification -->
                     <div class="pt-2">
                         <div class="p-3.5 rounded-xl bg-[#F8EAEA] border border-[#780000]/30">
                             <label class="flex items-start gap-2.5 cursor-pointer">
@@ -799,10 +793,10 @@
 
                 </div>
 
-                <!-- RIGHT COLUMN: Live Booking Summary (5 Columns, Sticky) -->
+                <!-- Live Booking Summary -->
                 <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-6">
                     
-                    <!-- Itemized Invoice Card -->
+                    <!-- Itemized Price Calculation Summary -->
                     <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden shadow-2xs">
                         <div class="bg-[#FAFAFC] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F] text-sm">Booking Summary</span>
@@ -815,7 +809,7 @@
                                 <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber((pricingQuote ? pricingQuote.base_price_per_pax : calculateBasePriceUnit()) * form.participants.length)"></span>
                             </div>
 
-                            <!-- Dynamic Pricing Adjustments (Itemized Breakdown) -->
+                            <!-- Dynamic Pricing Adjustments -->
                             <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
                                 <div class="space-y-1.5 py-2 border-y border-dashed border-[#E5E5EA]">
                                     <div class="text-[10px] uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
@@ -878,9 +872,7 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- STEP 4: DOWNPAYMENT (PAYMONGO HOSTED CHECKOUT: QR PH, GCASH, BPI) -->
-        <!-- ========================================================================= -->
+        <!-- Step 4: Downpayment -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
             <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
@@ -960,7 +952,7 @@
                     </p>
                 </div>
 
-                <!-- Cancellation & Reschedule Policy Card (Moved to Step 4) -->
+                <!-- Cancellation and Reschedule Policy -->
                 <div class="p-4 sm:p-5 rounded-2xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2.5">
                     <h4 class="font-bold text-[#780000] text-xs">
                         Cancellation & Reschedule Policy
@@ -1018,9 +1010,7 @@
 
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- STEP 5: CONFIRMATION & PIN RETRIEVAL (FINAL STEP) -->
-        <!-- ========================================================================= -->
+        <!-- Step 5: Confirmation & Credentials -->
         <div x-show="currentStep === 5" x-cloak class="space-y-6 text-center">
             <div class="w-16 h-16 bg-[#ECFDF5] text-[#34C759] rounded-full flex items-center justify-center mx-auto text-3xl font-extrabold shadow-sm border border-[#A7F3D0]">
                 ✓
@@ -1072,7 +1062,7 @@
                     <span class="font-bold text-[#1D1D1F]" x-text="form.participants.length + ' participant(s)'"></span>
                 </div>
 
-                <!-- Step 5: Applied Pricing Rules Recap -->
+                <!-- Applied Dynamic Pricing Rules -->
                 <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
                     <div class="py-2 border-b border-[#E5E5EA] space-y-1.5">
                         <div class="text-[10px] uppercase font-bold tracking-wider text-[#6E6E73]">Applied Dynamic Pricing Rules:</div>
@@ -1124,9 +1114,7 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- BOTTOM WIZARD CONTROLS (Steps 1, 2, 3) -->
-        <!-- ========================================================================= -->
+        <!-- Step Navigation Controls -->
         <div x-show="currentStep < 4" class="mt-8 pt-6 flex items-center justify-between">
             <button type="button" 
                     @click="prevStep()" 

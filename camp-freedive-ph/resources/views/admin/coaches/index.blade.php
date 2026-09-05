@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6 text-sm">
     
-    <!-- Top Header & Action Controls -->
+    <!-- Header and Actions -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Coach Roster & Schedules</h1>
@@ -15,7 +15,7 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <!-- Shortcut 1: Matching Queue -->
+            <!-- Matching Queue Shortcut -->
             <a href="{{ route('admin.coaches.matching') }}" 
                class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-2 shadow-2xs">
                 <span>Students Needing Coach</span>
@@ -26,7 +26,7 @@
                 @endif
             </a>
 
-            <!-- Shortcut 2: Coach Requests -->
+            <!-- Coach Requests Shortcut -->
             <a href="{{ route('admin.coaches.requests') }}" 
                class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
                 <span>Coach Requests</span>
@@ -34,11 +34,11 @@
         </div>
     </div>
 
-    <!-- Integrated Toolbar (Status Tabs + Search & Filter) -->
+    <!-- Toolbar and Filter Controls -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3 shadow-2xs">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             
-            <!-- Left: Account Status Tabs -->
+            <!-- Status Filter Tabs -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                 <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -54,7 +54,7 @@
                 </a>
             </div>
 
-            <!-- Right: Search Input + Filter Popover -->
+            <!-- Search and Filter Controls -->
             <div class="flex items-center gap-2" x-data="{ openFilters: false }">
                 <form action="{{ route('admin.coaches.index') }}" method="GET" class="flex items-center gap-2">
                     @if(request('status'))
@@ -77,7 +77,7 @@
                     </div>
                 </form>
 
-                <!-- Filter Button with Popover -->
+                <!-- Filter Controls -->
                 <div class="relative">
                     <button type="button" 
                             @click="openFilters = !openFilters" 
@@ -91,7 +91,7 @@
                         @endif
                     </button>
 
-                    <!-- Filter Popover Menu -->
+                    <!-- Filter Form Dropdown -->
                     <div x-show="openFilters" 
                          @click.outside="openFilters = false" 
                          x-cloak 
@@ -130,7 +130,7 @@
         </div>
     </div>
 
-    <!-- Coach Roster Cards Grid -->
+    <!-- Coach Roster -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         @forelse($coaches as $coach)
         @php
@@ -153,7 +153,7 @@
         
         <div onclick="window.location='{{ route('admin.coaches.show', $coach) }}'" class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group">
             
-            <!-- Card Header: Avatar, Name & Status -->
+            <!-- Coach Header -->
             <div>
                 <div class="flex items-start justify-between gap-3">
                     <div class="flex items-center gap-3">
@@ -170,13 +170,13 @@
                         </div>
                     </div>
 
-                    <!-- Status Pill -->
+                    <!-- Status Badge -->
                     <span class="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 {{ $coach->status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' }}">
                         {{ ucfirst($coach->status) }}
                     </span>
                 </div>
 
-                <!-- Metrics & Details -->
+                <!-- Coach Metrics -->
                 <div class="mt-3.5 pt-3 border-t border-[#E5E5EA] space-y-2 text-xs">
                     <div class="flex items-center justify-between">
                         <span class="text-[#6E6E73]">Upcoming Active Dates:</span>
@@ -224,7 +224,7 @@
         @endforelse
     </div>
 
-    <!-- Pagination -->
+    <!-- Table Pagination -->
     <div class="pt-2">
         {{ $coaches->links() }}
     </div>

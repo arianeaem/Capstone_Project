@@ -17,14 +17,14 @@
         </div>
     </div>
 
-    <!-- Audit Logs Ledger Table Container with Integrated Toolbar Header -->
+    <!-- Audit Logs Ledger -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
-        <!-- Integrated Toolbar Header (Action Pills + Search + Filter Popover) -->
+        <!-- Audit Log Filters and Search -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Action Category Pills -->
+                <!-- Action Category Filters -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['action' => '']) }}" 
                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('action') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -48,7 +48,7 @@
                     </a>
                 </div>
 
-                <!-- Right: Search Input + Filter Popover -->
+                <!-- Search and Advanced Filters -->
                 <div class="flex items-center gap-2" x-data="{ openFilters: false }">
                     <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-2">
                         @if(request('action'))
@@ -74,7 +74,7 @@
                         </div>
                     </form>
 
-                    <!-- Filter Button with Popover -->
+                    <!-- Advanced Filter Toggle -->
                     <div class="relative">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
@@ -88,7 +88,7 @@
                             @endif
                         </button>
 
-                        <!-- Filter Popover Menu -->
+                        <!-- Advanced Filter Options -->
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 

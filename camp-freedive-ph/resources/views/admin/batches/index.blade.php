@@ -31,35 +31,35 @@
         </div>
     </div>
 
-    <!-- Integrated Toolbar (Status Tabs + Search & Filter) -->
+    <!-- Search and Filter Toolbar -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3 shadow-2xs">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             
-            <!-- Left: Batch Status Tabs -->
+            <!-- Batch Status Filters -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                 <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
-                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     All Batches
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'confirmed']) }}" 
-                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'confirmed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'confirmed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Confirmed
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}" 
-                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'completed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'completed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Completed
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'rescheduled']) }}" 
-                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'rescheduled' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'rescheduled' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Rescheduled
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'cancelled_by_camp']) }}" 
-                   class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'cancelled_by_camp' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'cancelled_by_camp' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Cancelled
                 </a>
             </div>
 
-            <!-- Right: Search Input + Filter Popover -->
+            <!-- Search and Advanced Filters -->
             <div class="flex items-center gap-2" x-data="{ openFilters: false }">
                 <form action="{{ route('admin.batches.index') }}" method="GET" class="flex items-center gap-2">
                     @if(request('status'))
@@ -85,7 +85,7 @@
                     </div>
                 </form>
 
-                <!-- Filter Button with Popover -->
+                <!-- Advanced Filter Toggle -->
                 <div class="relative">
                     <button type="button" 
                             @click="openFilters = !openFilters" 
@@ -99,7 +99,7 @@
                         @endif
                     </button>
 
-                    <!-- Filter Popover Menu -->
+                    <!-- Advanced Filter Options -->
                     <div x-show="openFilters" 
                          x-cloak 
                          @click.outside="openFilters = false" 
@@ -152,12 +152,12 @@
         </div>
     </div>
 
-    <!-- Batches Cards Grid -->
+    <!-- Batches List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         @forelse($batches as $batch)
         <div onclick="window.location='{{ route('admin.batches.show', $batch) }}'" class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group {{ $batch->needs_attention ? 'bg-[#FEF3C7]' : 'bg-white' }}">
             
-            <!-- Card Header: Title & Status -->
+            <!-- Batch Information -->
             <div>
                 <div class="flex items-start justify-between gap-2">
                     <div>
@@ -178,11 +178,11 @@
                     </div>
                 @endif
 
-                <!-- Metrics & Operational Status -->
+                <!-- Metrics and Operational Status -->
                 <div class="mt-3 space-y-2 text-xs">
 
-                    <!-- Staffing & Capacity Meter (Max 45 Pax) -->
-                    <div class="space-y-1.5">
+                    <!-- Staffing and Capacity Overview -->
+                    <div class="space-y-1.5">">
                         <div class="flex items-center justify-between text-xs">
                             <span class="font-bold text-[#1D1D1F]">
                                 {{ $batch->total_participants_count }} Pax ({{ $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])->count() }} bookings)

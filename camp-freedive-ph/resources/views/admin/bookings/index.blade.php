@@ -35,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Quick Stats (Single Box with Vertical Dividers) -->
+    <!-- Booking Status Metrics -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 items-center gap-y-4">
             <!-- Total -->
@@ -81,14 +81,14 @@
         </div>
     </div>
 
-    <!-- Bookings Table Container with Integrated Toolbar Header -->
+    <!-- Bookings Table -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
-        <!-- Integrated Toolbar Header (Pills + Search + Filter Popover) -->
+        <!-- Table Toolbar Header -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Class Package Tabs -->
+                <!-- Class Package Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => '']) }}" 
                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('class_type') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -108,7 +108,7 @@
                     </a>
                 </div>
 
-                <!-- Right: Search Input + Filter Popover -->
+                <!-- Search and Filter Controls -->
                 <div class="flex items-center gap-2" x-data="{ openFilters: false }">
                     <form method="GET" action="{{ route('admin.bookings.index') }}" class="flex items-center gap-2">
                         @if(request('class_type'))
@@ -137,7 +137,7 @@
                         </div>
                     </form>
 
-                    <!-- Filter Button with Popover -->
+                    <!-- Filter Controls -->
                     <div class="relative">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
@@ -151,7 +151,7 @@
                             @endif
                         </button>
 
-                        <!-- Filter Popover Menu -->
+                        <!-- Filter Form Dropdown -->
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
@@ -236,7 +236,7 @@
             <tbody class="divide-y divide-[#E5E5EA]">
                 @forelse($bookings as $b)
                 <tr onclick="window.location='{{ route('admin.bookings.show', $b) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors text-xs sm:text-sm group">
-                    <!-- Booking Number & PIN -->
+                    <!-- Booking Reference -->
                     <td class="p-4 pl-6 font-mono">
                         <span class="font-bold text-[#780000] group-hover:underline block text-sm">
                             {{ $b->booking_number }}
@@ -247,19 +247,19 @@
                         @endif
                     </td>
 
-                    <!-- Contact -->
+                    <!-- Customer Details -->
                     <td class="p-4">
                         <div class="font-bold text-[#1D1D1F]">{{ $b->contact_name }}</div>
                         <div class="text-xs text-[#6E6E73]">{{ $b->contact_phone }}</div>
                     </td>
 
-                    <!-- Class -->
+                    <!-- Package Details -->
                     <td class="p-4">
                         <span class="font-semibold text-[#1D1D1F] block">{{ $b->formatted_class_type }}</span>
                         <span class="text-xs text-[#6E6E73]">{{ $b->pickup_option === 'carpool' ? 'Carpool' : 'Own Transpo' }} • {{ $b->participants->count() }} pax</span>
                     </td>
 
-                    <!-- Dates -->
+                    <!-- Trip Dates -->
                     <td class="p-4 whitespace-nowrap">
                         <strong class="text-[#1D1D1F] block">{{ $b->start_date->format('M d, Y') }}</strong>
                         <span class="text-xs text-[#8E8E93]">to {{ $b->end_date->format('M d, Y') }}</span>
@@ -282,7 +282,7 @@
                         @endif
                     </td>
 
-                    <!-- Status Badge -->
+                    <!-- Booking Status -->
                     <td class="p-4">
                         <span class="px-2 py-0.5 rounded text-xs font-bold {{ $b->status_badge['bg'] }}">
                             {{ $b->status_badge['label'] }}

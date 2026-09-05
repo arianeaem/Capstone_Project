@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Summary Metrics (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    <!-- Staff Summary Metrics -->
     @if(isset($stats))
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
         <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
@@ -57,14 +57,14 @@
     </div>
     @endif
 
-    <!-- Staff Directory Table Container with Integrated Toolbar Header -->
+    <!-- Staff Directory Table -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
-        <!-- Integrated Toolbar Header (Role Pills + Search + Filter Popover) -->
+        <!-- Table Toolbar Header -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Role Tabs -->
+                <!-- Role Filter Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['role' => '']) }}" 
                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('role') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -84,7 +84,7 @@
                     </a>
                 </div>
 
-                <!-- Right: Search Input + Filter Popover -->
+                <!-- Search and Filter Controls -->
                 <div class="flex items-center gap-2" x-data="{ openFilters: false }">
                     <form method="GET" action="{{ route('admin.users.index') }}" class="flex items-center gap-2">
                         @if(request('role'))
@@ -107,7 +107,7 @@
                         </div>
                     </form>
 
-                    <!-- Filter Button with Popover -->
+                    <!-- Filter Controls -->
                     <div class="relative">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
@@ -121,7 +121,7 @@
                             @endif
                         </button>
 
-                        <!-- Filter Popover Menu -->
+                        <!-- Filter Form Dropdown -->
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
@@ -176,7 +176,7 @@
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($users as $user)
                     <tr onclick="window.location='{{ route('admin.users.edit', $user) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group">
-                        <!-- Staff Name & Email -->
+                        <!-- Staff Details -->
                         <td class="py-3 px-4 text-left">
                             <div class="font-bold text-sm text-[#1D1D1F] group-hover:text-[#780000]">
                                 {{ $user->name }}
@@ -187,7 +187,7 @@
                             <span class="text-xs text-[#6E6E73] block mt-0.5">{{ $user->email }}</span>
                         </td>
 
-                        <!-- Phone -->
+                        <!-- Phone Number -->
                         <td class="py-3 px-4 text-left text-[#1D1D1F]">
                             {{ $user->phone ?? '—' }}
                         </td>
@@ -214,12 +214,12 @@
                             @endif
                         </td>
 
-                        <!-- Last Login -->
+                        <!-- Last Login Timestamp -->
                         <td class="py-3 px-4 text-left text-[#6E6E73] whitespace-nowrap">
                             {{ $user->last_login_at ? $user->last_login_at->format('M d, Y g:i A') : 'Never logged in' }}
                         </td>
 
-                        <!-- 3-Dots Action Menu -->
+                        <!-- Actions Menu -->
                         <td class="py-3 px-4 text-right pr-6 whitespace-nowrap" onclick="event.stopPropagation()">
                             @if($currentUser->isOwner() || ($currentUser->isAdmin() && $user->isCoach()))
                                 <div class="relative inline-block text-left" x-data="{ openMenu: false }">
@@ -234,19 +234,19 @@
                                         </svg>
                                     </button>
 
-                                    <!-- Dropdown Menu -->
+                                    <!-- Actions Dropdown -->
                                     <div x-show="openMenu" 
                                          @click.outside="openMenu = false" 
                                          x-cloak 
                                          class="absolute right-0 mt-1 w-44 bg-white rounded-xl border border-[#E5E5EA] shadow-lg p-1.5 z-50 space-y-1 text-left">
                                         
-                                        <!-- Edit Profile -->
+                                        <!-- Edit Account -->
                                         <a href="{{ route('admin.users.edit', $user) }}" 
                                            class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
                                             <span>Edit Account</span>
                                         </a>
 
-                                        <!-- Status Toggle -->
+                                        <!-- Account Status Toggle -->
                                         @if($user->id !== $currentUser->id)
                                             <form action="{{ route('admin.users.toggle_status', $user) }}" method="POST" class="block w-full">
                                                 @csrf
@@ -283,7 +283,7 @@
         @endif
     </div>
 
-    <!-- PROVISION ACCOUNT MODAL -->
+    <!-- Provision Account Modal -->
     <div x-show="openAddModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-[#E5E5EA]" @click.outside="openAddModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">

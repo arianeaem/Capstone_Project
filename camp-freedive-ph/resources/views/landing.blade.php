@@ -6,13 +6,13 @@
 @section('content')
 <div class="w-full">
 
-    <!-- 1. Hero Section: Deep #780000 with Top-Centered Ambient Radial Glow (Fixed / No Mouse Tracking) -->
+    <!-- Hero Section -->
     <section id="hero-section" class="relative overflow-hidden bg-[#780000] pt-12 sm:pt-20 pb-0 text-white transition-colors m-0" style="--field-mask-x: 50%; --field-mask-y: 10%;">
         
-        <!-- Ambient Base Radial Spotlight (PayMongo Aesthetic in #780000) -->
+        <!-- Background Glow Effect -->
         <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,_#A0151E_0%,_#780000_50%,_#450000_100%)] pointer-events-none"></div>
 
-        <!-- Dynamic Layer: Canvas with CSS Masking (Top-Centered Fixed Glow) -->
+        <!-- Dynamic Background Canvas -->
         <div class="hero-dynamic-field absolute inset-0 pointer-events-none overflow-hidden" 
              style="-webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 0%, rgba(0,0,0,0.85) 50%, transparent 100%), linear-gradient(to bottom, black 65%, transparent 100%);
                     mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 0%, rgba(0,0,0,0.85) 50%, transparent 100%), linear-gradient(to bottom, black 65%, transparent 100%);
@@ -21,14 +21,14 @@
             <canvas id="hero-gradient-canvas" class="w-full h-full block opacity-90"></canvas>
         </div>
 
-        <!-- Subtle Top Lighting Dust -->
+        <!-- Lighting Overlay -->
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,255,255,0.12)_0%,_transparent_60%)] pointer-events-none"></div>
 
-        <!-- Content Layer -->
+        <!-- Hero Content -->
         <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-3xl mx-auto">
 
-                <!-- Main Heading (PayMongo Style Typography) -->
+                <!-- Main Heading -->
                 <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.15] mb-5">
                     Sharing the love for ocean through freediving in <br class="hidden sm:inline" />
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#63a5c4] via-[#164B60] to-[#2e80a3]">
@@ -36,12 +36,12 @@
                     </span>
                 </h1>
 
-                <!-- Subtitle in Plain, Friendly Language -->
+                <!-- Subtitle -->
                 <p class="text-sm sm:text-lg text-[#FFFFFF]/90 leading-relaxed mb-8 sm:mb-10 font-normal max-w-2xl mx-auto">
                     Learn to hold your breath and dive safely with our friendly coaches.
                 </p>
 
-                <!-- Primary CTAs -->
+                <!-- Call to Action Buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
                     <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-lg shadow-black/20 text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
                         <span>Book Slot Now</span>
@@ -54,7 +54,7 @@
                 </div>
             </div>
 
-            <!-- Double Border / Frame Image (PayMongo Cut-off Style) -->
+            <!-- Hero Image Preview -->
             <div class="mt-12 sm:mt-16 max-w-5xl mx-auto">
                 <div class="rounded-t-2xl sm:rounded-t-3xl border-t border-x border-white/20 bg-white/10 p-1.5 sm:p-2.5 shadow-2xl backdrop-blur-xs">
                     <div class="rounded-t-xl sm:rounded-t-2xl border-t border-x border-black/10 sm:border-white/30 overflow-hidden bg-white">
@@ -67,10 +67,10 @@
         </div>
     </section>
 
-    <!-- Content Sections Wrapper with Spacing -->
+    <!-- Content Sections -->
     <div class="space-y-14 sm:space-y-24 mt-12 sm:mt-18">
 
-    <!-- 2. Class Packages Section (Modern Tiered Cards Matching #780000 Theme) -->
+    <!-- Class Packages Section -->
     <section id="packages" class="w-full bg-[#FAFAFC] py-16 sm:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
@@ -79,10 +79,10 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-stretch">
                 @foreach($classes as $c)
-                <!-- Clean White Card Container -->
+                <!-- Package Item -->
                 <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden text-sm">
                     
-                    <!-- Top Tinted Box (Matching Reference Header Layout) -->
+                    <!-- Package Header & Price -->
                     <div class="bg-gradient-to-b from-[#F8EAEA] via-[#F8EAEA]/40 to-transparent border-b border-[#E5E5EA] p-6 sm:p-8 flex flex-col justify-between text-center min-h-[360px]">
                         <div>
                             <!-- Category Badge -->
@@ -130,7 +130,7 @@
                                 @endif
                             </div>
 
-                            <!-- Note / Target Audience Description -->
+                            <!-- Target Audience Description -->
                             <p class="text-sm sm:text-base text-[#4A4A4F] font-medium mt-3 mb-6 min-h-[44px] flex items-center justify-center leading-relaxed text-center">
                                 {{ $c['note'] }}
                             </p>
@@ -139,13 +139,13 @@
                         <!-- Top CTA Button -->
                         <div class="pt-2">
                             <a href="{{ route('booking.create', ['class' => $c['id']]) }}" 
-                               class="w-full py-3.5 px-6 rounded-xl font-extrabold text-sm text-center block shadow-md hover:shadow-lg transition-all duration-200 bg-[#780000] hover:bg-[#5E0000] text-white">
+                                class="w-full py-3.5 px-6 rounded-xl font-extrabold text-sm text-center block shadow-md hover:shadow-lg transition-all duration-200 bg-[#780000] hover:bg-[#5E0000] text-white">
                                 Book Class
                             </a>
                         </div>
                     </div>
 
-                    <!-- Bottom Inclusions & Exclusions Box -->
+                    <!-- Inclusions & Exclusions -->
                     <div class="p-6 sm:p-8 space-y-6 bg-white flex-grow flex flex-col justify-between">
                         <div class="space-y-5">
                             <!-- Inclusions -->
@@ -186,7 +186,7 @@
         </div>
     </section>
 
-    <!-- 3. Add-ons, Carpool & Fees in #F8EAEA Card Grid Format -->
+    <!-- Logistics, Add-ons & Fees -->
     <section id="addons" class="max-w-7xl mx-auto px-8 sm:px-16 lg:px-32 text-sm">
         <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Carpool, Add-ons & Reservation Policies</h2>
@@ -195,7 +195,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             
-            <!-- Card 1: Manila Carpool Service (#F8EAEA) -->
+            <!-- Manila Carpool Service -->
             <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
@@ -207,7 +207,7 @@
                 </div>
             </div>
 
-            <!-- Card 2: Reservation Downpayment Policy (#F8EAEA) -->
+            <!-- Reservation Downpayment Policy -->
             <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between gap-2">
@@ -219,7 +219,7 @@
                 </div>
             </div>
 
-            <!-- Card 3: Boat Dive (Optional) (#F8EAEA) -->
+            <!-- Boat Dive Option -->
             <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
@@ -231,7 +231,7 @@
                 </div>
             </div>
 
-            <!-- Card 4: Mabini LGU Marine Fees (#F8EAEA) -->
+            <!-- Mabini LGU Marine Fees -->
             <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
@@ -246,7 +246,7 @@
         </div>
     </section>
 
-    <!-- 4. FAQ Accordion Section (Including Things to Bring) -->
+    <!-- FAQ Section -->
     <section id="faq" class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-sm" x-data="{ openFaq: null }">
         <div class="text-center mb-10 sm:mb-12">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Frequently Asked Questions</h2>

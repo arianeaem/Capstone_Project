@@ -14,7 +14,7 @@
          currentEndDate: '{{ $booking->end_date->format('Y-m-d') }}'
      })">
 
-    <!-- Top Navigation / Breadcrumb -->
+    <!-- Back Navigation -->
     <div class="flex items-center justify-between mb-6">
         <a href="{{ route('manage.index') }}" class="text-xs sm:text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5">
             ← Switch to another bookings
@@ -25,7 +25,7 @@
     </div>
 
     @if($booking->status === 'pending_downpayment')
-    <!-- Downpayment Required Banner -->
+    <!-- Downpayment Required Alert -->
     <div class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
         <div class="space-y-1">
             <div class="flex items-center gap-2 font-bold text-sm sm:text-base text-amber-900">
@@ -45,7 +45,7 @@
     </div>
     @endif
 
-    <!-- Booking Overview Header -->
+    <!-- Booking Overview -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6">
             <div>
@@ -60,14 +60,14 @@
                 </div>
             </div>
 
-            <!-- PIN Badge -->
+            <!-- Security PIN -->
             <div class="bg-[#F8EAEA] border border-[#780000]/20 rounded-xl p-3 sm:p-3.5 sm:text-right shrink-0">
                 <span class="text-xs font-bold uppercase tracking-wider text-[#780000] block">Security PIN</span>
                 <span class="text-base sm:text-lg font-mono font-extrabold text-[#780000] tracking-widest">{{ $booking->pin }}</span>
             </div>
         </div>
 
-        <!-- Key Specs Grid -->
+        <!-- Booking Key Information -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-sm">
             <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
                 <span class="text-xs text-[#6E6E73] block mb-1">Lead Booker:</span>
@@ -108,13 +108,13 @@
         </div>
     </div>
 
-    <!-- MAIN TWO COLUMN GRID -->
+    <!-- Booking Content and Actions -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
 
-        <!-- LEFT 2 COLUMNS: BOOKING DETAILS & LOGISTICS -->
+        <!-- Booking Details and Logistics -->
         <div class="lg:col-span-2 space-y-6 sm:space-y-8">
             
-            <!-- Dynamic Pricing & Rate Breakdown (if adjustments exist) -->
+            <!-- Dynamic Pricing and Rate Breakdown -->
             @if($booking->priceAdjustments && $booking->priceAdjustments->count() > 0)
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-sm space-y-3">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
@@ -176,7 +176,7 @@
                 </div>
             </div>
 
-            <!-- Logistics & Add-ons -->
+            <!-- Logistics and Add-ons -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm">
                 <h3 class="text-base font-bold text-[#1D1D1F] mb-4">Transportation & Add-ons</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -200,7 +200,7 @@
                 </div>
             </div>
 
-            <!-- Pending Requests History (if any) -->
+            <!-- Request History -->
             @if($booking->rescheduleRequests->isNotEmpty() || $booking->cancellationRequests->isNotEmpty())
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F]">Request History</h3>
@@ -235,10 +235,10 @@
 
         </div>
 
-        <!-- RIGHT 1 COLUMN: LIVE POLICY ENGINE & ACTIONS -->
+        <!-- Policy Engine and Actions -->
         <div class="space-y-6 text-sm">
 
-            <!-- Policy Engine Status Box -->
+            <!-- Policy Status -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm space-y-5">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Cancellation & Rescheduling Policy</span>
@@ -246,7 +246,7 @@
                 </div>
 
                 @if($booking->status === 'pending_downpayment')
-                <!-- Unpaid Notice Card -->
+                <!-- Unpaid Downpayment Notice -->
                 <div class="p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 space-y-3">
                     <div class="font-bold text-sm text-amber-900">
                         Downpayment Required
@@ -262,7 +262,7 @@
                     </form>
                 </div>
                 @else
-                <!-- Reschedule Status Card -->
+                <!-- Reschedule Status -->
                 <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Reschedule</span>
@@ -281,7 +281,7 @@
                     @endif
                 </div>
 
-                <!-- Cancellation Status Card -->
+                <!-- Cancellation Status -->
                 <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Cancel / Refund</span>
@@ -301,7 +301,7 @@
                 </div>
                 @endif
 
-                <!-- Force Majeure Notice if applicable -->
+                <!-- Marine Safety Advisory Notice -->
                 @if($policy['is_force_majeure'])
                 <div class="p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-sm text-[#991B1B] space-y-1">
                     <div class="font-bold">
@@ -314,7 +314,7 @@
                 @endif
             </div>
 
-            <!-- Help Box -->
+            <!-- Coordinator Contact -->
             <div class="p-5 sm:p-6 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-sm text-[#6E6E73] space-y-2">
                 <h4 class="font-bold text-[#1D1D1F] text-sm">Need Special Assistance?</h4>
                 <p class="text-xs">For custom requests, contact our coordinators:</p>
@@ -329,9 +329,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- RESCHEDULE MODAL -->
-    <!-- ========================================================================= -->
+    <!-- Reschedule Modal -->
     <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
@@ -368,7 +366,7 @@
                     </div>
                 </div>
 
-                <!-- Weather Check for Reschedule -->
+                <!-- Weather Forecast Check -->
                 <div x-show="rescheduleForecast" x-cloak class="p-3.5 rounded-xl text-xs space-y-1"
                      :style="'background-color: ' + (rescheduleForecast?.bg_color || '#F2F2F7') + '; color: ' + (rescheduleForecast?.text_color || '#1D1D1F')">
                     <div class="font-bold flex items-center justify-between">
@@ -399,9 +397,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- CANCELLATION MODAL -->
-    <!-- ========================================================================= -->
+    <!-- Cancellation Modal -->
     <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
@@ -416,7 +412,7 @@
                 @csrf
                 <input type="hidden" name="pin" value="{{ $booking->pin }}">
 
-                <!-- Refund calculation breakdown -->
+                <!-- Refund Calculation Breakdown -->
                 <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                     <div class="flex justify-between">
                         <span class="text-[#6E6E73]">Downpayment Paid:</span>
@@ -438,7 +434,7 @@
                     <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <!-- 2-Step Confirmation Checkbox -->
+                <!-- Cancellation Confirmation Checkbox -->
                 <div class="pt-1">
                     <label class="flex items-start gap-2.5 cursor-pointer">
                         <input type="checkbox" name="confirm_cancel_ack" required class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5">

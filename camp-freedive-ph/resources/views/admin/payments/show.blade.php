@@ -5,7 +5,7 @@
 @section('content')
 <div class="space-y-6 text-sm" x-data="{ openBalanceModal: false }">
     
-    <!-- Top Breadcrumb -->
+    <!-- Breadcrumb and Actions -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-4">
         <div>
             <div class="flex items-center gap-2">
@@ -34,7 +34,7 @@
         </div>
     </div>
 
-    <!-- Overview Banner -->
+    <!-- Payment Overview Banner -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="space-y-2">
             <div class="flex items-center gap-3">
@@ -62,10 +62,10 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- LEFT 2 COLUMNS: TRANSACTION & GATEWAY DETAILS -->
+        <!-- Transaction and Gateway Details -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- PayMongo Gateway Identifiers -->
+            <!-- Gateway and Reference Identifiers -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Gateway & Reference Identifiers</h3>
 
@@ -126,10 +126,10 @@
 
         </div>
 
-        <!-- RIGHT 1 COLUMN: LINKED BOOKING SUMMARY -->
+        <!-- Linked Booking Summary -->
         <div class="space-y-6">
             
-            <!-- Linked Booking Card -->
+            <!-- Linked Booking Details -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Linked Reservation</h3>
@@ -178,9 +178,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- BALANCE SETTLEMENT MODAL -->
-    <!-- ========================================================================= -->
+    <!-- Balance Settlement Modal -->
     <div x-show="openBalanceModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openBalanceModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Record Balance Settlement</h3>

@@ -42,7 +42,7 @@
         <!-- VIEW 1: OPERATIONS COMMAND CENTER (ADMIN & OWNER OPS) -->
         <!-- ========================================================================= -->
 
-        <!-- 1. Operational KPI Metrics (Single Box with Vertical Line Dividers) -->
+        <!-- Operational KPI Metrics -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
             <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
                 
@@ -78,11 +78,11 @@
             </div>
         </div>
 
-        <!-- 2. Combined Row: Action Sub-Cards (Left) & Upcoming Weekend Batches 4 Cards (Right) -->
+        <!-- Action Items and Upcoming Weekend Batches -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
             
             @if($actionInbox['total_count'] > 0)
-                <!-- Left Column: Action Required Sub-Cards (Borderless, Using Tint Backgrounds, Covering Full Height) -->
+                <!-- Action Items -->
                 <div class="lg:col-span-4 flex flex-col h-full space-y-3">
                     <div class="flex items-center justify-between pb-0.5">
                         <h2 class="text-base font-bold text-[#1D1D1F]">Action Items</h2>
@@ -170,7 +170,7 @@
                     </div>
                 </div>
 
-                <!-- Right Column: Upcoming Weekend Batches (4 cards in 2x2 grid) -->
+                <!-- Upcoming Weekend Batches -->
                 <div class="lg:col-span-8 space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
@@ -199,7 +199,7 @@
 
                                     <div>
                                         <p class="text-xs text-[#6E6E73]">
-                                            {{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}
+                                             {{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}
                                             <span class="text-[#780000] font-semibold">({{ $batch->start_date->diffForHumans() }})</span>
                                         </p>
                                     </div>
@@ -210,7 +210,7 @@
                                         <span class="font-bold text-[#1D1D1F]">{{ $pax }} {{ Str::plural('participant', $pax) }}</span>
                                     </div>
 
-                                    <!-- Staffing Status Pill -->
+                                    <!-- Staffing Status -->
                                     <div class="flex items-center justify-between text-xs">
                                         <span class="text-[#6E6E73] font-medium">Coaches:</span>
                                         @if($coachesAssigned >= $coachesNeeded)
@@ -234,7 +234,7 @@
                     </div>
                 </div>
             @else
-                <!-- When no action alerts, Upcoming Weekend Batches spans 4 columns -->
+                <!-- Upcoming Weekend Batches -->
                 <div class="lg:col-span-12 space-y-3">
                     <div class="flex items-center justify-between">
                         <div>
@@ -274,7 +274,7 @@
                                         <span class="font-bold text-[#1D1D1F]">{{ $pax }} {{ Str::plural('participant', $pax) }}</span>
                                     </div>
 
-                                    <!-- Staffing Status Pill -->
+                                    <!-- Staffing Status -->
                                     <div class="flex items-center justify-between text-xs">
                                         <span class="text-[#6E6E73] font-medium">Coaches:</span>
                                         @if($coachesAssigned >= $coachesNeeded)
@@ -301,7 +301,7 @@
 
         </div>
 
-        <!-- 4. Recent Confirmed Bookings Feed -->
+        <!-- Recent Confirmed Bookings -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
             <div class="p-4 sm:p-5 border-b border-[#E5E5EA] flex items-center justify-between">
                 <div>
@@ -377,7 +377,7 @@
         <!-- VIEW 2: OWNER EXECUTIVE & FINANCIAL ANALYTICS -->
         <!-- ========================================================================= -->
 
-        <!-- 1. Executive Financial Balance Sheet (Single Box with Vertical Line Dividers) -->
+        <!-- Executive Financial Metrics -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
             <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
                 
@@ -411,7 +411,7 @@
             </div>
         </div>
 
-        <!-- 2. Class Package Revenue Contribution (Segmented Progress Bar) -->
+        <!-- Class Package Revenue Contribution -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-2xs space-y-5">
@@ -419,7 +419,7 @@
                     <h2 class="text-base font-bold text-[#1D1D1F]">Class Package Revenue Contribution</h2>
                 </div>
 
-                <!-- Multi-Segment Stacked Progress Bar (Reference Design) -->
+                <!-- Package Revenue Share -->
                 <div class="space-y-2">
                     <div class="w-full bg-[#E5E5EA] h-6 sm:h-7 rounded-xl overflow-hidden flex shadow-inner">
                         @foreach($packageAnalytics as $pKey => $pData)
@@ -442,7 +442,7 @@
                     </div>
                 </div>
 
-                <!-- 3-Column Stats Sub-Card (Matching reference design) -->
+                <!-- Package Metrics Breakdown -->
                 <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC]">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5EA]">
                         @foreach($packageAnalytics as $pKey => $pData)
@@ -474,7 +474,7 @@
                 </div>
             </div>
 
-            <!-- 3. Dynamic Pricing Strategy Card -->
+            <!-- Dynamic Pricing Strategy -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-2xs space-y-4 flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
@@ -510,7 +510,7 @@
 
         </div>
 
-        <!-- 4. Governance & Audit Log Stream -->
+        <!-- Governance & Audit Log Stream -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-2xs space-y-4">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                 <div>

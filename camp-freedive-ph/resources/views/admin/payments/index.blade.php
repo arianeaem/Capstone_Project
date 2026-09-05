@@ -30,7 +30,7 @@
         </div>
     </div>
 
-    <!-- Quick Stats Grid (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    <!-- Payment Summary Metrics -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
         <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
             <!-- Total Collections -->
@@ -66,14 +66,14 @@
         </div>
     </div>
 
-    <!-- Payments Ledger Table Container with Integrated Toolbar Header -->
+    <!-- Payments Ledger Table -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
-        <!-- Integrated Toolbar Header (Stage Pills + Search + Filter Popover) -->
+        <!-- Table Toolbar Header -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Stage Tabs -->
+                <!-- Payment Stage Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['stage' => '']) }}" 
                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('stage') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -93,7 +93,7 @@
                     </a>
                 </div>
 
-                <!-- Right: Search Input + Filter Popover -->
+                <!-- Search and Filter Controls -->
                 <div class="flex items-center gap-2" x-data="{ openFilters: false }">
                     <form method="GET" action="{{ route('admin.payments.index') }}" class="flex items-center gap-2">
                         @if(request('stage'))
@@ -119,7 +119,7 @@
                         </div>
                     </form>
 
-                    <!-- Filter Button with Popover -->
+                    <!-- Filter Controls -->
                     <div class="relative">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
@@ -133,7 +133,7 @@
                             @endif
                         </button>
 
-                        <!-- Filter Popover Menu -->
+                        <!-- Filter Form Dropdown -->
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
@@ -205,7 +205,7 @@
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($payments as $payment)
                     <tr onclick="window.location='{{ route('admin.payments.show', $payment) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group">
-                        <!-- Transaction ID -->
+                        <!-- Transaction Details -->
                         <td class="py-3 px-4 text-left font-mono font-bold text-[#1D1D1F] group-hover:text-[#780000]">
                             {{ $payment->transaction_id ?? ('TXN-' . $payment->id) }}
                             @if($payment->paymongo_payment_id)
@@ -213,7 +213,7 @@
                             @endif
                         </td>
 
-                        <!-- Booking Link -->
+                        <!-- Booking Reference -->
                         <td class="py-3 px-4 text-left" onclick="event.stopPropagation()">
                             @if($payment->booking)
                                 <a href="{{ route('admin.bookings.show', $payment->booking) }}" class="font-mono font-bold text-[#780000] hover:underline">
@@ -241,24 +241,24 @@
                             </span>
                         </td>
 
-                        <!-- Method -->
+                        <!-- Payment Method -->
                         <td class="py-3 px-4 text-left font-medium text-[#1D1D1F]">
                             {{ $payment->formatted_payment_method }}
                         </td>
 
-                        <!-- Gross Amount -->
+                        <!-- Payment Amount -->
                         <td class="py-3 px-4 text-left font-bold text-sm text-[#1D1D1F]">
                             ₱{{ number_format($payment->amount, 2) }}
                         </td>
 
-                        <!-- Status Badge -->
+                        <!-- Payment Status -->
                         <td class="py-3 px-4 text-left">
                             <span class="px-2 py-0.5 rounded-md text-xs font-bold border inline-block {{ $payment->status_badge['class'] }}">
                                 {{ $payment->status_badge['label'] }}
                             </span>
                         </td>
 
-                        <!-- Date -->
+                        <!-- Payment Date -->
                         <td class="py-3 px-4 text-left pr-6 text-[#6E6E73] whitespace-nowrap">
                             {{ $payment->paid_at ? $payment->paid_at->format('M d, Y g:i A') : $payment->created_at->format('M d, Y g:i A') }}
                         </td>
@@ -274,7 +274,7 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- Table Pagination -->
         @if($payments->hasPages())
         <div class="p-4 border-t border-[#E5E5EA] bg-[#FAFAFC]">
             {{ $payments->links() }}

@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    <!-- Batch Assignment Cards Grid -->
+    <!-- Batch Assignment Schedule -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($batches as $batch)
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col justify-between space-y-4 hover:border-[#D1D1D6] transition-colors">
@@ -112,9 +112,7 @@
         {{ $batches->links() }}
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 1: CREATE 2D1N BATCH SCHEDULE -->
-    <!-- ========================================================================= -->
+    <!-- Create Batch Schedule Modal -->
     <div x-show="openBatchModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openBatchModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Create 2D1N Batch Schedule</h3>
@@ -155,9 +153,7 @@
         </div>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- MODAL 2: ASSIGN COACH TO BATCH -->
-    <!-- ========================================================================= -->
+    <!-- Assign Coach Modal -->
     <div x-show="openAssignModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openAssignModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Assign Coach to Batch</h3>

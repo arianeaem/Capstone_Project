@@ -46,7 +46,7 @@
         </div>
     </div>
 
-    <!-- Section 1: Pending Queue (Card Format) -->
+    <!-- Pending Refund Queue -->
     <div class="space-y-3.5">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
@@ -59,7 +59,7 @@
             </h2>
         </div>
 
-        <!-- CARD GRID -->
+        <!-- Pending Refund Requests -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             @forelse($pendingRefunds as $req)
             @php
@@ -71,7 +71,7 @@
             @endphp
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
                 
-                <!-- Card Header -->
+                <!-- Request Header -->
                 <div>
                     <div class="flex items-start justify-between gap-3 border-b border-[#E5E5EA] pb-3">
                         <div class="space-y-1 min-w-0">
@@ -93,7 +93,7 @@
                         </span>
                     </div>
 
-                    <!-- Lead Guest & Trip Details -->
+                    <!-- Guest and Trip Details -->
                     <div class="mt-3 space-y-1 text-xs">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-sm text-[#1D1D1F]">{{ $booking->contact_name }}</span>
@@ -107,7 +107,7 @@
                         </div>
                     </div>
 
-                    <!-- Refund Claim Details (Single Clean Section) -->
+                    <!-- Refund Claim Details -->
                     <div class="mt-3 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                         <div class="flex items-baseline justify-between">
                             <span class="text-xs text-[#6E6E73] font-medium">Refund Claim Amount:</span>
@@ -147,10 +147,10 @@
                     </div>
                 </div>
 
-                <!-- Card Action Footer -->
+                <!-- Request Actions -->
                 <div class="pt-3 border-t border-[#E5E5EA] space-y-2">
                     <div class="flex items-center gap-2">
-                        <!-- Reject Button -->
+                        <!-- Reject Action -->
                         <button type="button" 
                                 @click="openRejectModal('{{ route('admin.payments.refunds.reject', $req) }}', '{{ $booking->booking_number }}', '₱{{ number_format($claimAmount, 2) }}')"
                                 class="btn-secondary py-2 px-3 text-xs font-semibold text-center shrink-0">
@@ -158,7 +158,7 @@
                         </button>
 
                         @if(!$isEligible)
-                            <!-- Forfeit Action Form -->
+                            <!-- Forfeit Deposit Action -->
                             <form action="{{ route('admin.payments.refunds.forfeit', $req) }}" method="POST" class="flex-1">
                                 @csrf
                                 <input type="hidden" name="forfeit_reason" value="cancellation_outside_policy_window">
@@ -169,7 +169,7 @@
                                 </button>
                             </form>
                         @else
-                            <!-- Approve Action Form -->
+                            <!-- Approve Refund Action -->
                             <form action="{{ route('admin.payments.refunds.approve', $req) }}" method="POST" class="flex-1">
                                 @csrf
                                 <button type="submit" 
@@ -182,7 +182,7 @@
                     </div>
 
                     @if(!$isEligible)
-                        <!-- Policy Override Action Button -->
+                        <!-- Policy Override Refund Action -->
                         <form action="{{ route('admin.payments.refunds.approve', $req) }}" method="POST">
                             @csrf
                             <input type="hidden" name="notes" value="Administrative policy override: 100% refund approved">
@@ -210,7 +210,7 @@
         </div>
     </div>
 
-    <!-- Section 2: Processed Refund History Table -->
+    <!-- Processed Refund History -->
     <div class="space-y-3 pt-6 border-t border-[#E5E5EA]">
         <div class="flex items-center justify-between">
             <div>

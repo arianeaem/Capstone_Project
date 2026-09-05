@@ -59,7 +59,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- LEFT 2 COLUMNS: PARTICIPANTS & TRIP INFO -->
+    <!-- Participants & Trip Details -->
         <div class="lg:col-span-2 space-y-6">
             
             <!-- Participants Roster -->
@@ -89,7 +89,7 @@
                 </div>
             </div>
 
-            <!-- Primary Contact & Transportation -->
+            <!-- Contact and Logistics -->
             <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Contact & Logistics</h3>
 
@@ -124,7 +124,7 @@
                 </div>
             </div>
 
-            <!-- Status Transition History & Audit Trail -->
+            <!-- Booking Audit Trail -->
             <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Booking Audit Trail & History</h3>
@@ -152,7 +152,7 @@
                         <span class="text-xs text-[#8E8E93] block">Actor: <strong class="text-[#1D1D1F]">{{ $log->user ? $log->user->name : ($booking->created_by ? 'Staff' : 'Online Guest / System') }}</strong></span>
                     </div>
                     @empty
-                    <!-- Fallback row for legacy seeded bookings -->
+                    <!-- Fallback Creation Log -->
                     <div class="py-3 text-xs space-y-1">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F]">Reservation Created</span>
@@ -167,10 +167,10 @@
 
         </div>
 
-        <!-- RIGHT 1 COLUMN: INVOICE & PAYMENT SNAPSHOT -->
+        <!-- Invoice & Payment Snapshot -->
         <div class="space-y-6">
             
-            <!-- Itemized Pricing Breakdown -->
+            <!-- Itemized Invoice Breakdown -->
             <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Itemized Invoice</h3>
 
@@ -221,7 +221,7 @@
                 </div>
             </div>
 
-            <!-- Payment Summary Snapshot (Read-Only) -->
+            <!-- Payment Summary Snapshot -->
             <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Payment Summary</h3>
@@ -243,7 +243,7 @@
                     @endforelse
                 </div>
 
-                <!-- Route to Payments & Refunds Module Button -->
+                <!-- Payment Navigation -->
                 <div class="border-[#E5E5EA]">
                     <a href="javascript:void(0)" 
                        onclick="alert('Routing to Payments & Refunds Module for Booking #{{ $booking->booking_number }}')"
@@ -257,9 +257,7 @@
 
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- STATUS CHANGE MODAL -->
-    <!-- ========================================================================= -->
+    <!-- Status Change Modal -->
     <div x-show="openStatusModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-[#E5E5EA]" @click.outside="openStatusModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">

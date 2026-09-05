@@ -27,7 +27,7 @@
         </a>
     </div>
 
-    <!-- PENDING REQUESTS GROUPED BY BATCH -->
+    <!-- Pending Requests Grouped by Batch -->
     <div class="space-y-6">
 
         @forelse($pendingRequests as $batchId => $groupRequests)
@@ -60,7 +60,7 @@
                 </div>
             </div>
 
-            <!-- Coaches Applied Cards Grid -->
+            <!-- Applied Coaches List -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 @foreach($groupRequests as $req)
                 <div class="bg-[#FAFAFC] p-4 rounded-xl flex flex-col justify-between gap-3 shadow-2xs">
@@ -103,7 +103,7 @@
         @endforelse
     </div>
 
-    <!-- REVIEWED HISTORY -->
+    <!-- Reviewed Request History -->
     @if($reviewedRequests->count() > 0)
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
         <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Reviewed History</h3>

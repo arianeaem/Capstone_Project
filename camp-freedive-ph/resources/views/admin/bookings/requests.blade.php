@@ -43,7 +43,7 @@
         </div>
     </div>
 
-    <!-- Section 1: Pending Reschedule Requests -->
+    <!-- Pending Reschedule Requests -->
     <div class="space-y-3.5">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
@@ -63,7 +63,7 @@
                 $resPolicy = $reschedulePolicies[$req->id] ?? null;
             @endphp
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:border-[#D1D1D6] transition-all gap-4">
-                <!-- Header & Body -->
+                <!-- Request Header -->
                 <div>
                     <div class="flex items-start justify-between gap-2 border-b border-[#E5E5EA] pb-3">
                         <div class="min-w-0">
@@ -78,7 +78,7 @@
                         </span>
                     </div>
 
-                    <!-- Date Shift Comparison Box -->
+                    <!-- Date Shift Details -->
                     <div class="mt-3 space-y-2 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] text-xs">
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-[#6E6E73] text-xs">Current:</span>
@@ -102,7 +102,7 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
+                <!-- Reschedule Actions -->
                 <div class="flex items-center gap-2 pt-3 border-t border-[#E5E5EA]">
                     <button type="button" 
                             @click="openRejectModal('{{ route('admin.bookings.requests.reschedule.reject', $req) }}', '{{ $booking->booking_number }}', 'Reschedule')"
@@ -128,7 +128,7 @@
         </div>
     </div>
 
-    <!-- Section 2: Pending Cancellation Requests -->
+    <!-- Pending Cancellation Requests -->
     <div class="space-y-3.5 pt-4">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
@@ -150,7 +150,7 @@
                 $recRefund = $policy['calculated_refund'] ?? $req->calculated_refund_amount;
             @endphp
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:border-[#D1D1D6] transition-all gap-4">
-                <!-- Header & Body -->
+                <!-- Request Header -->
                 <div>
                     <div class="flex items-start justify-between gap-2 border-b border-[#E5E5EA] pb-3">
                         <div class="min-w-0">
@@ -165,7 +165,7 @@
                         </span>
                     </div>
 
-                    <!-- Details & Policy Section (Single Clean Box) -->
+                    <!-- Cancellation Policy & Breakdown -->
                     <div class="mt-3 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
                         <div class="flex items-center justify-between gap-2">
                             <span class="text-[#6E6E73]">Trip Dates:</span>
@@ -206,10 +206,10 @@
                     </div>
                 </div>
 
-                <!-- Action Buttons with Policy Choices -->
+                <!-- Cancellation Resolution Actions -->
                 <div class="space-y-2 pt-3 border-t border-[#E5E5EA]">
                     @if($isFullRefund)
-                        <!-- If Policy gives full refund -->
+                        <!-- Full Refund Actions -->
                         <div class="flex items-center gap-2">
                             <button type="button" 
                                     @click="openRejectModal('{{ route('admin.bookings.requests.cancellation.reject', $req) }}', '{{ $booking->booking_number }}', 'Cancellation')"
@@ -228,7 +228,7 @@
                             </form>
                         </div>
                     @else
-                        <!-- If Policy forfeits downpayment (< 14 days), offer choices -->
+                        <!-- Forfeiture or Override Actions -->
                         <div class="space-y-2">
                             <div class="flex items-center gap-2">
                                 <button type="button" 

@@ -7,7 +7,7 @@
 <div class="max-w-md mx-auto px-4 sm:px-6 py-12 sm:py-20 text-sm">
     <div class="bg-white rounded-xl border border-[#E5E5EA] shadow-sm p-6 sm:p-10">
         
-        <!-- Header -->
+        <!-- Lookup Header -->
         <div class="text-center mb-8">
             <h1 class="text-2xl font-extrabold text-[#1D1D1F]">Manage Booking</h1>
             <p class="text-sm text-[#6E6E73] mt-1.5">
@@ -15,7 +15,7 @@
             </p>
         </div>
 
-        <!-- Form -->
+        <!-- Booking Lookup Form -->
         <form action="{{ route('manage.search') }}" method="POST" class="space-y-5">
             @csrf
 
@@ -54,7 +54,7 @@
             </button>
         </form>
 
-        <!-- Help Strip -->
+        <!-- Support Contact Information -->
         <div class="mt-8 pt-6 border-t border-[#E5E5EA] text-center text-sm text-[#6E6E73]">
             <p>Need help with your reservation? <br>
             Message us on <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline">Facebook Messenger</a> or call <a href="tel:09278879894" class="text-[#780000] font-bold">0927 887 9894</a>.</p>

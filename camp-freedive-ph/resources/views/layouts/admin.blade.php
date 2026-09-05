@@ -58,17 +58,15 @@
 
     <div class="min-h-full flex flex-col md:flex-row">
 
-        <!-- ========================================================================= -->
-        <!-- 1. DESKTOP LEFT SIDEBAR (COLLAPSIBLE) -->
-        <!-- ========================================================================= -->
+        <!-- Desktop Sidebar -->
         <aside class="hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-white border-r border-[#E5E5EA] z-30 transition-all duration-300"
                :class="sidebarCollapsed ? 'md:w-20' : 'md:w-64'">
             
-            <!-- Top: Brand Logo & Company Name (Aligned with Header h-14) -->
+            <!-- Sidebar Header -->
             <div class="h-14 flex items-center bg-white border-b border-[#E5E5EA] transition-all overflow-hidden"
                  :class="sidebarCollapsed ? 'justify-center px-2' : 'px-4'">
                 
-                <!-- Expanded State: Logo + Camp FreedivePH Brand Name -->
+                <!-- Expanded Logo and Brand -->
                 <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
                    x-show="!sidebarCollapsed" 
                    class="flex items-center gap-2.5 min-w-0 flex-1 group">
@@ -78,7 +76,7 @@
                     </div>
                 </a>
 
-                <!-- Collapsed State: Centered Brand Logo Icon -->
+                <!-- Collapsed Logo -->
                 <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
                    x-show="sidebarCollapsed" 
                    class="flex items-center justify-center group"
@@ -174,8 +172,7 @@
                         </a>
                     @endif
                 @else
-                    <!-- Coach Portal Navigation -->
-                    <!-- 1. Dashboard -->
+                    <!-- Coach Navigation -->
                     <a href="{{ route('coach.dashboard') }}" 
                        title="Dashboard"
                        class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
@@ -184,7 +181,7 @@
                         <span x-show="!sidebarCollapsed" class="truncate">Dashboard</span>
                     </a>
 
-                    <!-- 2. Availability Calendar -->
+                    <!-- Availability Calendar -->
                     <a href="{{ route('coach.availability.index') }}" 
                        title="Availability Calendar"
                        class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
@@ -193,7 +190,7 @@
                         <span x-show="!sidebarCollapsed" class="truncate">Availability Calendar</span>
                     </a>
 
-                    <!-- 3. My Schedule & Students -->
+                    <!-- My Schedule & Students -->
                     <a href="{{ route('coach.schedule.index') }}" 
                        title="My Schedule & History"
                        class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('coach.schedule.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
@@ -202,7 +199,7 @@
                         <span x-show="!sidebarCollapsed" class="truncate">My Schedule & History</span>
                     </a>
 
-                    <!-- 4. Open Requests Board -->
+                    <!-- Open Requests Board -->
                     <a href="{{ route('coach.requests.index') }}" 
                        title="Open Slot Requests"
                        class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('coach.requests.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
@@ -214,9 +211,7 @@
             </nav>
         </aside>
 
-        <!-- ========================================================================= -->
-        <!-- 2. MOBILE DRAWER -->
-        <!-- ========================================================================= -->
+        <!-- Mobile Drawer -->
         <div x-show="mobileMenuOpen" x-cloak class="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="mobileMenuOpen = false"></div>
 
         <div x-show="mobileMenuOpen" 
@@ -230,7 +225,7 @@
              class="md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col shadow-2xl border-r border-[#E5E5EA]">
             
             <div>
-                <!-- Drawer Header with Brand Logo & Company Name -->
+                <!-- Mobile Drawer Header -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-[#E5E5EA]">
                     <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" class="flex items-center gap-2.5 min-w-0">
                         <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] shrink-0">
@@ -285,7 +280,7 @@
                             </a>
                         @endif
                     @else
-                        <!-- Coach Portal Mobile Navigation -->
+                        <!-- Coach Mobile Navigation -->
                         <a href="{{ route('coach.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
                             <span>Dashboard</span>
@@ -307,18 +302,16 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- 3. MAIN CONTENT CONTAINER WITH TOP NAV HEADER -->
-        <!-- ========================================================================= -->
+        <!-- Main Content Container -->
         <main class="flex-1 flex flex-col min-h-screen transition-all duration-300"
               :class="sidebarCollapsed ? 'md:pl-20' : 'md:pl-64'">
             
-            <!-- Sticky Top Header (Sidebar Toggle + Breadcrumbs + Avatar Dropdown) -->
+            <!-- Top Header -->
             <header class="sticky top-0 z-20 bg-white border-b border-[#E5E5EA] px-4 sm:px-6 h-14 flex items-center justify-between shadow-2xs">
                 
-                <!-- Left: Sidebar Toggle Button + Vertical Divider + Breadcrumb Title -->
+                <!-- Sidebar Controls and Breadcrumbs -->
                 <div class="flex items-center gap-3">
-                    <!-- Desktop Sidebar Toggle Button -->
+                    <!-- Desktop Sidebar Toggle -->
                     <button type="button" 
                             @click="toggleSidebar()" 
                             class="hidden md:flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] transition-all cursor-pointer"
@@ -326,17 +319,17 @@
                         <img src="{{ asset('icons/icons8-sidebar-60.png') }}" class="w-5 h-5 shrink-0 opacity-80 hover:opacity-100 transition-opacity" alt="Toggle Sidebar">
                     </button>
 
-                    <!-- Mobile Menu Trigger Button -->
+                    <!-- Mobile Drawer Toggle -->
                     <button type="button" 
                             @click="mobileMenuOpen = !mobileMenuOpen"
                             class="md:hidden flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] cursor-pointer">
                         <img src="{{ asset('icons/icons8-sidebar-60.png') }}" class="w-5 h-5 shrink-0 opacity-80 hover:opacity-100 transition-opacity" alt="Open Menu">
                     </button>
 
-                    <!-- Vertical Divider -->
+                    <!-- Section Separator -->
                     <div class="h-4 w-px bg-[#D1D1D6]"></div>
 
-                    <!-- Breadcrumb Trail / Page Title -->
+                    <!-- Breadcrumbs -->
                     <div class="flex items-center gap-1.5 text-xs sm:text-sm">
                         @if(View::hasSection('breadcrumb'))
                             @yield('breadcrumb')
@@ -346,20 +339,20 @@
                     </div>
                 </div>
 
-                <!-- Right: User Avatar + Interactive Profile Popover Dropdown -->
+                <!-- User Profile Menu -->
                 <div class="relative" x-data="{ profileMenuOpen: false }">
                     <button type="button" 
                             @click="profileMenuOpen = !profileMenuOpen" 
                             @click.outside="profileMenuOpen = false"
                             class="flex items-center gap-2 cursor-pointer focus:outline-none group">
                         
-                        <!-- Circular Avatar with User Initials -->
+                        <!-- User Avatar -->
                         <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs group-hover:ring-2 group-hover:ring-[#780000]/30 transition-all">
                             {{ $userInitials }}
                         </div>
                     </button>
 
-                    <!-- Dropdown Popover Menu (First & Last Name, Email, Role, Logout) -->
+                    <!-- User Profile Dropdown -->
                     <div x-show="profileMenuOpen" 
                          x-cloak
                          x-transition:enter="transition ease-out duration-150 transform"
@@ -370,7 +363,7 @@
                          x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
                          class="absolute right-0 mt-2 w-64 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-3 z-50 space-y-3">
                         
-                        <!-- User Info Header (First & Last Name + Email) -->
+                        <!-- User Information -->
                         <div class="flex items-center gap-3 pb-3 border-b border-[#E5E5EA]">
                             <div class="w-10 h-10 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-sm shrink-0 shadow-2xs">
                                 {{ $userInitials }}
@@ -384,7 +377,7 @@
                             </div>
                         </div>
 
-                        <!-- Logout Button -->
+                        <!-- Logout -->
                         <div>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf

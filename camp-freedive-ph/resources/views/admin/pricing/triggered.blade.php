@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <!-- Metrics Cards -->
+    <!-- Pricing Trigger Metrics -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] shadow-2xs space-y-0.5">
             <div class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider">Bookings Triggered</div>

@@ -23,7 +23,7 @@
         </div>
     </div>
 
-    <!-- Metrics Summary (Single Box with Vertical Dividers with Top/Bottom Margin) -->
+    <!-- Pricing Metrics Summary -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
         <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
             <!-- Total Rules -->
@@ -61,14 +61,14 @@
         </div>
     </div>
 
-    <!-- Pricing Rules Table with Integrated Toolbar Header -->
+    <!-- Pricing Rules Table -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
-        <!-- Integrated Toolbar Header (Pill Tabs + Filter Popover) -->
+        <!-- Table Toolbar Header -->
         <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
-                <!-- Left: Rule Type Tabs -->
+                <!-- Rule Type Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['rule_type' => 'all']) }}" 
                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('rule_type', 'all') === 'all' || !request('rule_type') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
@@ -88,7 +88,7 @@
                     </a>
                 </div>
 
-                <!-- Right: Filter Popover -->
+                <!-- Filter Controls -->
                 <div class="flex items-center gap-2 self-end lg:self-auto shrink-0" x-data="{ openFilters: false }">
                     <div class="relative">
                         <button type="button" 
@@ -103,7 +103,7 @@
                             @endif
                         </button>
 
-                        <!-- Filter Popover Menu -->
+                        <!-- Filter Dropdown Menu -->
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 

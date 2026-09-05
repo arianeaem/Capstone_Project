@@ -1,7 +1,7 @@
 @if ($paginator->hasPages() || $paginator->total() > 0)
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 py-3 bg-[#FAFAFC] border-t border-[#E5E5EA] text-xs text-[#6E6E73] rounded-b-xl">
         
-        <!-- 1. Rows Per Page Selector -->
+        <!-- Rows Per Page Selector -->
         <div class="flex items-center gap-2">
             <span class="font-medium text-[#6E6E73]">Rows per page:</span>
             <select onchange="window.handleTablePerPageChange(this.value)"
@@ -17,7 +17,7 @@
             </select>
         </div>
 
-        <!-- 2. Showing X to Y of Z Results -->
+        <!-- Pagination Result Counter -->
         <div class="font-medium text-[#6E6E73] text-center sm:text-left">
             @if ($paginator->total() > 0)
                 Showing 
@@ -32,7 +32,7 @@
             @endif
         </div>
 
-        <!-- 3. Page X of Y & Navigation Controls -->
+        <!-- Pagination Navigation Controls -->
         <div class="flex items-center justify-end gap-3 flex-wrap">
             <span class="font-medium text-[#6E6E73]">
                 Page <span class="font-bold text-[#1D1D1F]">{{ $paginator->currentPage() }}</span> 

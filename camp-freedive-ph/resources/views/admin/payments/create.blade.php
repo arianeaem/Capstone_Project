@@ -9,7 +9,7 @@
          amount: '{{ $selectedBooking ? $selectedBooking->balance_amount : '' }}'
      }">
     
-    <!-- Top Breadcrumb -->
+    <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
         <div>
             <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <!-- Form Card -->
+    <!-- Create Payment Record Form -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
         <form action="{{ route('admin.payments.store') }}" method="POST" class="space-y-4">
             @csrf
@@ -106,7 +106,7 @@
                 <textarea name="notes" id="notes" rows="2" placeholder="e.g. Remaining balance collected during gear fitting" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
             </div>
 
-            <!-- Submit Controls -->
+            <!-- Form Actions -->
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E5EA]">
                 <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
                 <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold shadow-md">
