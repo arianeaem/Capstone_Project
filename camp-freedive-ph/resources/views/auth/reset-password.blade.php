@@ -15,9 +15,9 @@
     
     <!-- Auth Brand Banner -->
     <div class="hidden lg:block lg:w-1/2 relative bg-[#1D1D1F] overflow-hidden min-h-screen">
-        <img src="{{ asset('images/about-hero.jpg') }}" 
+        <img src="{{ asset('images/bg-auth.png') }}" 
              alt="Camp FreedivePH Ocean" 
-             class="absolute inset-0 w-full h-full object-cover opacity-85">
+             class="absolute inset-0 w-full h-full object-cover">
     </div>
 
     <!-- Reset Password Form -->

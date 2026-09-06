@@ -552,7 +552,7 @@
                     <!-- Section 1: Participants -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between pb-2">
-                            <h3 class="text-base font-bold text-[#1D1D1F]">1. Participants</h3>
+                            <h4 class="text-lg font-bold text-[#1D1D1F]">1. Participants</h4>
                             <button type="button" 
                                     @click="addParticipant()" 
                                     class="px-3.5 py-1.5 rounded-xl border border-[#780000] text-[#780000] font-bold text-xs bg-[#F8EAEA]/30 hover:bg-[#F8EAEA] transition-colors flex items-center gap-1.5 shadow-2xs">
@@ -647,7 +647,7 @@
 
                     <!-- Contact Details -->
                     <div class="space-y-4 pt-2">
-                        <h3 class="text-base font-bold text-[#1D1D1F] pb-2">2. Contact Information</h3>
+                        <h4  class="text-lg font-bold text-[#1D1D1F] pb-2">2. Contact Information</h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
@@ -711,7 +711,7 @@
 
                     <!-- Transportation and Add-ons -->
                     <div class="space-y-4 pt-2">
-                        <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h3>
+                        <h4  class="text-lg font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h4>
                         
                         <div class="space-y-3">
                             <label class="block font-bold text-[#1D1D1F] text-xs">Transportation Option:</label>

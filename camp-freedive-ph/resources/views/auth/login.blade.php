@@ -6,6 +6,7 @@
     <title>Login | Camp FreedivePH</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800,900" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full antialiased font-sans bg-white text-[#1D1D1F]">
@@ -14,9 +15,9 @@
     
     <!-- Auth Brand Banner -->
     <div class="hidden lg:block lg:w-1/2 relative bg-[#1D1D1F] overflow-hidden min-h-screen">
-        <img src="{{ asset('images/about-hero.jpg') }}" 
+        <img src="{{ asset('images/bg-auth.png') }}" 
              alt="Camp FreedivePH Ocean" 
-             class="absolute inset-0 w-full h-full object-cover opacity-85">
+             class="absolute inset-0 w-full h-full object-cover">
     </div>
 
     <!-- Login Form -->
