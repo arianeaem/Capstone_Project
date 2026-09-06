@@ -155,7 +155,7 @@
     <!-- Batches List -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
         @forelse($batches as $batch)
-        <div onclick="window.location='{{ route('admin.batches.show', $batch) }}'" class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group {{ $batch->needs_attention ? 'bg-[#FEF3C7]' : 'bg-white' }}">
+        <div onclick="window.location='{{ route('admin.batches.show', $batch) }}'" class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group bg-white">
             
             <!-- Batch Information -->
             <div>
@@ -182,7 +182,7 @@
                 <div class="mt-3 space-y-2 text-xs">
 
                     <!-- Staffing and Capacity Overview -->
-                    <div class="space-y-1.5">">
+                    <div class="space-y-1.5">
                         <div class="flex items-center justify-between text-xs">
                             <span class="font-bold text-[#1D1D1F]">
                                 {{ $batch->total_participants_count }} Pax ({{ $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])->count() }} bookings)

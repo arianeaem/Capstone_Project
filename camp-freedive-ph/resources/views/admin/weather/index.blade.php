@@ -164,18 +164,10 @@
             $day1 = $batch->riskAssessments->where('day_number', 1)->first() ?? $batch->riskAssessments->filter(fn($a) => $a->dive_date?->toDateString() === $batch->start_date?->toDateString())->first();
             $day2 = $batch->riskAssessments->where('day_number', 2)->first() ?? $batch->riskAssessments->filter(fn($a) => $a->dive_date?->toDateString() === $batch->end_date?->toDateString())->first();
             $override = $batch->manualOverrides->first();
-
-            $riskKey = strtolower(str_replace([' ', '-'], '_', $batch->risk_classification ?: 'safe'));
-            $batchCardBg = match($riskKey) {
-                'very_safe', 'safe' => 'bg-[#ECFDF5]',
-                'moderate' => 'bg-[#FEF3C7]',
-                'high_risk', 'critical_risk' => 'bg-[#FEE2E2]',
-                default => 'bg-white',
-            };
         @endphp
         
         <div onclick="window.location='{{ route('admin.weather.show', $batch) }}'" 
-             class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group {{ $batchCardBg }}">
+             class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group bg-white">
             
             <!-- Batch Information -->
             <div>
@@ -202,7 +194,7 @@
                 <div class="mt-3 grid grid-cols-2 gap-2">
                     
                     <!-- Day 1 Assessment -->
-                    <div class="p-2.5 rounded-lg border border-[#E5E5EA] bg-white/80 space-y-1">
+                    <div class="p-2.5 rounded-lg border border-[#E5E5EA] bg-[#FAFAFC] space-y-1">
                         <div class="text-xs font-bold text-[#6E6E73]">
                             Day 1 ({{ $batch->start_date->format('M d') }})
                         </div>
@@ -216,7 +208,7 @@
                     </div>
 
                     <!-- Day 2 Assessment -->
-                    <div class="p-2.5 rounded-lg border border-[#E5E5EA] bg-white/80 space-y-1">
+                    <div class="p-2.5 rounded-lg border border-[#E5E5EA] bg-[#FAFAFC] space-y-1">
                         <div class="text-xs font-bold text-[#6E6E73]">
                             Day 2 ({{ $batch->end_date->format('M d') }})
                         </div>

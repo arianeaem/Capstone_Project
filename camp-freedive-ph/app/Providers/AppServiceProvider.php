@@ -15,6 +15,18 @@ class AppServiceProvider extends ServiceProvider
             \App\Contracts\PaymentGatewayInterface::class,
             \App\Services\Gateways\PayMongoGateway::class
         );
+
+        $this->app->singleton('url', function ($app) {
+            $routes = $app['router']->getRoutes();
+            $app->instance('routes', $routes);
+            return new \App\Routing\RoleAwareUrlGenerator(
+                $routes,
+                $app->rebinding('request', function ($app, $request) {
+                    $app['url']->setRequest($request);
+                }),
+                $app['config']['app.asset_url']
+            );
+        });
     }
 
     /**

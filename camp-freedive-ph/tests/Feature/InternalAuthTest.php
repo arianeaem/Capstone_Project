@@ -26,14 +26,14 @@ class InternalAuthTest extends TestCase
         $response->assertSee('Email Address');
     }
 
-    public function test_owner_login_redirects_to_admin_dashboard(): void
+    public function test_owner_login_redirects_to_owner_dashboard(): void
     {
         $response = $this->post('/login', [
             'email' => 'owner@campfreedive.ph',
             'password' => 'Password123!',
         ]);
 
-        $response->assertRedirect('/admin');
+        $response->assertRedirect('/owner');
         $this->assertAuthenticated();
         $this->assertEquals('owner', auth()->user()->role);
 
@@ -135,17 +135,20 @@ class InternalAuthTest extends TestCase
         $adminResponse->assertSee('Upcoming Weekend Batches');
         $this->get('/admin/settings/audit-logs')->assertStatus(403);
 
-        // Owner can access both executive and operations views
+        // Owner can access both executive and operations views on /owner
         $this->actingAs($owner);
-        $ownerExecResponse = $this->get('/admin')->assertStatus(200);
+        $ownerExecResponse = $this->get('/owner')->assertStatus(200);
         $ownerExecResponse->assertSee('Gross Collected Revenue');
         $ownerExecResponse->assertSee('Executive Analytics');
 
-        $ownerOpsResponse = $this->get('/admin?view=operations')->assertStatus(200);
+        $ownerOpsResponse = $this->get('/owner?view=operations')->assertStatus(200);
         $ownerOpsResponse->assertSee('Upcoming Weekend Batches');
 
-        $this->get('/admin/settings/audit-logs')->assertStatus(200);
-        $this->get('/admin/settings/users')->assertStatus(200);
+        $this->get('/owner/settings/audit-logs')->assertStatus(200);
+        $this->get('/owner/settings/users')->assertStatus(200);
+
+        // Owner visiting /admin/settings/audit-logs redirects to /owner/settings/audit-logs
+        $this->get('/admin/settings/audit-logs')->assertRedirect('/owner/settings/audit-logs');
     }
 
     public function test_owner_can_provision_new_coach_and_toggle_status(): void
@@ -154,7 +157,7 @@ class InternalAuthTest extends TestCase
         $this->actingAs($owner);
 
         // Provision a new Coach
-        $createResponse = $this->post('/admin/settings/users', [
+        $createResponse = $this->post('/owner/settings/users', [
             'name' => 'Coach New Recruit',
             'email' => 'coach.new@campfreedive.ph',
             'phone' => '0912 345 6789',
@@ -162,7 +165,7 @@ class InternalAuthTest extends TestCase
             'temp_password' => 'TempPass999!',
         ]);
 
-        $createResponse->assertRedirect(route('admin.users.index'));
+        $createResponse->assertRedirect(route('owner.users.index'));
         $this->assertDatabaseHas('users', [
             'email' => 'coach.new@campfreedive.ph',
             'role' => 'coach',
@@ -173,19 +176,19 @@ class InternalAuthTest extends TestCase
         $newCoach = User::where('email', 'coach.new@campfreedive.ph')->first();
 
         // Toggle status to inactive
-        $toggleResponse = $this->patch("/admin/settings/users/{$newCoach->id}/toggle-status");
+        $toggleResponse = $this->patch("/owner/settings/users/{$newCoach->id}/toggle-status");
         $toggleResponse->assertRedirect();
         $this->assertEquals('inactive', $newCoach->fresh()->status);
 
         // Edit profile
-        $editResponse = $this->put("/admin/settings/users/{$newCoach->id}", [
+        $editResponse = $this->put("/owner/settings/users/{$newCoach->id}", [
             'name' => 'Coach Updated Name',
             'email' => 'coach.new@campfreedive.ph',
             'phone' => '0999 888 7777',
             'role' => 'coach',
             'status' => 'active',
         ]);
-        $editResponse->assertRedirect(route('admin.users.index'));
+        $editResponse->assertRedirect(route('owner.users.index'));
         $this->assertEquals('Coach Updated Name', $newCoach->fresh()->name);
         $this->assertEquals('active', $newCoach->fresh()->status);
     }

@@ -63,7 +63,7 @@
                            name="email" 
                            id="email" 
                            value="{{ old('email') }}" 
-                           placeholder="staff@campfreedive.ph" 
+                           placeholder="name@example.com" 
                            required 
                            autofocus
                            class="w-full px-4 py-3 rounded-xl border {{ $errors->has('email') ? 'border-[#FF3B3C]' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-colors">

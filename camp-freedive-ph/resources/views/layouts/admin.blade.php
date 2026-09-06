@@ -39,15 +39,15 @@
 
     $routeName = request()->route() ? request()->route()->getName() : '';
     $pageBreadcrumbTitle = match(true) {
-        str_starts_with($routeName, 'admin.dashboard') => 'Dashboard',
-        str_starts_with($routeName, 'admin.bookings') => 'Bookings',
-        str_starts_with($routeName, 'admin.batches') => 'Batches',
-        str_starts_with($routeName, 'admin.weather') => 'Safety Monitoring',
-        str_starts_with($routeName, 'admin.pricing') => 'Dynamic Pricing',
-        str_starts_with($routeName, 'admin.payments') => 'Payments',
-        str_starts_with($routeName, 'admin.coaches') => 'Coaches & Schedules',
-        str_starts_with($routeName, 'admin.users') => 'User Management',
-        str_starts_with($routeName, 'admin.audit_logs') => 'Audit Logs',
+        str_starts_with($routeName, 'admin.dashboard') || str_starts_with($routeName, 'owner.dashboard') => 'Dashboard',
+        str_starts_with($routeName, 'admin.bookings') || str_starts_with($routeName, 'owner.bookings') => 'Bookings',
+        str_starts_with($routeName, 'admin.batches') || str_starts_with($routeName, 'owner.batches') => 'Batches',
+        str_starts_with($routeName, 'admin.weather') || str_starts_with($routeName, 'owner.weather') => 'Safety Monitoring',
+        str_starts_with($routeName, 'admin.pricing') || str_starts_with($routeName, 'owner.pricing') => 'Dynamic Pricing',
+        str_starts_with($routeName, 'admin.payments') || str_starts_with($routeName, 'owner.payments') => 'Payments',
+        str_starts_with($routeName, 'admin.coaches') || str_starts_with($routeName, 'owner.coaches') => 'Coaches & Schedules',
+        str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'owner.users') => 'User Management',
+        str_starts_with($routeName, 'admin.audit_logs') || str_starts_with($routeName, 'owner.audit_logs') => 'Audit Logs',
         str_starts_with($routeName, 'coach.dashboard') => 'Dashboard',
         str_starts_with($routeName, 'coach.availability') => 'Availability Calendar',
         str_starts_with($routeName, 'coach.schedule') => 'My Schedule & History',
@@ -63,11 +63,11 @@
                :class="sidebarCollapsed ? 'md:w-20' : 'md:w-64'">
             
             <!-- Sidebar Header -->
-            <div class="h-14 flex items-center bg-white border-b border-[#E5E5EA] transition-all overflow-hidden"
+            <div class="h-14 flex items-center bg-white transition-all overflow-hidden"
                  :class="sidebarCollapsed ? 'justify-center px-2' : 'px-4'">
                 
                 <!-- Expanded Logo and Brand -->
-                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
+                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : (auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard')) }}" 
                    x-show="!sidebarCollapsed" 
                    class="flex items-center gap-2.5 min-w-0 flex-1 group">
                     <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] group-hover:scale-105 transition-transform shrink-0">
@@ -77,7 +77,7 @@
                 </a>
 
                 <!-- Collapsed Logo -->
-                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" 
+                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : (auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard')) }}" 
                    x-show="sidebarCollapsed" 
                    class="flex items-center justify-center group"
                    title="Camp FreedivePH">
@@ -90,72 +90,72 @@
                  :class="sidebarCollapsed ? 'px-2' : 'px-3'">
                 @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
                     <!-- Dashboard -->
-                    <a href="{{ route('admin.dashboard') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard') }}" 
                        title="Dashboard"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.dashboard', 'owner.dashboard']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
                         <span x-show="!sidebarCollapsed" class="truncate">Dashboard</span>
                     </a>
 
                     <!-- Bookings -->
-                    <a href="{{ route('admin.bookings.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.index') : route('admin.bookings.index') }}" 
                        title="Bookings"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.bookings.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.bookings.*', 'owner.bookings.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Bookings">
                         <span x-show="!sidebarCollapsed" class="truncate">Bookings</span>
                     </a>
 
                     <!-- Batches -->
-                    <a href="{{ route('admin.batches.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.batches.index') : route('admin.batches.index') }}" 
                        title="Batches"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.batches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.batches.*', 'owner.batches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-medium-icons-32.png') }}" class="w-5 h-5 shrink-0" alt="Batches">
                         <span x-show="!sidebarCollapsed" class="truncate">Batches</span>
                     </a>
 
                     <!-- Weather & Marine Safety -->
-                    <a href="{{ route('admin.weather.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.weather.index') : route('admin.weather.index') }}" 
                        title="Safety Monitoring"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.weather.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.weather.*', 'owner.weather.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-warning-shield-32.png') }}" class="w-5 h-5 shrink-0" alt="SafetyMonitoring">
                         <span x-show="!sidebarCollapsed" class="truncate">Safety Monitoring</span>
                     </a>
 
                     <!-- Dynamic Pricing -->
-                    <a href="{{ route('admin.pricing.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.pricing.index') : route('admin.pricing.index') }}" 
                        title="Dynamic Pricing"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.pricing.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.pricing.*', 'owner.pricing.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-price-tag-60.png') }}" class="w-5 h-5 shrink-0" alt="DynamicPricing">
                         <span x-show="!sidebarCollapsed" class="truncate">Dynamic Pricing</span>
                     </a>
 
                     <!-- Payments & Refunds -->
-                    <a href="{{ route('admin.payments.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.payments.index') : route('admin.payments.index') }}" 
                        title="Payments & Refunds"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.payments.*', 'owner.payments.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-magnetic-card-60.png') }}" class="w-5 h-5 shrink-0" alt="PaymentsAndRefunds">
                         <span x-show="!sidebarCollapsed" class="truncate">Payments & Refunds</span>
                     </a>
 
                     <!-- Coaches & Schedules -->
-                    <a href="{{ route('admin.coaches.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.coaches.index') : route('admin.coaches.index') }}" 
                        title="Coaches & Schedules"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.coaches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.coaches.*', 'owner.coaches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="Coaches">
                         <span x-show="!sidebarCollapsed" class="truncate">Coaches & Schedules</span>
                     </a>
 
                     <!-- User Management -->
-                    <a href="{{ route('admin.users.index') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" 
                        title="User Management"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.users.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.users.*', 'owner.users.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                        :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                         <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
                         <span x-show="!sidebarCollapsed" class="truncate">User Management</span>
@@ -163,9 +163,9 @@
 
                     <!-- Audit Logs (Owner Only) -->
                     @if(auth()->user()->isOwner())
-                        <a href="{{ route('admin.audit_logs.index') }}" 
+                        <a href="{{ route('owner.audit_logs.index') }}" 
                            title="Audit Logs"
-                           class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs('admin.audit_logs.*') ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                           class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.audit_logs.*', 'owner.audit_logs.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                            :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
                             <img src="{{ asset('icons/icons8-audit-60.png') }}" class="w-5 h-5 shrink-0" alt="Audit">
                             <span x-show="!sidebarCollapsed" class="truncate">Audit Logs</span>
@@ -227,7 +227,7 @@
             <div>
                 <!-- Mobile Drawer Header -->
                 <div class="h-14 flex items-center justify-between px-4 border-b border-[#E5E5EA]">
-                    <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : route('admin.dashboard') }}" class="flex items-center gap-2.5 min-w-0">
+                    <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : (auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard')) }}" class="flex items-center gap-2.5 min-w-0">
                         <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] shrink-0">
                         <span class="font-extrabold text-sm text-[#1D1D1F] tracking-tight">Camp Freedive<span class="text-[#780000]">PH</span></span>
                     </a>
@@ -241,40 +241,40 @@
 
                 <nav class="px-3 pt-3 space-y-1.5 overflow-y-auto">
                     @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.dashboard', 'owner.dashboard']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
                             <span>Dashboard</span>
                         </a>
-                        <a href="{{ route('admin.bookings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.bookings.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.index') : route('admin.bookings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.bookings.*', 'owner.bookings.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Bookings">
                             <span>Bookings</span>
                         </a>
-                        <a href="{{ route('admin.batches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.batches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.batches.index') : route('admin.batches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.batches.*', 'owner.batches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-medium-icons-32.png') }}" class="w-5 h-5 shrink-0" alt="Batches">
                             <span>Batches</span>
                         </a>
-                        <a href="{{ route('admin.weather.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.weather.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.weather.index') : route('admin.weather.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.weather.*', 'owner.weather.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-warning-shield-32.png') }}" class="w-5 h-5 shrink-0" alt="SafetyMonitoring">
                             <span>Safety Monitoring</span>
                         </a>
-                        <a href="{{ route('admin.pricing.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.pricing.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.pricing.index') : route('admin.pricing.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.pricing.*', 'owner.pricing.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-price-tag-60.png') }}" class="w-5 h-5 shrink-0" alt="DynamicPricing">
                             <span>Dynamic Pricing</span>
                         </a>
-                        <a href="{{ route('admin.payments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.payments.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.payments.index') : route('admin.payments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.payments.*', 'owner.payments.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-magnetic-card-60.png') }}" class="w-5 h-5 shrink-0" alt="PaymentsAndRefunds">
                             <span>Payments & Refunds</span>
                         </a>
-                        <a href="{{ route('admin.coaches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.coaches.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.coaches.index') : route('admin.coaches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.coaches.*', 'owner.coaches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="Coaches">
                             <span>Coaches & Schedules</span>
                         </a>
-                        <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.users.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.users.*', 'owner.users.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                             <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
                             <span>User Management</span>
                         </a>
                         @if(auth()->user()->isOwner())
-                            <a href="{{ route('admin.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('admin.audit_logs.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <a href="{{ route('owner.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.audit_logs.*', 'owner.audit_logs.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
                                 <img src="{{ asset('icons/icons8-audit-60.png') }}" class="w-5 h-5 shrink-0" alt="Audit">
                                 <span>Audit Logs</span>
                             </a>

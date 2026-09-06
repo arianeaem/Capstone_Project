@@ -17,9 +17,8 @@ class RestrictGroup8Tester
         $user = Auth::user();
 
         if ($user && in_array($user->email, ['group8@campfreedive.ph', 'tester@campfreedive.ph'])) {
-            if ($request->is('admin') || $request->is('admin/*')) {
-                $isAllowed = $request->is('admin/bookings*')
-                    || $request->is('admin/payments*');
+            if ($request->is('admin', 'admin/*', 'owner', 'owner/*')) {
+                $isAllowed = $request->is('admin/bookings*', 'admin/payments*', 'owner/bookings*', 'owner/payments*');
 
                 if (!$isAllowed) {
                     return response()->view('errors.restricted_group8', [], 200);

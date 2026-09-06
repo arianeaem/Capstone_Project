@@ -142,11 +142,12 @@ class LoginController extends Controller
         }
 
         if (in_array($user->email, ['group8@campfreedive.ph', 'tester@campfreedive.ph'])) {
-            return redirect()->route('admin.bookings.index');
+            return redirect()->route($user->isOwner() ? 'owner.bookings.index' : 'admin.bookings.index');
         }
 
         return match ($user->role) {
-            'owner', 'admin' => redirect()->intended(route('admin.dashboard')),
+            'owner' => redirect()->intended(route('owner.dashboard')),
+            'admin' => redirect()->intended(route('admin.dashboard')),
             'coach' => redirect()->intended(route('coach.dashboard')),
             default => redirect()->route('landing'),
         };
