@@ -86,10 +86,10 @@
             <div class="grid grid-cols-1 gap-4 sm:gap-6">
                 <!-- Discovery Package Option -->
                 <div @click="form.class_type = 'discovery'" 
-                     class="p-4 sm:p-6 rounded-xl border-1 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                     :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#F8EAEA]/30 ring-1 ring-[#780000]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
+                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                     :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#F8EAEA]/30' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                     <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-1 flex items-center justify-center shrink-0 mt-0.5"
+                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
                              :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
                             <span x-show="form.class_type === 'discovery'" class="w-2 h-2 rounded-full bg-white"></span>
                         </div>
@@ -107,10 +107,10 @@
 
                 <!-- Fun Dive Package Option -->
                 <div @click="form.class_type = 'fundive'" 
-                     class="p-4 sm:p-6 rounded-xl border-1 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                     :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#F8EAEA]/30 ring-1 ring-[#780000]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
+                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                     :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#F8EAEA]/30' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                     <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-1 flex items-center justify-center shrink-0 mt-0.5"
+                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
                              :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
                             <span x-show="form.class_type === 'fundive'" class="w-2 h-2 rounded-full bg-white"></span>
                         </div>
@@ -128,10 +128,10 @@
 
                 <!-- Skill Refinement Package Option -->
                 <div @click="form.class_type = 'refinement'" 
-                     class="p-4 sm:p-6 rounded-xl border-1 transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                     :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#F8EAEA]/30 ring-1 ring-[#780000]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
+                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                     :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#F8EAEA]/30' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                     <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-1 flex items-center justify-center shrink-0 mt-0.5"
+                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
                              :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
                             <span x-show="form.class_type === 'refinement'" class="w-2 h-2 rounded-full bg-white"></span>
                         </div>
@@ -711,17 +711,17 @@
 
                     <!-- Transportation and Add-ons -->
                     <div class="space-y-4 pt-2">
-                        <h4  class="text-lg font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h4>
+                        <h4 class="text-lg font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h4>
                         
                         <div class="space-y-3">
                             <label class="block font-bold text-[#1D1D1F] text-xs">Transportation Option:</label>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label class="p-3.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between select-none"
+                                <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none"
                                        :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-[#F8EAEA]/40 shadow-xs' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
-                                            <span class="font-extrabold text-xs sm:text-sm text-[#1D1D1F]">Manila Carpool Van</span>
+                                             <span class="font-extrabold text-xs sm:text-sm text-[#1D1D1F]">Manila Carpool Van</span>
                                             <span x-show="form.pickup_option === 'carpool'" class="w-2.5 h-2.5 rounded-full bg-[#780000]"></span>
                                         </div>
                                         <span class="font-bold text-[#780000] text-xs block">₱1,200 / person</span>
@@ -729,7 +729,7 @@
                                     </div>
                                 </label>
 
-                                <label class="p-3.5 rounded-xl border-2 transition-all cursor-pointer flex flex-col justify-between select-none"
+                                <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none"
                                        :class="form.pickup_option === 'own' ? 'border-[#780000] bg-[#F8EAEA]/40 shadow-xs' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
@@ -762,7 +762,7 @@
 
                         <!-- Optional Boat Dive -->
                         <div class="pt-1">
-                            <label class="p-3.5 rounded-xl border-1 transition-all cursor-pointer flex items-start justify-between gap-3"
+                            <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3"
                                    :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white'">
                                 <div class="flex items-start gap-2.5">
                                     <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#008E98] focus:ring-[#00C3D0] mt-0.5">

@@ -272,7 +272,7 @@
                                           rows="4" 
                                           required 
                                           placeholder="Please explain the emergency, illness, or unavoidable circumstance requiring reassignment..."
-                                          class="w-full text-xs rounded-xl border-1 border-[#E5E5EA] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
+                                          class="w-full text-xs rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
                                 <span class="text-[11px] text-[#8E8E93]">Your request will be submitted to Camp Admin for review and student reassignment.</span>
                             </div>
 

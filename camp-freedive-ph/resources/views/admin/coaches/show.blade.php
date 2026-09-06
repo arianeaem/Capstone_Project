@@ -37,7 +37,7 @@
     <!-- Coach Profile Overview -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-full bg-[#F8EAEA] text-[#780000] border-2 border-[#780000] flex items-center justify-center font-black text-xl shadow-2xs shrink-0">
+            <div class="w-14 h-14 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-black text-xl shadow-2xs shrink-0">
                 {{ substr($coach->name, 0, 1) }}
             </div>
             <div>

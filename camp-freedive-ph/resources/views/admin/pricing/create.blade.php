@@ -119,21 +119,21 @@
             <div>
                 <label class="block text-xs font-bold text-[#1D1D1F] mb-2">Rule Type <span class="text-[#780000]">*</span></label>
                 <div class="grid grid-cols-3 gap-3">
-                    <label class="p-3 rounded-lg border-2 text-center cursor-pointer transition-all flex flex-col items-center gap-1"
+                    <label class="p-3 rounded-lg border text-center cursor-pointer transition-all flex flex-col items-center gap-1"
                            :class="rule_type === 'seasonality' ? 'border-[#780000] bg-[#F8EAEA]/50 text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#FAFAFC]'">
                         <input type="radio" name="rule_type" value="seasonality" x-model="rule_type" @change="condition_value = 'peak'" class="sr-only">
                         <span class="font-extrabold text-xs">Seasonality</span>
                         <span class="text-[11px] opacity-75">Peak, Shoulder, Off-Peak</span>
                     </label>
 
-                    <label class="p-3 rounded-lg border-2 text-center cursor-pointer transition-all flex flex-col items-center gap-1"
+                    <label class="p-3 rounded-lg border text-center cursor-pointer transition-all flex flex-col items-center gap-1"
                            :class="rule_type === 'demand' ? 'border-[#780000] bg-[#F8EAEA]/50 text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#FAFAFC]'">
                         <input type="radio" name="rule_type" value="demand" x-model="rule_type" @change="condition_value = 'high'" class="sr-only">
                         <span class="font-extrabold text-xs">Demand Level</span>
                         <span class="text-[11px] opacity-75">Live Booking Occupancy</span>
                     </label>
 
-                    <label class="p-3 rounded-lg border-2 text-center cursor-pointer transition-all flex flex-col items-center gap-1"
+                    <label class="p-3 rounded-lg border text-center cursor-pointer transition-all flex flex-col items-center gap-1"
                            :class="rule_type === 'lead_time' ? 'border-[#780000] bg-[#F8EAEA]/50 text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#FAFAFC]'">
                         <input type="radio" name="rule_type" value="lead_time" x-model="rule_type" @change="condition_value = '3'; condition_operator = '<='" class="sr-only">
                         <span class="font-extrabold text-xs">Lead Time</span>
