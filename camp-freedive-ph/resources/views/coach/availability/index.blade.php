@@ -53,7 +53,7 @@
                     <span>Wed</span>
                     <span>Thu</span>
                     <span>Fri</span>
-                    <span class="text-[#008E98]">Sat</span>
+                    <span class="text-[#00C3D0]">Sat</span>
                 </div>
 
                 <!-- Calendar Days -->
@@ -69,7 +69,7 @@
 
                         <div class="min-h-[110px] sm:min-h-[130px] p-2 sm:p-3 bg-white flex flex-col justify-between transition-colors relative group
                                     {{ $isOtherMonth ? 'bg-gray-50/60 opacity-40' : '' }}
-                                    {{ $day['is_today'] ? 'ring-2 ring-inset ring-[#008E98]' : '' }}"
+                                    {{ $day['is_today'] ? 'ring-2 ring-inset ring-[#00C3D0]' : '' }}"
                              :class="{
                                  'ring-2 ring-[#780000] bg-rose-50/40': isSelectedInBulk('{{ $dateStr }}'),
                                  'hover:bg-[#F2F2F7] cursor-pointer': !{{ $isPast ? 'true' : 'false' }} && !bulkMode && !{{ $isAssigned ? 'true' : 'false' }},
@@ -79,12 +79,12 @@
                             
                             <!-- Day Number & Indicators -->
                             <div class="flex items-center justify-between gap-1">
-                                <span class="font-extrabold text-sm {{ $day['is_today'] ? 'text-[#008E98]' : ($isOtherMonth ? 'text-gray-400' : 'text-[#1D1D1F]') }}">
+                                <span class="font-extrabold text-sm {{ $day['is_today'] ? 'text-[#00C3D0]' : ($isOtherMonth ? 'text-gray-400' : 'text-[#1D1D1F]') }}">
                                     {{ $day['day_number'] }}
                                 </span>
 
                                 @if($day['is_today'])
-                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#008E98] text-white">Today</span>
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#00C3D0] text-white">Today</span>
                                 @endif
 
                                 @if($day['has_release_request'])

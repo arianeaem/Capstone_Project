@@ -173,7 +173,7 @@
                     You currently have no students assigned for upcoming dates. Make sure your availability calendar is marked free or browse the Open Slot Requests board.
                 </p>
                 <div class="pt-2">
-                    <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl bg-[#008E98] text-white text-xs font-bold hover:bg-[#007A82] transition-colors inline-flex items-center gap-2">
+                    <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl bg-[#00C3D0] text-white text-xs font-bold hover:bg-[#00AAB6] transition-colors inline-flex items-center gap-2">
                         <span>Open Availability Calendar</span>
                     </a>
                 </div>

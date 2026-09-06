@@ -11,6 +11,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        if (file_exists(app_path('Helpers/portal_helpers.php'))) {
+            require_once app_path('Helpers/portal_helpers.php');
+        }
+
         $this->app->bind(
             \App\Contracts\PaymentGatewayInterface::class,
             \App\Services\Gateways\PayMongoGateway::class

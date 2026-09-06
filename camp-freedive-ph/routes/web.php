@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DeactivationController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\RefundController as AdminRefundController;
+use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use App\Http\Controllers\Auth\LoginController;
@@ -159,6 +160,11 @@ $registerBackofficeRoutes = function (string $portalRole) {
     Route::delete('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'destroy'])->name('pricing.destroy');
     Route::patch('/pricing/{rule}/toggle-status', [\App\Http\Controllers\Admin\PricingRuleController::class, 'toggleStatus'])->name('pricing.toggle_status');
     Route::get('/pricing/{rule}/triggered', [\App\Http\Controllers\Admin\PricingRuleController::class, 'triggered'])->name('pricing.triggered');
+
+    // Reports & Analytics Module
+    Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export', [ReportsController::class, 'export'])->name('reports.export');
+    Route::get('/reports/print', [ReportsController::class, 'printSummary'])->name('reports.print');
 
     // User Management
     Route::get('/users', [UserManagementController::class, 'index']);

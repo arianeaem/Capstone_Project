@@ -48,20 +48,22 @@
     @endunless
 
     <!-- Flash Messages -->
-    @if(session('success'))
-        <div class="bg-[#ECFDF5] border-b border-[#A7F3D0] text-[#065F46] py-3.5 px-4 text-sm text-center font-medium flex items-center justify-center gap-2">
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
+    <div id="app-flash-messages">
+        @if(session('success'))
+            <div class="bg-[#ECFDF5] border-b border-[#A7F3D0] text-[#065F46] py-3.5 px-4 text-sm text-center font-medium flex items-center justify-center gap-2">
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
 
-    @if(session('error'))
-        <div class="bg-[#FEF2F2] border-b border-[#FECACA] text-[#991B1B] py-3.5 px-4 text-sm text-center font-medium flex items-center justify-center gap-2">
-            <span>{{ session('error') }}</span>
-        </div>
-    @endif
+        @if(session('error'))
+            <div class="bg-[#FEF2F2] border-b border-[#FECACA] text-[#991B1B] py-3.5 px-4 text-sm text-center font-medium flex items-center justify-center gap-2">
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+    </div>
 
     <!-- Main Content -->
-    <main class="flex-grow w-full max-w-full overflow-hidden">
+    <main id="app-page-content" class="flex-grow w-full max-w-full overflow-hidden">
         @yield('content')
     </main>
 

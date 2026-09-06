@@ -25,7 +25,8 @@
               this.sidebarCollapsed = !this.sidebarCollapsed;
               localStorage.setItem('sidebar_collapsed', this.sidebarCollapsed);
           }
-      }">
+      }"
+      @close-mobile-menu.window="mobileMenuOpen = false">
 
 @php
     $userName = auth()->user()->name ?? 'User';
@@ -46,6 +47,7 @@
         str_starts_with($routeName, 'admin.pricing') || str_starts_with($routeName, 'owner.pricing') => 'Dynamic Pricing',
         str_starts_with($routeName, 'admin.payments') || str_starts_with($routeName, 'owner.payments') => 'Payments',
         str_starts_with($routeName, 'admin.coaches') || str_starts_with($routeName, 'owner.coaches') => 'Coaches & Schedules',
+        str_starts_with($routeName, 'admin.reports') || str_starts_with($routeName, 'owner.reports') => 'Reports & Analytics',
         str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'owner.users') => 'User Management',
         str_starts_with($routeName, 'admin.audit_logs') || str_starts_with($routeName, 'owner.audit_logs') => 'Audit Logs',
         str_starts_with($routeName, 'coach.dashboard') => 'Dashboard',
@@ -59,7 +61,8 @@
     <div class="min-h-full flex flex-col md:flex-row">
 
         <!-- Desktop Sidebar -->
-        <aside class="hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-white border-r border-[#E5E5EA] z-30 transition-all duration-300"
+        <aside id="desktop-sidebar" 
+               class="hidden md:flex md:flex-col md:fixed md:inset-y-0 bg-white border-r border-[#E5E5EA] z-30 transition-all duration-300"
                :class="sidebarCollapsed ? 'md:w-20' : 'md:w-64'">
             
             <!-- Sidebar Header -->
@@ -81,7 +84,7 @@
                    x-show="sidebarCollapsed" 
                    class="flex items-center justify-center group"
                    title="Camp FreedivePH">
-                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] group-hover:scale-105 transition-transform">
+                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] transition-transform">
                 </a>
             </div>
 
@@ -152,6 +155,15 @@
                         <span x-show="!sidebarCollapsed" class="truncate">Coaches & Schedules</span>
                     </a>
 
+                    <!-- Reports & Analytics -->
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.reports.index') : route('admin.reports.index') }}" 
+                       title="Reports & Analytics"
+                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.reports.*', 'owner.reports.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                       :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
+                        <img src="{{ asset('icons/icons8-analytics-60.png') }}" class="w-5 h-5 shrink-0" alt="Reports">
+                        <span x-show="!sidebarCollapsed" class="truncate">Reports & Analytics</span>
+                    </a>
+
                     <!-- User Management -->
                     <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" 
                        title="User Management"
@@ -216,90 +228,94 @@
 
         <div x-show="mobileMenuOpen" 
              x-cloak 
+             id="mobile-sidebar"
              x-transition:enter="transition ease-out duration-300 transform"
              x-transition:enter-start="-translate-x-full"
              x-transition:enter-end="translate-x-0"
              x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-x-0"
              x-transition:leave-end="-translate-x-full"
-             class="md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-white flex flex-col shadow-2xl border-r border-[#E5E5EA]">
+             class="md:hidden fixed inset-y-0 left-0 z-50 w-72 h-full max-h-screen bg-white flex flex-col shadow-2xl border-r border-[#E5E5EA]">
             
-            <div>
-                <!-- Mobile Drawer Header -->
-                <div class="h-14 flex items-center justify-between px-4 border-b border-[#E5E5EA]">
-                    <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : (auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard')) }}" class="flex items-center gap-2.5 min-w-0">
-                        <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] shrink-0">
-                        <span class="font-extrabold text-sm text-[#1D1D1F] tracking-tight">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                    </a>
-                    <button type="button" @click="mobileMenuOpen = false" class="w-8 h-8 flex items-center justify-center text-[#8E8E93] hover:text-[#1D1D1F] rounded-lg hover:bg-[#F2F2F7] transition-colors cursor-pointer">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
+            <!-- Mobile Drawer Header -->
+            <div class="h-14 shrink-0 flex items-center justify-between px-4 border-b border-[#E5E5EA]">
+                <a href="{{ auth()->user()->isCoach() ? route('coach.dashboard') : (auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard')) }}" class="flex items-center gap-2.5 min-w-0">
+                    <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] shrink-0">
+                    <span class="font-extrabold text-sm text-[#1D1D1F] tracking-tight">Camp Freedive<span class="text-[#780000]">PH</span></span>
+                </a>
+                <button type="button" @click="mobileMenuOpen = false" class="w-8 h-8 flex items-center justify-center text-[#8E8E93] hover:text-[#1D1D1F] rounded-lg hover:bg-[#F2F2F7] transition-colors cursor-pointer">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
 
-                <nav class="px-3 pt-3 space-y-1.5 overflow-y-auto">
-                    @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.dashboard', 'owner.dashboard']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.index') : route('admin.bookings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.bookings.*', 'owner.bookings.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Bookings">
-                            <span>Bookings</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.batches.index') : route('admin.batches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.batches.*', 'owner.batches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-medium-icons-32.png') }}" class="w-5 h-5 shrink-0" alt="Batches">
-                            <span>Batches</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.weather.index') : route('admin.weather.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.weather.*', 'owner.weather.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-warning-shield-32.png') }}" class="w-5 h-5 shrink-0" alt="SafetyMonitoring">
-                            <span>Safety Monitoring</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.pricing.index') : route('admin.pricing.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.pricing.*', 'owner.pricing.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-price-tag-60.png') }}" class="w-5 h-5 shrink-0" alt="DynamicPricing">
-                            <span>Dynamic Pricing</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.payments.index') : route('admin.payments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.payments.*', 'owner.payments.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-magnetic-card-60.png') }}" class="w-5 h-5 shrink-0" alt="PaymentsAndRefunds">
-                            <span>Payments & Refunds</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.coaches.index') : route('admin.coaches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.coaches.*', 'owner.coaches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="Coaches">
-                            <span>Coaches & Schedules</span>
-                        </a>
-                        <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.users.*', 'owner.users.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
-                            <span>User Management</span>
-                        </a>
-                        @if(auth()->user()->isOwner())
-                            <a href="{{ route('owner.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.audit_logs.*', 'owner.audit_logs.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                                <img src="{{ asset('icons/icons8-audit-60.png') }}" class="w-5 h-5 shrink-0" alt="Audit">
-                                <span>Audit Logs</span>
-                            </a>
-                        @endif
-                    @else
-                        <!-- Coach Mobile Navigation -->
-                        <a href="{{ route('coach.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
-                            <span>Dashboard</span>
-                        </a>
-                        <a href="{{ route('coach.availability.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-calendar-60.png') }}" class="w-5 h-5 shrink-0" alt="Availability Calendar">
-                            <span>Availability Calendar</span>
-                        </a>
-                        <a href="{{ route('coach.schedule.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.schedule.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Schedule">
-                            <span>My Schedule & History</span>
-                        </a>
-                        <a href="{{ route('coach.requests.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.requests.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="OpenRequests">
-                            <span>Open Slot Requests</span>
+            <!-- Mobile Drawer Navigation -->
+            <nav class="flex-1 min-h-0 px-3 py-3 space-y-1.5 overflow-y-auto overscroll-contain">
+                @if(auth()->user()->isOwner() || auth()->user()->isAdmin())
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.dashboard', 'owner.dashboard']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.index') : route('admin.bookings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.bookings.*', 'owner.bookings.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Bookings">
+                        <span>Bookings</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.batches.index') : route('admin.batches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.batches.*', 'owner.batches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-medium-icons-32.png') }}" class="w-5 h-5 shrink-0" alt="Batches">
+                        <span>Batches</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.weather.index') : route('admin.weather.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.weather.*', 'owner.weather.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-warning-shield-32.png') }}" class="w-5 h-5 shrink-0" alt="SafetyMonitoring">
+                        <span>Safety Monitoring</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.pricing.index') : route('admin.pricing.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.pricing.*', 'owner.pricing.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-price-tag-60.png') }}" class="w-5 h-5 shrink-0" alt="DynamicPricing">
+                        <span>Dynamic Pricing</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.payments.index') : route('admin.payments.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.payments.*', 'owner.payments.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-magnetic-card-60.png') }}" class="w-5 h-5 shrink-0" alt="PaymentsAndRefunds">
+                        <span>Payments & Refunds</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.coaches.index') : route('admin.coaches.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.coaches.*', 'owner.coaches.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="Coaches">
+                        <span>Coaches & Schedules</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.reports.index') : route('admin.reports.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.reports.*', 'owner.reports.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-analytics-60.png') }}" class="w-5 h-5 shrink-0" alt="Reports">
+                        <span>Reports & Analytics</span>
+                    </a>
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.users.*', 'owner.users.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
+                        <span>User Management</span>
+                    </a>
+                    @if(auth()->user()->isOwner())
+                        <a href="{{ route('owner.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.audit_logs.*', 'owner.audit_logs.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-audit-60.png') }}" class="w-5 h-5 shrink-0" alt="Audit">
+                            <span>Audit Logs</span>
                         </a>
                     @endif
-                </nav>
-            </div>
+                @else
+                    <!-- Coach Mobile Navigation -->
+                    <a href="{{ route('coach.dashboard') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.dashboard') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-home-32.png') }}" class="w-5 h-5 shrink-0" alt="Dashboard">
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ route('coach.availability.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.availability.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-calendar-60.png') }}" class="w-5 h-5 shrink-0" alt="Availability Calendar">
+                        <span>Availability Calendar</span>
+                    </a>
+                    <a href="{{ route('coach.schedule.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.schedule.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-booking-60.png') }}" class="w-5 h-5 shrink-0" alt="Schedule">
+                        <span>My Schedule & History</span>
+                    </a>
+                    <a href="{{ route('coach.requests.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs('coach.requests.*') ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                        <img src="{{ asset('icons/icons8-coach-60.png') }}" class="w-5 h-5 shrink-0" alt="OpenRequests">
+                        <span>Open Slot Requests</span>
+                    </a>
+                @endif
+            </nav>
         </div>
 
         <!-- Main Content Container -->
@@ -330,7 +346,7 @@
                     <div class="h-4 w-px bg-[#D1D1D6]"></div>
 
                     <!-- Breadcrumbs -->
-                    <div class="flex items-center gap-1.5 text-xs sm:text-sm">
+                    <div id="header-breadcrumbs" class="flex items-center gap-1.5 text-xs sm:text-sm">
                         @if(View::hasSection('breadcrumb'))
                             @yield('breadcrumb')
                         @else
@@ -347,7 +363,7 @@
                             class="flex items-center gap-2 cursor-pointer focus:outline-none group">
                         
                         <!-- User Avatar -->
-                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs group-hover:ring-2 group-hover:ring-[#780000]/30 transition-all">
+                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 group-hover:ring-[#780000]/30 transition-all">
                             {{ $userInitials }}
                         </div>
                     </button>
@@ -393,7 +409,7 @@
             </header>
             
             <!-- Global Flash Messages -->
-            <div class="px-4 sm:px-8 pt-4">
+            <div id="flash-messages-container" class="px-4 sm:px-8 pt-4">
                 @if(session('success'))
                     <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] flex items-center justify-between text-xs sm:text-sm font-medium shadow-sm">
                         <div class="flex items-center gap-2.5">
@@ -426,7 +442,7 @@
             </div>
 
             <!-- Page Specific Content -->
-            <div class="flex-1 px-4 sm:px-6 lg:px-8 xl:px-10 pb-12 pt-2 max-w-[1600px] w-full mx-auto">
+            <div id="spa-page-content" class="flex-1 px-4 sm:px-6 lg:px-8 xl:px-10 pb-12 pt-2 max-w-[1600px] w-full mx-auto">
                 @yield('content')
             </div>
 

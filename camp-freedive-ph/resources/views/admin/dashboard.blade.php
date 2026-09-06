@@ -20,18 +20,18 @@
             @if($isOwner)
                 <!-- Owner View Switcher -->
                 <div class="inline-flex p-1 rounded-lg bg-white border border-[#E5E5EA] text-xs font-bold shadow-2xs">
-                    <a href="{{ route('admin.dashboard') }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard') }}" 
                        class="px-3 py-1.5 rounded-md transition-all {{ $activeView === 'executive' ? 'bg-[#780000] text-white shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]' }}">
                         Executive Analytics
                     </a>
-                    <a href="{{ route('admin.dashboard', ['view' => 'operations']) }}" 
+                    <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard', ['view' => 'operations']) : route('admin.dashboard', ['view' => 'operations']) }}" 
                        class="px-3 py-1.5 rounded-md transition-all {{ $activeView === 'operations' ? 'bg-[#780000] text-white shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]' }}">
                         Operations View
                     </a>
                 </div>
             @endif
 
-            <a href="{{ route('admin.bookings.create') }}" class="px-4 py-2 rounded-lg text-xs font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-sm transition-all hover:scale-[1.02] flex items-center gap-1.5">
+            <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.create') : route('admin.bookings.create') }}" class="px-4 py-2 rounded-lg text-xs font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-sm transition-all hover:scale-[1.02] flex items-center gap-1.5">
                 <span>Walk-in Booking</span>
             </a>
         </div>
@@ -43,34 +43,34 @@
         <!-- ========================================================================= -->
 
         <!-- Operational KPI Metrics -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
-            <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-[#E5E5EA]">
                 
                 <!-- Active Divers -->
-                <div class="px-4 py-1">
+                <div class="px-2 sm:px-4 py-1">
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Active Divers (This Month)</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $operationalStats['active_divers_month'] }}</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">{{ $operationalStats['active_divers_month'] }}</div>
                 </div>
 
                 <!-- Average Trip Occupancy -->
-                <div class="relative px-4 py-1">
+                <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Average Trip Occupancy</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $operationalStats['avg_occupancy'] }}%</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">{{ $operationalStats['avg_occupancy'] }}%</div>
                 </div>
 
                 <!-- Active Instructors -->
-                <div class="relative px-4 py-1">
+                <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Active Instructors</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $operationalStats['active_coaches_count'] }}</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">{{ $operationalStats['active_coaches_count'] }}</div>
                 </div>
 
                 <!-- Unmatched Students -->
-                <div class="relative px-4 py-1">
+                <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Unmatched Students</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold mt-0.5 {{ $operationalStats['unmatched_students_count'] > 0 ? 'text-amber-700' : 'text-emerald-700' }}">
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold mt-0.5 break-words {{ $operationalStats['unmatched_students_count'] > 0 ? 'text-amber-700' : 'text-emerald-700' }}">
                         {{ $operationalStats['unmatched_students_count'] }}
                     </div>
                 </div>
@@ -378,34 +378,34 @@
         <!-- ========================================================================= -->
 
         <!-- Executive Financial Metrics -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
-            <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-[#E5E5EA]">
                 
                 <!-- Gross Collected Revenue -->
-                <div class="px-4 py-1">
+                <div class="px-2 sm:px-4 py-1">
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Gross Collected Revenue</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-[#780000] mt-0.5">₱{{ number_format($financials['gross_revenue'], 2) }}</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-[#780000] mt-0.5 break-words">₱{{ number_format($financials['gross_revenue'], 2) }}</div>
                 </div>
 
                 <!-- Outstanding Balances -->
-                <div class="relative px-4 py-1">
+                <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Outstanding Balances</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-amber-700 mt-0.5">₱{{ number_format($financials['outstanding_balances'], 2) }}</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-amber-700 mt-0.5 break-words">₱{{ number_format($financials['outstanding_balances'], 2) }}</div>
                 </div>
 
                 <!-- Total Refunds Issued -->
-                <div class="relative px-4 py-1">
+                <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Refunds Issued</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-rose-700 mt-0.5">₱{{ number_format($financials['refunds_processed'], 2) }}</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-rose-700 mt-0.5 break-words">₱{{ number_format($financials['refunds_processed'], 2) }}</div>
                 </div>
 
                 <!-- Net Business Yield -->
-                <div class="relative px-4 py-1">
+                <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Net Business Yield</span>
-                    <div class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-0.5">₱{{ number_format($financials['net_revenue'], 2) }}</div>
+                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold text-emerald-700 mt-0.5 break-words">₱{{ number_format($financials['net_revenue'], 2) }}</div>
                 </div>
 
             </div>

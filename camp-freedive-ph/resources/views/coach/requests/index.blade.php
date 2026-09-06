@@ -43,12 +43,12 @@
                         $hasApplied = in_array($op->id, $myRequestedOpeningIds);
                     @endphp
 
-                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs hover:border-[#008E98] hover:shadow-md transition-all flex flex-col justify-between space-y-5">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-6 shadow-xs hover:border-[#00C3D0] hover:shadow-md transition-all flex flex-col justify-between space-y-5">
                         
                         <!-- Slot Opening Information -->
                         <div class="space-y-3.5">
                             <div class="flex items-center justify-between gap-2">
-                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#008E98]/10 text-[#008E98] border border-[#008E98]/20 font-mono">
+                                <span class="text-xs font-bold px-3 py-1 rounded-full bg-[#00C3D0]/10 text-[#00AAB6] border border-[#00C3D0]/20 font-mono">
                                     {{ $batch?->batch_number ?? 'Dive Batch' }}
                                 </span>
                             </div>
@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-[#6E6E73] font-medium">Students Needing Coach:</span>
-                                    <span class="font-extrabold text-[#008E98] bg-[#008E98]/10 px-2 py-0.5 rounded-md">
+                                    <span class="font-extrabold text-[#00AAB6] bg-[#00C3D0]/10 px-2 py-0.5 rounded-md">
                                         {{ $op->needed_students_count }} student(s)
                                     </span>
                                 </div>
@@ -89,7 +89,7 @@
                             @else
                                 <button type="button" 
                                         @click="selectedOpening = {{ json_encode($op) }}; applyModalOpen = true"
-                                        class="w-full py-2.5 rounded-xl bg-[#008E98] hover:bg-[#007A82] text-white text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2">
+                                        class="w-full py-2.5 rounded-xl bg-[#00C3D0] hover:bg-[#00AAB6] text-white text-xs font-bold shadow-xs transition-all flex items-center justify-center gap-2">
                                     <span>Request This Slot</span>
                                     <span>→</span>
                                 </button>
@@ -172,7 +172,7 @@
             
             <div class="flex items-start justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-[#008E98]">Volunteer Request</div>
+                    <div class="text-xs font-bold uppercase tracking-wider text-[#00AAB6]">Volunteer Request</div>
                     <h3 class="text-lg font-black text-[#1D1D1F] mt-0.5">Request Open Dive Slot</h3>
                 </div>
                 <button type="button" @click="applyModalOpen = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
@@ -195,7 +195,7 @@
                         <textarea name="notes" 
                                   rows="3" 
                                   placeholder="E.g., I have gear ready and available for this entire weekend..."
-                                  class="w-full text-xs rounded-xl border-[#E5E5EA] focus:border-[#008E98] focus:ring-[#008E98] p-3"></textarea>
+                                  class="w-full text-xs rounded-xl border-[#E5E5EA] focus:border-[#00C3D0] focus:ring-[#00C3D0] p-3"></textarea>
                     </div>
 
                     <div class="p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900 leading-relaxed">
@@ -206,7 +206,7 @@
                         <button type="button" @click="applyModalOpen = false" class="px-4 py-2.5 rounded-xl border border-[#E5E5EA] text-xs font-bold text-[#6E6E73] hover:bg-[#F2F2F7]">
                             Cancel
                         </button>
-                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#008E98] hover:bg-[#007A82] text-white text-xs font-bold shadow-sm transition-all">
+                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#00C3D0] hover:bg-[#00AAB6] text-white text-xs font-bold shadow-sm transition-all">
                             Submit Slot Request
                         </button>
                     </div>

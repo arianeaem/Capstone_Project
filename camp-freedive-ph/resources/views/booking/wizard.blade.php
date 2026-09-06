@@ -191,7 +191,7 @@
                     <!-- Information Icon with Hover Notice -->
                     <div class="relative group inline-flex items-center self-start sm:self-center">
                         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-xs font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
-                            <svg class="w-4 h-4 text-[#008E98] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <svg class="w-4 h-4 text-[#00C3D0] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                             <span>About Forecast</span>
                         </div>
 
@@ -244,13 +244,13 @@
                             <div class="pl-3 sm:pl-4">
                                 <div class="flex items-center justify-between">
                                     <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#6E6E73]">Return</span>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#008E98]">Day 2</span>
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#00C3D0]">Day 2</span>
                                 </div>
                                 <div class="mt-1.5">
                                     <template x-if="form.end_date">
                                         <div>
                                             <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.end_date)"></div>
-                                            <div class="text-xs font-semibold text-[#008E98] mt-0.5" x-text="formatDateDayOfWeek(form.end_date)"></div>
+                                            <div class="text-xs font-semibold text-[#00C3D0] mt-0.5" x-text="formatDateDayOfWeek(form.end_date)"></div>
                                         </div>
                                     </template>
                                     <template x-if="!form.end_date">
@@ -321,7 +321,7 @@
                                                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold shadow-sm ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
-                                                            'bg-[#008E98] text-white font-bold shadow-sm ring-2 ring-[#008E98]/20': dObj.dateStr === form.end_date,
+                                                            'bg-[#00C3D0] text-white font-bold shadow-sm ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
                                                             'text-gray-300 cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
                                                             'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
@@ -377,7 +377,7 @@
                                                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold shadow-sm ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
-                                                            'bg-[#008E98] text-white font-bold shadow-sm ring-2 ring-[#008E98]/20': dObj.dateStr === form.end_date,
+                                                            'bg-[#00C3D0] text-white font-bold shadow-sm ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
                                                             'text-gray-300 cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
                                                             'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
@@ -402,52 +402,27 @@
                         
                         <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-[#008E98] animate-pulse"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-[#00C3D0] animate-pulse"></span>
                                 <h3 class="font-black text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
                             </div>
                             
                             <template x-if="weatherLoading">
-                                <span class="text-xs text-[#008E98] font-bold flex items-center gap-1">
+                                <span class="text-xs text-[#00C3D0] font-bold flex items-center gap-1">
                                     <svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                                     Checking...
                                 </span>
                             </template>
                         </div>
 
-                        <!-- Empty State -->
-                        <template x-if="!form.start_date && !weatherLoading">
-                            <div class="py-8 px-4 text-center space-y-4">
-                                <div class="w-12 h-12 rounded-2xl bg-[#EBF7F8] text-[#008E98] flex items-center justify-center mx-auto shadow-2xs">
-                                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M2 12a10 10 0 0 1 18-6M2 12a10 10 0 0 0 18 6"/><path d="M12 2v20"/></svg>
-                                </div>
-                                <div class="space-y-1 max-w-xs mx-auto">
-                                    <h4 class="font-extrabold text-sm text-[#1D1D1F]">Select Dates to View Safety</h4>
-                                    <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                        Pick your departure date on the calendar to see real-time coastal wave heights, ocean currents, and wind safety for Mabini, Batangas.
-                                    </p>
-                                </div>
-                                <div class="grid grid-cols-2 gap-2 pt-2 text-[11px] font-semibold text-[#6E6E73] text-left">
-                                    <div class="p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center gap-2">
-                                        <span class="text-base">🌊</span>
-                                        <span>Wave Heights</span>
-                                    </div>
-                                    <div class="p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center gap-2">
-                                        <span class="text-base">💨</span>
-                                        <span>Wind Speeds</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-
                         <!-- Forecast Loading State -->
                         <div x-show="weatherLoading" x-cloak class="space-y-4 py-2">
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between text-xs">
                                     <span class="font-semibold text-[#1D1D1F]">Checking weather & marine conditions...</span>
-                                    <span class="font-mono font-bold text-[#008E98]" x-text="weatherProgress + '%'"></span>
+                                    <span class="font-mono font-bold text-[#00C3D0]" x-text="weatherProgress + '%'"></span>
                                 </div>
                                 <div class="w-full bg-[#E5E5EA] h-1.5 rounded-full overflow-hidden">
-                                    <div class="bg-gradient-to-r from-[#008E98] to-[#00C3D0] h-full transition-all duration-200 rounded-full"
+                                    <div class="bg-gradient-to-r from-[#00C3D0] to-[#00C3D0] h-full transition-all duration-200 rounded-full"
                                          :style="'width: ' + weatherProgress + '%'"></div>
                                 </div>
                             </div>
@@ -512,7 +487,7 @@
                                         <!-- Day 2 -->
                                         <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1 text-xs">
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#008E98] text-xs uppercase tracking-wider">Day 2</span>
+                                                <span class="font-extrabold text-[#00C3D0] text-xs uppercase tracking-wider">Day 2</span>
                                                 <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"
                                                       :class="{
                                                           'bg-emerald-100 text-emerald-800': forecast.day2.classification === 'Very Safe' || forecast.day2.classification === 'Safe',
@@ -765,14 +740,14 @@
                             <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3"
                                    :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white'">
                                 <div class="flex items-start gap-2.5">
-                                    <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#008E98] focus:ring-[#00C3D0] mt-0.5">
+                                    <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#00C3D0] focus:ring-[#00C3D0] mt-0.5">
                                     <div>
                                         <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">Boat Dive (Optional)</span>
                                         <span class="text-xs text-[#6E6E73] block">Boat ride to deeper marine sanctuaries.</span>
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <span class="font-extrabold text-[#008E98] text-xs sm:text-sm">+₱600</span>
+                                    <span class="font-extrabold text-[#00C3D0] text-xs sm:text-sm">+₱600</span>
                                     <span class="text-[10px] text-[#6E6E73] block">/ person</span>
                                 </div>
                             </label>
