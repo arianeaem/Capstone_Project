@@ -6,7 +6,7 @@
 
 <div class="space-y-6">
 
-    <!-- Top Bookings KPI Summary: Clean Responsive Layout -->
+    <!-- Top Bookings KPI Summary -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-[#E5E5EA]">
             
