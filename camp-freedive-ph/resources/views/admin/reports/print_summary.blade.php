@@ -28,22 +28,7 @@
         }
     </style>
 </head>
-<body class="bg-[#FAFAFC] text-[#1D1D1F] p-6 sm:p-10">
-
-    <!-- Action Bar (Hidden on Print) -->
-    <div class="max-w-4xl mx-auto mb-6 flex items-center justify-between no-print bg-white p-4 rounded-xl border border-[#E5E5EA] shadow-sm">
-        <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-[#6E6E73]">Print Preview:</span>
-            <span class="text-xs font-semibold text-[#1D1D1F]">{{ $range['label'] }}</span>
-        </div>
-        <div class="flex items-center gap-3">
-            <button onclick="window.close()" class="px-3 py-1.5 rounded-lg border border-[#E5E5EA] text-xs font-semibold text-[#6E6E73] hover:bg-[#F2F2F7]">Close</button>
-            <button onclick="window.print()" class="px-4 py-1.5 rounded-lg bg-[#780000] text-white text-xs font-bold hover:bg-[#5C0000] shadow-sm flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                <span>Print / Save as PDF</span>
-            </button>
-        </div>
-    </div>
+<body class="bg-[#FAFAFC] text-[#1D1D1F] p-6 sm:p-10" onload="window.print()">
 
     <!-- Official Report Document -->
     <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-8 sm:p-10 shadow-sm space-y-8">
@@ -83,7 +68,7 @@
                     <span class="text-lg font-black text-[#1D1D1F] block mt-0.5">{{ $data['operations']['avg_occupancy'] ?? 0 }}%</span>
                 </div>
                 <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                    <span class="text-[10px] font-bold uppercase text-[#6E6E73] block">Safety Ratio Compliance</span>
+                    <span class="text-[10px] font-bold uppercase text-[#6E6E73] block">Staffing Fulfillment</span>
                     <span class="text-lg font-black text-emerald-700 block mt-0.5">{{ $data['operations']['safety_compliance_rate'] ?? 100 }}%</span>
                 </div>
             </div>
@@ -127,9 +112,9 @@
             </div>
         @endif
 
-        <!-- 3. Operational Batches & Safety Summary -->
+        <!-- 3. Operational Batches & Coach Staffing Summary -->
         <div class="space-y-3">
-            <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73]">{{ $isOwner ? '3' : '2' }}. Operational Batches & Capacity Utilization</h2>
+            <h2 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73]">{{ $isOwner ? '3' : '2' }}. Operational Batches & Coach Staffing</h2>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border border-[#E5E5EA] rounded-xl overflow-hidden">
                     <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
@@ -140,7 +125,7 @@
                             <th class="p-2.5 text-center">Divers</th>
                             <th class="p-2.5 text-center">Occupancy</th>
                             <th class="p-2.5">Assigned Coaches</th>
-                            <th class="p-2.5 text-center">Safety Ratio</th>
+                            <th class="p-2.5 text-center">Coach Staffing</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-[#E5E5EA]">
@@ -150,6 +135,7 @@
                                 $cap = $batch->max_capacity ?: 20;
                                 $occ = $cap > 0 ? round(($pax / $cap) * 100) : 0;
                                 $coachesCnt = $batch->assigned_coaches_count;
+                                $recCoaches = max(1, (int) ceil($pax / 4));
                             @endphp
                             <tr>
                                 <td class="p-2.5 font-bold">Batch #{{ $batch->id }}</td>
@@ -158,8 +144,8 @@
                                 <td class="p-2.5 text-center">{{ $pax }} / {{ $cap }}</td>
                                 <td class="p-2.5 text-center font-bold {{ $occ >= 90 ? 'text-[#780000]' : '' }}">{{ $occ }}%</td>
                                 <td class="p-2.5 text-[11px]">{{ $batch->coachAssignments->map(fn($ca) => $ca->coach?->name)->filter()->implode(', ') ?: 'None' }}</td>
-                                <td class="p-2.5 text-center font-bold {{ $coachesCnt > 0 && ($pax / $coachesCnt) <= 4 ? 'text-emerald-700' : 'text-rose-600' }}">
-                                    {{ $coachesCnt > 0 ? round($pax / $coachesCnt, 1) . ' : 1' : 'N/A' }}
+                                <td class="p-2.5 text-center font-bold {{ $coachesCnt >= $recCoaches ? 'text-emerald-700' : 'text-amber-600' }}">
+                                    {{ $coachesCnt }} Assigned (Rec: {{ $recCoaches }})
                                 </td>
                             </tr>
                         @empty

@@ -137,6 +137,7 @@ $registerBackofficeRoutes = function (string $portalRole) {
     Route::post('/coaches/matching/batch-assign', [CoachMatchingController::class, 'batchAssign'])->name('coaches.matching.batch_assign');
     Route::post('/coaches/matching/broadcast', [CoachMatchingController::class, 'broadcastOpening'])->name('coaches.matching.broadcast');
     Route::get('/coaches/requests', [CoachMatchingController::class, 'requests'])->name('coaches.requests');
+    Route::post('/coaches/requests/bulk-approve', [CoachMatchingController::class, 'bulkApproveRequests'])->name('coaches.requests.bulk_approve');
     Route::post('/coaches/requests/{coachRequest}/approve', [CoachMatchingController::class, 'approveRequest'])->name('coaches.requests.approve');
     Route::post('/coaches/release-requests/{releaseRequest}/approve', [CoachMatchingController::class, 'approveReleaseRequest'])->name('coaches.release_requests.approve');
     Route::post('/coaches/release-requests/{releaseRequest}/reject', [CoachMatchingController::class, 'rejectReleaseRequest'])->name('coaches.release_requests.reject');

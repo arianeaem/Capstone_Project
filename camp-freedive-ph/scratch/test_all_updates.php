@@ -42,9 +42,9 @@ echo "/admin for Group 8 => " . ($isLocked ? '🔒 LOCKED (bawal po gr 8 di pa s
 $reqBookings = Illuminate\Http\Request::create('/admin/bookings', 'GET');
 $reqBookings->setUserResolver(fn() => $tester);
 $resBookings = app()->handle($reqBookings);
-echo "/admin/bookings for Group 8 => Status: " . $resBookings->getStatusCode() . " (" . ($resBookings->getStatusCode() === 200 && !str_contains($resBookings->getContent(), 'bawal') ? '✓ ALLOWED' : 'BLOCKED ✗') . ")\n";
+echo "/admin/bookings for Group 8 => Status: " . $resBookings->getStatusCode() . " (" . ($resBookings->getStatusCode() === 200 && !str_contains($resBookings->getContent(), 'bawal') ? 'ALLOWED' : 'BLOCKED ✗') . ")\n";
 
 $reqPayments = Illuminate\Http\Request::create('/admin/payments', 'GET');
 $reqPayments->setUserResolver(fn() => $tester);
 $resPayments = app()->handle($reqPayments);
-echo "/admin/payments for Group 8 => Status: " . $resPayments->getStatusCode() . " (" . ($resPayments->getStatusCode() === 200 && !str_contains($resPayments->getContent(), 'bawal') ? '✓ ALLOWED' : 'BLOCKED ✗') . ")\n";
+echo "/admin/payments for Group 8 => Status: " . $resPayments->getStatusCode() . " (" . ($resPayments->getStatusCode() === 200 && !str_contains($resPayments->getContent(), 'bawal') ? 'ALLOWED' : 'BLOCKED ✗') . ")\n";

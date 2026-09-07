@@ -36,7 +36,7 @@ foreach ($testUrls as $path => $expected) {
     echo sprintf("%-30s [%d] %s => %s\n", 
         $path, 
         $res->getStatusCode(), 
-        $isLockScreen ? '🔒 RESTRICTED LOCK SCREEN' : '✓ NORMAL ACCESS',
+        $isLockScreen ? '🔒 RESTRICTED LOCK SCREEN' : 'NORMAL ACCESS',
         $expected
     );
 }
@@ -48,4 +48,4 @@ Auth::login($owner);
 $req = Illuminate\Http\Request::create('/admin/batches', 'GET');
 $req->setUserResolver(fn() => $owner);
 $res = app()->handle($req);
-echo sprintf("/admin/batches (Owner) => %s\n", str_contains($res->getContent(), 'bawal po gr 8') ? 'LOCKED (BUG!)' : '✓ FULL OWNER ACCESS');
+echo sprintf("/admin/batches (Owner) => %s\n", str_contains($res->getContent(), 'bawal po gr 8') ? 'LOCKED (BUG!)' : 'FULL OWNER ACCESS');

@@ -618,8 +618,7 @@ class CoachMatchingService
 
     /**
      * Review & approve a coach request for an open slot.
-     * Supports multi-coach batches: keeps opening and pending requests open
-     * until all needed coaches (based on 1:4 ratio) are approved.
+     * Assigns the coach to the batch without rigid restrictions on coach count.
      */
     public function approveCoachRequest(CoachRequest $request, User $reviewer): void
     {
@@ -631,54 +630,27 @@ class CoachMatchingService
                 'reviewed_at' => now(),
             ]);
 
-            // Calculate how many coaches are needed for this batch (1:4 ratio)
             $batch = $request->batch;
-            $headcount = (int) $batch->total_participants_count ?: ($request->opening?->needed_students_count ?: 4);
-            $coachesNeeded = max(1, (int) ceil($headcount / 4));
 
-            // Count how many coaches are currently approved for this batch
-            $approvedCount = CoachRequest::where('batch_id', $batch->id)
-                ->where('status', 'approved')
-                ->count();
-
-            // If we have now fulfilled all needed coaches, mark opening as filled and mark remaining pending as not_selected
-            if ($approvedCount >= $coachesNeeded) {
-                CoachRequest::where('batch_id', $batch->id)
-                    ->where('id', '!=', $request->id)
-                    ->where('status', 'pending')
-                    ->update([
-                        'status' => 'not_selected',
-                        'reviewed_by' => $reviewer->id,
-                        'reviewed_at' => now(),
-                    ]);
-
-                if ($request->opening) {
-                    $request->opening->update(['status' => 'filled']);
-                }
-            } else {
-                // More coaches still needed! Keep opening open
-                if ($request->opening) {
-                    $request->opening->update(['status' => 'open']);
-                }
-            }
+            // 2. Assign the coach to the batch
+            $currentAssignedIds = $batch->assigned_coaches->pluck('id')->toArray();
+            $newCoachIds = array_values(array_unique(array_merge($currentAssignedIds, [$request->coach_id])));
+            $this->assignCoachesToBatch($batch, $newCoachIds, $reviewer);
 
             // 3. Mark coach availability to assigned
-            $dateStr = $request->batch->start_date->format('Y-m-d');
-            $avail = CoachAvailability::where('coach_id', $request->coach_id)->whereDate('date', $dateStr)->first();
-            if ($avail) {
-                $avail->update(['status' => 'assigned', 'notes' => "Approved for batch {$request->batch->batch_code}"]);
-            } else {
-                CoachAvailability::create([
-                    'coach_id' => $request->coach_id,
-                    'date' => $dateStr,
-                    'status' => 'assigned',
-                    'notes' => "Approved for batch {$request->batch->batch_code}",
-                ]);
+            $dateStr1 = $batch->start_date->format('Y-m-d');
+            $dateStr2 = $batch->end_date ? $batch->end_date->format('Y-m-d') : $batch->start_date->copy()->addDay()->format('Y-m-d');
+
+            foreach ([$dateStr1, $dateStr2] as $dStr) {
+                CoachAvailability::updateOrCreate(
+                    ['coach_id' => $request->coach_id, 'date' => $dStr],
+                    ['status' => 'assigned', 'notes' => "Approved request for batch {$batch->batch_code}"]
+                );
             }
 
             AuditLogger::log(
                 'COACH_REQUEST_APPROVED',
-                "Approved Coach {$request->coach->name} for batch {$request->batch->batch_code} ({$approvedCount}/{$coachesNeeded} coach slots filled).",
+                "Approved Coach {$request->coach->name} for batch {$batch->batch_code}.",
                 $reviewer,
                 $reviewer->name
             );

@@ -54,7 +54,7 @@
                 <div class="p-3 rounded-xl border text-xs flex items-center justify-between"
                      style="background-color: {{ $batch->is_coach_pending ? '#FFFBEB' : '#ECFDF5' }}; border-color: {{ $batch->is_coach_pending ? '#FDE68A' : '#A7F3D0' }}; color: {{ $batch->is_coach_pending ? '#92400E' : '#065F46' }}">
                     <span class="font-bold">
-                        {{ $batch->is_coach_pending ? 'Coach Pending' : '✓ Capacity Ready' }}
+                        {{ $batch->is_coach_pending ? 'Coach Pending' : 'Capacity Ready' }}
                     </span>
                     <strong class="text-sm font-extrabold">
                         {{ $batch->computed_capacity }} Student Slots ({{ $batch->activeAssignments->count() }} Coach{{ $batch->activeAssignments->count() == 1 ? '' : 'es' }})

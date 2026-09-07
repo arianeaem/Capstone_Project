@@ -311,7 +311,7 @@ class BatchManagementController extends Controller
                 default => 'Updated to ' . ucfirst($validated['status']),
             };
 
-            return back()->with('success', "✓ Batch status updated: {$actionLabel}.");
+            return back()->with('success', "Batch status updated: {$actionLabel}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -339,7 +339,7 @@ class BatchManagementController extends Controller
                 $validated['reason'] ?? null
             );
 
-            return back()->with('success', "✓ Booking {$booking->booking_number} moved successfully.");
+            return back()->with('success', "Booking {$booking->booking_number} moved successfully.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

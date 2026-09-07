@@ -24,7 +24,7 @@
             <p>Great news! Your reschedule request for your upcoming freediving trip has been <strong>approved</strong> by camp management.</p>
 
             <div class="status-box">
-                <strong>✓ Your New Dive Dates are Confirmed</strong><br>
+                <strong>Your New Dive Dates are Confirmed</strong><br>
                 <span>{{ $booking->start_date->format('F d, Y (l)') }} – {{ $booking->end_date->format('F d, Y (l)') }}</span>
             </div>
 

@@ -117,8 +117,8 @@ class ExportService
             'Occupancy (%)',
             'Assigned Coaches',
             'Coaches Count',
-            'Safety Ratio (Divers : Coach)',
-            'Safety Ratio Compliant',
+            'Recommended Coaches',
+            'Staffing Met',
             'Risk Rating',
         ]);
 
@@ -133,9 +133,8 @@ class ExportService
             $maxCap = $b->max_capacity ?: 20;
             $occupancy = $maxCap > 0 ? round(($paxCount / $maxCap) * 100, 1) : 0;
             $coachNames = $b->coachAssignments->map(fn($ca) => $ca->coach?->name)->filter()->implode(', ') ?: 'None';
-            $requiredCoaches = (int) ceil($paxCount / 4);
+            $requiredCoaches = max(1, (int) ceil($paxCount / 4));
             $isCompliant = ($paxCount === 0 || $coachesCount >= $requiredCoaches) ? 'YES' : 'NO';
-            $ratioStr = $coachesCount > 0 ? round($paxCount / $coachesCount, 1) . ' : 1' : ($paxCount > 0 ? 'Unassigned' : '0 : 0');
 
             fputcsv($handle, [
                 $b->id,
@@ -148,7 +147,7 @@ class ExportService
                 $occupancy . '%',
                 $coachNames,
                 $coachesCount,
-                $ratioStr,
+                $requiredCoaches,
                 $isCompliant,
                 ucwords(str_replace('_', ' ', $b->risk_classification ?? $b->riskAssessment?->overall_risk_rating ?? 'Safe')),
             ]);

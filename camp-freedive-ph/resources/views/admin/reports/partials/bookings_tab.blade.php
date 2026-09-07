@@ -171,7 +171,7 @@
 
     </div>
 
-    <!-- Bottom: Bookings & Diver Demographic Log (Styled like Booking List Table) -->
+    <!-- Bottom: Bookings & Diver Demographic Log -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
         <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
             <div>

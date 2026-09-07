@@ -36,39 +36,62 @@
             $headcount = (int) $batch->total_participants_count ?: 4;
             $coachesNeeded = max(1, (int) ceil($headcount / 4));
             $alreadyApproved = \App\Models\CoachRequest::where('batch_id', $batch->id)->where('status', 'approved')->count();
-            $slotsRemaining = max(0, $coachesNeeded - $alreadyApproved);
         @endphp
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4" x-data="{ selectedRequests: [] }">
             
-            <div class="border-b border-[#E5E5EA] pb-4">
-                <div class="flex items-center gap-2 flex-wrap">
-                    <span class="font-mono font-extrabold text-base text-[#780000]">{{ $batch->batch_code }}</span>
-                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
-                        {{ $groupRequests->count() }} {{ Str::plural('Applicant', $groupRequests->count()) }}
-                    </span>
-                    <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                        {{ $alreadyApproved }}/{{ $coachesNeeded }} Approved (Recommended: {{ $coachesNeeded }})
-                    </span>
-                </div>
-                <div class="space-y-1 text-xs text-[#6E6E73] mt-2">
-                    <div>
-                        <span class="font-bold text-[#1D1D1F]">{{ $batch->start_date->format('F d, Y (l)') }} – {{ $batch->end_date->format('F d, Y (l)') }}</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-4">
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-mono font-extrabold text-base text-[#780000]">{{ $batch->batch_code }}</span>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                            {{ $groupRequests->count() }} {{ Str::plural('Applicant', $groupRequests->count()) }}
+                        </span>
+                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                            {{ $alreadyApproved }} Approved (Recommended: {{ $coachesNeeded }})
+                        </span>
                     </div>
-                    <div>
-                        <span>Students Booked: <strong class="text-[#1D1D1F]">{{ $headcount }}</strong> {{ Str::plural('Student', $headcount) }}</span>
+                    <div class="space-y-1 text-xs text-[#6E6E73] mt-2">
+                        <div>
+                            <span class="font-bold text-[#1D1D1F]">{{ $batch->start_date->format('F d, Y (l)') }} – {{ $batch->end_date->format('F d, Y (l)') }}</span>
+                        </div>
+                        <div>
+                            <span>Students Booked: <strong class="text-[#1D1D1F]">{{ $headcount }}</strong> {{ Str::plural('Student', $headcount) }}</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Bulk Approve Action -->
+                <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.requests.bulk_approve') : route('admin.coaches.requests.bulk_approve') }}" 
+                      method="POST" 
+                      x-show="selectedRequests.length > 0" 
+                      x-cloak>
+                    @csrf
+                    <template x-for="rId in selectedRequests" :key="rId">
+                        <input type="hidden" name="request_ids[]" :value="rId">
+                    </template>
+                    <button type="submit" 
+                            onclick="return confirm('Approve the selected ' + selectedRequests.length + ' coach applicant(s) for ' + '{{ $batch->batch_code }}' + '?')"
+                            class="btn-primary px-4 py-2 text-xs font-bold shadow-2xs flex items-center gap-1.5">
+                        <span>Approve Selected (<span x-text="selectedRequests.length"></span>)</span>
+                    </button>
+                </form>
             </div>
 
-            <!-- Applied Coaches List -->
+            <!-- Applied Coaches List with Multi-Select -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 @foreach($groupRequests as $req)
-                <div class="bg-[#FAFAFC] p-4 rounded-xl flex flex-col justify-between gap-3 shadow-2xs">
+                <label class="bg-[#FAFAFC] p-4 rounded-xl flex flex-col justify-between gap-3 shadow-2xs hover:bg-white hover:border-[#D1D1D6] border border-[#E5E5EA] transition-all cursor-pointer select-none">
                     <div class="space-y-2.5">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-9 h-9 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-xs flex items-center justify-center shrink-0">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" 
+                                   :value="{{ $req->id }}" 
+                                   x-model="selectedRequests" 
+                                   class="rounded text-[#780000] focus:ring-[#780000] w-4 h-4 cursor-pointer shrink-0">
+
+                            <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-xs flex items-center justify-center shrink-0">
                                 {{ strtoupper(substr($req->coach->name, 0, 1)) }}
                             </div>
+
                             <div class="min-w-0 flex-1">
                                 <strong class="font-bold text-xs text-[#1D1D1F] block truncate">{{ $req->coach->name }}</strong>
                                 <span class="text-[11px] text-[#8E8E93] block">Applied {{ $req->created_at->format('M d, Y g:i A') }}</span>
@@ -83,15 +106,19 @@
                     </div>
 
                     <div class="pt-2 border-t border-[#E5E5EA]">
-                        <form action="{{ route('admin.coaches.requests.approve', $req) }}" method="POST" class="w-full"
-                              onsubmit="return confirm('Approve Coach {{ $req->coach->name }} for {{ $batch->batch_code }}? {{ $slotsRemaining > 1 ? 'Slot ' . ($alreadyApproved + 1) . ' of ' . $coachesNeeded . ' will be filled. Other applicants remain available for the next slot.' : 'This will fill the final coach slot and complete the roster for this batch.' }}');">
+                        <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.requests.approve', $req) : route('admin.coaches.requests.approve', $req) }}" 
+                              method="POST" 
+                              class="w-full"
+                              onsubmit="return confirm('Approve Coach {{ $req->coach->name }} for {{ $batch->batch_code }}?');">
                             @csrf
-                            <button type="submit" class="btn-primary w-full py-2 text-xs font-bold shadow-2xs">
-                                Approve Coach (Slot {{ $alreadyApproved + 1 }}/{{ $coachesNeeded }})
+                            <button type="submit" 
+                                    @click.stop 
+                                    class="btn-primary w-full py-1.5 text-xs font-bold shadow-2xs">
+                                Approve Single Coach
                             </button>
                         </form>
                     </div>
-                </div>
+                </label>
                 @endforeach
             </div>
 

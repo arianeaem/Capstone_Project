@@ -85,7 +85,7 @@
                 @endforeach
             </div>
 
-            <!-- Tabular Breakdown (Styled like Booking List Table) -->
+            <!-- Tabular Breakdown -->
             <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
                 <table class="w-full text-left min-w-[550px]">
                     <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">

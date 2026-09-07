@@ -122,7 +122,7 @@ class CoachMatchingController extends Controller
                     auth()->user()
                 );
 
-                return back()->with('success', "✓ Coaches successfully assigned to {$batch->batch_number}.");
+                return back()->with('success', "Coaches successfully assigned to {$batch->batch_number}.");
             } catch (Exception $e) {
                 return back()->with('error', $e->getMessage());
             }
@@ -156,7 +156,7 @@ class CoachMatchingController extends Controller
                     auth()->user()
                 );
 
-                return back()->with('success', "✓ Assigned Coach {$coach->name} to {$batch->batch_number}.");
+                return back()->with('success', "Assigned Coach {$coach->name} to {$batch->batch_number}.");
             } catch (Exception $e) {
                 return back()->with('error', $e->getMessage());
             }
@@ -189,7 +189,7 @@ class CoachMatchingController extends Controller
             );
 
             $names = $result['coaches']->pluck('name')->implode(', ');
-            return back()->with('success', "✓ Assigned {$names} to {$batch->batch_number}.");
+            return back()->with('success', "Assigned {$names} to {$batch->batch_number}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -211,7 +211,7 @@ class CoachMatchingController extends Controller
 
             $this->matchingService->unassignCoachFromBatch($batch, $coach, auth()->user());
 
-            return back()->with('success', "✓ Unassigned Coach {$coach->name} from {$batch->batch_number}.");
+            return back()->with('success', "Unassigned Coach {$coach->name} from {$batch->batch_number}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -237,7 +237,7 @@ class CoachMatchingController extends Controller
                 $validated['notes'] ?? null
             );
 
-            return back()->with('success', "✓ Open slot for {$batch->batch_code} ({$batch->start_date->format('M d, Y')}) has been posted to the Coach Portal.");
+            return back()->with('success', "Open slot for {$batch->batch_code} ({$batch->start_date->format('M d, Y')}) has been posted to the Coach Portal.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -269,20 +269,41 @@ class CoachMatchingController extends Controller
     {
         try {
             $this->matchingService->approveCoachRequest($coachRequest, auth()->user());
-
             $batch = $coachRequest->batch;
-            $headcount = $batch->booked_headcount ?: 4;
-            $coachesNeeded = max(1, (int) ceil($headcount / 4));
-            $approvedCount = CoachRequest::where('batch_id', $batch->id)->where('status', 'approved')->count();
 
-            if ($approvedCount >= $coachesNeeded) {
-                $msg = "✓ Approved Coach {$coachRequest->coach->name}. All {$coachesNeeded} coach slot(s) for batch {$batch->batch_code} are now filled!";
-            } else {
-                $remaining = $coachesNeeded - $approvedCount;
-                $msg = "✓ Approved Coach {$coachRequest->coach->name} for {$batch->batch_code} ({$approvedCount} of {$coachesNeeded} slots filled). {$remaining} more coach(es) needed.";
+            return back()->with('success', "Approved Coach {$coachRequest->coach->name} for {$batch->batch_code}.");
+        } catch (Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Bulk approve selected coach requests.
+     */
+    public function bulkApproveRequests(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'request_ids' => 'required|array|min:1',
+            'request_ids.*' => 'exists:coach_requests,id',
+        ]);
+
+        $approvedCount = 0;
+        $coachNames = [];
+        $batchCode = '';
+
+        try {
+            foreach ($validated['request_ids'] as $reqId) {
+                $coachRequest = CoachRequest::find($reqId);
+                if ($coachRequest && $coachRequest->status === 'pending') {
+                    $this->matchingService->approveCoachRequest($coachRequest, auth()->user());
+                    $approvedCount++;
+                    $coachNames[] = $coachRequest->coach->name;
+                    $batchCode = $coachRequest->batch?->batch_code ?? '';
+                }
             }
 
-            return back()->with('success', $msg);
+            $namesStr = implode(', ', $coachNames);
+            return back()->with('success', "Approved {$approvedCount} coach applicant(s) ({$namesStr}) for {$batchCode}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -322,7 +343,7 @@ class CoachMatchingController extends Controller
                     ->update(['status' => 'unavailable']);
             });
 
-            return back()->with('success', "✓ Approved release request for Coach {$releaseRequest->coach->name}. Students have been moved back to the matching queue.");
+            return back()->with('success', "Approved release request for Coach {$releaseRequest->coach->name}. Students have been moved back to the matching queue.");
         } catch (Exception $e) {
             return back()->with('error', 'Failed to approve release request: ' . $e->getMessage());
         }

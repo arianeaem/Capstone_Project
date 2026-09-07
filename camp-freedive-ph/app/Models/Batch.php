@@ -141,12 +141,33 @@ class Batch extends Model
      */
     public function getAssignedCoachesAttribute(): Collection
     {
-        return $this->activeParticipantAssignments()
+        $fromAssignments = $this->activeParticipantAssignments()
             ->with('coach')
             ->get()
             ->pluck('coach')
             ->unique('id')
             ->filter();
+
+        // Also detect coaches assigned for this batch date when participants are 0
+        $startDateStr = $this->start_date ? $this->start_date->format('Y-m-d') : null;
+        if ($startDateStr) {
+            $batchNum = $this->batch_number;
+            $batchCode = $this->batch_code;
+
+            $fromAvailabilities = User::where('role', 'coach')
+                ->whereHas('coachAvailabilities', function ($q) use ($startDateStr, $batchNum, $batchCode) {
+                    $q->whereDate('date', $startDateStr)
+                      ->where('status', 'assigned')
+                      ->where(function ($sub) use ($batchNum, $batchCode) {
+                          if ($batchNum) $sub->where('notes', 'like', "%{$batchNum}%");
+                          if ($batchCode) $sub->orWhere('notes', 'like', "%{$batchCode}%");
+                      });
+                })->get();
+
+            return $fromAssignments->merge($fromAvailabilities)->unique('id')->values();
+        }
+
+        return $fromAssignments;
     }
 
     public const MAX_CAPACITY = 45;

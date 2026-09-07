@@ -256,7 +256,7 @@
                     </div>
 
                     <span class="px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
-                        ✓ {{ $item['students_count'] }} Student(s) Completed
+                        {{ $item['students_count'] }} Student(s) Completed
                     </span>
                 </div>
 

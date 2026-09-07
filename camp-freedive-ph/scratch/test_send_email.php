@@ -28,7 +28,7 @@ echo "Testing dispatch with Booking #{$booking->booking_number}...\n";
 
 try {
     Mail::to($recipient)->send(new BookingConfirmedMail($booking));
-    echo "✓ SUCCESS! Confirmation email successfully sent to {$recipient}.\n";
+    echo "SUCCESS! Confirmation email successfully sent to {$recipient}.\n";
 } catch (\Exception $e) {
     echo "✗ FAILED: " . $e->getMessage() . "\n";
     if (str_contains($e->getMessage(), '535') || str_contains($e->getMessage(), 'BadCredentials')) {

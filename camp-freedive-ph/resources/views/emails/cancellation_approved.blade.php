@@ -26,7 +26,7 @@
 
             @if(!$isForfeited && $refundAmount > 0)
                 <div class="refund-box">
-                    <strong>✓ Refund Approved & Queued for Processing</strong><br>
+                    <strong>Refund Approved & Queued for Processing</strong><br>
                     <span>Approved Refund Amount: <strong>₱{{ number_format($refundAmount, 2) }}</strong></span><br>
                     <span style="font-size: 12px;">Our finance staff has queued your refund back to your original payment method (PayMongo / GCash / Maya).</span>
                 </div>

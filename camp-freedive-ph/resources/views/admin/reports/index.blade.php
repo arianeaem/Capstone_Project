@@ -22,7 +22,7 @@
                 <button type="button" 
                         @click="exportOpen = !exportOpen" 
                         class="btn-secondary px-3.5 py-2 text-xs font-bold flex items-center gap-2">
-                    <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <img src="{{ asset('icons/icons8-download-60.png') }}" class="w-4 h-4 shrink-0" alt="Export CSV">
                     <span>Export CSV</span>
                     <svg class="w-3 h-3 text-[#8E8E93]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
@@ -54,7 +54,7 @@
             <a href="{{ (auth()->user()->isOwner() ? route('owner.reports.print') : route('admin.reports.print')) . '?' . http_build_query(['preset' => $range['preset'], 'start_date' => $range['start']->format('Y-m-d'), 'end_date' => $range['end']->format('Y-m-d')]) }}" 
                target="_blank" 
                class="btn-secondary px-3.5 py-2 text-xs font-bold flex items-center gap-2">
-                <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <img src="{{ asset('icons/icons8-print-60.png') }}" class="w-4 h-4 shrink-0" alt="Print Summary">
                 <span>Print Summary</span>
             </a>
 

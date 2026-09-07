@@ -34,16 +34,16 @@
                 </div>
             </div>
 
-            <!-- Safety Ratio Compliance -->
+            <!-- Staffing Fulfillment -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Safety Ratio Adherence</span>
+                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Staffing Fulfillment</span>
                 <div class="text-xl sm:text-2xl font-extrabold mt-0.5 break-words {{ ($op['safety_compliance_rate'] ?? 100) >= 95 ? 'text-emerald-700' : 'text-amber-600' }}">
                     {{ $op['safety_compliance_rate'] ?? 100 }}%
                 </div>
                 <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Max 1 Coach : 4 Students</span>
-                    <span class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Standard</span>
+                    <span>{{ $op['compliant_batches_count'] ?? 0 }} of {{ $op['total_batches'] ?? 0 }} batches</span>
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Staffed</span>
                 </div>
             </div>
 
@@ -66,7 +66,7 @@
     <!-- Middle: Coach Workload Leaderboard & Operational Highlights -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Coach Assignments Distribution (Styled like Booking List Table) -->
+        <!-- Coach Assignments Distribution -->
         <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                 <div>
@@ -164,12 +164,12 @@
 
     </div>
 
-    <!-- Batch Runways & Performance List (Styled like Booking List Table) -->
+    <!-- Batch Runways & Performance List -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
         <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
             <div>
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Batch Runway & Roster Log</h3>
-                <p class="text-xs text-[#6E6E73]">Trip-by-trip occupancy, distinct coach allocation, and safety ratio tracking.</p>
+                <p class="text-xs text-[#6E6E73]">Trip-by-trip occupancy, distinct coach allocation, and recommended staffing tracking.</p>
             </div>
         </div>
 
@@ -182,7 +182,7 @@
                         <th class="p-4 text-center">Divers Booked</th>
                         <th class="p-4 min-w-[150px]">Occupancy Rate</th>
                         <th class="p-4 min-w-[200px]">Assigned Coaches</th>
-                        <th class="p-4 text-center">Safety Ratio</th>
+                        <th class="p-4 text-center">Coach Staffing</th>
                         <th class="p-4 pr-6 text-center">Status</th>
                     </tr>
                 </thead>
@@ -194,8 +194,7 @@
                             $occ = $cap > 0 ? round(($pax / $cap) * 100) : 0;
                             $distinctCoaches = $batch->coachAssignments->pluck('coach')->unique('id')->filter();
                             $coachesCnt = $distinctCoaches->count();
-                            $required = (int) ceil($pax / 4);
-                            $isRatioGood = ($pax === 0 || $coachesCnt >= $required);
+                            $required = max(1, (int) ceil($pax / 4));
                         @endphp
                         <tr class="hover:bg-[#FAFAFC] transition-colors text-xs sm:text-sm">
                             <td class="p-4 pl-6 font-mono">
@@ -230,9 +229,12 @@
                                 </div>
                             </td>
                             <td class="p-4 text-center">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $isRatioGood ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
-                                    {{ $coachesCnt > 0 ? round($pax / $coachesCnt, 1) . ' : 1' : ($pax > 0 ? 'Exceeded' : 'OK') }}
-                                </span>
+                                <div class="text-xs font-bold text-[#1D1D1F]">
+                                    {{ $coachesCnt }} Assigned
+                                </div>
+                                <div class="text-[11px] text-[#8E8E93]">
+                                    Rec: {{ $required }} {{ Str::plural('coach', $required) }}
+                                </div>
                             </td>
                             <td class="p-4 pr-6 text-center">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $batch->status === 'completed' ? 'bg-emerald-50 text-emerald-700' : ($batch->status === 'confirmed' ? 'bg-sky-50 text-sky-700' : ($batch->status === 'rescheduled' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-700')) }}">

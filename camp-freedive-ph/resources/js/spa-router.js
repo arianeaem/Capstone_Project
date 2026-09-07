@@ -201,20 +201,23 @@ class SPARouter {
                 }
             });
 
-            if (response.redirected) {
-                await this.navigate(response.url);
+            if (!response.ok && response.status === 401) {
+                window.location.href = response.url || '/login';
                 return;
             }
+
+            const finalUrl = response.url || action;
+            const htmlText = await response.text();
 
             if (!response.ok) {
                 // If validation failed (422) or error (500), parse and display response HTML
-                const htmlText = await response.text();
-                this.renderContent(htmlText, response.url || action, false);
+                this.renderContent(htmlText, finalUrl, false);
+                this.currentUrl = finalUrl;
                 return;
             }
 
-            const htmlText = await response.text();
-            this.renderContent(htmlText, response.url || action, true);
+            this.renderContent(htmlText, finalUrl, true);
+            this.currentUrl = finalUrl;
         } catch (err) {
             console.error('[SPARouter] Form submission error, falling back to native:', err);
             form.submit();
