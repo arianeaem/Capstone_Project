@@ -160,7 +160,7 @@
                     <tr class="hover:bg-[#FAFAFC] transition-colors">
                         <!-- Timestamp -->
                         <td class="py-3 px-4 text-left text-[#6E6E73] whitespace-nowrap font-mono text-xs">
-                            {{ $log->created_at ? $log->created_at->format('M d, Y g:i:s A') : '—' }}
+                            {{ $log->created_at ? $log->created_at->format('M d, Y g:i:s A') : '-' }}
                         </td>
 
                         <!-- Action Badge -->

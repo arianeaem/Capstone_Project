@@ -266,7 +266,7 @@
                                 {{ $pr->reviewer->name ?? 'System Administrator' }}
                             </td>
                             <td class="py-3 px-4 text-[#6E6E73] whitespace-nowrap">
-                                {{ $pr->reviewed_at ? $pr->reviewed_at->format('M d, Y g:i A') : '—' }}
+                                {{ $pr->reviewed_at ? $pr->reviewed_at->format('M d, Y g:i A') : '-' }}
                             </td>
                             <td class="py-3 px-4 font-mono text-xs text-[#6E6E73]">
                                 {{ $pr->paymongo_refund_id ?? ($pr->status === 'forfeited' ? 'Forfeited to Camp' : 'N/A') }}

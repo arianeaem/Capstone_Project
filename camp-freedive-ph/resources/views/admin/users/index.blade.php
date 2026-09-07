@@ -189,7 +189,7 @@
 
                         <!-- Phone Number -->
                         <td class="py-3 px-4 text-left text-[#1D1D1F]">
-                            {{ $user->phone ?? '—' }}
+                            {{ $user->phone ?? '-' }}
                         </td>
 
                         <!-- Role Badge -->

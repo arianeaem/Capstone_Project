@@ -119,7 +119,7 @@
                     <tr @if($booking) onclick="window.location='{{ route('admin.bookings.show', $booking) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group" @else class="hover:bg-[#FAFAFC] transition-colors" @endif>
                         <!-- Booking Number -->
                         <td class="py-3.5 px-4 text-left font-mono font-bold text-[#780000] group-hover:underline">
-                            {{ $booking ? $booking->booking_number : '—' }}
+                            {{ $booking ? $booking->booking_number : '-' }}
                         </td>
 
                         <!-- Customer Name -->
@@ -130,12 +130,12 @@
 
                         <!-- Dive Date -->
                         <td class="py-3.5 px-4 text-left font-medium text-[#1D1D1F]">
-                            {{ $booking ? $booking->start_date->format('M d, Y') : '—' }}
+                            {{ $booking ? $booking->start_date->format('M d, Y') : '-' }}
                         </td>
 
                         <!-- Class -->
                         <td class="py-3.5 px-4 text-left capitalize font-semibold text-[#1D1D1F]">
-                            {{ $booking ? $booking->class_type : '—' }}
+                            {{ $booking ? $booking->class_type : '-' }}
                         </td>
 
                         <!-- Base -> Adjusted Rate -->

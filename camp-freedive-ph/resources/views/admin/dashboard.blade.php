@@ -199,7 +199,7 @@
 
                                     <div>
                                         <p class="text-xs text-[#6E6E73]">
-                                             {{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}
+                                             {{ $batch->start_date->format('M d, Y') }} - {{ $batch->end_date->format('M d, Y') }}
                                             <span class="text-[#780000] font-semibold">({{ $batch->start_date->diffForHumans() }})</span>
                                         </p>
                                     </div>
@@ -263,7 +263,7 @@
 
                                     <div>
                                         <p class="text-xs text-[#6E6E73]">
-                                            {{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}
+                                            {{ $batch->start_date->format('M d, Y') }} - {{ $batch->end_date->format('M d, Y') }}
                                             <span class="text-[#780000] font-semibold">({{ $batch->start_date->diffForHumans() }})</span>
                                         </p>
                                     </div>

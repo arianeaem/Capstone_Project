@@ -3,16 +3,16 @@
 Standalone weather-risk forecast API for Camp FreedivePH. Wraps `assess_booking()`
 (extracted from `weather_risk_assessment.ipynb`) behind a tiny FastAPI app.
 
-**This is a separate project from the Laravel app — do not copy it into your
+**This is a separate project from the Laravel app - do not copy it into your
 Laravel folders.** Laravel talks to it over HTTP.
 
 ## What's in here
 
-- `app/weather_risk.py` — the scoring logic (WEIGHTS, `score_*` functions,
+- `app/weather_risk.py` - the scoring logic (WEIGHTS, `score_*` functions,
   `check_overrides`, `assess_weather_risk`, `assess_booking`), extracted from
-  the notebook. No trained model files or `xgboost` needed — it calls
+  the notebook. No trained model files or `xgboost` needed - it calls
   Open-Meteo's live Marine + Weather APIs directly.
-- `app/main.py` — FastAPI app exposing `POST /assess-booking`.
+- `app/main.py` - FastAPI app exposing `POST /assess-booking`.
 
 ## Run it locally
 
@@ -58,7 +58,7 @@ FORECAST_SERVICE_URL=http://127.0.0.1:8001
 ```
 
 `ForecastService.php` calls `POST {FORECAST_SERVICE_URL}/assess-booking` once
-per window (AM, PM) — twice per day, four times per full batch assessment —
+per window (AM, PM) - twice per day, four times per full batch assessment -
 per the PRD's Section 13.
 
 ## Deploying
@@ -76,7 +76,7 @@ directory structure.
 
 ## Known open item
 
-`get_risk_assessment(horizon)` — the XGBoost-model-based function from the
-same notebook — is **not** included here, since it's not used by the booking
+`get_risk_assessment(horizon)` - the XGBoost-model-based function from the
+same notebook - is **not** included here, since it's not used by the booking
 flow in the notebook and needs the trained model files. Add it back in only
 if Bryan confirms it's needed for something this service should also expose.

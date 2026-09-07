@@ -2,10 +2,10 @@
 Weather risk scoring + booking assessment logic.
 
 Extracted from weather_risk_assessment.ipynb. This module intentionally
-does NOT import xgboost or load any trained model files — assess_booking()
+does NOT import xgboost or load any trained model files - assess_booking()
 (the function used by the booking flow) only needs live Open-Meteo data
 and the fixed scoring rules below. If get_risk_assessment(horizon) (the
-XGBoost-model path) is ever needed, it can be added back in separately —
+XGBoost-model path) is ever needed, it can be added back in separately -
 see the notebook's cell 2 for that function if required.
 """
 
@@ -397,7 +397,7 @@ def assess_booking(
 ):
     """
     Full per-window booking assessment. Call this once per window
-    (AM or PM) — day-level aggregation ("worst window wins" between
+    (AM or PM) - day-level aggregation ("worst window wins" between
     a day's two windows) happens on the Laravel side, not here.
     """
     open_water_window = validate_open_water_window(dive_start, dive_end)

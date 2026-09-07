@@ -85,7 +85,7 @@ class WeatherSafetyModuleTest extends TestCase
         $overrideData = [
             'tcws_signal' => 3,
             'gale_warning' => true,
-            'reason' => 'PAGASA Marine Warning #3 — Severe Tropical Storm in Batangas waters',
+            'reason' => 'PAGASA Marine Warning #3 - Severe Tropical Storm in Batangas waters',
         ];
 
         $res = $this->forecastService->applyManualOverride($batch, $overrideData, $this->admin, false);

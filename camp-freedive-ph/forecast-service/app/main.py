@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field
 
 from .weather_risk import assess_booking
 
-app = FastAPI(title="Camp FreedivePH — Weather Risk Forecast Service")
+app = FastAPI(title="Camp FreedivePH - Weather Risk Forecast Service")
 
 
 class Overrides(BaseModel):

@@ -18,7 +18,7 @@ use Illuminate\View\View;
 class PricingRuleController extends Controller
 {
     /**
-     * Page 1 — Pricing Rules List
+     * Page 1 - Pricing Rules List
      */
     public function index(Request $request): View
     {
@@ -63,7 +63,7 @@ class PricingRuleController extends Controller
     }
 
     /**
-     * Page 2 — Rule Builder (Create)
+     * Page 2 - Rule Builder (Create)
      */
     public function create(): View
     {
@@ -120,7 +120,7 @@ class PricingRuleController extends Controller
     }
 
     /**
-     * Page 2 — Rule Builder (Edit)
+     * Page 2 - Rule Builder (Edit)
      */
     public function edit(PricingRule $rule): View
     {
@@ -233,7 +233,7 @@ class PricingRuleController extends Controller
     }
 
     /**
-     * Page 3 — Bookings Triggered by Rule
+     * Page 3 - Bookings Triggered by Rule
      */
     public function triggered(Request $request, PricingRule $rule): View
     {

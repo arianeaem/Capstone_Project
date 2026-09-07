@@ -51,7 +51,7 @@
                     <div class="space-y-1">
                         <h3 class="text-xl font-black text-[#1D1D1F]">{{ $batch->batch_number }}</h3>
                         <p class="text-xs text-[#6E6E73]">
-                            Dates: <strong>{{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}</strong> • Mabini Coastline Base
+                            Dates: <strong>{{ $batch->start_date->format('M d, Y') }} - {{ $batch->end_date->format('M d, Y') }}</strong> • Mabini Coastline Base
                         </p>
                     </div>
 
@@ -251,7 +251,7 @@
                     <div>
                         <h3 class="text-base font-extrabold text-[#1D1D1F]">{{ $batch->batch_number }}</h3>
                         <p class="text-xs text-[#6E6E73] mt-0.5">
-                            Concluded: {{ $batch->start_date->format('M d, Y') }} — {{ $batch->end_date->format('M d, Y') }}
+                            Concluded: {{ $batch->start_date->format('M d, Y') }} - {{ $batch->end_date->format('M d, Y') }}
                         </p>
                     </div>
 
