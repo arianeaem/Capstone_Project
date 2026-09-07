@@ -225,7 +225,7 @@
     </div>
 
     <!-- Table Pagination -->
-    <div class="pt-2">
+    <div class="bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] overflow-hidden shadow-xs [&>*]:border-t-0">
         {{ $coaches->links() }}
     </div>
 

@@ -173,11 +173,7 @@
             </table>
         </div>
 
-        @if($adjustments->hasPages())
-        <div class="p-4 border-t border-[#E5E5EA] bg-[#FAFAFC]">
-            {{ $adjustments->links() }}
-        </div>
-        @endif
+        {{ $adjustments->links() }}
     </div>
 
 </div>

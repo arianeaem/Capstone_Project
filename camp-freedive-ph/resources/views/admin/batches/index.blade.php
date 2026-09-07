@@ -32,11 +32,11 @@
     </div>
 
     <!-- Search and Filter Toolbar -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-3 shadow-2xs">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-2.5 sm:p-3 shadow-2xs">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3">
             
             <!-- Batch Status Filters -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none -mx-0.5 px-0.5">
                 <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
                     class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     All Batches
@@ -60,8 +60,8 @@
             </div>
 
             <!-- Search and Advanced Filters -->
-            <div class="flex items-center gap-2" x-data="{ openFilters: false }">
-                <form action="{{ route('admin.batches.index') }}" method="GET" class="flex items-center gap-2">
+            <div class="flex items-center gap-2 w-full lg:w-auto" x-data="{ openFilters: false }">
+                <form action="{{ route('admin.batches.index') }}" method="GET" class="flex-1 min-w-0 lg:flex-initial">
                     @if(request('status'))
                         <input type="hidden" name="status" value="{{ request('status') }}">
                     @endif
@@ -72,12 +72,12 @@
                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                     @endif
 
-                    <div class="relative w-48 sm:w-64">
+                    <div class="relative w-full sm:w-64">
                         <input type="text" 
                                name="search" 
                                value="{{ request('search') }}" 
                                placeholder="Search batch (e.g. Batch 4)..." 
-                               class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
+                               class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000] shadow-xs">
                         <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -86,16 +86,16 @@
                 </form>
 
                 <!-- Advanced Filter Toggle -->
-                <div class="relative">
+                <div class="relative shrink-0">
                     <button type="button" 
                             @click="openFilters = !openFilters" 
-                            class="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer">
-                        <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer shadow-xs">
+                        <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                         </svg>
-                        <span>Filter & Sort</span>
+                        <span class="whitespace-nowrap">Filter & Sort</span>
                         @if(request()->anyFilled(['staffing', 'sort', 'date_from', 'date_to']))
-                            <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
                         @endif
                     </button>
 
@@ -103,7 +103,7 @@
                     <div x-show="openFilters" 
                          x-cloak 
                          @click.outside="openFilters = false" 
-                         class="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-[#E5E5EA] p-4 z-30 space-y-3">
+                         class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl shadow-xl border border-[#E5E5EA] p-4 z-30 space-y-3">
                         <div class="flex items-center justify-between pb-2">
                             <h4 class="font-bold text-xs text-[#1D1D1F]">Filter & Sort Batches</h4>
                             <a href="{{ route('admin.batches.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
@@ -224,7 +224,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="pt-2">
+    <div class="bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] overflow-hidden shadow-xs [&>*]:border-t-0">
         {{ $batches->links() }}
     </div>
 

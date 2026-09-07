@@ -24,39 +24,39 @@
     </div>
 
     <!-- Pricing Metrics Summary -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-2.5 sm:p-4 shadow-2xs">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-2 sm:gap-4">
             <!-- Total Rules -->
-            <div class="px-4 py-1">
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Rules</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ number_format($totalRules) }}</div>
-                <div class="text-xs text-[#6E6E73] mt-0.5">Configured pricing rules</div>
+            <div class="px-2 sm:px-4 py-1">
+                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Total Rules</span>
+                <div class="text-lg sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ number_format($totalRules) }}</div>
+                <div class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Configured pricing rules</div>
             </div>
 
             <!-- Active Rules -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 py-1 border-l border-[#E5E5EA] sm:border-l-0">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Active Rules</span>
-                <div class="text-2xl font-extrabold text-emerald-700 mt-0.5">{{ number_format($activeRules) }}</div>
-                <div class="text-xs text-emerald-600 mt-0.5 font-medium">Affecting live booking engine</div>
+                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Active Rules</span>
+                <div class="text-lg sm:text-2xl font-extrabold text-emerald-700 mt-0.5">{{ number_format($activeRules) }}</div>
+                <div class="text-[11px] text-emerald-600 hidden sm:block mt-0.5 font-medium">Affecting booking engine</div>
             </div>
 
             <!-- Bookings Triggered -->
-            <div class="relative px-4 py-1">
-                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Bookings Triggered</span>
-                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">{{ number_format($totalTriggered) }}</div>
-                <div class="text-xs text-[#6E6E73] mt-0.5">Reservations affected</div>
+            <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-[#E5E5EA]">
+                <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Triggered</span>
+                <div class="text-lg sm:text-2xl font-extrabold text-[#780000] mt-0.5">{{ number_format($totalTriggered) }}</div>
+                <div class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Reservations affected</div>
             </div>
 
             <!-- Net Price Delta -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-l border-[#E5E5EA] sm:border-l-0">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Net Price Delta</span>
-                <div class="text-2xl font-extrabold mt-0.5 {{ $netRevenueImpact >= 0 ? 'text-[#1D1D1F]' : 'text-rose-700' }}">
+                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Net Delta</span>
+                <div class="text-lg sm:text-2xl font-extrabold mt-0.5 {{ $netRevenueImpact >= 0 ? 'text-[#1D1D1F]' : 'text-rose-700' }}">
                     {{ $netRevenueImpact >= 0 ? '+' : '−' }}₱{{ number_format(abs($netRevenueImpact), 2) }}
                 </div>
-                <div class="text-xs text-[#6E6E73] mt-0.5">Cumulative discount/surge volume</div>
+                <div class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Discount/surge volume</div>
             </div>
         </div>
     </div>
@@ -65,11 +65,11 @@
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         
         <!-- Table Toolbar Header -->
-        <div class="p-3 sm:p-4 border-b border-[#E5E5EA]">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+        <div class="p-2.5 sm:p-4 border-b border-[#E5E5EA]">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2.5 sm:gap-3">
                 
                 <!-- Rule Type Tabs -->
-                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none -mx-0.5 px-0.5">
                     <a href="{{ request()->fullUrlWithQuery(['rule_type' => 'all']) }}" 
                        class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('rule_type', 'all') === 'all' || !request('rule_type') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Rules
@@ -90,16 +90,16 @@
 
                 <!-- Filter Controls -->
                 <div class="flex items-center gap-2 self-end lg:self-auto shrink-0" x-data="{ openFilters: false }">
-                    <div class="relative">
+                    <div class="relative shrink-0">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
-                                class="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer">
-                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer shadow-xs">
+                            <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                             </svg>
-                            <span>Filter</span>
+                            <span class="whitespace-nowrap">Filter</span>
                             @if(request()->anyFilled(['status', 'applies_to', 'sort']))
-                                <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                                <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
                             @endif
                         </button>
 
@@ -107,7 +107,7 @@
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
-                             class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
                             <div class="flex items-center justify-between pb-2">
                                 <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Rules</h4>
                                 <a href="{{ route('admin.pricing.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
@@ -290,11 +290,7 @@
             </table>
         </div>
 
-        @if($rules->hasPages())
-        <div class="p-4 border-t border-[#E5E5EA]">
-            {{ $rules->links() }}
-        </div>
-        @endif
+        {{ $rules->links() }}
     </div>
 
     <!-- Soft Delete Confirmation Modal -->

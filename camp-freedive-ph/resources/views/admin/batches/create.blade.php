@@ -163,26 +163,34 @@
                     </table>
 
                     <!-- Pagination Controls -->
-                    <div x-show="totalPages > 1" class="bg-[#FAFAFC] px-3 py-2 border-t border-[#D1D1D6] flex items-center justify-between text-xs text-[#6E6E73]">
-                        <div>
-                            Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span> to <span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span>
+                    <div x-show="totalPages > 1" class="bg-[#FAFAFC] px-3.5 py-2.5 border-t border-[#E5E5EA] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-[#6E6E73] rounded-b-xl select-none">
+                        <div class="font-medium text-[#6E6E73] text-center sm:text-left">
+                            Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span>–<span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span> results
                         </div>
-                        <div class="flex items-center gap-1">
-                            <button type="button" 
-                                    @click="currentPage--" 
-                                    :disabled="currentPage <= 1"
-                                    class="px-2 py-1 rounded bg-white border border-[#D1D1D6] hover:bg-[#F2F2F7] disabled:opacity-40 disabled:cursor-not-allowed">
-                                Prev
-                            </button>
-                            <span class="px-2 py-1 font-bold text-[#1D1D1F]">
-                                <span x-text="currentPage"></span> / <span x-text="totalPages"></span>
+                        <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+                            <span class="font-medium text-[#6E6E73]">
+                                Page <span class="font-bold text-[#1D1D1F]" x-text="currentPage"></span> of <span class="font-bold text-[#1D1D1F]" x-text="totalPages"></span>
                             </span>
-                            <button type="button" 
-                                    @click="currentPage++" 
-                                    :disabled="currentPage >= totalPages"
-                                    class="px-2 py-1 rounded bg-white border border-[#D1D1D6] hover:bg-[#F2F2F7] disabled:opacity-40 disabled:cursor-not-allowed">
-                                Next
-                            </button>
+                            <div class="inline-flex items-center gap-1">
+                                <button type="button" 
+                                        @click="currentPage--" 
+                                        :disabled="currentPage <= 1"
+                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-xs hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all shadow-xs">
+                                    <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                                    </svg>
+                                    Prev
+                                </button>
+                                <button type="button" 
+                                        @click="currentPage++" 
+                                        :disabled="currentPage >= totalPages"
+                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-xs hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all shadow-xs">
+                                    Next
+                                    <svg class="w-3.5 h-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

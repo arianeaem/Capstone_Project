@@ -443,7 +443,7 @@
                 </div>
 
                 <!-- Package Metrics Breakdown -->
-                <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC]">
+                <div class="p-2 sm:p-3">
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5EA]">
                         @foreach($packageAnalytics as $pKey => $pData)
                             <div class="space-y-2 {{ !$loop->first ? 'pt-3 sm:pt-0 sm:pl-4 lg:pl-6' : '' }}">
@@ -463,10 +463,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Revenue & Divers Metric -->
+                                <!-- Revenue Metric -->
                                 <div class="text-[11px] text-[#6E6E73]">
                                     <span class="font-bold text-[#1D1D1F]">₱{{ number_format($pData['revenue'], 2) }}</span>
-                                    <span class="block text-[10px] text-[#8E8E93] mt-0.5">{{ $pData['pax_count'] }} divers trained</span>
                                 </div>
                             </div>
                         @endforeach

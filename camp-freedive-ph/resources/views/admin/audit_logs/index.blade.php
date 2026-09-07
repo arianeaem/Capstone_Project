@@ -199,11 +199,7 @@
             </table>
         </div>
 
-        @if($logs->hasPages())
-        <div class="p-4 border-t border-[#E5E5EA] bg-[#FAFAFC]">
-            {{ $logs->links() }}
-        </div>
-        @endif
+        {{ $logs->links() }}
     </div>
 
 </div>

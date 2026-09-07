@@ -1,5 +1,5 @@
 <!-- Date Range & Filter Bar -->
-<div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs" x-data="{ customOpen: false }">
+<div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-4.5 shadow-2xs" x-data="{ customOpen: false }">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         
         <!-- Left: Reporting Period & Label/Dates (Next line, bigger) -->

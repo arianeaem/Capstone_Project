@@ -5,58 +5,58 @@
 
 <div class="space-y-6">
 
-    <!-- Top Operational KPI Summary: Separator matching Payments Module -->
+    <!-- Top Operational KPI Summary: Clean Responsive Layout -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-[#E5E5EA]">
             
             <!-- Average Occupancy -->
-            <div class="px-4 py-1">
+            <div class="px-2 sm:px-4 py-1">
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Average Occupancy</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     {{ $op['avg_occupancy'] ?? 0 }}%
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $op['total_booked_pax'] ?? 0 }} of {{ $op['total_capacity_slots'] ?? 0 }} slots</span>
-                    <span class="font-bold text-[#780000]">{{ $op['total_batches'] ?? 0 }} batches</span>
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-bold text-[#780000] bg-[#F8EAEA] border border-[#F1D5D5] shrink-0">{{ $op['total_batches'] ?? 0 }} batches</span>
                 </div>
             </div>
 
             <!-- Weekend vs Weekday Utilization -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Weekend vs Weekday</span>
-                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     {{ $op['weekend_occupancy'] ?? 0 }}% <span class="text-xs font-semibold text-[#8E8E93]">Weekend</span>
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Weekday Avg: {{ $op['weekday_occupancy'] ?? 0 }}%</span>
-                    <span class="font-semibold text-emerald-700">Peak Demand</span>
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Peak Demand</span>
                 </div>
             </div>
 
             <!-- Safety Ratio Compliance -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Safety Ratio Adherence</span>
-                <div class="text-2xl font-extrabold mt-0.5 {{ ($op['safety_compliance_rate'] ?? 100) >= 95 ? 'text-emerald-700' : 'text-amber-600' }}">
+                <div class="text-xl sm:text-2xl font-extrabold mt-0.5 break-words {{ ($op['safety_compliance_rate'] ?? 100) >= 95 ? 'text-emerald-700' : 'text-amber-600' }}">
                     {{ $op['safety_compliance_rate'] ?? 100 }}%
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Max 1 Coach : 4 Students</span>
-                    <span class="font-semibold text-emerald-700">Standard</span>
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Standard</span>
                 </div>
             </div>
 
             <!-- Coach Roster Output -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Coach Roster Output</span>
-                <div class="text-2xl font-extrabold text-[#00C3D0] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#00C3D0] mt-0.5 break-words">
                     {{ $co['total_assignments_period'] ?? 0 }} <span class="text-xs font-semibold text-[#8E8E93]">shifts</span>
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $co['total_active_coaches'] ?? 0 }} active coaches</span>
-                    <span>{{ ($co['total_assignments_period'] ?? 0) * 2 }} dive days</span>
+                    <span class="text-[11px] font-semibold text-[#6E6E73] shrink-0">{{ ($co['total_assignments_period'] ?? 0) * 2 }} dive days</span>
                 </div>
             </div>
 
@@ -67,7 +67,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Coach Assignments Distribution (Styled like Booking List Table) -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Coach Workload & Shift Allocation</h3>
@@ -124,7 +124,7 @@
         </div>
 
         <!-- Capacity Bottlenecks & Highlights -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Operational Highlights</h3>
             
             <div class="space-y-3 text-xs">
@@ -165,7 +165,7 @@
     </div>
 
     <!-- Batch Runways & Performance List (Styled like Booking List Table) -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
         <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
             <div>
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Batch Runway & Roster Log</h3>

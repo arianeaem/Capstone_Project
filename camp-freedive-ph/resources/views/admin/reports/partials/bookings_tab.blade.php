@@ -6,58 +6,58 @@
 
 <div class="space-y-6">
 
-    <!-- Top Bookings KPI Summary: Separator matching Payments Module -->
+    <!-- Top Bookings KPI Summary: Clean Responsive Layout -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-[#E5E5EA]">
             
             <!-- Total Bookings -->
-            <div class="px-4 py-1">
+            <div class="px-2 sm:px-4 py-1">
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Bookings</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     {{ number_format($b['total_bookings'] ?? 0) }}
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Confirmed: {{ $b['confirmed_bookings'] ?? 0 }}</span>
-                    <span class="px-1.5 py-0.2 rounded font-bold {{ ($b['booking_delta'] ?? 0) >= 0 ? 'text-emerald-700' : 'text-rose-700' }}">
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0 {{ ($b['booking_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                         {{ ($b['booking_delta'] ?? 0) >= 0 ? '+' : '' }}{{ $b['booking_delta'] ?? 0 }}%
                     </span>
                 </div>
             </div>
 
             <!-- Total Divers (Headcount) -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Total Divers (Headcount)</span>
-                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     {{ number_format($b['total_participants'] ?? 0) }} pax
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Confirmed: {{ $b['confirmed_participants'] ?? 0 }}</span>
                     <span>Avg {{ $totalBookings > 0 ? round(($b['total_participants'] ?? 0) / $totalBookings, 1) : 0 }}/bk</span>
                 </div>
             </div>
 
             <!-- Conversion Rate -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Deposit Conversion</span>
-                <div class="text-2xl font-extrabold text-emerald-700 mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-emerald-700 mt-0.5 break-words">
                     {{ $b['conversion_rate'] ?? 0 }}%
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $b['confirmed_bookings'] ?? 0 }} of {{ $b['total_bookings'] ?? 0 }} paid</span>
-                    <span class="font-semibold text-emerald-700">Healthy</span>
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Healthy</span>
                 </div>
             </div>
 
             <!-- Churn Rate -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Drop-off & Churn</span>
-                <div class="text-2xl font-extrabold text-rose-700 mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-rose-700 mt-0.5 break-words">
                     {{ $b['cancellation_rate'] ?? 0 }}%
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $b['cancellation_count'] ?? 0 }} Cancelled</span>
                     <span>{{ $b['reschedule_count'] ?? 0 }} Resched</span>
                 </div>
@@ -70,7 +70,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Left 2 Cols: Group Sizes & Swimmer Comfort Distribution -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-6">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Guest Cohort & Skill Demographics</h3>
@@ -137,7 +137,7 @@
         </div>
 
         <!-- Right 1 Col: Booking Lead Time Distribution -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <div class="border-b border-[#E5E5EA] pb-3">
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Booking Lead Times</h3>
                 <p class="text-xs text-[#6E6E73]">How far in advance guests book reservations.</p>
@@ -172,7 +172,7 @@
     </div>
 
     <!-- Bottom: Bookings & Diver Demographic Log (Styled like Booking List Table) -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
         <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
             <div>
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Recent Bookings & Guest Cohort Log</h3>

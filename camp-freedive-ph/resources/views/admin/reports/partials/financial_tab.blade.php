@@ -4,60 +4,60 @@
 
 <div class="space-y-6">
 
-    <!-- Top Financial KPI Summary: Separator matching Payments Module -->
+    <!-- Top Financial KPI Summary: Clean Responsive Layout -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-3">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-stretch gap-4 sm:gap-6 divide-y sm:divide-y-0 divide-[#E5E5EA]">
             
             <!-- Net Collections -->
-            <div class="px-4 py-1">
+            <div class="px-2 sm:px-4 py-1">
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Net Collections</span>
-                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     ₱{{ number_format($fin['net_revenue'] ?? 0, 2) }}
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Gross: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
-                    <span class="px-1.5 py-0.2 rounded font-bold {{ ($fin['revenue_delta'] ?? 0) >= 0 ? 'text-emerald-700' : 'text-rose-700' }}">
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-bold shrink-0 {{ ($fin['revenue_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
                         {{ ($fin['revenue_delta'] ?? 0) >= 0 ? '+' : '' }}{{ $fin['revenue_delta'] ?? 0 }}%
                     </span>
                 </div>
             </div>
 
             <!-- Downpayments vs Balance -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Payment Stage Breakdown</span>
-                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     ₱{{ number_format($fin['downpayment_revenue'] ?? 0, 2) }}
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Downpayments: {{ ($fin['gross_revenue'] ?? 0) > 0 ? round((($fin['downpayment_revenue'] ?? 0) / $fin['gross_revenue']) * 100, 1) : 0 }}%</span>
                     <span>Settlements: ₱{{ number_format($fin['balance_revenue'] ?? 0, 2) }}</span>
                 </div>
             </div>
 
             <!-- Outstanding Receivables -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Unsettled Receivables</span>
-                <div class="text-2xl font-extrabold text-[#92400E] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#92400E] mt-0.5 break-words">
                     ₱{{ number_format($fin['outstanding_receivables'] ?? 0, 2) }}
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Pending check-in settlement</span>
-                    <span class="font-semibold text-[#92400E]">Confirmed</span>
+                    <span class="px-1.5 py-0.5 rounded text-[11px] font-bold text-[#92400E] bg-amber-50 border border-amber-200 shrink-0">Confirmed</span>
                 </div>
             </div>
 
             <!-- Average Revenue Per Diver (ARPD) -->
-            <div class="relative px-4 py-1">
+            <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                 <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Avg Revenue / Diver (ARPD)</span>
-                <div class="text-2xl font-extrabold text-[#00C3D0] mt-0.5">
+                <div class="text-xl sm:text-2xl font-extrabold text-[#00C3D0] mt-0.5 break-words">
                     ₱{{ number_format($fin['arpd'] ?? 0, 2) }}
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between mt-0.5">
+                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Avg / Booking: ₱{{ number_format($fin['arpb'] ?? 0, 2) }}</span>
-                    <span>Realized Yield</span>
+                    <span class="text-[11px] font-semibold text-[#6E6E73] shrink-0">Realized Yield</span>
                 </div>
             </div>
 
@@ -68,11 +68,10 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Left 2 Cols: Package Revenue Table & Progress Bars -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-5">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
+            <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue by Class Package</h3>
-                    <p class="text-xs text-[#6E6E73]">Financial performance and guest distribution by freediving course.</p>
                 </div>
                 <span class="text-xs font-bold text-[#780000]">Total: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
             </div>
@@ -117,7 +116,7 @@
         </div>
 
         <!-- Right 1 Col: Add-ons & Ancillary Revenue -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Add-ons & Logistics</h3>
             
             <!-- Manila Carpool Van -->
@@ -136,7 +135,7 @@
             </div>
 
             <!-- Boat Dive Optional -->
-            <div class="p-3.5 rounded-xl bg-[#FAFAFC] SSspace-y-2">
+            <div class="p-3.5 rounded-xl bg-[#FAFAFC] space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="font-bold text-xs text-[#1D1D1F]">Boat Dive Add-on</span>
                     <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-[#00C3D0] text-white">₱600 / pax</span>
@@ -151,7 +150,7 @@
             </div>
 
             <!-- Dynamic Pricing Lift -->
-            <div class="p-3.5 rounded-xl bg-[#F8EAEA] SSspace-y-2">
+            <div class="p-3.5 rounded-xl bg-[#F8EAEA] space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="font-bold text-xs text-[#780000]">Dynamic Pricing Net Lift</span>
                     <span class="text-[10px] font-bold text-[#780000]">{{ $fin['dynamic_pricing']['adjustments_count'] ?? 0 }} rules</span>

@@ -283,11 +283,7 @@
                 </table>
             </div>
 
-            @if($processedRefunds->hasPages())
-            <div class="p-4 border-t border-[#E5E5EA] bg-[#FAFAFC]">
-                {{ $processedRefunds->links() }}
-            </div>
-            @endif
+            {{ $processedRefunds->links() }}
         </div>
     </div>
 

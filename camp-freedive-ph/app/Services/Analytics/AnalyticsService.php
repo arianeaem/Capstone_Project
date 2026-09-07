@@ -76,12 +76,22 @@ class AnalyticsService
                 $label = 'Q' . $now->quarter . ' ' . $now->year;
                 break;
 
+            case 'year_to_date':
             case 'ytd':
                 $start = $now->copy()->startOfYear();
                 $end = $now->copy()->endOfDay();
                 $priorStart = $start->copy()->subYear()->startOfYear();
                 $priorEnd = $priorStart->copy()->addDays($start->diffInDays($end))->endOfDay();
                 $label = 'YTD (' . $now->year . ')';
+                $preset = 'year_to_date';
+                break;
+
+            case 'last_year':
+                $start = $now->copy()->subYear()->startOfYear();
+                $end = $start->copy()->endOfYear();
+                $priorStart = $start->copy()->subYear()->startOfYear();
+                $priorEnd = $priorStart->copy()->endOfYear();
+                $label = 'Last Year (' . $start->year . ')';
                 break;
 
             case 'all_time':

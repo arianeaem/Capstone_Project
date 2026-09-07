@@ -72,11 +72,11 @@
     @endif
 
     <!-- Risk Filters and Toolbar -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-3 shadow-2xs">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-2.5 sm:p-3 shadow-2xs">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-3">
             
             <!-- Risk Level Filters -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 scrollbar-none -mx-0.5 px-0.5">
                 <a href="{{ request()->fullUrlWithQuery(['risk' => '']) }}" 
                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('risk') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     All Risks
@@ -112,16 +112,16 @@
                     </a>
                 @endif
 
-                <div class="relative">
+                <div class="relative shrink-0">
                     <button type="button" 
                             @click="openFilters = !openFilters" 
-                            class="btn-secondary flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold cursor-pointer">
-                        <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer shadow-xs">
+                        <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                         </svg>
-                        <span>Filter</span>
+                        <span class="whitespace-nowrap">Filter</span>
                         @if(request()->anyFilled(['status', 'date_from', 'date_to']))
-                            <span class="w-2 h-2 rounded-full bg-[#780000]"></span>
+                            <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
                         @endif
                     </button>
 
@@ -129,7 +129,7 @@
                     <div x-show="openFilters" 
                          @click.outside="openFilters = false" 
                          x-cloak 
-                         class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                         class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
                         <form action="{{ route('admin.weather.index') }}" method="GET" class="space-y-3 text-xs">
                             <input type="hidden" name="risk" value="{{ request('risk') }}">
 
@@ -242,7 +242,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="pt-2">
+    <div class="bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] overflow-hidden shadow-xs [&>*]:border-t-0">
         {{ $batches->links() }}
     </div>
 
