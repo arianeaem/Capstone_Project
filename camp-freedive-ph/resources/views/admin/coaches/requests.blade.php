@@ -33,8 +33,8 @@
         @forelse($pendingRequests as $batchId => $groupRequests)
         @php 
             $batch = $groupRequests->first()->batch;
-            $headcount = (int) $batch->total_participants_count ?: 4;
-            $coachesNeeded = max(1, (int) ceil($headcount / 4));
+            $headcount = (int) $batch->total_participants_count;
+            $coachesNeeded = $headcount > 0 ? (int) ceil($headcount / 4) : 0;
             $alreadyApproved = \App\Models\CoachRequest::where('batch_id', $batch->id)->where('status', 'approved')->count();
         @endphp
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4" x-data="{ selectedRequests: [] }">
@@ -80,7 +80,8 @@
             <!-- Applied Coaches List with Multi-Select -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 @foreach($groupRequests as $req)
-                <label class="bg-[#FAFAFC] p-4 rounded-xl flex flex-col justify-between gap-3 shadow-2xs hover:bg-white hover:border-[#D1D1D6] border border-[#E5E5EA] transition-all cursor-pointer select-none">
+                <label class="bg-[#FAFAFC] p-4 rounded-xl flex flex-col justify-between gap-2.5 shadow-2xs hover:bg-white hover:border-[#D1D1D6] border border-[#E5E5EA] transition-all cursor-pointer select-none"
+                       :class="selectedRequests.includes({{ $req->id }}) ? 'border-[#780000] bg-white ring-1 ring-[#780000]/30' : ''">
                     <div class="space-y-2.5">
                         <div class="flex items-center gap-3">
                             <input type="checkbox" 
@@ -103,20 +104,6 @@
                                 "{{ $req->notes }}"
                             </p>
                         @endif
-                    </div>
-
-                    <div class="pt-2 border-t border-[#E5E5EA]">
-                        <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.requests.approve', $req) : route('admin.coaches.requests.approve', $req) }}" 
-                              method="POST" 
-                              class="w-full"
-                              onsubmit="return confirm('Approve Coach {{ $req->coach->name }} for {{ $batch->batch_code }}?');">
-                            @csrf
-                            <button type="submit" 
-                                    @click.stop 
-                                    class="btn-primary w-full py-1.5 text-xs font-bold shadow-2xs">
-                                Approve Single Coach
-                            </button>
-                        </form>
                     </div>
                 </label>
                 @endforeach

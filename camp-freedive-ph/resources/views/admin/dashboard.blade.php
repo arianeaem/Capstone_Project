@@ -185,7 +185,7 @@
                         @forelse($upcomingBatches as $batch)
                             @php
                                 $pax = $batch->total_participants_count;
-                                $coachesNeeded = max(1, (int) ceil($pax / 4));
+                                $coachesNeeded = $pax > 0 ? (int) ceil($pax / 4) : 0;
                                 $coachesAssigned = $batch->assigned_coaches_count;
                             @endphp
                             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all space-y-3 flex flex-col justify-between">
@@ -213,7 +213,11 @@
                                     <!-- Staffing Status -->
                                     <div class="flex items-center justify-between text-xs">
                                         <span class="text-[#6E6E73] font-medium">Coaches:</span>
-                                        @if($coachesAssigned >= $coachesNeeded)
+                                        @if($pax === 0)
+                                            <span class="text-[#8E8E93] font-medium">
+                                                {{ $coachesAssigned }} Assigned (0 Needed)
+                                            </span>
+                                        @elseif($coachesAssigned >= $coachesNeeded)
                                             <span class="text-emerald-700 font-bold flex items-center gap-1">
                                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                 {{ $coachesAssigned }}/{{ $coachesNeeded }} Staffed
@@ -249,7 +253,7 @@
                         @forelse($upcomingBatches as $batch)
                             @php
                                 $pax = $batch->total_participants_count;
-                                $coachesNeeded = max(1, (int) ceil($pax / 4));
+                                $coachesNeeded = $pax > 0 ? (int) ceil($pax / 4) : 0;
                                 $coachesAssigned = $batch->assigned_coaches_count;
                             @endphp
                             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all space-y-3 flex flex-col justify-between">
@@ -277,7 +281,11 @@
                                     <!-- Staffing Status -->
                                     <div class="flex items-center justify-between text-xs">
                                         <span class="text-[#6E6E73] font-medium">Coaches:</span>
-                                        @if($coachesAssigned >= $coachesNeeded)
+                                        @if($pax === 0)
+                                            <span class="text-[#8E8E93] font-medium">
+                                                {{ $coachesAssigned }} Assigned (0 Needed)
+                                            </span>
+                                        @elseif($coachesAssigned >= $coachesNeeded)
                                             <span class="text-emerald-700 font-bold flex items-center gap-1">
                                                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                 {{ $coachesAssigned }}/{{ $coachesNeeded }} Staffed

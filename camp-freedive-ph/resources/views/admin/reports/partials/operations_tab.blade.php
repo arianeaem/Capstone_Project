@@ -194,7 +194,7 @@
                             $occ = $cap > 0 ? round(($pax / $cap) * 100) : 0;
                             $distinctCoaches = $batch->coachAssignments->pluck('coach')->unique('id')->filter();
                             $coachesCnt = $distinctCoaches->count();
-                            $required = max(1, (int) ceil($pax / 4));
+                            $required = $pax > 0 ? (int) ceil($pax / 4) : 0;
                         @endphp
                         <tr class="hover:bg-[#FAFAFC] transition-colors text-xs sm:text-sm">
                             <td class="p-4 pl-6 font-mono">

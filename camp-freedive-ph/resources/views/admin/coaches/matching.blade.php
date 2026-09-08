@@ -59,7 +59,11 @@
                                 <div class="flex items-center gap-2 flex-wrap text-[#6E6E73] mt-0.5">
                                     <span>Participants: <strong class="text-[#1D1D1F]">{{ $totalPax }}</strong></span>
                                     <span>•</span>
-                                    <span>Recommended: <strong class="text-[#780000]">{{ $neededCoaches }} {{ Str::plural('coach', $neededCoaches) }}</strong></span>
+                                    @if($totalPax > 0)
+                                        <span>Recommended: <strong class="text-[#780000]">{{ $neededCoaches }} {{ Str::plural('coach', $neededCoaches) }}</strong></span>
+                                    @else
+                                        <span class="text-[#8E8E93] italic font-medium">0 Coaches Needed (No Participants)</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -67,9 +71,15 @@
                         <!-- Right Column: Coaches to fill badge on top of Share to Coaches -->
                         <div class="flex flex-col items-end gap-2 shrink-0">
                             <!-- Coaches to Fill Badge -->
-                            <span class="px-3 py-0.5 rounded-full text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5] inline-flex items-center justify-center whitespace-nowrap shadow-2xs">
-                                {{ $assignedCount }} / {{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }}
-                            </span>
+                            @if($totalPax > 0)
+                                <span class="px-3 py-0.5 rounded-full text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5] inline-flex items-center justify-center whitespace-nowrap shadow-2xs">
+                                    {{ $assignedCount }} / {{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }}
+                                </span>
+                            @else
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA] inline-flex items-center justify-center whitespace-nowrap shadow-2xs">
+                                    0 Needed
+                                </span>
+                            @endif
 
                             <!-- Broadcast Slot Button -->
                             @if($group['open_broadcast'])
@@ -77,7 +87,7 @@
                                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
                                     Shared
                                 </span>
-                            @else
+                            @elseif($totalPax > 0)
                                 <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.broadcast') : route('admin.coaches.matching.broadcast') }}" method="POST" class="inline-block">
                                     @csrf
                                     <input type="hidden" name="batch_id" value="{{ $batch->id }}">
@@ -92,85 +102,91 @@
                     </div>
                 </div>
 
-                <!-- Assigned Coaches Section -->
-                <div class="space-y-2.5">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider flex items-center gap-1.5">
-                            <span>Assigned Coaches</span>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F2F2F7] text-[#1D1D1F]">
-                                {{ $assignedCount }}
-                            </span>
-                        </h3>
-                    </div>
+                @if($totalPax > 0)
+                    <!-- Assigned Coaches Section -->
+                    <div class="space-y-2.5">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider flex items-center gap-1.5">
+                                <span>Assigned Coaches</span>
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F2F2F7] text-[#1D1D1F]">
+                                    {{ $assignedCount }}
+                                </span>
+                            </h3>
+                        </div>
 
-                    @if($assignedCount > 0)
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            @foreach($assignedCoaches as $assignedCoach)
-                                <div class="p-2.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between gap-2 shadow-2xs">
-                                    <div class="flex items-center gap-2 min-w-0">
-                                        <div class="w-6 h-6 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-[10px] flex items-center justify-center shrink-0">
-                                            {{ strtoupper(substr($assignedCoach->name, 0, 1)) }}
+                        @if($assignedCount > 0)
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                @foreach($assignedCoaches as $assignedCoach)
+                                    <div class="p-2.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2 min-w-0">
+                                            <div class="w-6 h-6 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-[10px] flex items-center justify-center shrink-0">
+                                                {{ strtoupper(substr($assignedCoach->name, 0, 1)) }}
+                                            </div>
+                                            <span class="font-bold text-xs text-[#1D1D1F] truncate">{{ $assignedCoach->name }}</span>
                                         </div>
-                                        <span class="font-bold text-xs text-[#1D1D1F] truncate">{{ $assignedCoach->name }}</span>
+
+                                        <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.unassign') : route('admin.coaches.matching.unassign') }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="batch_id" value="{{ $batch->id }}">
+                                            <input type="hidden" name="coach_id" value="{{ $assignedCoach->id }}">
+                                            <button type="submit" 
+                                                    onclick="return confirm('Remove Coach {{ $assignedCoach->name }} from {{ $batch->batch_number }}?')"
+                                                    class="text-[11px] font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-1.5 py-0.5 rounded transition-colors shrink-0">
+                                                Remove
+                                            </button>
+                                        </form>
                                     </div>
-
-                                    <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.unassign') : route('admin.coaches.matching.unassign') }}" method="POST">
-                                        @csrf
-                                        <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-                                        <input type="hidden" name="coach_id" value="{{ $assignedCoach->id }}">
-                                        <button type="submit" 
-                                                onclick="return confirm('Remove Coach {{ $assignedCoach->name }} from {{ $batch->batch_number }}?')"
-                                                class="text-[11px] font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-1.5 py-0.5 rounded transition-colors shrink-0">
-                                            Remove
-                                        </button>
-                                    </form>
-                                </div>
-                            @endforeach
-                        </div>
-                    @else
-                        <div class="p-3 rounded-xl text-center text-xs text-[#8E8E93] bg-[#FAFAFC] border border-dashed border-[#E5E5EA]">
-                            No coaches assigned yet. Select available coaches below.
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Available Coaches Section -->
-                <div class="space-y-2.5 pt-2">
-                    <div class="flex items-center justify-between flex-wrap gap-2">
-                        <h3 class="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
-                            Available Coaches
-                        </h3>
-
-                        <!-- Bulk Assign Action -->
-                        <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.assign') : route('admin.coaches.matching.assign') }}" method="POST" x-show="selectedCoaches.length > 0" x-cloak>
-                            @csrf
-                            <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-                            <template x-for="cId in selectedCoaches" :key="cId">
-                                <input type="hidden" name="coach_ids[]" :value="cId">
-                            </template>
-                            <button type="submit" class="btn-primary px-3 py-1 text-xs font-bold shadow-2xs flex items-center gap-1">
-                                <span>Assign Selected (<span x-text="selectedCoaches.length"></span>)</span>
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Available Coach Selection Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        @forelse($availableCoaches as $coachItem)
-                            <label class="p-2.5 rounded-xl bg-[#FAFAFC] hover:bg-white hover:shadow-2xs border border-[#E5E5EA] flex items-center gap-2 transition-all cursor-pointer select-none">
-                                <input type="checkbox" 
-                                       :value="{{ $coachItem['id'] }}" 
-                                       x-model="selectedCoaches"
-                                       class="rounded text-[#780000] focus:ring-[#780000] w-4 h-4 cursor-pointer shrink-0">
-                                <span class="font-semibold text-xs text-[#1D1D1F] truncate">{{ $coachItem['name'] }}</span>
-                            </label>
-                        @empty
-                            <div class="col-span-full p-3 rounded-xl text-center text-xs text-[#8E8E93] bg-[#FAFAFC]">
-                                No other available coaches on this schedule.
+                                @endforeach
                             </div>
-                        @endforelse
+                        @else
+                            <div class="p-3 rounded-xl text-center text-xs text-[#8E8E93] bg-[#FAFAFC] border border-dashed border-[#E5E5EA]">
+                                No coaches assigned yet. Select available coaches below.
+                            </div>
+                        @endif
                     </div>
-                </div>
+
+                    <!-- Available Coaches Section -->
+                    <div class="space-y-2.5 pt-2">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <h3 class="text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
+                                Available Coaches
+                            </h3>
+
+                            <!-- Bulk Assign Action -->
+                            <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.assign') : route('admin.coaches.matching.assign') }}" method="POST" x-show="selectedCoaches.length > 0" x-cloak>
+                                @csrf
+                                <input type="hidden" name="batch_id" value="{{ $batch->id }}">
+                                <template x-for="cId in selectedCoaches" :key="cId">
+                                    <input type="hidden" name="coach_ids[]" :value="cId">
+                                </template>
+                                <button type="submit" class="btn-primary px-3 py-1 text-xs font-bold shadow-2xs flex items-center gap-1">
+                                    <span>Assign Selected (<span x-text="selectedCoaches.length"></span>)</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Available Coach Selection Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            @forelse($availableCoaches as $coachItem)
+                                <label class="p-2.5 rounded-xl bg-[#FAFAFC] hover:bg-white hover:shadow-2xs  flex items-center gap-2 transition-all cursor-pointer select-none">
+                                    <input type="checkbox" 
+                                           :value="{{ $coachItem['id'] }}" 
+                                           x-model="selectedCoaches"
+                                           class="rounded text-[#780000] focus:ring-[#780000] w-4 h-4 cursor-pointer shrink-0">
+                                    <span class="font-semibold text-xs text-[#1D1D1F] truncate">{{ $coachItem['name'] }}</span>
+                                </label>
+                            @empty
+                                <div class="col-span-full p-3 rounded-xl text-center text-xs text-[#8E8E93] bg-[#FAFAFC]">
+                                    No other available coaches on this schedule.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                @else
+                    <div class="py-5 px-4 rounded-xl text-center text-xs text-[#8E8E93] bg-[#FAFAFC] border border-dashed border-[#E5E5EA]">
+                        No participants registered in this batch yet. Coach matching will open once students join.
+                    </div>
+                @endif
 
             </div>
             @endforeach

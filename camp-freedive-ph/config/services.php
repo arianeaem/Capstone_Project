@@ -39,4 +39,9 @@ return [
         'base_url' => env('PAYMONGO_BASE_URL', 'https://api.paymongo.com/v1'),
     ],
 
+    'ml' => [
+        'token' => env('ML_API_TOKEN', 'camp_freedive_ml_secret_token_2026'),
+        'url' => env('ML_SERVICE_URL', 'http://127.0.0.1:8001'),
+    ],
+
 ];

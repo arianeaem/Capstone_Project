@@ -65,8 +65,8 @@ class ScheduleController extends Controller
                 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
             ];
 
-            // 48-Hour Cutoff check
-            $diveStart = $batch->start_date->copy()->setTime(9, 30);
+            // 48-Hour Cutoff check (06:30 AM start)
+            $diveStart = $batch->start_date->copy()->setTime(6, 30);
             $hoursUntilDive = Carbon::now()->diffInHours($diveStart, false);
             $canRequestRelease = $hoursUntilDive > 48;
 

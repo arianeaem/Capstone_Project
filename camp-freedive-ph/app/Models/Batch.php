@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
 class Batch extends Model
@@ -87,7 +88,7 @@ class Batch extends Model
         return $this->hasMany(BatchRiskAssessment::class, 'batch_id')->orderBy('assessed_at', 'desc');
     }
 
-    public function riskAssessment()
+    public function riskAssessment(): HasOne
     {
         return $this->hasOne(BatchRiskAssessment::class, 'batch_id')->latestOfMany('assessed_at');
     }
@@ -95,6 +96,11 @@ class Batch extends Model
     public function manualOverrides(): HasMany
     {
         return $this->hasMany(ManualOverride::class, 'batch_id')->orderBy('created_at', 'desc');
+    }
+
+    public function latestManualOverride(): HasOne
+    {
+        return $this->hasOne(ManualOverride::class, 'batch_id')->latestOfMany();
     }
 
     public function notificationLogs(): HasMany
@@ -125,7 +131,7 @@ class Batch extends Model
 
     public function getLatestManualOverrideAttribute(): ?ManualOverride
     {
-        return $this->manualOverrides()->first();
+        return $this->latestManualOverride()->first();
     }
 
     /**
@@ -230,13 +236,56 @@ class Batch extends Model
     }
 
     /**
-     * Total collected amount for bookings in this batch.
+     * Total expected revenue from active bookings.
+     */
+    public function getTotalRevenueAttribute(): float
+    {
+        return (float) $this->bookings
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
+            ->sum('total_amount');
+    }
+
+    /**
+     * Verified collected amount for bookings in this batch.
+     */
+    public function getCollectedRevenueAttribute(): float
+    {
+        $activeBookings = $this->bookings
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']);
+
+        $activeBookingIds = $activeBookings->pluck('id');
+
+        $paymentSum = (float) Payment::whereIn('booking_id', $activeBookingIds)
+            ->whereIn('status', ['completed', 'paid'])
+            ->sum('amount');
+
+        if ($paymentSum === 0.0 && $activeBookings->isNotEmpty()) {
+            $calculatedCollected = $activeBookings->sum(function ($b) {
+                return max(0.0, (float) ($b->total_amount - $b->balance_amount));
+            });
+            return (float) max(0.0, $calculatedCollected);
+        }
+
+        return $paymentSum;
+    }
+
+    /**
+     * Total collected amount for bookings in this batch (alias).
      */
     public function getTotalCollectedAmountAttribute(): float
     {
-        return (float) Payment::whereIn('booking_id', $this->bookings()->pluck('id'))
-            ->whereIn('status', ['completed', 'paid'])
-            ->sum('amount');
+        return $this->collected_revenue;
+    }
+
+    /**
+     * Active bookings with an outstanding balance.
+     */
+    public function getOutstandingBalanceBookingsAttribute(): Collection
+    {
+        return $this->bookings
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
+            ->filter(fn($b) => (float) $b->balance_amount > 0)
+            ->values();
     }
 
     /**
@@ -244,10 +293,7 @@ class Batch extends Model
      */
     public function getOutstandingBalanceBookingsCountAttribute(): int
     {
-        return $this->bookings()
-            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
-            ->where('balance_amount', '>', 0)
-            ->count();
+        return $this->outstanding_balance_bookings->count();
     }
 
     /**

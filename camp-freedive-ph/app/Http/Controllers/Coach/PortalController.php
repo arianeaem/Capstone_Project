@@ -62,8 +62,8 @@ class PortalController extends Controller
                 'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
             ];
 
-            // Check if within 48 hours of dive date (09:30 AM start)
-            $diveStart = $batch->start_date->copy()->setTime(9, 30);
+            // Check if within 48 hours of dive date (06:30 AM start)
+            $diveStart = $batch->start_date->copy()->setTime(6, 30);
             $hoursUntilDive = max(0, Carbon::now('Asia/Manila')->diffInHours($diveStart, false));
             $canRequestRelease = $hoursUntilDive > 48;
 
@@ -109,7 +109,7 @@ class PortalController extends Controller
                     'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                 ];
 
-                $diveStart = $batch->start_date->copy()->setTime(9, 30);
+                $diveStart = $batch->start_date->copy()->setTime(6, 30);
                 $hoursUntilDive = max(0, Carbon::now('Asia/Manila')->diffInHours($diveStart, false));
                 $canRequestRelease = $hoursUntilDive > 48;
 
@@ -171,30 +171,43 @@ class PortalController extends Controller
             ->take(3)
             ->get();
 
-        // 5. Quick Weekend Calendar Status (Next 3 weekends: 6 weekend days)
-        $quickWeekendDays = [];
+        // 5. Quick Upcoming Availability Calendar Status (Next 7 days from today)
+        $quickDays = [];
         $cursor = $today->copy();
-        while (count($quickWeekendDays) < 6) {
-            if ($cursor->isWeekend()) {
-                $dateStr = $cursor->format('Y-m-d');
-                $isAssigned = ParticipantAssignment::where('coach_id', $coach->id)
-                    ->where('status', 'assigned')
-                    ->whereDate('dive_date', $dateStr)
-                    ->exists();
+        for ($i = 0; $i < 7; $i++) {
+            $dateStr = $cursor->format('Y-m-d');
+            $isAssigned = ParticipantAssignment::where('coach_id', $coach->id)
+                ->where('status', 'assigned')
+                ->where(function ($q) use ($dateStr) {
+                    $q->whereDate('dive_date', $dateStr)
+                      ->orWhereHas('batch', function ($bq) use ($dateStr) {
+                          $bq->whereDate('start_date', '<=', $dateStr)
+                             ->whereDate('end_date', '>=', $dateStr);
+                      });
+                })
+                ->exists();
 
-                $isAvailable = CoachAvailability::where('coach_id', $coach->id)
-                    ->where('status', 'available')
+            if (!$isAssigned) {
+                $isAssigned = CoachAvailability::where('coach_id', $coach->id)
+                    ->where('status', 'assigned')
                     ->whereDate('date', $dateStr)
                     ->exists();
-
-                $status = $isAssigned ? 'assigned' : ($isAvailable ? 'available' : 'not_set');
-
-                $quickWeekendDays[] = [
-                    'date' => $cursor->copy(),
-                    'date_str' => $dateStr,
-                    'status' => $status,
-                ];
             }
+
+            $isAvailable = CoachAvailability::where('coach_id', $coach->id)
+                ->where('status', 'available')
+                ->whereDate('date', $dateStr)
+                ->exists();
+
+            $status = $isAssigned ? 'assigned' : ($isAvailable ? 'available' : 'not_set');
+
+            $quickDays[] = [
+                'date' => $cursor->copy(),
+                'date_str' => $dateStr,
+                'is_today' => $cursor->isToday(),
+                'is_weekend' => $cursor->isWeekend(),
+                'status' => $status,
+            ];
             $cursor->addDay();
         }
 
@@ -208,7 +221,7 @@ class PortalController extends Controller
             'totalStudentsMentored',
             'upcomingAssignments',
             'openCoachOpenings',
-            'quickWeekendDays'
+            'quickDays'
         ));
     }
 }

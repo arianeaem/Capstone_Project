@@ -42,7 +42,7 @@ class CoachMatchingController extends Controller
         // 3. Build simplified batch staffing data
         $batchData = $batches->map(function ($batch) use ($activeCoaches) {
             $totalParticipants = (int) $batch->total_participants_count;
-            $neededCoaches = max(1, (int) ceil($totalParticipants / 4));
+            $neededCoaches = $totalParticipants > 0 ? (int) ceil($totalParticipants / 4) : 0;
             $assignedCoaches = $batch->assigned_coaches;
             $assignedCoachIds = $assignedCoaches->pluck('id')->toArray();
 
@@ -114,6 +114,11 @@ class CoachMatchingController extends Controller
 
             try {
                 $batch = Batch::findOrFail($validated['batch_id']);
+
+                if ($batch->total_participants_count === 0) {
+                    return back()->with('error', "Cannot assign coaches to {$batch->batch_number} because there are no participants registered yet.");
+                }
+
                 $coachIds = array_keys($validated['assignments']);
 
                 $this->matchingService->assignCoachesToBatch(
@@ -149,6 +154,10 @@ class CoachMatchingController extends Controller
                 $coach = User::findOrFail($validated['coach_id']);
                 $batch = Batch::findOrFail($validated['batch_id']);
 
+                if ($batch->total_participants_count === 0) {
+                    return back()->with('error', "Cannot assign coaches to {$batch->batch_number} because there are no participants registered yet.");
+                }
+
                 $result = $this->matchingService->assignStudentsToCoach(
                     $validated['participant_ids'],
                     $coach,
@@ -169,6 +178,11 @@ class CoachMatchingController extends Controller
             'coach_ids.*' => 'exists:users,id',
             'coach_id' => 'nullable|exists:users,id',
         ]);
+
+        $batch = Batch::findOrFail($validated['batch_id']);
+        if ($batch->total_participants_count === 0) {
+            return back()->with('error', "Cannot assign coaches to {$batch->batch_number} because there are no participants registered yet.");
+        }
 
         $coachIds = $validated['coach_ids'] ?? [];
         if (!empty($validated['coach_id'])) {

@@ -81,7 +81,7 @@
             
             <!-- Connected Bookings Section -->
             <div class="space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-b border-[#E5E5EA] pb-3.5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5">
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <h3 class="text-base font-extrabold text-[#1D1D1F]">Connected Customer Bookings</h3>
@@ -99,97 +99,81 @@
                 <!-- Bookings List -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                     @forelse($batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']) as $booking)
-                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:shadow-xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-3.5">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:shadow-xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
                         <!-- Card Content -->
                         <div class="space-y-3.5">
-                            <!-- Header: Booking Number, Class Type & Status Badge -->
-                            <div class="space-y-1">
+                            <!-- Header: Booking Number, Status, Class Type & Lead Guest -->
+                            <div class="space-y-1.5">
                                 <div class="flex items-center justify-between gap-2">
-                                    <div class="flex items-center gap-1.5 flex-wrap min-w-0">
-                                        <a href="{{ route('admin.bookings.show', $booking) }}" class="text-base sm:text-lg font-black text-[#1D1D1F] hover:text-[#780000] transition-colors tracking-tight font-mono whitespace-nowrap">
-                                            {{ $booking->booking_number }}
-                                        </a>
-                                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-[#48484A] shrink-0">
-                                            {{ ucfirst($booking->class_type ?? 'Discovery') }}
-                                        </span>
-                                    </div>
+                                    <a href="{{ route('admin.bookings.show', $booking) }}" class="text-base sm:text-lg font-black text-[#1D1D1F] hover:text-[#780000] transition-colors tracking-tight font-mono whitespace-nowrap">
+                                        {{ $booking->booking_number }}
+                                    </a>
 
                                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border shrink-0 whitespace-nowrap {{ $booking->status_badge['class'] }}">
                                         {{ $booking->status_badge['label'] }}
                                     </span>
                                 </div>
 
-                                @if($booking->contact_name)
-                                    <div class="text-xs text-[#6E6E73] truncate" title="Lead Guest: {{ $booking->contact_name }}">
-                                        <span class="text-[#8E8E93] font-medium">Lead:</span> {{ $booking->contact_name }}
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Meta Row: Amount & Payment Status (Crisp 2-Column Bar) -->
-                            <div class="flex items-center justify-between gap-3 pb-2 text-xs">
-                                <div class="min-w-0">
-                                    <span class="text-[10px] uppercase font-bold text-[#8E8E93] block tracking-wider">Total Amount</span>
-                                    <strong class="font-extrabold text-sm text-[#1D1D1F] whitespace-nowrap">₱{{ number_format($booking->total_amount, 2) }}</strong>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <span class="text-[10px] uppercase font-bold text-[#8E8E93] block tracking-wider">Payment Status</span>
-                                    @if($booking->balance_amount > 0)
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 text-amber-800 border border-amber-200 whitespace-nowrap">
-                                            ₱{{ number_format($booking->balance_amount, 2) }} Due
-                                        </span>
-                                    @else
-                                        <span class="inline-block px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap">
-                                            Fully Paid
-                                        </span>
-                                    @endif
+                                <div class="flex items-center gap-2 flex-wrap text-xs">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-[#48484A] shrink-0">
+                                        {{ ucfirst($booking->class_type ?? 'Discovery') }}
+                                    </span>
                                 </div>
                             </div>
 
                             <!-- Students & Pod Assignment List -->
                             <div class="space-y-2">
-                                <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-[#8E8E93]">
-                                    <span>Students ({{ $booking->participants->count() }})</span>
-                                    <span class="hidden sm:inline">On-Site Coach</span>
-                                </div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">
+                                    Students & Coaches ({{ $booking->participants->count() }})
+                                </span>
 
-                                <div class="divide-y divide-[#F2F2F7]">
+                                <div class="space-y-2">
                                     @foreach($booking->participants as $p)
                                         @php 
-                                            $coach = $p->coach; 
-                                            $hasMedical = $p->health_condition && !in_array(strtolower(trim($p->health_condition)), ['none', 'none declared', 'no', 'n/a', 'fit for diving', 'fit for diving.']);
+                                             $coach = $p->coach; 
+                                             $rawCondition = trim($p->health_condition ?? '');
+                                             $cleanHealth = strtolower(rtrim($rawCondition, '.'));
+                                             $isNoneOrGeneral = empty($cleanHealth) 
+                                                 || in_array($cleanHealth, ['none', 'none declared', 'no', 'n/a', 'na', 'nil', 'normal', 'fit for diving', 'fit for diving, no declared medical issues', 'cleared medical waiver', 'first time freediving'])
+                                                 || str_starts_with($cleanHealth, 'fit for diving')
+                                                 || str_starts_with($cleanHealth, 'none')
+                                                 || str_starts_with($cleanHealth, 'cleared medical waiver')
+                                                 || str_starts_with($cleanHealth, 'first time freediving')
+                                                 || str_starts_with($cleanHealth, 'certified aida')
+                                                 || str_starts_with($cleanHealth, 'working on frenzel');
+                                             $hasMedical = !$isNoneOrGeneral && !empty($rawCondition);
                                         @endphp
-                                        <div class="py-2.5 first:pt-0 last:pb-0 space-y-1.5">
+                                        <div class="bg-[#F8F9FA] rounded-xl p-3 space-y-2">
                                             <!-- Row 1: Student Name, Age, Swimmer Pill -->
                                             <div class="flex items-center justify-between gap-2">
                                                 <div class="min-w-0 flex items-center gap-1.5 flex-wrap">
-                                                    <span class="text-xs font-bold text-[#1D1D1F]">{{ $p->name }}</span>
-                                                    <span class="text-[11px] text-[#8E8E93]">({{ $p->age }} yrs)</span>
+                                                    <strong class="text-xs font-bold text-[#1D1D1F]">{{ $p->name }}</strong>
+                                                    <span class="text-[11px] text-[#8E8E93] shrink-0 font-normal">({{ $p->age }} yrs)</span>
                                                 </div>
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 {{ strtolower($p->swimmer_status) === 'non_swimmer' ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-gray-100 text-[#48484A]' }}">
+                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 {{ strtolower($p->swimmer_status) === 'non_swimmer' ? 'bg-rose-50 text-rose-700' : 'bg-white text-[#48484A] shadow-2xs' }}">
                                                     {{ ucfirst(str_replace('_', ' ', $p->swimmer_status ?? 'Swimmer')) }}
                                                 </span>
                                             </div>
 
                                             @if($hasMedical)
-                                                <div class="text-[10px] font-medium text-amber-800 bg-amber-50/80 px-2 py-0.5 rounded border border-amber-200/80 flex items-center gap-1" title="{{ $p->health_condition }}">
-                                                    <span class="shrink-0">⚠️</span>
-                                                    <span class="truncate">{{ $p->health_condition }}</span>
+                                                <div class="text-[11px] font-medium text-amber-900 bg-amber-50/80 px-2.5 py-1 rounded-lg flex items-start gap-1.5" title="{{ $p->health_condition }}">
+                                                    <span class="shrink-0 text-xs">⚠️</span>
+                                                    <span class="break-words leading-tight">{{ $p->health_condition }}</span>
                                                 </div>
                                             @endif
 
                                             <!-- Row 2: Coach Assignment -->
-                                            <div class="flex items-center justify-between gap-2 pt-0.5">
+                                            <div class="flex items-center justify-between gap-2">
                                                 <span class="text-[11px] text-[#8E8E93] font-medium shrink-0">Coach:</span>
                                                 @if(isset($assignedCoaches) && count($assignedCoaches) > 0)
                                                     <form action="{{ auth()->user()->isOwner() ? route('owner.batches.assign_participant', $batch) : route('admin.batches.assign_participant', $batch) }}" 
                                                           method="POST"
-                                                          class="shrink-0">
+                                                          class="min-w-0 flex-1 flex justify-end">
                                                         @csrf
                                                         <input type="hidden" name="participant_id" value="{{ $p->id }}">
                                                         <select name="coach_id" 
                                                                 onchange="this.form.submit()" 
-                                                                class="text-xs font-semibold py-1 px-2.5 rounded-lg border border-[#E5E5EA] bg-white text-[#1D1D1F] hover:border-[#D1D1D6] focus:ring-1 focus:ring-[#780000] focus:outline-hidden cursor-pointer transition-all shadow-2xs {{ $coach ? 'text-[#780000] font-bold bg-[#FDF5F5] border-[#F1D5D5]' : '' }}">
+                                                                class="w-full sm:w-auto max-w-[200px] text-xs font-semibold py-1 px-2.5 rounded-lg border border-[#E5E5EA] bg-white text-[#1D1D1F] hover:border-[#D1D1D6] focus:ring-1 focus:ring-[#780000] focus:outline-hidden cursor-pointer transition-all shadow-2xs {{ $coach ? 'text-[#780000] font-bold bg-[#FDF5F5] border-[#F1D5D5]' : '' }}">
                                                             <option value="" {{ !$coach ? 'selected' : '' }}>-- Shared Pool --</option>
                                                             @foreach($assignedCoaches as $batchCoach)
                                                                 <option value="{{ $batchCoach->id }}" {{ $coach && $coach->id === $batchCoach->id ? 'selected' : '' }}>
@@ -199,7 +183,7 @@
                                                         </select>
                                                     </form>
                                                 @else
-                                                    <span class="text-xs font-semibold text-[#8E8E93] italic">
+                                                    <span class="text-xs font-medium text-[#8E8E93] italic px-2 py-0.5 rounded bg-white">
                                                         {{ $coach ? 'Coach ' . $coach->name : 'Shared Pool' }}
                                                     </span>
                                                 @endif
@@ -221,7 +205,7 @@
 
                             <a href="{{ route('admin.bookings.show', $booking) }}" 
                                class="btn-secondary py-1.5 px-3 text-xs font-semibold text-center">
-                                View Details →
+                                View Details
                             </a>
                         </div>
                     </div>
@@ -310,7 +294,7 @@
                 </div>
 
                 <!-- Assigned Coaches Count & Status -->
-                <div class="space-y-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="space-y-2">
                     <div class="flex items-center justify-between text-xs">
                         <span class="text-[#6E6E73] font-medium">Assigned Instructors:</span>
                         <strong class="font-bold text-[#1D1D1F]">
@@ -348,7 +332,6 @@
                 <div class="text-xs">
                     @if($carpoolBookingsList->isNotEmpty())
                         <div class="space-y-2 pt-1">
-                            <span class="text-[11px] font-bold text-[#8E8E93] uppercase tracking-wider block">Pickup Hub Locations:</span>
                             <div class="divide-y divide-[#F2F2F7]">
                                 @foreach($carpoolBookingsList as $cb)
                                     <div class="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-2">
@@ -380,35 +363,51 @@
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Financial Overview</h3>
                     <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#780000] font-bold hover:underline">
-                        Ledger
+                        Ledger →
                     </a>
                 </div>
 
-                <div class="space-y-3 text-xs">
+                <div class="space-y-3.5 text-xs">
                     <div class="flex items-center justify-between">
-                        <span class="text-[#6E6E73]">Total Expected Revenue:</span>
+                        <span class="text-[#6E6E73] font-medium">Total Expected Revenue:</span>
                         <strong class="text-sm font-extrabold text-[#1D1D1F]">
                             ₱{{ number_format($batch->total_revenue, 2) }}
                         </strong>
                     </div>
 
                     <div class="flex items-center justify-between">
-                        <span class="text-[#6E6E73]">Verified Collected Amount:</span>
+                        <span class="text-[#6E6E73] font-medium">Verified Collected Amount:</span>
                         <strong class="text-sm font-extrabold text-emerald-700">
                             ₱{{ number_format($batch->collected_revenue, 2) }}
                         </strong>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <span class="text-[#6E6E73]">Bookings with Balance:</span>
-                        <strong class="text-sm font-extrabold text-amber-700">
-                            {{ $batch->outstanding_balance_bookings_count }} Booking(s)
-                        </strong>
+                    <!-- Bookings with Balance -->
+                    <div class="space-y-1.5 pt-2 border-t border-[#F2F2F7]">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[#6E6E73] font-medium">Bookings with Balance:</span>
+                            <strong class="text-sm font-extrabold text-amber-700">
+                                {{ $batch->outstanding_balance_bookings_count }} {{ Str::plural('Booking', $batch->outstanding_balance_bookings_count) }}
+                            </strong>
+                        </div>
+
+                        @if($batch->outstanding_balance_bookings->isNotEmpty())
+                            <div class="space-y-1 pt-1">
+                                @foreach($batch->outstanding_balance_bookings as $balBooking)
+                                    <div class="flex items-center justify-between text-[11px] bg-amber-50/70 rounded-lg px-2.5 py-1 text-amber-900">
+                                        <a href="{{ route('admin.bookings.show', $balBooking) }}" class="font-bold hover:underline text-[#780000] flex items-center gap-1 font-mono truncate mr-2">
+                                            <span>{{ $balBooking->booking_number }}</span>
+                                        </a>
+                                        <span class="font-bold text-amber-800 shrink-0">₱{{ number_format($balBooking->balance_amount, 2) }} due</span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <span class="text-[#6E6E73]">Pending Refund Requests:</span>
-                        <strong class="text-sm font-extrabold text-[#780000]">
+                    <div class="flex items-center justify-between pt-2 border-t border-[#F2F2F7]">
+                        <span class="text-[#6E6E73] font-medium">Pending Refund Requests:</span>
+                        <strong class="text-sm font-extrabold {{ $batch->pending_refunds_count > 0 ? 'text-[#780000]' : 'text-[#8E8E93]' }}">
                             {{ $batch->pending_refunds_count }} Pending
                         </strong>
                     </div>

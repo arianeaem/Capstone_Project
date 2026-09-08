@@ -473,75 +473,95 @@ class DatabaseSeeder extends Seeder
         // 3. SEED COACH AVAILABILITIES (COACH PORTAL CALENDAR)
         // =========================================================================
 
-        // Jose Reyes: Assigned on Batch 5, Available on Batch 6
-        CoachAvailability::create([
-            'coach_id' => $coachJose->id,
-            'date' => $batch5Start->format('Y-m-d'),
-            'status' => 'assigned',
-            'notes' => 'Assigned lead instructor for Batch 5 Discovery Group',
-        ]);
-        CoachAvailability::create([
-            'coach_id' => $coachJose->id,
-            'date' => $batch6Start->format('Y-m-d'),
-            'status' => 'available',
-            'notes' => 'Available for weekend departure',
-        ]);
+        // Jose Reyes: Assigned on Batch 5 (Sept 12 & 13), Available on Batch 6 (Sept 19 & 20)
+        foreach ([$batch5Start, $batch5End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachJose->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'assigned',
+                'notes' => 'Assigned lead instructor for Batch 5 Discovery Group',
+            ]);
+        }
+        foreach ([$batch6Start, $batch6End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachJose->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'available',
+                'notes' => 'Available for weekend departure',
+            ]);
+        }
 
-        // Mary Grace Bautista: Assigned on Batch 5, Available on Batch 6
-        CoachAvailability::create([
-            'coach_id' => $coachMary->id,
-            'date' => $batch5Start->format('Y-m-d'),
-            'status' => 'assigned',
-            'notes' => 'Assigned instructor for Batch 5 Open Water Group',
-        ]);
-        CoachAvailability::create([
-            'coach_id' => $coachMary->id,
-            'date' => $batch6Start->format('Y-m-d'),
-            'status' => 'available',
-            'notes' => 'Available for beginner sessions',
-        ]);
+        // Mary Grace Bautista: Assigned on Batch 5 (Sept 12 & 13), Available on Batch 6 (Sept 19 & 20)
+        foreach ([$batch5Start, $batch5End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachMary->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'assigned',
+                'notes' => 'Assigned instructor for Batch 5 Open Water Group',
+            ]);
+        }
+        foreach ([$batch6Start, $batch6End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachMary->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'available',
+                'notes' => 'Available for beginner sessions',
+            ]);
+        }
 
-        // Michael Cruz: Assigned on Batch 5, Unavailable on Batch 6
-        CoachAvailability::create([
-            'coach_id' => $coachMichael->id,
-            'date' => $batch5Start->format('Y-m-d'),
-            'status' => 'assigned',
-            'notes' => 'Assigned safety & fundive coach for Batch 5',
-        ]);
-        CoachAvailability::create([
-            'coach_id' => $coachMichael->id,
-            'date' => $batch6Start->format('Y-m-d'),
-            'status' => 'unavailable',
-            'notes' => 'Attending CPR/First Aid Renewal Seminar',
-        ]);
+        // Michael Cruz: Assigned on Batch 5 (Sept 12 & 13), Unavailable on Batch 6 (Sept 19 & 20)
+        foreach ([$batch5Start, $batch5End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachMichael->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'assigned',
+                'notes' => 'Assigned safety & fundive coach for Batch 5',
+            ]);
+        }
+        foreach ([$batch6Start, $batch6End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachMichael->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'unavailable',
+                'notes' => 'Attending CPR/First Aid Renewal Seminar',
+            ]);
+        }
 
-        // Christine Villamayor: Available on Batch 5 & 6
-        CoachAvailability::create([
-            'coach_id' => $coachChristine->id,
-            'date' => $batch5Start->format('Y-m-d'),
-            'status' => 'available',
-            'notes' => 'Available for standby or private coaching',
-        ]);
-        CoachAvailability::create([
-            'coach_id' => $coachChristine->id,
-            'date' => $batch6Start->format('Y-m-d'),
-            'status' => 'available',
-            'notes' => 'Available for Batch 6 coaching roster',
-        ]);
+        // Christine Villamayor: Available on Batch 5 (Sept 12 & 13) & Batch 6 (Sept 19 & 20)
+        foreach ([$batch5Start, $batch5End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachChristine->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'available',
+                'notes' => 'Available for standby or private coaching',
+            ]);
+        }
+        foreach ([$batch6Start, $batch6End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachChristine->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'available',
+                'notes' => 'Available for Batch 6 coaching roster',
+            ]);
+        }
 
-        // Mark Garcia: Available on Batch 6 & 7
-        CoachAvailability::create([
-            'coach_id' => $coachMark->id,
-            'date' => $batch6Start->format('Y-m-d'),
-            'status' => 'available',
-            'notes' => 'Ready for assignment in Matching Queue',
-        ]);
-        CoachAvailability::create([
-            'coach_id' => $coachMark->id,
-            'date' => $batch7Start->format('Y-m-d'),
-            'status' => 'available',
-            'notes' => 'Available for depth clinic',
-        ]);
+        // Mark Garcia: Available on Batch 6 (Sept 19 & 20) & Batch 7 (Sept 26 & 27)
+        foreach ([$batch6Start, $batch6End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachMark->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'available',
+                'notes' => 'Ready for assignment in Matching Queue',
+            ]);
+        }
+        foreach ([$batch7Start, $batch7End] as $d) {
+            CoachAvailability::create([
+                'coach_id' => $coachMark->id,
+                'date' => $d->format('Y-m-d'),
+                'status' => 'available',
+                'notes' => 'Available for depth clinic',
+            ]);
+        }
 
         // =========================================================================
         // 4. SEED AUTHENTIC CUSTOMER BOOKINGS & PARTICIPANTS

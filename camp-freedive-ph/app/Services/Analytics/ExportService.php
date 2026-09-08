@@ -133,7 +133,7 @@ class ExportService
             $maxCap = $b->max_capacity ?: 20;
             $occupancy = $maxCap > 0 ? round(($paxCount / $maxCap) * 100, 1) : 0;
             $coachNames = $b->coachAssignments->map(fn($ca) => $ca->coach?->name)->filter()->implode(', ') ?: 'None';
-            $requiredCoaches = max(1, (int) ceil($paxCount / 4));
+            $requiredCoaches = $paxCount > 0 ? (int) ceil($paxCount / 4) : 0;
             $isCompliant = ($paxCount === 0 || $coachesCount >= $requiredCoaches) ? 'YES' : 'NO';
 
             fputcsv($handle, [

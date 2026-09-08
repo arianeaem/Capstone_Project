@@ -135,7 +135,7 @@
                                 $cap = $batch->max_capacity ?: 20;
                                 $occ = $cap > 0 ? round(($pax / $cap) * 100) : 0;
                                 $coachesCnt = $batch->assigned_coaches_count;
-                                $recCoaches = max(1, (int) ceil($pax / 4));
+                                $recCoaches = $pax > 0 ? (int) ceil($pax / 4) : 0;
                             @endphp
                             <tr>
                                 <td class="p-2.5 font-bold">Batch #{{ $batch->id }}</td>

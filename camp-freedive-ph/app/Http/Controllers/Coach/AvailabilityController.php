@@ -40,13 +40,44 @@ class AvailabilityController extends Controller
             ->get()
             ->keyBy(fn($a) => $a->date->format('Y-m-d'));
 
-        // Fetch all assigned dates for this coach
-        $assignments = ParticipantAssignment::with('batch')
+        // Fetch all active assignments for this coach in calendar window
+        $rawAssignments = ParticipantAssignment::with('batch')
             ->where('coach_id', $coach->id)
             ->where('status', 'assigned')
-            ->whereBetween('dive_date', [$startOfCalendar->format('Y-m-d'), $endOfCalendar->format('Y-m-d')])
-            ->get()
-            ->groupBy(fn($a) => $a->dive_date->format('Y-m-d'));
+            ->where(function ($q) use ($startOfCalendar, $endOfCalendar) {
+                $q->whereBetween('dive_date', [$startOfCalendar->format('Y-m-d'), $endOfCalendar->format('Y-m-d')])
+                  ->orWhereHas('batch', function ($bq) use ($startOfCalendar, $endOfCalendar) {
+                      $bq->where('start_date', '<=', $endOfCalendar->format('Y-m-d'))
+                         ->where('end_date', '>=', $startOfCalendar->format('Y-m-d'));
+                  });
+            })
+            ->get();
+
+        // Map assignments to every date covered by the batch (e.g. Saturday + Sunday for 2D1N batches)
+        $assignmentsByDate = collect();
+        foreach ($rawAssignments as $assignment) {
+            $batch = $assignment->batch;
+            $dates = [];
+            if ($batch && $batch->start_date && $batch->end_date) {
+                $c = $batch->start_date->copy();
+                while ($c->lte($batch->end_date)) {
+                    $dates[] = $c->format('Y-m-d');
+                    $c->addDay();
+                }
+            } elseif ($assignment->dive_date) {
+                $dates[] = $assignment->dive_date->format('Y-m-d');
+                if ($assignment->dive_date->isSaturday()) {
+                    $dates[] = $assignment->dive_date->copy()->addDay()->format('Y-m-d');
+                }
+            }
+
+            foreach ($dates as $dStr) {
+                if (!$assignmentsByDate->has($dStr)) {
+                    $assignmentsByDate->put($dStr, collect());
+                }
+                $assignmentsByDate->get($dStr)->push($assignment);
+            }
+        }
 
         // Fetch active release requests
         $releaseRequests = AssignmentReleaseRequest::where('coach_id', $coach->id)
@@ -60,10 +91,16 @@ class AvailabilityController extends Controller
 
         while ($dayCursor->lte($endOfCalendar)) {
             $dateStr = $dayCursor->format('Y-m-d');
-            $isAssigned = $assignments->has($dateStr);
-            $assignmentList = $assignments->get($dateStr, collect());
+            $assignmentList = $assignmentsByDate->get($dateStr, collect());
+            $isAssigned = $assignmentList->isNotEmpty();
             $firstAssignment = $assignmentList->first();
             $batch = $firstAssignment?->batch;
+
+            // Also check if CoachAvailability is explicitly marked as assigned
+            $availRecord = $availabilities->get($dateStr);
+            if (!$isAssigned && $availRecord && $availRecord->status === 'assigned') {
+                $isAssigned = true;
+            }
 
             $hasReleaseRequest = $releaseRequests->has($dateStr);
             $releaseRequest = $releaseRequests->get($dateStr);
@@ -71,12 +108,12 @@ class AvailabilityController extends Controller
             $status = 'unset';
             if ($isAssigned) {
                 $status = 'assigned';
-            } elseif ($availabilities->has($dateStr)) {
-                $status = $availabilities->get($dateStr)->status;
+            } elseif ($availRecord) {
+                $status = $availRecord->status;
             }
 
-            // Determine if $>48 hours away for emergency release request
-            $diveStart = $dayCursor->copy()->setTime(9, 30);
+            // Determine if >48 hours away for emergency release request (06:30 AM start)
+            $diveStart = $dayCursor->copy()->setTime(6, 30);
             $hoursUntilDive = max(0, Carbon::now()->diffInHours($diveStart, false));
             $canRequestRelease = $isAssigned && ($hoursUntilDive > 48) && !$hasReleaseRequest;
 
@@ -146,11 +183,30 @@ class AvailabilityController extends Controller
 
         $datesToUpdate = [$day1->format('Y-m-d'), $day2->format('Y-m-d')];
 
-        // Check if either date is already assigned
+        // Check if either date is already assigned via ParticipantAssignment or CoachAvailability
         $hasAssignment = ParticipantAssignment::where('coach_id', $coach->id)
             ->where('status', 'assigned')
-            ->whereIn('dive_date', $datesToUpdate)
+            ->where(function ($q) use ($datesToUpdate) {
+                $q->whereIn('dive_date', $datesToUpdate)
+                  ->orWhereHas('batch', function ($bq) use ($datesToUpdate) {
+                      $bq->where(function ($sub) use ($datesToUpdate) {
+                          foreach ($datesToUpdate as $dt) {
+                              $sub->orWhere(function ($s) use ($dt) {
+                                  $s->whereDate('start_date', '<=', $dt)
+                                    ->whereDate('end_date', '>=', $dt);
+                              });
+                          }
+                      });
+                  });
+            })
             ->exists();
+
+        if (!$hasAssignment) {
+            $hasAssignment = CoachAvailability::where('coach_id', $coach->id)
+                ->where('status', 'assigned')
+                ->whereIn('date', $datesToUpdate)
+                ->exists();
+        }
 
         if ($hasAssignment) {
             $msg = 'Assigned dates are locked from self-editing. Please submit an emergency release request if you cannot attend.';
@@ -240,17 +296,37 @@ class AvailabilityController extends Controller
 
         $uniqueDates = array_values(array_unique($expandedDates));
 
-        // Filter out assigned dates
-        $assignedDates = ParticipantAssignment::where('coach_id', $coach->id)
+        // Filter out locked assigned dates
+        $assignedDatesFromAssignments = ParticipantAssignment::with('batch')
+            ->where('coach_id', $coach->id)
             ->where('status', 'assigned')
-            ->whereIn('dive_date', $uniqueDates)
-            ->pluck('dive_date')
+            ->get()
+            ->flatMap(function ($a) {
+                if ($a->batch && $a->batch->start_date && $a->batch->end_date) {
+                    $dates = [];
+                    $cur = $a->batch->start_date->copy();
+                    while ($cur->lte($a->batch->end_date)) {
+                        $dates[] = $cur->format('Y-m-d');
+                        $cur->addDay();
+                    }
+                    return $dates;
+                }
+                return [$a->dive_date ? $a->dive_date->format('Y-m-d') : null];
+            })
+            ->filter()
+            ->toArray();
+
+        $assignedDatesFromAvail = CoachAvailability::where('coach_id', $coach->id)
+            ->where('status', 'assigned')
+            ->pluck('date')
             ->map(fn($d) => Carbon::parse($d)->format('Y-m-d'))
             ->toArray();
 
+        $lockedAssignedDates = array_unique(array_merge($assignedDatesFromAssignments, $assignedDatesFromAvail));
+
         $updatedCount = 0;
         foreach ($uniqueDates as $d) {
-            if (in_array($d, $assignedDates)) {
+            if (in_array($d, $lockedAssignedDates)) {
                 continue; // Skip locked assigned dates
             }
 
@@ -303,8 +379,8 @@ class AvailabilityController extends Controller
         $batch = Batch::findOrFail($request->input('batch_id'));
         $diveDate = Carbon::parse($request->input('dive_date'))->startOfDay();
 
-        // 48-Hour Cutoff Enforcement (§5.3 / PRD Q3)
-        $diveStart = $diveDate->copy()->setTime(9, 30);
+        // 48-Hour Cutoff Enforcement (§5.3 / PRD Q3 - 06:30 AM Base Call)
+        $diveStart = $diveDate->copy()->setTime(6, 30);
         $hoursUntilDive = Carbon::now()->diffInHours($diveStart, false);
 
         if ($hoursUntilDive <= 48) {

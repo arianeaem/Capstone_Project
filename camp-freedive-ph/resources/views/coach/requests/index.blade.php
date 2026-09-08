@@ -61,8 +61,14 @@
 
                             <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs text-[#1D1D1F]">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[#6E6E73] font-medium">Dive Date:</span>
-                                    <span class="font-bold">{{ $op->dive_date->format('M d, Y') }}</span>
+                                    <span class="text-[#6E6E73] font-medium">Dive Dates:</span>
+                                    <span class="font-bold text-[#1D1D1F]">
+                                        @if($batch && $batch->start_date && $batch->end_date && $batch->start_date->ne($batch->end_date))
+                                            {{ $batch->start_date->format('M d') }} - {{ $batch->end_date->format('d, Y') }} ({{ $batch->start_date->format('D') }} - {{ $batch->end_date->format('D') }})
+                                        @else
+                                            {{ $op->dive_date->format('M d, Y') }}
+                                        @endif
+                                    </span>
                                 </div>
                                 <div class="flex items-center justify-between">
                                     <span class="text-[#6E6E73] font-medium">Students Needing Coach:</span>

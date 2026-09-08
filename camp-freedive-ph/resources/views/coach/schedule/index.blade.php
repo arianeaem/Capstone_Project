@@ -126,15 +126,39 @@
                             <tbody class="divide-y divide-[#E5E5EA] bg-white text-[#1D1D1F]">
                                 @foreach($students as $s)
                                     @php
-                                        $hasMedical = $s->health_condition && !in_array(strtolower(trim($s->health_condition)), ['none', 'none declared', 'no', 'n/a']);
+                                        $rawCondition = trim($s->health_condition ?? '');
+                                        $cleanHealth = strtolower(rtrim($rawCondition, '.'));
+                                        $isNoneOrGeneral = empty($cleanHealth) 
+                                            || in_array($cleanHealth, ['none', 'none declared', 'no', 'n/a', 'na', 'nil', 'normal', 'fit for diving', 'fit for diving, no declared medical issues', 'cleared medical waiver', 'first time freediving'])
+                                            || str_starts_with($cleanHealth, 'fit for diving')
+                                            || str_starts_with($cleanHealth, 'none')
+                                            || str_starts_with($cleanHealth, 'cleared medical waiver')
+                                            || str_starts_with($cleanHealth, 'first time freediving')
+                                            || str_starts_with($cleanHealth, 'certified aida')
+                                            || str_starts_with($cleanHealth, 'working on frenzel');
+                                        $hasMedical = !$isNoneOrGeneral && !empty($rawCondition);
                                     @endphp
                                     <tr class="hover:bg-[#FAFAFC] transition-colors">
                                         <td class="px-4 py-3.5 font-bold">{{ $s->name }}</td>
                                         <td class="px-4 py-3.5 text-[#6E6E73]">{{ $s->age }} yrs</td>
                                         <td class="px-4 py-3.5">
-                                            <span class="px-2 py-0.5 rounded font-semibold {{ strtolower($s->swimmer_status) === 'non_swimmer' ? 'bg-rose-50 text-rose-700' : 'bg-gray-100 text-gray-700' }}">
-                                                {{ ucfirst(str_replace('_', ' ', $s->swimmer_status ?: 'Swimmer')) }}
-                                            </span>
+                                            @php $swimStatus = strtolower($s->swimmer_status ?? 'swimmer'); @endphp
+                                            @if($swimStatus === 'confident' || $swimStatus === 'confident_swimmer')
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-900 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                                    <span>Confident Swimmer</span>
+                                                </span>
+                                            @elseif($swimStatus === 'non_swimmer')
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-900 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                                                    <span>Non-Swimmer</span>
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-100 text-blue-900 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                                    <span>Swimmer</span>
+                                                </span>
+                                            @endif
                                         </td>
                                         <td class="px-4 py-3.5 font-semibold text-[#780000]">
                                             {{ $s->booking?->formatted_class_type ?? 'Discovery' }}
@@ -277,7 +301,25 @@
                                         <td class="px-4 py-2.5 font-bold text-[#1D1D1F]">{{ $s->name }}</td>
                                         <td class="px-4 py-2.5 text-[#6E6E73]">{{ $s->age }} yrs</td>
                                         <td class="px-4 py-2.5 text-[#780000] font-semibold">{{ $s->booking?->formatted_class_type ?? 'Discovery' }}</td>
-                                        <td class="px-4 py-2.5 text-[#6E6E73]">{{ ucfirst(str_replace('_', ' ', $s->swimmer_status ?: 'Swimmer')) }}</td>
+                                        <td class="px-4 py-2.5">
+                                            @php $swimStatus = strtolower($s->swimmer_status ?? 'swimmer'); @endphp
+                                            @if($swimStatus === 'confident' || $swimStatus === 'confident_swimmer')
+                                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-emerald-100 text-emerald-900 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                                                    <span>Confident Swimmer</span>
+                                                </span>
+                                            @elseif($swimStatus === 'non_swimmer')
+                                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-100 text-rose-900 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>
+                                                    <span>Non-Swimmer</span>
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-100 text-blue-900 shadow-2xs">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>
+                                                    <span>Swimmer</span>
+                                                </span>
+                                            @endif
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

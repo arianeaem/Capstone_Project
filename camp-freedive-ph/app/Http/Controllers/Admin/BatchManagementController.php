@@ -362,7 +362,7 @@ class BatchManagementController extends Controller
         });
 
         $coachName = !empty($validated['coach_id']) ? \App\Models\User::find($validated['coach_id'])?->name : 'Shared Pool';
-        return back()->with('success', "✓ Assigned {$participant->name} to {$coachName}.");
+        return back()->with('success', "Assigned {$participant->name} to {$coachName}.");
     }
 
     /**
