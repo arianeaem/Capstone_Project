@@ -119,11 +119,15 @@
                                 <th class="py-3 px-4">Age</th>
                                 <th class="py-3 px-4">Class Package</th>
                                 <th class="py-3 px-4">Swimming Ability</th>
+                                <th class="py-3 px-4">Health / Medical Notes</th>
                                 <th class="py-3 px-4">Lead Booker & Contact</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#E5E5EA]">
                             @foreach($nextSessionData['students'] as $student)
+                                @php
+                                    $hasMedical = $student->health_condition && !in_array(strtolower(trim($student->health_condition)), ['none', 'none declared', 'no', 'n/a', 'fit for diving', 'fit for diving.']);
+                                @endphp
                                 <tr class="hover:bg-[#FAFAFC] transition-colors">
                                     <td class="py-3 px-4 font-bold text-[#1D1D1F]">
                                         {{ $student->name }}
@@ -142,16 +146,26 @@
                                         @endphp
                                         @if($swim === 'non_swimmer')
                                             <span class="px-2 py-0.5 rounded-md font-bold bg-amber-50 text-amber-800 border border-amber-300">
-                                                Non-Swimmer (Requires Extra Float Line)
+                                                Non-Swimmer
                                             </span>
-                                        @elseif($swim === 'confident')
+                                        @elseif($swim === 'confident' || $swim === 'confident_swimmer')
                                             <span class="px-2 py-0.5 rounded-md font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                                 Confident Swimmer
                                             </span>
                                         @else
                                             <span class="px-2 py-0.5 rounded-md font-bold bg-blue-50 text-blue-700 border border-blue-200">
-                                                Basic Swimmer
+                                                {{ ucfirst(str_replace('_', ' ', $student->swimmer_status ?: 'Swimmer')) }}
                                             </span>
+                                        @endif
+                                    </td>
+                                    <td class="py-3 px-4">
+                                        @if($hasMedical)
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-50 text-amber-900 border border-amber-200 font-bold">
+                                                <span>⚠️</span>
+                                                <span>{{ $student->health_condition }}</span>
+                                            </span>
+                                        @else
+                                            <span class="text-[#8E8E93]">None declared</span>
                                         @endif
                                     </td>
                                     <td class="py-3 px-4 text-[#6E6E73]">

@@ -35,6 +35,15 @@ use Illuminate\Support\Facades\Schema;
 class DatabaseSeeder extends Seeder
 {
     /**
+     * Fixed Carpool Pickup Points strictly matching the booking wizard process.
+     */
+    public const PICKUP_MONUMENTO = 'Monumento Hypermarket - 2:30 AM';
+    public const PICKUP_TIENDESITAS = 'Shell Tiendesitas - 3:00 AM';
+    public const PICKUP_MARKET_MARKET = 'Market Market Taxi Bay - 3:40 AM';
+    public const PICKUP_ALABANG = 'Alabang Starmall - 4:15 AM';
+    public const PICKUP_STO_TOMAS = 'Sto Tomas Exit - 5:30 AM';
+
+    /**
      * Seed the application's database with authentic Camp Freedive PH operational data.
      */
     public function run(): void
@@ -216,26 +225,139 @@ class DatabaseSeeder extends Seeder
         AuditLogger::log('USER_STATUS_TOGGLED', 'Staff account marked inactive (Leave of Absence): Angelo Fernandez', $coachAngelo, 'Antonio Mercado');
 
         // =========================================================================
-        // 2. SEED REALISTIC 2D1N DIVE BATCHES (MABINI, BATANGAS)
+        // 2. SEED REALISTIC 2D1N DIVE BATCHES IN STRICT CHRONOLOGICAL ORDER
+        // Batch 1 is strictly the earliest date, progressing sequentially to future batches.
         // =========================================================================
+        $upcomingSat = Carbon::now()->next(Carbon::SATURDAY)->startOfDay();
 
-        // Batch 1: Upcoming Weekend (Confirmed, High Staffing)
-        $batch1Start = Carbon::now()->next(Carbon::SATURDAY)->startOfDay();
+        // -------------------------------------------------------------------------
+        // BATCH 1: Earliest Past Batch (-28 Days / 4 Weeks Ago) -> Completed
+        // -------------------------------------------------------------------------
+        $batch1Start = $upcomingSat->copy()->subDays(28);
+        $batch1End = $batch1Start->copy()->addDay();
         $batch1 = Batch::create([
-            'name' => $batch1Start->format('M d') . '–' . $batch1Start->copy()->addDay()->format('d') . ' Discovery & Open Water Batch',
+            'name' => 'Batch 1',
             'batch_code' => 'Batch 1',
             'start_date' => $batch1Start,
-            'end_date' => $batch1Start->copy()->addDay(),
+            'end_date' => $batch1End,
+            'status' => 'completed',
+            'lifecycle_status' => 'completed',
+            'risk_classification' => 'very_safe',
+            'capacity_note' => 'Season Opener Discovery Camp (Mabini Coastline)',
+            'notes' => 'Early season kickoff. Anilao Marine Sanctuary line & depth orientation.',
+            'completed_at' => $batch1End->copy()->addDay(),
+            'created_by' => $admin->id,
+        ]);
+        BatchStatusLog::create([
+            'batch_id' => $batch1->id,
+            'old_status' => 'confirmed',
+            'new_status' => 'completed',
+            'changed_by' => $admin->id,
+            'note' => 'Trip safely concluded. All divers certified.',
+            'created_at' => $batch1End->copy()->addDay(),
+        ]);
+
+        // -------------------------------------------------------------------------
+        // BATCH 2: Past Batch (-21 Days / 3 Weeks Ago) -> Completed
+        // -------------------------------------------------------------------------
+        $batch2Start = $upcomingSat->copy()->subDays(21);
+        $batch2End = $batch2Start->copy()->addDay();
+        $batch2 = Batch::create([
+            'name' => 'Batch 2',
+            'batch_code' => 'Batch 2',
+            'start_date' => $batch2Start,
+            'end_date' => $batch2End,
+            'status' => 'completed',
+            'lifecycle_status' => 'completed',
+            'risk_classification' => 'very_safe',
+            'capacity_note' => 'Discovery & Open Water Training Camp',
+            'notes' => 'Twin Rocks & Cathedral Rock marine sanctuary sessions.',
+            'completed_at' => $batch2End->copy()->addDay(),
+            'created_by' => $admin->id,
+        ]);
+        BatchStatusLog::create([
+            'batch_id' => $batch2->id,
+            'old_status' => 'confirmed',
+            'new_status' => 'completed',
+            'changed_by' => $admin->id,
+            'note' => 'All participants returned safely. Batch logged as completed.',
+            'created_at' => $batch2End->copy()->addDay(),
+        ]);
+
+        // -------------------------------------------------------------------------
+        // BATCH 3: Past Batch (-14 Days / 2 Weeks Ago) -> Cancelled by Camp (Storm Advisory)
+        // -------------------------------------------------------------------------
+        $batch3Start = $upcomingSat->copy()->subDays(14);
+        $batch3End = $batch3Start->copy()->addDay();
+        $batch3 = Batch::create([
+            'name' => 'Batch 3',
+            'batch_code' => 'Batch 3',
+            'start_date' => $batch3Start,
+            'end_date' => $batch3End,
+            'status' => 'cancelled_by_camp',
+            'lifecycle_status' => 'cancelled_by_camp',
+            'risk_classification' => 'critical_risk',
+            'cancelled_at' => $batch3Start->copy()->subDays(2),
+            'cancellation_reason' => 'PAGASA Heavy Rainfall Warning & PCG Sea Travel Gale Advisory.',
+            'capacity_note' => 'Monsoon Storm Advisory Rebooking',
+            'notes' => 'Camp cancelled due to extreme monsoon squalls and gale warnings. All guests rebooked or refunded.',
+            'created_by' => $owner->id,
+        ]);
+        BatchStatusLog::create([
+            'batch_id' => $batch3->id,
+            'old_status' => 'confirmed',
+            'new_status' => 'cancelled_by_camp',
+            'changed_by' => $owner->id,
+            'note' => 'Cancelled by Camp due to PCG Gale Warning & PAGASA Southwest Monsoon advisory.',
+            'created_at' => $batch3Start->copy()->subDays(2),
+        ]);
+
+        // -------------------------------------------------------------------------
+        // BATCH 4: Past Batch (-7 Days / 1 Week Ago) -> Completed
+        // -------------------------------------------------------------------------
+        $batch4Start = $upcomingSat->copy()->subDays(7);
+        $batch4End = $batch4Start->copy()->addDay();
+        $batch4 = Batch::create([
+            'name' => 'Batch 4',
+            'batch_code' => 'Batch 4',
+            'start_date' => $batch4Start,
+            'end_date' => $batch4End,
+            'status' => 'completed',
+            'lifecycle_status' => 'completed',
+            'risk_classification' => 'very_safe',
+            'capacity_note' => 'Weekend Discovery Camp (Mabini Coastline)',
+            'notes' => 'Successful 2D1N trip in Mabini with 100% student certification rate.',
+            'completed_at' => $batch4End->copy()->addDay(),
+            'created_by' => $admin->id,
+        ]);
+        BatchStatusLog::create([
+            'batch_id' => $batch4->id,
+            'old_status' => 'confirmed',
+            'new_status' => 'completed',
+            'changed_by' => $admin->id,
+            'note' => 'All participants safely returned to Manila. Batch logged as completed.',
+            'created_at' => $batch4End->copy()->addDay(),
+        ]);
+
+        // -------------------------------------------------------------------------
+        // BATCH 5: Upcoming Weekend (Current Active Departure) -> Confirmed
+        // -------------------------------------------------------------------------
+        $batch5Start = $upcomingSat->copy();
+        $batch5End = $batch5Start->copy()->addDay();
+        $batch5 = Batch::create([
+            'name' => 'Batch 5',
+            'batch_code' => 'Batch 5',
+            'start_date' => $batch5Start,
+            'end_date' => $batch5End,
             'status' => 'confirmed',
             'lifecycle_status' => 'confirmed',
             'risk_classification' => 'very_safe',
-            'capacity_note' => 'Weekend Discovery Camp (Mabini Coastline)',
+            'capacity_note' => 'Weekend Discovery & Line Training Camp',
             'notes' => 'Anilao Marine Sanctuary Discovery & Line Training. High student turnout.',
             'created_by' => $admin->id,
         ]);
-
         BatchStatusLog::create([
-            'batch_id' => $batch1->id,
+            'batch_id' => $batch5->id,
             'old_status' => null,
             'new_status' => 'confirmed',
             'changed_by' => $admin->id,
@@ -243,13 +365,16 @@ class DatabaseSeeder extends Seeder
             'created_at' => now()->subDays(6),
         ]);
 
-        // Batch 2: Next Weekend (+7 Days) (Confirmed, In Matching Queue for 1 coach)
-        $batch2Start = $batch1Start->copy()->addDays(7);
-        $batch2 = Batch::create([
-            'name' => $batch2Start->format('M d') . '–' . $batch2Start->copy()->addDay()->format('d') . ' Open Water & Beginner Batch',
-            'batch_code' => 'Batch 2',
-            'start_date' => $batch2Start,
-            'end_date' => $batch2Start->copy()->addDay(),
+        // -------------------------------------------------------------------------
+        // BATCH 6: Next Weekend (+7 Days) -> Confirmed, Open for Matching
+        // -------------------------------------------------------------------------
+        $batch6Start = $upcomingSat->copy()->addDays(7);
+        $batch6End = $batch6Start->copy()->addDay();
+        $batch6 = Batch::create([
+            'name' => 'Batch 6',
+            'batch_code' => 'Batch 6',
+            'start_date' => $batch6Start,
+            'end_date' => $batch6End,
             'status' => 'confirmed',
             'lifecycle_status' => 'confirmed',
             'risk_classification' => 'safe',
@@ -257,9 +382,8 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Cathedral Rock & Twin Rocks Marine Reserve dive spots.',
             'created_by' => $admin->id,
         ]);
-
         BatchStatusLog::create([
-            'batch_id' => $batch2->id,
+            'batch_id' => $batch6->id,
             'old_status' => null,
             'new_status' => 'confirmed',
             'changed_by' => $admin->id,
@@ -267,13 +391,16 @@ class DatabaseSeeder extends Seeder
             'created_at' => now()->subDays(4),
         ]);
 
-        // Batch 3: Future Weekend (+14 Days) (Confirmed, Instructor Pending)
-        $batch3Start = $batch1Start->copy()->addDays(14);
-        $batch3 = Batch::create([
-            'name' => $batch3Start->format('M d') . '–' . $batch3Start->copy()->addDay()->format('d') . ' Advance & Refinement Weekend',
-            'batch_code' => 'Batch 3',
-            'start_date' => $batch3Start,
-            'end_date' => $batch3Start->copy()->addDay(),
+        // -------------------------------------------------------------------------
+        // BATCH 7: Future Weekend (+14 Days) -> Confirmed
+        // -------------------------------------------------------------------------
+        $batch7Start = $upcomingSat->copy()->addDays(14);
+        $batch7End = $batch7Start->copy()->addDay();
+        $batch7 = Batch::create([
+            'name' => 'Batch 7',
+            'batch_code' => 'Batch 7',
+            'start_date' => $batch7Start,
+            'end_date' => $batch7End,
             'status' => 'confirmed',
             'lifecycle_status' => 'confirmed',
             'risk_classification' => 'safe',
@@ -281,9 +408,8 @@ class DatabaseSeeder extends Seeder
             'notes' => 'Specialized depth training and Frenzel equalization clinic.',
             'created_by' => $admin->id,
         ]);
-
         BatchStatusLog::create([
-            'batch_id' => $batch3->id,
+            'batch_id' => $batch7->id,
             'old_status' => null,
             'new_status' => 'confirmed',
             'changed_by' => $admin->id,
@@ -291,23 +417,25 @@ class DatabaseSeeder extends Seeder
             'created_at' => now()->subDays(2),
         ]);
 
-        // Batch 4: Rescheduled Batch (+21 Days)
-        $batch4Start = $batch1Start->copy()->addDays(21);
-        $batch4 = Batch::create([
-            'name' => $batch4Start->format('M d') . '–' . $batch4Start->copy()->addDay()->format('d') . ' Rescheduled Freediving Batch',
-            'batch_code' => 'Batch 4',
-            'start_date' => $batch4Start,
-            'end_date' => $batch4Start->copy()->addDay(),
+        // -------------------------------------------------------------------------
+        // BATCH 8: Future Weekend (+21 Days) -> Rescheduled
+        // -------------------------------------------------------------------------
+        $batch8Start = $upcomingSat->copy()->addDays(21);
+        $batch8End = $batch8Start->copy()->addDay();
+        $batch8 = Batch::create([
+            'name' => 'Batch 8',
+            'batch_code' => 'Batch 8',
+            'start_date' => $batch8Start,
+            'end_date' => $batch8End,
             'status' => 'rescheduled',
             'lifecycle_status' => 'rescheduled',
             'risk_classification' => 'moderate',
             'capacity_note' => 'Resort facility maintenance rollover',
-            'notes' => 'Shifted date to accommodate resort generator and dock repair.',
+            'notes' => 'Shifted date to accommodate resort dock and compressor maintenance.',
             'created_by' => $owner->id,
         ]);
-
         BatchStatusLog::create([
-            'batch_id' => $batch4->id,
+            'batch_id' => $batch8->id,
             'old_status' => 'confirmed',
             'new_status' => 'rescheduled',
             'changed_by' => $owner->id,
@@ -315,146 +443,125 @@ class DatabaseSeeder extends Seeder
             'created_at' => now()->subDay(),
         ]);
 
-        // Batch 5: Concluded / Completed Batch (Past Weekend - 7 days ago)
-        $batch5Start = $batch1Start->copy()->subDays(7);
-        $batch5 = Batch::create([
-            'name' => $batch5Start->format('M d') . '–' . $batch5Start->copy()->addDay()->format('d') . ' Completed Summer Dive Camp',
-            'batch_code' => 'Batch 5',
-            'start_date' => $batch5Start,
-            'end_date' => $batch5Start->copy()->addDay(),
-            'status' => 'completed',
-            'lifecycle_status' => 'completed',
+        // -------------------------------------------------------------------------
+        // BATCH 9: Future Weekend (+28 Days) -> Open for Booking
+        // -------------------------------------------------------------------------
+        $batch9Start = $upcomingSat->copy()->addDays(28);
+        $batch9End = $batch9Start->copy()->addDay();
+        $batch9 = Batch::create([
+            'name' => 'Batch 9',
+            'batch_code' => 'Batch 9',
+            'start_date' => $batch9Start,
+            'end_date' => $batch9End,
+            'status' => 'confirmed',
+            'lifecycle_status' => 'confirmed',
             'risk_classification' => 'very_safe',
-            'completed_at' => $batch5Start->copy()->addDays(2),
-            'notes' => 'Successful 2D1N trip concluded in Mabini with 100% student certification rate.',
+            'capacity_note' => 'Advance Open Water & Line Training Camp',
+            'notes' => 'Open for online reservations across all courses.',
             'created_by' => $admin->id,
         ]);
-
         BatchStatusLog::create([
-            'batch_id' => $batch5->id,
-            'old_status' => 'confirmed',
-            'new_status' => 'completed',
+            'batch_id' => $batch9->id,
+            'old_status' => null,
+            'new_status' => 'confirmed',
             'changed_by' => $admin->id,
-            'note' => 'All participants safely returned to Manila. Batch logged as completed.',
-            'created_at' => $batch5Start->copy()->addDays(2),
-        ]);
-
-        // Batch 6: Cancelled by Camp (Force Majeure Storm Advisory - Past)
-        $batch6Start = $batch1Start->copy()->subDays(14);
-        $batch6 = Batch::create([
-            'name' => $batch6Start->format('M d') . '–' . $batch6Start->copy()->addDay()->format('d') . ' Storm Advisory Batch',
-            'batch_code' => 'Batch 6',
-            'start_date' => $batch6Start,
-            'end_date' => $batch6Start->copy()->addDay(),
-            'status' => 'cancelled_by_camp',
-            'lifecycle_status' => 'cancelled_by_camp',
-            'risk_classification' => 'critical_risk',
-            'cancelled_at' => $batch6Start->copy()->subDays(2),
-            'cancellation_reason' => 'PAGASA Heavy Rainfall Warning & PCG Sea Travel Gale Advisory.',
-            'notes' => 'Camp cancelled due to extreme monsoon squalls and gale warnings. All guests rebooked or refunded.',
-            'created_by' => $owner->id,
-        ]);
-
-        BatchStatusLog::create([
-            'batch_id' => $batch6->id,
-            'old_status' => 'confirmed',
-            'new_status' => 'cancelled_by_camp',
-            'changed_by' => $owner->id,
-            'note' => 'Cancelled by Camp due to PCG Gale Warning & PAGASA Southwest Monsoon advisory.',
-            'created_at' => $batch6Start->copy()->subDays(2),
+            'note' => 'Published 4-week advance booking schedule.',
+            'created_at' => now()->subDay(),
         ]);
 
         // =========================================================================
         // 3. SEED COACH AVAILABILITIES (COACH PORTAL CALENDAR)
         // =========================================================================
 
-        // Jose Reyes: Assigned on Batch 1, Available on Batch 2
+        // Jose Reyes: Assigned on Batch 5, Available on Batch 6
         CoachAvailability::create([
             'coach_id' => $coachJose->id,
-            'date' => $batch1Start->format('Y-m-d'),
+            'date' => $batch5Start->format('Y-m-d'),
             'status' => 'assigned',
-            'notes' => 'Assigned lead instructor for Batch 1 Discovery Group',
+            'notes' => 'Assigned lead instructor for Batch 5 Discovery Group',
         ]);
         CoachAvailability::create([
             'coach_id' => $coachJose->id,
-            'date' => $batch2Start->format('Y-m-d'),
+            'date' => $batch6Start->format('Y-m-d'),
             'status' => 'available',
             'notes' => 'Available for weekend departure',
         ]);
 
-        // Mary Grace Bautista: Assigned on Batch 1, Available on Batch 2
+        // Mary Grace Bautista: Assigned on Batch 5, Available on Batch 6
         CoachAvailability::create([
             'coach_id' => $coachMary->id,
-            'date' => $batch1Start->format('Y-m-d'),
+            'date' => $batch5Start->format('Y-m-d'),
             'status' => 'assigned',
-            'notes' => 'Assigned instructor for Batch 1 Open Water Group',
+            'notes' => 'Assigned instructor for Batch 5 Open Water Group',
         ]);
         CoachAvailability::create([
             'coach_id' => $coachMary->id,
-            'date' => $batch2Start->format('Y-m-d'),
+            'date' => $batch6Start->format('Y-m-d'),
             'status' => 'available',
             'notes' => 'Available for beginner sessions',
         ]);
 
-        // Michael Cruz: Assigned on Batch 1, Unavailable on Batch 2
+        // Michael Cruz: Assigned on Batch 5, Unavailable on Batch 6
         CoachAvailability::create([
             'coach_id' => $coachMichael->id,
-            'date' => $batch1Start->format('Y-m-d'),
+            'date' => $batch5Start->format('Y-m-d'),
             'status' => 'assigned',
-            'notes' => 'Assigned safety & fundive coach for Batch 1',
+            'notes' => 'Assigned safety & fundive coach for Batch 5',
         ]);
         CoachAvailability::create([
             'coach_id' => $coachMichael->id,
-            'date' => $batch2Start->format('Y-m-d'),
+            'date' => $batch6Start->format('Y-m-d'),
             'status' => 'unavailable',
             'notes' => 'Attending CPR/First Aid Renewal Seminar',
         ]);
 
-        // Christine Villamayor: Available on Batch 1 & 2
+        // Christine Villamayor: Available on Batch 5 & 6
         CoachAvailability::create([
             'coach_id' => $coachChristine->id,
-            'date' => $batch1Start->format('Y-m-d'),
+            'date' => $batch5Start->format('Y-m-d'),
             'status' => 'available',
             'notes' => 'Available for standby or private coaching',
         ]);
         CoachAvailability::create([
             'coach_id' => $coachChristine->id,
-            'date' => $batch2Start->format('Y-m-d'),
+            'date' => $batch6Start->format('Y-m-d'),
             'status' => 'available',
-            'notes' => 'Available for Batch 2 coaching roster',
+            'notes' => 'Available for Batch 6 coaching roster',
         ]);
 
-        // Mark Garcia: Available on Batch 2 & 3
+        // Mark Garcia: Available on Batch 6 & 7
         CoachAvailability::create([
             'coach_id' => $coachMark->id,
-            'date' => $batch2Start->format('Y-m-d'),
+            'date' => $batch6Start->format('Y-m-d'),
             'status' => 'available',
             'notes' => 'Ready for assignment in Matching Queue',
         ]);
         CoachAvailability::create([
             'coach_id' => $coachMark->id,
-            'date' => $batch3Start->format('Y-m-d'),
+            'date' => $batch7Start->format('Y-m-d'),
             'status' => 'available',
             'notes' => 'Available for depth clinic',
         ]);
 
         // =========================================================================
         // 4. SEED AUTHENTIC CUSTOMER BOOKINGS & PARTICIPANTS
+        // Strictly using the 5 exact fixed pickup points from the booking wizard!
         // =========================================================================
 
         // -------------------------------------------------------------------------
-        // BOOKING 1: Discovery Class (3 Pax) - Lead: Juan Dela Cruz -> Batch 1
+        // BOOKING 1: Discovery Class (3 Pax) - Lead: Juan Dela Cruz -> Batch 5
+        // Pickup: Shell Tiendesitas - 3:00 AM
         // -------------------------------------------------------------------------
         $b1 = Booking::create([
-            'batch_id' => $batch1->id,
+            'batch_id' => $batch5->id,
             'booking_number' => 'CFP-2026-1001',
             'pin' => '1001',
             'class_type' => 'discovery',
             'is_certified_diver' => false,
-            'start_date' => $batch1Start,
-            'end_date' => $batch1Start->copy()->addDay(),
+            'start_date' => $batch5Start,
+            'end_date' => $batch5End,
             'pickup_option' => 'carpool',
-            'pickup_location' => 'Shell Tiendesitas (C5 Pasig) - 3:00 AM',
+            'pickup_location' => self::PICKUP_TIENDESITAS,
             'carpool_fee' => 3000.00,
             'boat_dive' => true,
             'boat_dive_fee' => 2400.00,
@@ -502,8 +609,8 @@ class DatabaseSeeder extends Seeder
                 'participant_id' => $p->id,
                 'booking_id' => $b1->id,
                 'coach_id' => $coachJose->id,
-                'batch_id' => $batch1->id,
-                'dive_date' => $batch1Start,
+                'batch_id' => $batch5->id,
+                'dive_date' => $batch5Start,
                 'assigned_by' => $admin->id,
                 'assigned_at' => now()->subDays(4),
                 'status' => 'assigned',
@@ -535,16 +642,17 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // -------------------------------------------------------------------------
-        // BOOKING 2: Level 1 Open Water (2 Pax) - Lead: Robert Gonzales -> Batch 1
+        // BOOKING 2: Discovery Class (2 Pax) - Lead: Robert Gonzales -> Batch 5
+        // Pickup: Own Transportation
         // -------------------------------------------------------------------------
         $b2 = Booking::create([
-            'batch_id' => $batch1->id,
+            'batch_id' => $batch5->id,
             'booking_number' => 'CFP-2026-1002',
             'pin' => '1002',
             'class_type' => 'discovery',
             'is_certified_diver' => false,
-            'start_date' => $batch1Start,
-            'end_date' => $batch1Start->copy()->addDay(),
+            'start_date' => $batch5Start,
+            'end_date' => $batch5End,
             'pickup_option' => 'own',
             'pickup_location' => null,
             'carpool_fee' => 0.00,
@@ -552,9 +660,9 @@ class DatabaseSeeder extends Seeder
             'boat_dive_fee' => 1600.00,
             'lgu_fee' => 600.00,
             'environmental_fee' => 100.00,
-            'subtotal' => 13600.00,
-            'total_amount' => 15900.00,
-            'downpayment_amount' => 15900.00,
+            'subtotal' => 8500.00,
+            'total_amount' => 10800.00,
+            'downpayment_amount' => 10800.00,
             'balance_amount' => 0.00,
             'contact_name' => 'Robert Gonzales',
             'contact_email' => 'robert.gonzales@yahoo.com',
@@ -569,7 +677,7 @@ class DatabaseSeeder extends Seeder
             'age' => 31,
             'health_condition' => 'Cleared medical waiver. Swimmer with open water experience.',
             'swimmer_status' => 'confident_swimmer',
-            'price_per_person' => 6800.00,
+            'price_per_person' => 4250.00,
         ]);
         $p2_2 = BookingParticipant::create([
             'booking_id' => $b2->id,
@@ -577,7 +685,7 @@ class DatabaseSeeder extends Seeder
             'age' => 29,
             'health_condition' => 'None declared.',
             'swimmer_status' => 'swimmer',
-            'price_per_person' => 6800.00,
+            'price_per_person' => 4250.00,
         ]);
 
         // Assign Booking 2 students to Coach Mary Grace Bautista
@@ -586,8 +694,8 @@ class DatabaseSeeder extends Seeder
                 'participant_id' => $p->id,
                 'booking_id' => $b2->id,
                 'coach_id' => $coachMary->id,
-                'batch_id' => $batch1->id,
-                'dive_date' => $batch1Start,
+                'batch_id' => $batch5->id,
+                'dive_date' => $batch5Start,
                 'assigned_by' => $admin->id,
                 'assigned_at' => now()->subDays(3),
                 'status' => 'assigned',
@@ -600,9 +708,9 @@ class DatabaseSeeder extends Seeder
             'payment_method' => 'bpi_bank_transfer',
             'transaction_id' => 'PAYM-20260831-BPI-4412',
             'paymongo_payment_id' => 'pay_live_7mN3xP1vQ5wR',
-            'amount' => 15900.00,
+            'amount' => 10800.00,
             'fee_amount' => 0.00,
-            'net_amount' => 15900.00,
+            'net_amount' => 10800.00,
             'payment_type' => 'full_payment',
             'status' => 'completed',
             'paid_at' => now()->subDays(3),
@@ -613,23 +721,24 @@ class DatabaseSeeder extends Seeder
             'old_status' => 'new',
             'new_status' => 'confirmed',
             'changed_by' => null,
-            'note' => 'Full payment received via BPI Direct Transfer (₱15,900.00). Assigned to Coach Mary Grace Bautista.',
+            'note' => 'Full payment received via BPI Direct Transfer (₱10,800.00). Assigned to Coach Mary Grace Bautista.',
             'created_at' => now()->subDays(3),
         ]);
 
         // -------------------------------------------------------------------------
-        // BOOKING 3: Fun Dive & Line Training (1 Pax) - Lead: David Lim -> Batch 1
+        // BOOKING 3: Fun Dive & Line Training (1 Pax) - Lead: David Lim -> Batch 5
+        // Pickup: Market Market Taxi Bay - 3:40 AM
         // -------------------------------------------------------------------------
         $b3 = Booking::create([
-            'batch_id' => $batch1->id,
+            'batch_id' => $batch5->id,
             'booking_number' => 'CFP-2026-1003',
             'pin' => '1003',
             'class_type' => 'fundive',
             'is_certified_diver' => true,
-            'start_date' => $batch1Start,
-            'end_date' => $batch1Start->copy()->addDay(),
+            'start_date' => $batch5Start,
+            'end_date' => $batch5End,
             'pickup_option' => 'carpool',
-            'pickup_location' => 'Market! Market! (BGC Taguig) - 3:40 AM',
+            'pickup_location' => self::PICKUP_MARKET_MARKET,
             'carpool_fee' => 1000.00,
             'boat_dive' => true,
             'boat_dive_fee' => 800.00,
@@ -660,8 +769,8 @@ class DatabaseSeeder extends Seeder
             'participant_id' => $p3_1->id,
             'booking_id' => $b3->id,
             'coach_id' => $coachMichael->id,
-            'batch_id' => $batch1->id,
-            'dive_date' => $batch1Start,
+            'batch_id' => $batch5->id,
+            'dive_date' => $batch5Start,
             'assigned_by' => $admin->id,
             'assigned_at' => now()->subDays(2),
             'status' => 'assigned',
@@ -691,18 +800,19 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // -------------------------------------------------------------------------
-        // BOOKING 4: Discovery Class (4 Pax) - Lead: Joseph Tan -> Batch 2 (Unassigned -> Matching Queue)
+        // BOOKING 4: Discovery Class (4 Pax) - Lead: Joseph Tan -> Batch 6
+        // Pickup: Monumento Hypermarket - 2:30 AM (In Matching Queue for Batch 6)
         // -------------------------------------------------------------------------
         $b4 = Booking::create([
-            'batch_id' => $batch2->id,
+            'batch_id' => $batch6->id,
             'booking_number' => 'CFP-2026-1004',
             'pin' => '1004',
             'class_type' => 'discovery',
             'is_certified_diver' => false,
-            'start_date' => $batch2Start,
-            'end_date' => $batch2Start->copy()->addDay(),
+            'start_date' => $batch6Start,
+            'end_date' => $batch6End,
             'pickup_option' => 'carpool',
-            'pickup_location' => 'Shell Tiendesitas (C5 Pasig) - 3:00 AM',
+            'pickup_location' => self::PICKUP_MONUMENTO,
             'carpool_fee' => 4000.00,
             'boat_dive' => true,
             'boat_dive_fee' => 3200.00,
@@ -770,14 +880,15 @@ class DatabaseSeeder extends Seeder
             'old_status' => 'new',
             'new_status' => 'confirmed',
             'changed_by' => null,
-            'note' => 'Group booking confirmed with ₱12,000 GCash downpayment. In coach matching queue for Batch 2.',
+            'note' => 'Group booking confirmed with ₱12,000 GCash downpayment. In coach matching queue for Batch 6.',
             'created_at' => now()->subDay(),
         ]);
 
         // -------------------------------------------------------------------------
         // BOOKING 5: Refinement Class (2 Pax) - Lead: Richard Soriano -> Reschedule Requested
+        // Pickup: Alabang Starmall - 4:15 AM
         // -------------------------------------------------------------------------
-        $b5Start = $batch1Start->copy()->addDays(5);
+        $b5Start = $batch5Start->copy()->addDays(5);
         $b5 = Booking::create([
             'batch_id' => null,
             'booking_number' => 'CFP-2026-1005',
@@ -786,17 +897,17 @@ class DatabaseSeeder extends Seeder
             'is_certified_diver' => false,
             'start_date' => $b5Start,
             'end_date' => $b5Start->copy()->addDay(),
-            'pickup_option' => 'own',
-            'pickup_location' => null,
-            'carpool_fee' => 0.00,
+            'pickup_option' => 'carpool',
+            'pickup_location' => self::PICKUP_ALABANG,
+            'carpool_fee' => 2000.00,
             'boat_dive' => true,
             'boat_dive_fee' => 1600.00,
             'lgu_fee' => 600.00,
             'environmental_fee' => 100.00,
             'subtotal' => 8200.00,
-            'total_amount' => 10500.00,
-            'downpayment_amount' => 5000.00,
-            'balance_amount' => 5500.00,
+            'total_amount' => 12500.00,
+            'downpayment_amount' => 6000.00,
+            'balance_amount' => 6500.00,
             'contact_name' => 'Richard Soriano',
             'contact_email' => 'richard.soriano@gmail.com',
             'contact_phone' => '0917 222 3344',
@@ -826,9 +937,9 @@ class DatabaseSeeder extends Seeder
             'payment_method' => 'gcash',
             'transaction_id' => 'PAYM-20260831-GCASH-1105',
             'paymongo_payment_id' => 'pay_live_5vM1kP7xQ3wL',
-            'amount' => 5000.00,
-            'fee_amount' => 125.00,
-            'net_amount' => 4875.00,
+            'amount' => 6000.00,
+            'fee_amount' => 150.00,
+            'net_amount' => 5850.00,
             'payment_type' => 'downpayment',
             'status' => 'completed',
             'paid_at' => now()->subDays(5),
@@ -855,6 +966,7 @@ class DatabaseSeeder extends Seeder
 
         // -------------------------------------------------------------------------
         // BOOKING 6: Discovery Class (1 Pax) - Lead: Sarah Aquino -> Cancellation & 100% Policy Refund
+        // Pickup: Sto Tomas Exit - 5:30 AM
         // -------------------------------------------------------------------------
         $b6Start = Carbon::now()->addDays(18)->startOfDay(); // > 14 days out -> 100% Eligible
         $b6 = Booking::create([
@@ -866,7 +978,7 @@ class DatabaseSeeder extends Seeder
             'start_date' => $b6Start,
             'end_date' => $b6Start->copy()->addDay(),
             'pickup_option' => 'carpool',
-            'pickup_location' => 'Shell Tiendesitas (C5 Pasig) - 3:00 AM',
+            'pickup_location' => self::PICKUP_STO_TOMAS,
             'carpool_fee' => 1000.00,
             'boat_dive' => true,
             'boat_dive_fee' => 800.00,
@@ -939,6 +1051,7 @@ class DatabaseSeeder extends Seeder
 
         // -------------------------------------------------------------------------
         // BOOKING 7: Discovery Class (2 Pax) - Lead: Angelo Fernandez -> Cancelled by Guest (< 7 Days, Forfeited)
+        // Pickup: Own Transportation
         // -------------------------------------------------------------------------
         $b7Start = Carbon::now()->addDays(4)->startOfDay();
         $b7 = Booking::create([
@@ -1033,26 +1146,27 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // -------------------------------------------------------------------------
-        // BOOKING 8: Discovery Class (2 Pax) - Lead: Christian Santiago -> Attached to Completed Batch 5
+        // BOOKING 8: Discovery Class (2 Pax) - Lead: Christian Santiago -> Attached to Completed Batch 4
+        // Pickup: Shell Tiendesitas - 3:00 AM
         // -------------------------------------------------------------------------
         $b8 = Booking::create([
-            'batch_id' => $batch5->id,
+            'batch_id' => $batch4->id,
             'booking_number' => 'CFP-2026-1008',
             'pin' => '1008',
             'class_type' => 'discovery',
             'is_certified_diver' => false,
-            'start_date' => $batch5Start,
-            'end_date' => $batch5Start->copy()->addDay(),
-            'pickup_option' => 'own',
-            'pickup_location' => null,
-            'carpool_fee' => 0.00,
+            'start_date' => $batch4Start,
+            'end_date' => $batch4End,
+            'pickup_option' => 'carpool',
+            'pickup_location' => self::PICKUP_TIENDESITAS,
+            'carpool_fee' => 2000.00,
             'boat_dive' => false,
             'boat_dive_fee' => 0.00,
             'lgu_fee' => 600.00,
             'environmental_fee' => 100.00,
             'subtotal' => 8500.00,
-            'total_amount' => 9200.00,
-            'downpayment_amount' => 9200.00,
+            'total_amount' => 11200.00,
+            'downpayment_amount' => 11200.00,
             'balance_amount' => 0.00,
             'contact_name' => 'Christian Santiago',
             'contact_email' => 'christian.santiago@gmail.com',
@@ -1082,10 +1196,10 @@ class DatabaseSeeder extends Seeder
                 'participant_id' => $p->id,
                 'booking_id' => $b8->id,
                 'coach_id' => $coachJose->id,
-                'batch_id' => $batch5->id,
-                'dive_date' => $batch5Start,
+                'batch_id' => $batch4->id,
+                'dive_date' => $batch4Start,
                 'assigned_by' => $admin->id,
-                'assigned_at' => $batch5Start->copy()->subDays(3),
+                'assigned_at' => $batch4Start->copy()->subDays(3),
                 'status' => 'assigned',
                 'is_ratio_override' => false,
             ]);
@@ -1096,21 +1210,21 @@ class DatabaseSeeder extends Seeder
             'payment_method' => 'gcash',
             'transaction_id' => 'PAYM-20260831-GCASH-5501',
             'paymongo_payment_id' => 'pay_live_9vN4kP1xQ8wM',
-            'amount' => 9200.00,
-            'fee_amount' => 230.00,
-            'net_amount' => 8970.00,
+            'amount' => 11200.00,
+            'fee_amount' => 280.00,
+            'net_amount' => 10920.00,
             'payment_type' => 'full_payment',
             'status' => 'completed',
-            'paid_at' => $batch5Start->copy()->subDays(4),
+            'paid_at' => $batch4Start->copy()->subDays(4),
         ]);
 
         // =========================================================================
-        // 5. SEED COACH BROADCAST OPENING & APPLICATIONS
+        // 5. SEED COACH BROADCAST OPENING & APPLICATIONS FOR BATCH 6
         // =========================================================================
 
         $opening = CoachOpening::create([
-            'batch_id' => $batch2->id,
-            'dive_date' => $batch2Start,
+            'batch_id' => $batch6->id,
+            'dive_date' => $batch6Start,
             'needed_students_count' => 4,
             'status' => 'open',
             'posted_by' => $admin->id,
@@ -1119,7 +1233,7 @@ class DatabaseSeeder extends Seeder
 
         CoachRequest::create([
             'opening_id' => $opening->id,
-            'batch_id' => $batch2->id,
+            'batch_id' => $batch6->id,
             'coach_id' => $coachMark->id,
             'status' => 'pending',
             'notes' => 'Available to lead the Discovery group. Bringing safety float and dive line.',
@@ -1128,7 +1242,7 @@ class DatabaseSeeder extends Seeder
 
         CoachRequest::create([
             'opening_id' => $opening->id,
-            'batch_id' => $batch2->id,
+            'batch_id' => $batch6->id,
             'coach_id' => $coachChristine->id,
             'status' => 'pending',
             'notes' => 'Available for weekend departure from Manila.',
@@ -1221,8 +1335,8 @@ class DatabaseSeeder extends Seeder
         // =========================================================================
         try {
             $forecastService = app(\App\Services\WeatherForecastService::class);
-            $forecastService->assessBatch($batch1, null, $admin);
-            $forecastService->assessBatch($batch2, null, $admin);
+            $forecastService->assessBatch($batch5, null, $admin);
+            $forecastService->assessBatch($batch6, null, $admin);
         } catch (\Exception $e) {
             // Service fallback
         }

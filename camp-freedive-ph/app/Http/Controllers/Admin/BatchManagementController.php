@@ -269,6 +269,9 @@ class BatchManagementController extends Controller
             'creator',
         ]);
 
+        // Pre-trip assigned coaches for this batch
+        $assignedCoaches = $batch->assigned_coaches;
+
         // Unassigned students count in this batch
         $unassignedStudentsCount = $batch->bookings->flatMap->participants
             ->filter(fn($p) => !$p->activeAssignment)
@@ -281,9 +284,85 @@ class BatchManagementController extends Controller
 
         return view('admin.batches.show', compact(
             'batch',
+            'assignedCoaches',
             'unassignedStudentsCount',
             'otherBatches'
         ));
+    }
+
+    /**
+     * Quick on-site pod assignment for a participant using the batch's pre-trip assigned coaches.
+     */
+    public function assignParticipant(Request $request, Batch $batch): RedirectResponse
+    {
+        $validated = $request->validate([
+            'participant_id' => 'required|exists:booking_participants,id',
+            'coach_id' => 'nullable|exists:users,id',
+        ]);
+
+        $participant = \App\Models\BookingParticipant::findOrFail($validated['participant_id']);
+
+        if ($participant->booking?->batch_id !== $batch->id) {
+            return back()->with('error', 'Participant does not belong to this batch.');
+        }
+
+        $diveDate = $batch->start_date;
+        $assignedBy = auth()->user();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($batch, $participant, $validated, $diveDate, $assignedBy) {
+            $oldAssignment = \App\Models\ParticipantAssignment::where('participant_id', $participant->id)
+                ->where('status', 'assigned')
+                ->first();
+
+            $oldCoachId = $oldAssignment?->coach_id;
+
+            if (empty($validated['coach_id'])) {
+                if ($oldAssignment) {
+                    $oldAssignment->delete();
+                    \App\Models\AssignmentLog::create([
+                        'participant_id' => $participant->id,
+                        'old_coach_id' => $oldCoachId,
+                        'new_coach_id' => null,
+                        'changed_by' => $assignedBy->id,
+                        'reason' => 'On-site unassigned from pod.',
+                    ]);
+                }
+            } else {
+                $newCoach = \App\Models\User::findOrFail($validated['coach_id']);
+
+                if ($oldAssignment) {
+                    $oldAssignment->update([
+                        'coach_id' => $newCoach->id,
+                        'batch_id' => $batch->id,
+                        'dive_date' => $diveDate,
+                        'assigned_by' => $assignedBy->id,
+                        'assigned_at' => now(),
+                    ]);
+                } else {
+                    \App\Models\ParticipantAssignment::create([
+                        'participant_id' => $participant->id,
+                        'booking_id' => $participant->booking_id,
+                        'coach_id' => $newCoach->id,
+                        'batch_id' => $batch->id,
+                        'dive_date' => $diveDate,
+                        'assigned_by' => $assignedBy->id,
+                        'assigned_at' => now(),
+                        'status' => 'assigned',
+                    ]);
+                }
+
+                \App\Models\AssignmentLog::create([
+                    'participant_id' => $participant->id,
+                    'old_coach_id' => $oldCoachId,
+                    'new_coach_id' => $newCoach->id,
+                    'changed_by' => $assignedBy->id,
+                    'reason' => 'On-site pod assignment during session.',
+                ]);
+            }
+        });
+
+        $coachName = !empty($validated['coach_id']) ? \App\Models\User::find($validated['coach_id'])?->name : 'Shared Pool';
+        return back()->with('success', "✓ Assigned {$participant->name} to {$coachName}.");
     }
 
     /**

@@ -117,6 +117,7 @@ $registerBackofficeRoutes = function (string $portalRole) {
     Route::get('/batches/{batch}', [BatchManagementController::class, 'show'])->name('batches.show');
     Route::post('/batches/{batch}/status', [BatchManagementController::class, 'updateStatus'])->name('batches.update_status');
     Route::post('/batches/{batch}/move-booking', [BatchManagementController::class, 'moveBooking'])->name('batches.move_booking');
+    Route::post('/batches/{batch}/assign-participant', [BatchManagementController::class, 'assignParticipant'])->name('batches.assign_participant');
 
     // Payments & Refunds Module
     Route::get('/payments', [AdminPaymentController::class, 'index'])->name('payments.index');

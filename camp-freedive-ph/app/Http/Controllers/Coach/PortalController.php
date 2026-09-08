@@ -77,7 +77,55 @@ class PortalController extends Controller
                 'weather_badge' => $weatherBadge,
                 'hours_until_dive' => $hoursUntilDive,
                 'can_request_release' => $canRequestRelease,
+                'is_shared_pool' => false,
             ];
+        } elseif (!$nextAssignment) {
+            // Also check if coach is assigned to batch team during pre-trip
+            $nextBatch = Batch::whereDate('start_date', '>=', $today)
+                ->whereIn('status', ['confirmed', 'open'])
+                ->orderBy('start_date', 'asc')
+                ->get()
+                ->first(fn($b) => $b->assigned_coaches->pluck('id')->contains($coach->id));
+
+            if ($nextBatch) {
+                $batch = $nextBatch;
+                $allBatchParticipants = $batch->bookings()
+                    ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
+                    ->with('participants.booking')
+                    ->get()
+                    ->flatMap->participants
+                    ->unique('id');
+
+                $classBreakdown = [];
+                foreach ($allBatchParticipants as $p) {
+                    $type = $p->booking?->formatted_class_type ?? 'Freediving Class';
+                    $classBreakdown[$type] = ($classBreakdown[$type] ?? 0) + 1;
+                }
+
+                $d1Assessment = $batch->latestDay1Assessment;
+                $weatherClass = $d1Assessment ? $d1Assessment->overall_classification : 'Safe';
+                $weatherBadge = $d1Assessment ? $d1Assessment->classification_badge : [
+                    'label' => 'Safe',
+                    'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                ];
+
+                $diveStart = $batch->start_date->copy()->setTime(9, 30);
+                $hoursUntilDive = max(0, Carbon::now('Asia/Manila')->diffInHours($diveStart, false));
+                $canRequestRelease = $hoursUntilDive > 48;
+
+                $nextSessionData = [
+                    'batch' => $batch,
+                    'dive_date' => $batch->start_date,
+                    'students' => $allBatchParticipants,
+                    'students_count' => $allBatchParticipants->count(),
+                    'class_breakdown' => $classBreakdown,
+                    'weather_class' => $weatherClass,
+                    'weather_badge' => $weatherBadge,
+                    'hours_until_dive' => $hoursUntilDive,
+                    'can_request_release' => $canRequestRelease,
+                    'is_shared_pool' => true,
+                ];
+            }
         }
 
         // 2. Metrics & KPI Counts
@@ -90,11 +138,11 @@ class PortalController extends Controller
             ->where('status', 'pending')
             ->count();
 
-        $upcomingConfirmedDivesCount = ParticipantAssignment::where('coach_id', $coach->id)
-            ->where('status', 'assigned')
-            ->whereDate('dive_date', '>=', $today)
-            ->distinct('batch_id')
-            ->count('batch_id');
+        $upcomingConfirmedDivesCount = Batch::whereDate('start_date', '>=', $today)
+            ->whereIn('status', ['confirmed', 'open'])
+            ->get()
+            ->filter(fn($b) => $b->assigned_coaches->pluck('id')->contains($coach->id))
+            ->count();
 
         $activeOpeningsCount = CoachOpening::where('status', 'open')
             ->whereDate('dive_date', '>=', $today)
