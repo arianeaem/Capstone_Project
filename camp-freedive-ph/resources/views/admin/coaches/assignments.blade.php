@@ -24,7 +24,7 @@
         <div class="flex items-center gap-3">
             <button type="button" 
                     @click="openBatchModal = true"
-                    class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold shadow-sm flex items-center gap-2">
+                    class="btn-primary px-5 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Add 2D1N Schedule</span>
             </button>
@@ -34,7 +34,7 @@
     <!-- Batch Assignment Schedule -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @forelse($batches as $batch)
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col justify-between space-y-4 hover:border-[#D1D1D6] transition-colors">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 flex flex-col justify-between space-y-4 hover:border-[#D1D1D6] transition-colors">
             
             <!-- Batch Header -->
             <div class="space-y-2">
@@ -90,7 +90,7 @@
             <div class="pt-2">
                 <button type="button" 
                         @click="selectedBatchId = {{ $batch->id }}; assignBatchCode = '{{ $batch->batch_code }}'; assignBatchDate = '{{ $batch->start_date->format('M d, Y') }}'; openAssignModal = true"
-                        class="btn-primary w-full py-2 text-xs font-bold shadow-sm flex items-center justify-center gap-1.5">
+                        class="btn-primary w-full py-2 text-xs font-bold flex items-center justify-center gap-1.5">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>Assign Coach (+4 Pax)</span>
                 </button>
@@ -108,7 +108,7 @@
     </div>
 
     <!-- Pagination -->
-    <div class="bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] overflow-hidden shadow-xs [&>*]:border-t-0">
+    <div class="bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] overflow-hidden [&>*]:border-t-0">
         {{ $batches->links() }}
     </div>
 
@@ -147,7 +147,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
                     <button type="button" @click="openBatchModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-sm">Create Schedule</button>
+                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold">Create Schedule</button>
                 </div>
             </form>
         </div>
@@ -182,7 +182,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
                     <button type="button" @click="openAssignModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-sm">Confirm Assignment</button>
+                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold">Confirm Assignment</button>
                 </div>
             </form>
         </div>

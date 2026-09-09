@@ -12,7 +12,7 @@
                 <div class="relative inline-flex items-center">
                     <select onchange="window.handleTablePerPageChange(this.value)"
                             aria-label="Rows per page"
-                            class="pl-2.5 pr-7 py-1 rounded-lg border border-[#D1D1D6] bg-white text-xs font-bold text-[#1D1D1F] hover:border-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#780000]/15 focus:border-[#780000] cursor-pointer shadow-xs transition-all appearance-none">
+                            class="pl-2.5 pr-7 py-1 rounded-lg border border-[#D1D1D6] bg-white text-xs font-bold text-[#1D1D1F] hover:border-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#780000]/15 focus:border-[#780000] cursor-pointer transition-all appearance-none">
                         @php
                             $currentPerPage = (int) request('per_page', $paginator->perPage() ?? 10);
                         @endphp
@@ -68,7 +68,7 @@
                     </span>
                 @else
                     <a href="{{ $paginator->previousPageUrl() }}" rel="prev" aria-label="@lang('pagination.previous')"
-                       class="inline-flex items-center justify-center px-2.5 py-1 min-h-[30px] rounded-lg border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] text-xs font-bold transition-all shadow-xs">
+                       class="inline-flex items-center justify-center px-2.5 py-1 min-h-[30px] rounded-lg border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] text-xs font-bold transition-all">
                         <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                         </svg>
@@ -89,12 +89,12 @@
                             @foreach ($element as $page => $url)
                                 @if ($page == $paginator->currentPage())
                                     <span aria-current="page"
-                                          class="px-2.5 py-1 min-h-[30px] min-w-[30px] inline-flex items-center justify-center rounded-lg bg-[#780000] text-white text-xs font-black shadow-xs">
+                                          class="px-2.5 py-1 min-h-[30px] min-w-[30px] inline-flex items-center justify-center rounded-lg bg-[#780000] text-white text-xs font-black">
                                         {{ $page }}
                                     </span>
                                 @else
                                     <a href="{{ $url }}"
-                                       class="px-2.5 py-1 min-h-[30px] min-w-[30px] inline-flex items-center justify-center rounded-lg border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] text-xs font-bold transition-all shadow-xs">
+                                       class="px-2.5 py-1 min-h-[30px] min-w-[30px] inline-flex items-center justify-center rounded-lg border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] text-xs font-bold transition-all">
                                         {{ $page }}
                                     </a>
                                 @endif
@@ -106,7 +106,7 @@
                 {{-- Next Page Link --}}
                 @if ($paginator->hasMorePages())
                     <a href="{{ $paginator->nextPageUrl() }}" rel="next" aria-label="@lang('pagination.next')"
-                       class="inline-flex items-center justify-center px-2.5 py-1 min-h-[30px] rounded-lg border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] text-xs font-bold transition-all shadow-xs">
+                       class="inline-flex items-center justify-center px-2.5 py-1 min-h-[30px] rounded-lg border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] text-xs font-bold transition-all">
                         Next
                         <svg class="w-3.5 h-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />

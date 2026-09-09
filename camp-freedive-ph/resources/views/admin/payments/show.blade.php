@@ -22,7 +22,7 @@
             @if($payment->booking->balance_amount > 0)
                 <button type="button" 
                         @click="openBalanceModal = true"
-                        class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-sm flex items-center gap-1.5">
+                        class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                     <span>Record Balance Settlement</span>
                 </button>
@@ -35,7 +35,7 @@
     </div>
 
     <!-- Payment Overview Banner -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div class="space-y-2">
             <div class="flex items-center gap-3">
                 <span class="px-3 py-1 rounded-full text-xs font-bold border {{ $payment->status_badge['class'] }}">
@@ -66,7 +66,7 @@
         <div class="lg:col-span-2 space-y-6">
             
             <!-- Gateway and Reference Identifiers -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Gateway & Reference Identifiers</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -105,7 +105,7 @@
             </div>
 
             <!-- Transaction Audit Trail -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Transaction Lifecycle & Audit Trail</h3>
 
                 <div class="divide-y divide-[#E5E5EA]">
@@ -130,7 +130,7 @@
         <div class="space-y-6">
             
             <!-- Linked Booking Details -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Linked Reservation</h3>
                     <span class="font-mono text-xs font-bold text-[#780000]">{{ $payment->booking->booking_number }}</span>
@@ -211,7 +211,7 @@
 
                 <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E5EA]">
                     <button type="button" @click="openBalanceModal = false" class="btn-secondary px-4 py-2 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold shadow-sm">Save Settlement</button>
+                    <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold">Save Settlement</button>
                 </div>
             </form>
         </div>

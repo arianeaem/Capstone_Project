@@ -176,7 +176,8 @@ class PortalController extends Controller
         $cursor = $today->copy();
         for ($i = 0; $i < 7; $i++) {
             $dateStr = $cursor->format('Y-m-d');
-            $isAssigned = ParticipantAssignment::where('coach_id', $coach->id)
+            $assignment = ParticipantAssignment::with('batch')
+                ->where('coach_id', $coach->id)
                 ->where('status', 'assigned')
                 ->where(function ($q) use ($dateStr) {
                     $q->whereDate('dive_date', $dateStr)
@@ -185,7 +186,9 @@ class PortalController extends Controller
                              ->whereDate('end_date', '>=', $dateStr);
                       });
                 })
-                ->exists();
+                ->first();
+
+            $isAssigned = $assignment !== null;
 
             if (!$isAssigned) {
                 $isAssigned = CoachAvailability::where('coach_id', $coach->id)
@@ -201,12 +204,29 @@ class PortalController extends Controller
 
             $status = $isAssigned ? 'assigned' : ($isAvailable ? 'available' : 'not_set');
 
+            $assignedDayNumber = 1;
+            if ($isAssigned) {
+                $batch = $assignment?->batch;
+                if ($batch && $batch->start_date && $batch->end_date) {
+                    if ($dateStr === $batch->end_date->format('Y-m-d') || $cursor->isSunday()) {
+                        $assignedDayNumber = 2;
+                    } else {
+                        $assignedDayNumber = 1;
+                    }
+                } elseif ($cursor->isSunday()) {
+                    $assignedDayNumber = 2;
+                } else {
+                    $assignedDayNumber = 1;
+                }
+            }
+
             $quickDays[] = [
                 'date' => $cursor->copy(),
                 'date_str' => $dateStr,
                 'is_today' => $cursor->isToday(),
                 'is_weekend' => $cursor->isWeekend(),
                 'status' => $status,
+                'assigned_day_number' => $assignedDayNumber,
             ];
             $cursor->addDay();
         }

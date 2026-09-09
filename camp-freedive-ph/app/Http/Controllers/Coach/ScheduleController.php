@@ -25,7 +25,7 @@ class ScheduleController extends Controller
     {
         $coach = Auth::user();
         $today = Carbon::today();
-        $activeTab = $request->input('tab', 'upcoming');
+        $activeTab = $request->input('tab', ($request->filled('date_from') || $request->filled('date_to') || $request->filled('class_type')) ? 'history' : 'upcoming');
 
         // 1. UPCOMING ASSIGNMENTS (Future Confirmed Batches)
         $upcomingAssignmentsQuery = ParticipantAssignment::with([

@@ -196,7 +196,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
             
             <!-- Manila Carpool Service -->
-            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
+            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Manila Carpool Service</h4>
@@ -208,7 +208,7 @@
             </div>
 
             <!-- Reservation Downpayment Policy -->
-            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
+            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 flex flex-col justify-between">
                 <div class="space-y-4">
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Reservation Downpayment</h4>
@@ -220,7 +220,7 @@
             </div>
 
             <!-- Boat Dive Option -->
-            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
+            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Boat Dive (Optional)</h4>
@@ -232,7 +232,7 @@
             </div>
 
             <!-- Mabini LGU Marine Fees -->
-            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 shadow-xs flex flex-col justify-between">
+            <div class="bg-[#F8EAEA] rounded-xl p-6 sm:p-7 border border-[#F1D5D5] space-y-4 flex flex-col justify-between">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Mabini LGU Marine Fees</h4>
@@ -255,7 +255,7 @@
 
         <div class="space-y-4">
             <!-- Things to Bring FAQ Item -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-xs transition-all">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
                 <button 
                     @click="openFaq = (openFaq === 'bring' ? null : 'bring')"
                     class="w-full px-5 sm:px-6 py-4 sm:py-5 text-left font-bold text-sm sm:text-base text-[#1D1D1F] flex items-center justify-between gap-4 hover:bg-[#FAFAFC] transition-colors"
@@ -280,7 +280,7 @@
             </div>
 
             @foreach($faqs as $index => $faq)
-            <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-xs transition-all">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
                 <button 
                     @click="openFaq = (openFaq === {{ $index }} ? null : {{ $index }})"
                     class="w-full px-5 sm:px-6 py-4 sm:py-5 text-left font-bold text-sm sm:text-base text-[#1D1D1F] flex items-center justify-between gap-4 hover:bg-[#FAFAFC] transition-colors"

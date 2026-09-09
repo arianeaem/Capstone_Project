@@ -32,7 +32,7 @@
         @method('PUT')
 
         <!-- SECTION 1: TRIP DATES & LOGISTICS -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Dive Dates & Transportation Hub</h3>
 
             <!-- Hidden locked fields -->
@@ -90,7 +90,7 @@
         </div>
 
         <!-- SECTION 2: PARTICIPANTS & HEALTH NOTES -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <div class="flex items-center justify-between pb-2">
                 <div>
                     <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants ({{ $booking->participants->count() }} pax)</h3>
@@ -140,7 +140,7 @@
         </div>
 
         <!-- SECTION 3: PRIMARY CONTACT -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Primary Contact</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -160,7 +160,7 @@
         </div>
 
         <!-- SECTION 4: MANDATORY REASON FOR EDIT (RA 10173 AUDIT) -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-3">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-3">
             <div class="flex items-center justify-between pb-2">
                 <h3 class="text-base font-bold text-[#1D1D1F]">4. System Audit Log Note</h3>
                 <span class="text-xs text-[#780000] font-bold">Mandatory</span>

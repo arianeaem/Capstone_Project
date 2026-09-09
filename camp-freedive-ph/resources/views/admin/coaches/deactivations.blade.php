@@ -27,7 +27,7 @@
     </div>
 
     <!-- Active Requests Table -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] shadow-sm overflow-x-auto">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-x-auto">
         <div class="p-5 border-b border-[#E5E5EA] flex items-center justify-between">
             <h3 class="font-bold text-[#1D1D1F]">Pending Requests Awaiting Owner Confirmation</h3>
             <span class="text-xs font-bold text-[#7E22CE]">{{ $pendingRequests->count() }} Request(s)</span>
@@ -74,7 +74,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 <button type="button" 
                                         @click="selectedRequest = {{ json_encode($req) }}; openConfirmModal = true"
-                                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#FF3B3C] hover:bg-[#D32F2F] rounded-xl transition-colors shadow-sm">
+                                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#FF3B3C] hover:bg-[#D32F2F] rounded-xl transition-colors">
                                     Confirm Deactivation
                                 </button>
 
@@ -102,7 +102,7 @@
     </div>
 
     <!-- Processed Requests History -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] shadow-sm overflow-x-auto">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-x-auto">
         <div class="p-5 border-b border-[#E5E5EA]">
             <h3 class="font-bold text-[#1D1D1F]">Resolved Deactivation Requests</h3>
         </div>
@@ -173,7 +173,7 @@
                 @csrf
                 <div class="flex items-center justify-end gap-2">
                     <button type="button" @click="openConfirmModal = false" class="btn-secondary px-4 py-2 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold bg-[#FF3B3C] hover:bg-[#D32F2F] shadow-sm">
+                    <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold bg-[#FF3B3C] hover:bg-[#D32F2F]">
                         Confirm & Deactivate
                     </button>
                 </div>

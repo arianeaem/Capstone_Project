@@ -31,7 +31,7 @@
 <body class="bg-[#FAFAFC] text-[#1D1D1F] p-6 sm:p-10" onload="window.print()">
 
     <!-- Official Report Document -->
-    <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-8 sm:p-10 shadow-sm space-y-8">
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-8 sm:p-10 space-y-8">
         
         <!-- Header -->
         <div class="flex items-start justify-between border-b border-[#E5E5EA] pb-6">

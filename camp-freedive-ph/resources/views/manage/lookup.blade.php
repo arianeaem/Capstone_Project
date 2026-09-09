@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="max-w-md mx-auto px-4 sm:px-6 py-12 sm:py-20 text-sm">
-    <div class="bg-white rounded-xl border border-[#E5E5EA] shadow-sm p-6 sm:p-10">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-10">
         
         <!-- Lookup Header -->
         <div class="text-center mb-8">

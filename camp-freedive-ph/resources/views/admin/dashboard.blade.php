@@ -31,7 +31,7 @@
                 </div>
             @endif
 
-            <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.create') : route('admin.bookings.create') }}" class="px-4 py-2 rounded-lg text-xs font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-sm transition-all hover:scale-[1.02] flex items-center gap-1.5">
+            <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.create') : route('admin.bookings.create') }}" class="px-4 py-2 rounded-lg text-xs font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] transition-all hover:scale-[1.02] flex items-center gap-1.5">
                 <span>Walk-in Booking</span>
             </a>
         </div>

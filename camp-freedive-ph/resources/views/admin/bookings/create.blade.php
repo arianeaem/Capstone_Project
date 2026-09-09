@@ -29,7 +29,7 @@
         @csrf
 
         <!-- Class Package & Dive Dates -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Class Package & Dive Dates</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -88,7 +88,7 @@
         </div>
 
         <!-- Participants Information -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <div class="flex items-center justify-between pb-2">
                 <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants</h3>
                 <span class="text-xs text-[#6E6E73]">Data Privacy Act (RA 10173) Protected</span>
@@ -145,7 +145,7 @@
         </div>
 
         <!-- Primary Contact & Transportation -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Primary Contact & Transportation</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -193,7 +193,7 @@
         </div>
 
         <!-- Payment Recording -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 shadow-sm space-y-4">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">4. Payment Recording (Offline Reception)</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">

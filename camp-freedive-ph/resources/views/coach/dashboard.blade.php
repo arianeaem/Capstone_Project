@@ -18,11 +18,10 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA] transition-all flex items-center gap-2 shadow-xs">
-                <svg class="w-4 h-4 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA] transition-all flex items-center gap-2">
                 <span>Manage Availability</span>
             </a>
-            <a href="{{ route('coach.requests.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#780000] hover:bg-[#5E0000] text-white transition-all flex items-center gap-2 shadow-xs">
+            <a href="{{ route('coach.requests.index') }}" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#780000] hover:bg-[#5E0000] text-white transition-all flex items-center gap-2">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 <span>Open Camp Slots ({{ $activeOpeningsCount }})</span>
             </a>
@@ -33,25 +32,25 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         <!-- Assigned Dives -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA] shadow-xs">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA]">
             <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Assigned Dives</span>
             <div class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] mt-1">{{ $upcomingConfirmedDivesCount }}</div>
         </div>
 
         <!-- Available Dates Offered -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA] shadow-xs">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA]">
             <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Available Dates</span>
             <div class="text-2xl sm:text-3xl font-extrabold text-emerald-700 mt-1">{{ $availableDaysCount }}</div>
         </div>
 
         <!-- Open Camp Slots -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA] shadow-xs">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA]">
             <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Open Camp Slots</span>
             <div class="text-2xl sm:text-3xl font-extrabold text-amber-700 mt-1">{{ $activeOpeningsCount }}</div>
         </div>
 
         <!-- Total Divers Mentored -->
-        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA] shadow-xs">
+        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-[#E5E5EA]">
             <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Students Coached</span>
             <div class="text-2xl sm:text-3xl font-extrabold text-[#780000] mt-1">{{ $totalStudentsMentored }}</div>
         </div>
@@ -66,10 +65,10 @@
             <div class="lg:col-span-4 space-y-6">
                 
                 <!-- Upcoming Dive Batch Card -->
-                <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-sm p-5 sm:p-6 flex flex-col justify-between space-y-5">
+                <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 flex flex-col justify-between space-y-5">
                     <div class="space-y-3.5">
-                        <!-- Weather Safety Badge (Proper Background Color & Indicator, border-free) -->
-                        <div class="flex items-center gap-2">
+                        <!-- Weather Safety Badge & Description -->
+                        <div class="flex items-center gap-2.5 flex-wrap">
                             @php
                                 $wClass = strtolower(trim($nextSessionData['weather_class'] ?? 'Safe'));
                                 if (str_contains($wClass, 'safe')) {
@@ -86,9 +85,12 @@
                                     $wDot = 'bg-emerald-600';
                                 }
                             @endphp
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-black {{ $wBg }} inline-flex items-center gap-1.5 shadow-2xs">
+                            <span class="px-2.5 py-1 rounded-lg text-xs font-black {{ $wBg }} inline-flex items-center gap-1.5 shadow-2xs shrink-0">
                                 <span class="w-2 h-2 rounded-full {{ $wDot }} animate-pulse"></span>
                                 <span>{{ $nextSessionData['weather_class'] }}</span>
+                            </span>
+                            <span class="text-xs text-[#6E6E73] font-medium leading-tight">
+                                {{ \App\Services\WeatherForecastService::MEANING_MAP[$nextSessionData['weather_class']] ?? 'Standard marine safety protocols in effect.' }}
                             </span>
                         </div>
 
@@ -100,13 +102,25 @@
                             </h2>
                         </div>
 
-                        <!-- Departure (Plain Text · 6:30 AM Base Call) -->
-                        <div class="space-y-1.5 text-xs text-[#6E6E73] pt-1">
-                            <p class="text-sm font-semibold text-[#1D1D1F]">
-                                Departure: <strong>{{ $nextSessionData['dive_date']->format('l, M d, Y') }} · 6:30 AM Base Call</strong>
+                        <!-- Dive Dates & Students Line -->
+                        <div class="space-y-1 text-xs text-[#6E6E73] pt-1">
+                            <p>
+                                Dive Dates: <strong class="text-[#1D1D1F]">{{ $nextSessionData['batch']->start_date->format('M d') }} - {{ $nextSessionData['batch']->end_date->format('d, Y') }} ({{ $nextSessionData['batch']->start_date->format('D') }} - {{ $nextSessionData['batch']->end_date->format('D') }})</strong>
                             </p>
-                            <p class="text-xs text-[#6E6E73]">
+                            <p>
                                 Assigned Students: <strong class="text-[#1D1D1F]">{{ $nextSessionData['students_count'] }} Student(s)</strong>
+                                @if(!empty($nextSessionData['class_breakdown']))
+                                    <span class="text-[#8E8E93] mx-1">·</span>
+                                    <span class="text-[#1D1D1F] font-semibold">
+                                        @php
+                                            $dashBreakdownStrs = [];
+                                            foreach ($nextSessionData['class_breakdown'] as $cType => $cnt) {
+                                                $dashBreakdownStrs[] = "{$cnt} {$cType}";
+                                            }
+                                        @endphp
+                                        {{ implode(', ', $dashBreakdownStrs) }}
+                                    </span>
+                                @endif
                             </p>
                         </div>
                     </div>
@@ -117,26 +131,24 @@
                         @if($nextSessionData['can_request_release'])
                             <button type="button" 
                                     @click="openReleaseModal = true"
-                                    class="flex-1 px-4 py-2.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5">
-                                <svg class="w-4 h-4 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                    class="flex-1 px-4 py-2.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition-all flex items-center justify-center gap-1.5">
                                 <span>Request Release</span>
                             </button>
                         @else
                             <span class="flex-1 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-[#F2F2F7] text-[#8E8E93] text-center" title="Release requests are locked within 48 hours of dive start">
-                                🔒 Locked (&lt;48h to dive)
+                                Locked (&lt;48h to dive)
                             </span>
                         @endif
 
                         <!-- Secondary: View Full Schedule -->
-                        <a href="{{ route('coach.schedule.index') }}" class="flex-1 px-4 py-2.5 rounded-xl bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] text-xs font-bold transition-all shadow-xs inline-flex items-center justify-center gap-1.5">
+                        <a href="{{ route('coach.schedule.index') }}" class="flex-1 px-4 py-2.5 rounded-xl bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] text-xs font-bold transition-all inline-flex items-center justify-center gap-1.5">
                             <span>Full Schedule</span>
-                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
                         </a>
                     </div>
                 </div>
 
                 <!-- OPEN CAMP VOLUNTEER SLOTS (Placed below the batch card on the left side) -->
-                <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-4">
+                <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 flex flex-col justify-between space-y-4">
                     <div class="space-y-4">
                         <!-- Header with Subtitle and View Board Button (No separator line) -->
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
@@ -160,7 +172,7 @@
                                         ? $b->start_date->format('M d') . ' - ' . $b->end_date->format('d, Y') . ' (' . $b->start_date->format('D') . ' - ' . $b->end_date->format('D') . ')'
                                         : $opening->dive_date->format('M d, Y · l');
                                 @endphp
-                                <div class="p-4 rounded-2xl border border-[#E5E5EA] bg-[#FAFAFC] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#D1D1D6] transition-colors">
+                                <div class="p-4 rounded-2xl bg-[#FAFAFC] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#D1D1D6] transition-colors">
                                     <div class="space-y-1">
                                         <div class="flex items-center gap-2 flex-wrap">
                                             <span class="font-black text-sm text-[#1D1D1F]">{{ $opening->batch?->batch_number ?? 'Batch' }}</span>
@@ -184,7 +196,7 @@
                                         @else
                                             <form action="{{ route('coach.requests.store', $opening) }}" method="POST" onsubmit="return confirm('Volunteer for this coaching slot for {{ $datesDisplay }}?');">
                                                 @csrf
-                                                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold shadow-xs">
+                                                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold">
                                                     Volunteer
                                                 </button>
                                             </form>
@@ -236,7 +248,7 @@
                         @endphp
                         
                         <!-- Individual Student Card (Mobile-Optimized Padding & Clean Spacing) -->
-                        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-xs hover:border-[#D1D1D6] hover:shadow-sm transition-all space-y-4 flex flex-col justify-between">
+                        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#D1D1D6] hover:shadow-sm transition-all space-y-4 flex flex-col justify-between">
                             
                             <!-- Card Header: Student Name & Compact Package Badge (No border) -->
                             <div class="flex items-start justify-between gap-2.5">
@@ -323,7 +335,7 @@
     @else
         <!-- Empty State: No Immediate Dives -->
         <div class="space-y-6">
-            <div class="bg-white rounded-2xl border border-[#E5E5EA] p-8 text-center space-y-3 shadow-xs">
+            <div class="bg-white rounded-2xl border border-[#E5E5EA] p-8 text-center space-y-3">
                 <div class="w-12 h-12 rounded-full bg-[#F2F2F7] text-[#8E8E93] flex items-center justify-center mx-auto">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 </div>
@@ -334,7 +346,7 @@
                     </p>
                 </div>
                 <div class="pt-2">
-                    <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl bg-[#780000] hover:bg-[#5E0000] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-2">
+                    <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl bg-[#780000] hover:bg-[#5E0000] text-white text-xs font-bold transition-all inline-flex items-center gap-2">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <span>Update Availability Calendar</span>
                     </a>
@@ -343,7 +355,7 @@
 
             <!-- Open Camp Volunteer Slots below empty state -->
             @if($openCoachOpenings->isNotEmpty())
-                <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-xs space-y-4">
+                <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4">
                     <div class="flex items-center justify-between pb-1">
                         <div>
                             <h3 class="text-base font-black text-[#1D1D1F]">Open Camp Volunteer Slots</h3>
@@ -363,7 +375,7 @@
                                     ? $b->start_date->format('M d') . ' - ' . $b->end_date->format('d, Y') . ' (' . $b->start_date->format('D') . ' - ' . $b->end_date->format('D') . ')'
                                     : $opening->dive_date->format('M d, Y · l');
                             @endphp
-                            <div class="p-4 rounded-2xl border border-[#E5E5EA] bg-[#FAFAFC] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#D1D1D6] transition-colors">
+                            <div class="p-4 rounded-2xl bg-[#FAFAFC] flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-[#D1D1D6] transition-colors">
                                 <div class="space-y-1">
                                     <div class="flex items-center gap-2">
                                         <span class="font-black text-sm text-[#1D1D1F]">{{ $opening->batch?->batch_number ?? 'Batch' }}</span>
@@ -378,7 +390,7 @@
                                     @else
                                         <form action="{{ route('coach.requests.store', $opening) }}" method="POST" onsubmit="return confirm('Volunteer for this coaching slot for {{ $datesDisplay }}?');">
                                             @csrf
-                                            <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold shadow-xs">Volunteer</button>
+                                            <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold">Volunteer</button>
                                         </form>
                                     @endif
                                 </div>
@@ -391,7 +403,7 @@
     @endif
 
     <!-- FULL WIDTH SECTION: Upcoming Availability Snapshot (One Horizontal Line · Whole Card Clickable) -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-xs flex flex-col justify-between space-y-4">
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 flex flex-col justify-between space-y-4">
         <div class="space-y-4">
             <!-- Header with Title, Subtitle, and Full Month View Button (No separator line) -->
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
@@ -400,69 +412,75 @@
                     <p class="text-xs text-[#6E6E73]">Click any date card to toggle your availability</p>
                 </div>
                 <a href="{{ route('coach.availability.index') }}" class="px-3 py-1.5 rounded-xl bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] text-xs font-bold transition-all shadow-2xs inline-flex items-center gap-1.5 self-start sm:self-auto">
-                    <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                     <span>Full Month View</span>
                 </a>
             </div>
 
-            <!-- Single Horizontal Line of 7 Dates (Whole Card Is The Button) -->
-            <div class="grid grid-cols-7 gap-1.5 sm:gap-3">
-                @foreach($quickDays as $day)
-                    @if($day['status'] === 'assigned')
-                        <!-- Assigned: #780000 Background with White Text (Locked) -->
-                        <div class="w-full rounded-2xl p-2.5 sm:p-4 text-center space-y-1 bg-[#780000] text-white shadow-xs select-none flex flex-col justify-between" title="Assigned to dive batch (Locked)">
-                            <div>
-                                <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider block text-white/80">
-                                    {{ $day['date']->format('D') }}
-                                </span>
-                                <span class="text-sm sm:text-lg font-black block text-white mt-0.5">
-                                    {{ $day['date']->format('M j') }}
+            <!-- Single Horizontal Line of 7 Dates (Responsive Scrollable on Mobile, Grid on Tablet/Desktop) -->
+            <div class="overflow-x-auto pb-2 scrollbar-none -mx-2 px-2 sm:mx-0 sm:px-0">
+                <div class="grid grid-cols-7 gap-2 sm:gap-3 min-w-[580px] sm:min-w-0">
+                    @foreach($quickDays as $day)
+                        @if($day['status'] === 'assigned')
+                            @php
+                                $assignedDayNum = $day['assigned_day_number'] ?? 1;
+                                $bgClass = ($assignedDayNum === 1) ? 'bg-[#780000]' : 'bg-[#00C3D0]';
+                                $assignedLabel = ($assignedDayNum === 1) ? 'Day 1 Assigned' : 'Day 2 Assigned';
+                            @endphp
+                            <!-- Assigned: #780000 for Day 1 or #00C3D0 for Day 2 (White text, whole card colored) -->
+                            <div class="w-full rounded-2xl p-3 sm:p-4 text-center space-y-1.5 {{ $bgClass }} text-white select-none flex flex-col justify-between" title="{{ $assignedLabel }} (Locked)">
+                                <div>
+                                    <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider block text-white/80 whitespace-nowrap">
+                                        {{ $day['date']->format('D') }}
+                                    </span>
+                                    <span class="text-sm sm:text-lg font-black block text-white mt-0.5 whitespace-nowrap">
+                                        {{ $day['date']->format('M j') }}
+                                    </span>
+                                </div>
+                                <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider block text-white/95 pt-0.5 whitespace-nowrap">
+                                    {{ $assignedLabel }}
                                 </span>
                             </div>
-                            <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider block text-white/90 pt-0.5">
-                                Assigned
-                            </span>
-                        </div>
-                    @elseif($day['status'] === 'available')
-                        <!-- Available: Green Background with White Text (Whole Card is Button) -->
-                        <form action="{{ route('coach.availability.toggle') }}" method="POST" class="w-full">
-                            @csrf
-                            <input type="hidden" name="date" value="{{ $day['date_str'] }}">
-                            <button type="submit" class="w-full rounded-2xl p-2.5 sm:p-4 text-center space-y-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-all cursor-pointer flex flex-col justify-between group" title="Click to remove availability">
-                                <div>
-                                    <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider block text-emerald-100 group-hover:text-white">
-                                        {{ $day['date']->format('D') }}
+                        @elseif($day['status'] === 'available')
+                            <!-- Available: Green Background with White Text (Whole Card is Button) -->
+                            <form action="{{ route('coach.availability.toggle') }}" method="POST" class="w-full">
+                                @csrf
+                                <input type="hidden" name="date" value="{{ $day['date_str'] }}">
+                                <button type="submit" class="w-full rounded-2xl p-3 sm:p-4 text-center space-y-1.5 bg-emerald-600 hover:bg-emerald-700 text-white transition-all cursor-pointer flex flex-col justify-between group" title="Click to remove availability">
+                                    <div>
+                                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider block text-emerald-100 group-hover:text-white whitespace-nowrap">
+                                            {{ $day['date']->format('D') }}
+                                        </span>
+                                        <span class="text-sm sm:text-lg font-black block text-white mt-0.5 whitespace-nowrap">
+                                            {{ $day['date']->format('M j') }}
+                                        </span>
+                                    </div>
+                                    <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider block text-emerald-100 group-hover:text-white pt-0.5 whitespace-nowrap">
+                                        Available
                                     </span>
-                                    <span class="text-sm sm:text-lg font-black block text-white mt-0.5">
-                                        {{ $day['date']->format('M j') }}
+                                </button>
+                            </form>
+                        @else
+                            <!-- Not Set: No Background Color (Whole Card is Button) -->
+                            <form action="{{ route('coach.availability.toggle') }}" method="POST" class="w-full">
+                                @csrf
+                                <input type="hidden" name="date" value="{{ $day['date_str'] }}">
+                                <button type="submit" class="w-full rounded-2xl p-3 sm:p-4 text-center space-y-1.5 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] hover:border-[#780000] transition-all cursor-pointer flex flex-col justify-between group" title="Click to mark as available">
+                                    <div>
+                                        <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider block text-[#8E8E93] group-hover:text-[#780000] whitespace-nowrap">
+                                            {{ $day['date']->format('D') }}
+                                        </span>
+                                        <span class="text-sm sm:text-lg font-black block text-[#1D1D1F] mt-0.5 whitespace-nowrap">
+                                            {{ $day['date']->format('M j') }}
+                                        </span>
+                                    </div>
+                                    <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider block text-[#8E8E93] group-hover:text-[#780000] pt-0.5 whitespace-nowrap">
+                                        Not Set
                                     </span>
-                                </div>
-                                <span class="text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider block text-emerald-100 group-hover:text-white pt-0.5">
-                                    Available
-                                </span>
-                            </button>
-                        </form>
-                    @else
-                        <!-- Not Set: No Background Color (Whole Card is Button) -->
-                        <form action="{{ route('coach.availability.toggle') }}" method="POST" class="w-full">
-                            @csrf
-                            <input type="hidden" name="date" value="{{ $day['date_str'] }}">
-                            <button type="submit" class="w-full rounded-2xl p-2.5 sm:p-4 text-center space-y-1 bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] hover:border-[#780000] shadow-xs transition-all cursor-pointer flex flex-col justify-between group" title="Click to mark as available">
-                                <div>
-                                    <span class="text-[11px] sm:text-xs font-black uppercase tracking-wider block text-[#8E8E93] group-hover:text-[#780000]">
-                                        {{ $day['date']->format('D') }}
-                                    </span>
-                                    <span class="text-sm sm:text-lg font-black block text-[#1D1D1F] mt-0.5">
-                                        {{ $day['date']->format('M j') }}
-                                    </span>
-                                </div>
-                                <span class="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider block text-[#8E8E93] group-hover:text-[#780000] pt-0.5">
-                                    Not Set
-                                </span>
-                            </button>
-                        </form>
-                    @endif
-                @endforeach
+                                </button>
+                            </form>
+                        @endif
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
@@ -495,7 +513,7 @@
 
                 <div class="flex items-center justify-end gap-2.5 pt-2">
                     <button type="button" @click="openReleaseModal = false" class="btn-secondary px-4 py-2 text-xs">Cancel</button>
-                    <button type="submit" class="btn-danger px-4 py-2 text-xs font-bold shadow-xs">Submit Release Request</button>
+                    <button type="submit" class="btn-danger px-4 py-2 text-xs font-bold">Submit Release Request</button>
                 </div>
             </form>
         </div>

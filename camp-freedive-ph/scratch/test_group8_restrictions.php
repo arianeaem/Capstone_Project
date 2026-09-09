@@ -36,7 +36,7 @@ foreach ($testUrls as $path => $expected) {
     echo sprintf("%-30s [%d] %s => %s\n", 
         $path, 
         $res->getStatusCode(), 
-        $isLockScreen ? '🔒 RESTRICTED LOCK SCREEN' : 'NORMAL ACCESS',
+        $isLockScreen ? 'RESTRICTED LOCK SCREEN' : 'NORMAL ACCESS',
         $expected
     );
 }

@@ -26,7 +26,7 @@
 
             <button type="button" 
                     @click="openStatusModal = true"
-                    class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-sm flex items-center gap-1.5">
+                    class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5">
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 <span>Change Status</span>
             </button>
@@ -63,7 +63,7 @@
         <div class="lg:col-span-2 space-y-6">
             
             <!-- Participants Roster -->
-            <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Participant(s) ({{ $booking->participants->count() }} pax)</h3>
                 </div>
@@ -90,7 +90,7 @@
             </div>
 
             <!-- Contact and Logistics -->
-            <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl p-6 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Contact & Logistics</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
@@ -125,7 +125,7 @@
             </div>
 
             <!-- Booking Audit Trail -->
-            <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Booking Audit Trail & History</h3>
                     <span class="text-xs text-[#6E6E73]">
@@ -171,7 +171,7 @@
         <div class="space-y-6">
             
             <!-- Itemized Invoice Breakdown -->
-            <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl p-6 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Itemized Invoice</h3>
 
                 <div class="space-y-2 text-xs">
@@ -222,7 +222,7 @@
             </div>
 
             <!-- Payment Summary Snapshot -->
-            <div class="bg-white rounded-xl p-6 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Payment Summary</h3>
                     <span class="text-xs text-[#6E6E73]">Read-Only Snapshot</span>
@@ -292,7 +292,7 @@
 
                 <div class="flex items-center justify-end gap-3 pt-3 border-t border-[#E5E5EA]">
                     <button type="button" @click="openStatusModal = false" class="btn-secondary px-4 py-2 text-sm">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold shadow-sm">
+                    <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold">
                         Update Status
                     </button>
                 </div>

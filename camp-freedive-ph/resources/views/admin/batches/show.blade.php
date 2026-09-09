@@ -99,7 +99,7 @@
                 <!-- Bookings List -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                     @forelse($batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']) as $booking)
-                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:shadow-xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover: hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
                         <!-- Card Content -->
                         <div class="space-y-3.5">
                             <!-- Header: Booking Number, Status, Class Type & Lead Guest -->

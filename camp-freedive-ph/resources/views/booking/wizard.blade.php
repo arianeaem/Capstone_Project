@@ -74,7 +74,7 @@
     </div>
 
     <!-- Wizard Form Container -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] shadow-sm p-4 sm:p-8 lg:p-10 relative text-sm">
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-8 lg:p-10 relative text-sm">
 
         <!-- Step 1: Select Class -->
         <div x-show="currentStep === 1" x-cloak class="space-y-6">
@@ -320,8 +320,8 @@
                                                         :disabled="dObj.isDisabled"
                                                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
                                                         :class="{
-                                                            'bg-[#780000] text-white font-bold shadow-sm ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
-                                                            'bg-[#00C3D0] text-white font-bold shadow-sm ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
+                                                            'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
+                                                            'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
                                                             'text-gray-300 cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
                                                             'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
@@ -376,8 +376,8 @@
                                                         :disabled="dObj.isDisabled"
                                                         class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
                                                         :class="{
-                                                            'bg-[#780000] text-white font-bold shadow-sm ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
-                                                            'bg-[#00C3D0] text-white font-bold shadow-sm ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
+                                                            'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
+                                                            'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
                                                             'text-gray-300 cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
                                                             'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
@@ -692,7 +692,7 @@
                             <label class="block font-bold text-[#1D1D1F] text-xs">Transportation Option:</label>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none"
-                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-[#F8EAEA]/40 shadow-xs' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -705,7 +705,7 @@
                                 </label>
 
                                 <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none"
-                                       :class="form.pickup_option === 'own' ? 'border-[#780000] bg-[#F8EAEA]/40 shadow-xs' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       :class="form.pickup_option === 'own' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -850,7 +850,7 @@
         <!-- Step 4: Downpayment -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
-            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
+            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 space-y-6">
                 <!-- Top Navigation & Header -->
                 <div class="flex items-center justify-between border-b border-[#F2F2F7] pb-4">
                     <button type="button" 
@@ -987,7 +987,7 @@
 
         <!-- Step 5: Confirmation & Credentials -->
         <div x-show="currentStep === 5" x-cloak class="space-y-6 text-center">
-            <div class="w-16 h-16 bg-[#ECFDF5] text-[#34C759] rounded-full flex items-center justify-center mx-auto text-3xl font-extrabold shadow-sm border border-[#A7F3D0]">
+            <div class="w-16 h-16 bg-[#ECFDF5] text-[#34C759] rounded-full flex items-center justify-center mx-auto text-3xl font-extrabold border border-[#A7F3D0]">
                 ✓
             </div>
 
@@ -1001,7 +1001,7 @@
             </div>
 
             <!-- Booking Credentials Voucher -->
-            <div class="max-w-md mx-auto p-5 rounded-2xl bg-[#F8EAEA]/40 border border-[#780000]/20 space-y-4 shadow-xs">
+            <div class="max-w-md mx-auto p-5 rounded-2xl bg-[#F8EAEA]/40 border border-[#780000]/20 space-y-4">
                 <div>
                     <span class="text-xs uppercase tracking-wider text-[#6E6E73] font-bold">Booking Reference Number</span>
                     <div class="text-2xl sm:text-3xl font-mono font-extrabold text-[#780000] tracking-wider" x-text="confirmedBooking.booking_number"></div>
@@ -1101,7 +1101,7 @@
 
             <button type="button" 
                     @click="nextStep()" 
-                    class="btn-primary px-5 sm:px-8 py-2.5 text-sm shadow-sm cursor-pointer active:scale-[0.99] transition-all">
+                    class="btn-primary px-5 sm:px-8 py-2.5 text-sm cursor-pointer active:scale-[0.99] transition-all">
                 <span x-text="currentStep === 3 ? 'Proceed to Downpayment (₱' + formatNumber(calculateDownpayment()) + ')' : 'Continue'"></span>
             </button>
         </div>

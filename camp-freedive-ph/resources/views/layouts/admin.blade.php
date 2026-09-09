@@ -411,7 +411,7 @@
             <!-- Global Flash Messages -->
             <div id="flash-messages-container" class="px-4 sm:px-8 pt-4">
                 @if(session('success'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] flex items-center justify-between text-xs sm:text-sm font-medium shadow-sm">
+                    <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] flex items-center justify-between text-xs sm:text-sm font-medium">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#34C759]"></span>
                             <span>{{ session('success') }}</span>
@@ -421,7 +421,7 @@
                 @endif
 
                 @if(session('error'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] flex items-center justify-between text-xs sm:text-sm font-medium shadow-sm">
+                    <div class="p-4 mb-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] flex items-center justify-between text-xs sm:text-sm font-medium">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#FF3B3C]"></span>
                             <span>{{ session('error') }}</span>
@@ -431,7 +431,7 @@
                 @endif
 
                 @if(session('info'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#1E40AF] flex items-center justify-between text-xs sm:text-sm font-medium shadow-sm">
+                    <div class="p-4 mb-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#1E40AF] flex items-center justify-between text-xs sm:text-sm font-medium">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#0088FF]"></span>
                             <span>{{ session('info') }}</span>

@@ -116,7 +116,7 @@
         };
     @endphp
 
-    <div class="bg-white rounded-xl border {{ $overallConfig['border'] }} p-6 sm:p-7 shadow-sm space-y-4">
+    <div class="bg-white rounded-xl border {{ $overallConfig['border'] }} p-6 sm:p-7 space-y-4">
         
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
             <div>
@@ -124,7 +124,7 @@
                     Overall Batch Assessment
                 </span>
                 <div class="flex flex-wrap items-center gap-3">
-                    <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase shadow-sm {{ $overallConfig['pill'] }}">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase {{ $overallConfig['pill'] }}">
                         <span class="w-2.5 h-2.5 rounded-full {{ $overallConfig['dot'] }} animate-pulse"></span>
                         <span>{{ $overallClassification }}</span>
                     </span>
@@ -164,7 +164,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         <!-- Day 1 Forecast -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-sm space-y-5">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-5">
             
             <!-- Day 1 Header -->
             <div class="space-y-3">
@@ -312,7 +312,7 @@
         </div>
 
         <!-- Day 2 Forecast -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-sm space-y-5">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-5">
             
             <!-- Day 2 Header -->
             <div class="space-y-3">
@@ -462,7 +462,7 @@
     </div>
 
     <!-- Assessment History -->
-    <div x-data="{ openAuditTrail: false }" class="mt-8 bg-white rounded-xl border border-[#E5E5EA] shadow-sm overflow-hidden transition-all">
+    <div x-data="{ openAuditTrail: false }" class="mt-8 bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
         <button type="button" 
                 @click="openAuditTrail = !openAuditTrail" 
                 class="w-full p-5 sm:p-6 flex items-center justify-between text-left hover:bg-[#FAFAFC] transition-colors cursor-pointer select-none">
@@ -610,7 +610,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
                     <button type="button" @click="openOverrideModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-sm">
+                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold">
                         Apply Override
                     </button>
                 </div>

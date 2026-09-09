@@ -26,7 +26,7 @@
 
     @if($booking->status === 'pending_downpayment')
     <!-- Downpayment Required Alert -->
-    <div class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+    <div class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
             <div class="flex items-center gap-2 font-bold text-sm sm:text-base text-amber-900">
                 <svg class="w-5 h-5 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
@@ -46,7 +46,7 @@
     @endif
 
     <!-- Booking Overview -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm mb-6 sm:mb-8">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6">
             <div>
                 <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Reservation Details</span>
@@ -116,7 +116,7 @@
             
             <!-- Dynamic Pricing and Rate Breakdown -->
             @if($booking->priceAdjustments && $booking->priceAdjustments->count() > 0)
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-sm space-y-3">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 space-y-3">
                 <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Price Breakdown & Applied Rules</h3>
                     <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#F8EAEA] text-[#780000]">
@@ -154,7 +154,7 @@
             @endif
 
             <!-- Participant List -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8">
                 <h3 class="text-base font-bold text-[#1D1D1F] mb-4">Divers in this Booking ({{ $booking->participants->count() }})</h3>
                 <div class="divide-y divide-[#E5E5EA]">
                     @foreach($booking->participants as $p)
@@ -177,7 +177,7 @@
             </div>
 
             <!-- Logistics and Add-ons -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8">
                 <h3 class="text-base font-bold text-[#1D1D1F] mb-4">Transportation & Add-ons</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
@@ -202,7 +202,7 @@
 
             <!-- Request History -->
             @if($booking->rescheduleRequests->isNotEmpty() || $booking->cancellationRequests->isNotEmpty())
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F]">Request History</h3>
 
                 @foreach($booking->rescheduleRequests as $req)
@@ -239,7 +239,7 @@
         <div class="space-y-6 text-sm">
 
             <!-- Policy Status -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 shadow-sm space-y-5">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-5">
                 <div>
                     <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Cancellation & Rescheduling Policy</span>
                     <p class="text-xs text-[#6E6E73] mt-1">Policy based on days before your dive date.</p>
@@ -389,7 +389,7 @@
                     <button type="button" @click="openRescheduleModal = false" class="btn-secondary px-4 py-2 text-sm">Cancel</button>
                     <button type="submit" 
                             :disabled="rescheduleForecast && !rescheduleForecast.is_bookable" 
-                            class="btn-primary px-5 py-2 text-sm font-bold shadow-sm">
+                            class="btn-primary px-5 py-2 text-sm font-bold">
                         Submit Reschedule Request
                     </button>
                 </div>

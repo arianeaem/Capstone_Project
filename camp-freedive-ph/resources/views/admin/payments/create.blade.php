@@ -20,7 +20,7 @@
     </div>
 
     <!-- Create Payment Record Form -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm space-y-6">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 space-y-6">
         <form action="{{ route('admin.payments.store') }}" method="POST" class="space-y-4">
             @csrf
 

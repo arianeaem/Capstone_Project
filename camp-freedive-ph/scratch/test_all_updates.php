@@ -37,7 +37,7 @@ $reqAdmin->setUserResolver(fn() => $tester);
 $resAdmin = app()->handle($reqAdmin);
 $adminContent = $resAdmin->getContent();
 $isLocked = str_contains($adminContent, 'bawal po gr 8 di pa sya tapos hehehehhe');
-echo "/admin for Group 8 => " . ($isLocked ? '🔒 LOCKED (bawal po gr 8 di pa sya tapos hehehehhe) ✓' : 'UNLOCKED ✗') . "\n";
+echo "/admin for Group 8 => " . ($isLocked ? 'LOCKED (bawal po gr 8 di pa sya tapos hehehehhe) ✓' : 'UNLOCKED ✗') . "\n";
 
 $reqBookings = Illuminate\Http\Request::create('/admin/bookings', 'GET');
 $reqBookings->setUserResolver(fn() => $tester);

@@ -16,7 +16,7 @@
     </div>
 
     <!-- Create Coach Form -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-sm">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8">
         <form action="{{ route('admin.coaches.store') }}" method="POST" class="space-y-6">
             @csrf
 

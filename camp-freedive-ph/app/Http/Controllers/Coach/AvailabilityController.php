@@ -61,21 +61,34 @@ class AvailabilityController extends Controller
             if ($batch && $batch->start_date && $batch->end_date) {
                 $c = $batch->start_date->copy();
                 while ($c->lte($batch->end_date)) {
-                    $dates[] = $c->format('Y-m-d');
+                    $dates[] = [
+                        'date_str' => $c->format('Y-m-d'),
+                        'day_num' => ($c->format('Y-m-d') === $batch->start_date->format('Y-m-d')) ? 1 : 2,
+                    ];
                     $c->addDay();
                 }
             } elseif ($assignment->dive_date) {
-                $dates[] = $assignment->dive_date->format('Y-m-d');
+                $dates[] = [
+                    'date_str' => $assignment->dive_date->format('Y-m-d'),
+                    'day_num' => 1,
+                ];
                 if ($assignment->dive_date->isSaturday()) {
-                    $dates[] = $assignment->dive_date->copy()->addDay()->format('Y-m-d');
+                    $dates[] = [
+                        'date_str' => $assignment->dive_date->copy()->addDay()->format('Y-m-d'),
+                        'day_num' => 2,
+                    ];
                 }
             }
 
-            foreach ($dates as $dStr) {
+            foreach ($dates as $dInfo) {
+                $dStr = $dInfo['date_str'];
                 if (!$assignmentsByDate->has($dStr)) {
                     $assignmentsByDate->put($dStr, collect());
                 }
-                $assignmentsByDate->get($dStr)->push($assignment);
+                $assignmentsByDate->get($dStr)->push([
+                    'assignment' => $assignment,
+                    'day_num' => $dInfo['day_num'],
+                ]);
             }
         }
 
@@ -93,13 +106,27 @@ class AvailabilityController extends Controller
             $dateStr = $dayCursor->format('Y-m-d');
             $assignmentList = $assignmentsByDate->get($dateStr, collect());
             $isAssigned = $assignmentList->isNotEmpty();
-            $firstAssignment = $assignmentList->first();
+            $firstAssignedEntry = $assignmentList->first();
+            $firstAssignment = is_array($firstAssignedEntry) ? ($firstAssignedEntry['assignment'] ?? null) : $firstAssignedEntry;
             $batch = $firstAssignment?->batch;
 
             // Also check if CoachAvailability is explicitly marked as assigned
             $availRecord = $availabilities->get($dateStr);
             if (!$isAssigned && $availRecord && $availRecord->status === 'assigned') {
                 $isAssigned = true;
+            }
+
+            $assignedDayNumber = 1;
+            if ($isAssigned) {
+                if (is_array($firstAssignedEntry) && isset($firstAssignedEntry['day_num'])) {
+                    $assignedDayNumber = $firstAssignedEntry['day_num'];
+                } elseif ($batch && $batch->start_date && $batch->end_date) {
+                    $assignedDayNumber = ($dateStr === $batch->end_date->format('Y-m-d') || $dayCursor->isSunday()) ? 2 : 1;
+                } elseif ($dayCursor->isSunday()) {
+                    $assignedDayNumber = 2;
+                } else {
+                    $assignedDayNumber = 1;
+                }
             }
 
             $hasReleaseRequest = $releaseRequests->has($dateStr);
@@ -127,6 +154,7 @@ class AvailabilityController extends Controller
                 'is_weekend' => $dayCursor->isWeekend(),
                 'status' => $status,
                 'is_assigned' => $isAssigned,
+                'assigned_day_number' => $assignedDayNumber,
                 'batch' => $batch,
                 'students_count' => $assignmentList->count(),
                 'has_release_request' => $hasReleaseRequest,
