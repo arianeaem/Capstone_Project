@@ -293,7 +293,7 @@
          class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" 
              @click.outside="rejectModalOpen = false">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <h3 class="font-bold text-base text-[#1D1D1F]">
                     Reject Refund Request
                 </h3>

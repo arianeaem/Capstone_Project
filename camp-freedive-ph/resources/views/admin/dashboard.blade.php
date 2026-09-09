@@ -484,7 +484,7 @@
             <!-- Dynamic Pricing Strategy -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-2xs space-y-4 flex flex-col justify-between">
                 <div class="space-y-3">
-                    <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                    <div class="flex items-center justify-between">
                         <div>
                             <h2 class="text-base font-bold text-[#1D1D1F]">Dynamic Pricing Yield</h2>
                         </div>
@@ -519,7 +519,7 @@
 
         <!-- Governance & Audit Log Stream -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <div>
                     <h2 class="text-base font-bold text-[#1D1D1F]">Audit Trail & System Activity</h2>
                     <p class="text-xs text-[#6E6E73]">Immutable records of administrative decisions, price changes, and refunds.</p>

@@ -12,7 +12,6 @@
                 Welcome back, {{ $coach->name }}!
             </h1>
             <p class="text-xs sm:text-sm text-[#6E6E73] flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-[#8E8E93]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                 <span>It's {{ now('Asia/Manila')->format('l, F d, Y') }}</span>
             </p>
         </div>
@@ -489,7 +488,7 @@
     @if($nextSessionData && $nextSessionData['can_request_release'])
     <div x-show="openReleaseModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openReleaseModal = false">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-base font-black text-[#1D1D1F]">Request Release from Assignment</h3>
                     <p class="text-xs text-[#6E6E73]">{{ $nextSessionData['batch']->batch_number }} • {{ $nextSessionData['dive_date']->format('M d, Y') }}</p>

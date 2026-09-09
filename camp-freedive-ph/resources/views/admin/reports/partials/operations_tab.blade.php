@@ -68,7 +68,7 @@
         
         <!-- Coach Assignments Distribution -->
         <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Coach Workload & Shift Allocation</h3>
                     <p class="text-xs text-[#6E6E73]">Total trips and student coverage assigned to each coach in the selected period.</p>
@@ -125,10 +125,10 @@
 
         <!-- Capacity Bottlenecks & Highlights -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Operational Highlights</h3>
+            <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Operational Highlights</h3>
             
             <div class="space-y-3 text-xs">
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Batches at Full Capacity (≥90%)</span>
                         <span class="text-[11px] text-[#6E6E73]">High demand sell-outs</span>
@@ -136,7 +136,7 @@
                     <span class="text-base font-extrabold text-[#780000]">{{ $op['full_capacity_batches'] ?? 0 }}</span>
                 </div>
 
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Completed Trips</span>
                         <span class="text-[11px] text-[#6E6E73]">Successfully concluded</span>
@@ -144,7 +144,7 @@
                     <span class="text-base font-extrabold text-emerald-700">{{ $op['completed_batches'] ?? 0 }}</span>
                 </div>
 
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Active / Upcoming</span>
                         <span class="text-[11px] text-[#6E6E73]">Currently open for booking</span>
@@ -152,7 +152,7 @@
                     <span class="text-base font-extrabold text-[#00C3D0]">{{ $op['active_batches'] ?? 0 }}</span>
                 </div>
 
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Cancelled Trips</span>
                         <span class="text-[11px] text-[#6E6E73]">Weather / Admin cancelled</span>
@@ -166,7 +166,7 @@
 
     <!-- Batch Runways & Performance List -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Batch Runway & Roster Log</h3>
                 <p class="text-xs text-[#6E6E73]">Trip-by-trip occupancy, distinct coach allocation, and recommended staffing tracking.</p>

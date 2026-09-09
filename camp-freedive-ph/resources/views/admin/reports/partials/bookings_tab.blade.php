@@ -71,7 +71,7 @@
         
         <!-- Left 2 Cols: Group Sizes & Swimmer Comfort Distribution -->
         <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Guest Cohort & Skill Demographics</h3>
                     <p class="text-xs text-[#6E6E73]">Breakdown of party size compositions and swimmer comfort levels.</p>
@@ -173,7 +173,7 @@
 
     <!-- Bottom: Bookings & Diver Demographic Log -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+        <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Recent Bookings & Guest Cohort Log</h3>
                 <p class="text-xs text-[#6E6E73]">Guest party sizes, assigned batch dates, and lead times in the selected period.</p>

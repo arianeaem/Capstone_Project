@@ -282,7 +282,7 @@
     <!-- Provision Account Modal -->
     <div x-show="openAddModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-[#E5E5EA]" @click.outside="openAddModal = false">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-lg font-bold text-[#1D1D1F]">Provision Staff Account</h3>
                     <p class="text-xs text-[#6E6E73] mt-0.5">Create login credentials for a new instructor or administrative team member.</p>

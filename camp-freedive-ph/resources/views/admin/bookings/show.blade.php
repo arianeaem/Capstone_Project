@@ -64,7 +64,7 @@
             
             <!-- Participants Roster -->
             <div class="bg-white rounded-xl p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Participant(s) ({{ $booking->participants->count() }} pax)</h3>
                 </div>
 
@@ -126,7 +126,7 @@
 
             <!-- Booking Audit Trail -->
             <div class="bg-white rounded-xl p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Booking Audit Trail & History</h3>
                     <span class="text-xs text-[#6E6E73]">
                         Created {{ $booking->created_at->format('M d, Y h:i A') }}
@@ -223,7 +223,7 @@
 
             <!-- Payment Summary Snapshot -->
             <div class="bg-white rounded-xl p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Payment Summary</h3>
                     <span class="text-xs text-[#6E6E73]">Read-Only Snapshot</span>
                 </div>
@@ -260,7 +260,7 @@
     <!-- Status Change Modal -->
     <div x-show="openStatusModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl border border-[#E5E5EA]" @click.outside="openStatusModal = false">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between">
                 <h3 class="text-lg font-bold text-[#1D1D1F]">Update Booking Status</h3>
                 <button type="button" @click="openStatusModal = false" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
             </div>

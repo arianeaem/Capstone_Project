@@ -12,7 +12,7 @@
         </div>
 
         <!-- Right: Custom Range & Date Presets Stacked on the Right -->
-        <div class="flex flex-col items-start md:items-end gap-2.5">
+        <div class="flex flex-col items-start md:items-end gap-2.5 w-full md:w-auto">
             
             <!-- Custom Range Popover Button -->
             <div class="relative">
@@ -26,7 +26,7 @@
                 <div x-show="customOpen" 
                      @click.away="customOpen = false" 
                      x-cloak 
-                     class="absolute right-0 mt-2 w-72 bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-xl z-30 space-y-3">
+                     class="absolute left-0 sm:left-auto sm:right-0 mt-2 w-72 max-w-[calc(100vw-48px)] bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-xl z-30 space-y-3">
                     <h4 class="text-xs font-bold text-[#1D1D1F]">Select Custom Date Range</h4>
                     <form method="GET" action="{{ auth()->user()->isOwner() ? route('owner.reports.index') : route('admin.reports.index') }}" class="space-y-2.5">
                         <input type="hidden" name="preset" value="custom">
@@ -58,7 +58,7 @@
             </div>
 
             <!-- Date Presets on the Right below Custom Range -->
-            <div class="flex items-center gap-1.5 flex-wrap justify-start md:justify-end">
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none w-full md:w-auto flex-nowrap sm:flex-wrap justify-start md:justify-end">
                 @php
                     $presets = [
                         'this_month' => 'This Month',

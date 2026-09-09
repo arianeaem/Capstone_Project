@@ -207,9 +207,27 @@ class AnalyticsService
 
         // Package Revenue Breakdown
         $packages = [
-            'discovery' => ['name' => 'Discovery Class', 'color' => '#780000'],
-            'fundive' => ['name' => 'Fundive Experience', 'color' => '#A82020'],
-            'refinement' => ['name' => 'Skill Refinement', 'color' => '#D45D5D'],
+            'discovery' => [
+                'name' => 'Discovery',
+                'color' => '#780000',
+                'bg_color' => 'bg-[#780000]',
+                'dot_class' => 'bg-[#780000]',
+                'text_color' => 'text-[#780000]',
+            ],
+            'fundive' => [
+                'name' => 'Fundive',
+                'color' => '#A82020',
+                'bg_color' => 'bg-[#A82020]',
+                'dot_class' => 'bg-[#A82020]',
+                'text_color' => 'text-[#A82020]',
+            ],
+            'refinement' => [
+                'name' => 'Refinement',
+                'color' => '#D45D5D',
+                'bg_color' => 'bg-[#D45D5D]',
+                'dot_class' => 'bg-[#D45D5D]',
+                'text_color' => 'text-[#D45D5D]',
+            ],
         ];
 
         $packageRevenue = [];
@@ -230,13 +248,19 @@ class AnalyticsService
                   ->where('class_type', $type);
             })->count();
 
+            $share = $grossRevenue > 0 ? round(($rev / $grossRevenue) * 100, 1) : 0;
+
             $packageRevenue[$type] = [
                 'name' => $meta['name'],
                 'color' => $meta['color'],
+                'bg_color' => $meta['bg_color'],
+                'dot_class' => $meta['dot_class'],
+                'text_color' => $meta['text_color'],
                 'revenue' => $rev,
                 'bookings_count' => $bookingsCount,
                 'pax_count' => $paxCount,
-                'share' => $grossRevenue > 0 ? round(($rev / $grossRevenue) * 100, 1) : 0,
+                'share' => $share,
+                'share_percentage' => $share,
             ];
         }
 

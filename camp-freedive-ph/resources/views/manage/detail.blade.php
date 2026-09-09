@@ -117,7 +117,7 @@
             <!-- Dynamic Pricing and Rate Breakdown -->
             @if($booking->priceAdjustments && $booking->priceAdjustments->count() > 0)
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 space-y-3">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Price Breakdown & Applied Rules</h3>
                     <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#F8EAEA] text-[#780000]">
                         Dynamic Pricing Applied

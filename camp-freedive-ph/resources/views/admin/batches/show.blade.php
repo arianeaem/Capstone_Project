@@ -253,7 +253,7 @@
             
             <!-- Batch Status & Occupancy -->
             <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Batch Status & Capacity</h3>
                     <span class="px-2.5 py-0.5 rounded-md text-xs font-bold border {{ $batch->status_badge['class'] }}">
                         {{ $batch->status_badge['label'] }}
@@ -316,7 +316,7 @@
                 $totalCarpoolPax = $carpoolBookingsList->sum(fn($b) => $b->participants->count());
             @endphp
             <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-3">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Transportation Logistics</h3>
                     @if($totalCarpoolPax > 0)
                         <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
@@ -360,7 +360,7 @@
 
             <!-- Financial Overview -->
             <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Financial Overview</h3>
                     <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#780000] font-bold hover:underline">
                         Ledger →

@@ -77,7 +77,7 @@
             
             <!-- Assigned Students -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Students & Participants</h3>
                         <p class="text-xs text-[#6E6E73] mt-0.5">Students currently placed under Coach {{ $coach->name }}'s guidance.</p>
@@ -159,7 +159,7 @@
 
             <!-- Past Completed History -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Completed Dive History</h3>
                     <span class="text-xs text-[#6E6E73]">{{ $pastAssignments->count() }} past assignment(s)</span>
                 </div>

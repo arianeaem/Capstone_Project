@@ -131,7 +131,7 @@
             
             <!-- Linked Booking Details -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Linked Reservation</h3>
                     <span class="font-mono text-xs font-bold text-[#780000]">{{ $payment->booking->booking_number }}</span>
                 </div>

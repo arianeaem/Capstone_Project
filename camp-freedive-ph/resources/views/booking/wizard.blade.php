@@ -191,14 +191,14 @@
                     <!-- Information Icon with Hover Notice -->
                     <div class="relative group inline-flex items-center self-start sm:self-center">
                         <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-xs font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
-                            <svg class="w-4 h-4 text-[#00C3D0] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain" alt="About Forecast">
                             <span>About Forecast</span>
                         </div>
 
                         <!-- Interactive Date Help Tooltip -->
                         <div class="absolute right-0 sm:right-auto sm:left-0 top-full mt-2 w-80 p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
-                            <div class="font-bold flex items-center gap-1 text-[#00C3D0]">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                            <div class="font-bold flex items-center gap-1.5 text-[#00C3D0]">
+                                <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-3.5 h-3.5 shrink-0 object-contain brightness-0 invert" alt="Weather Note">
                                 <span>Weather & Sea Conditions Note</span>
                             </div>
                             <p class="text-[11px] text-gray-200">
@@ -400,7 +400,7 @@
                 <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-8">
                     <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                         
-                        <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                        <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <span class="w-2.5 h-2.5 rounded-full bg-[#00C3D0] animate-pulse"></span>
                                 <h3 class="font-black text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
@@ -465,7 +465,7 @@
                                 <template x-if="forecast.day1 && forecast.day2">
                                     <div class="space-y-2.5">
                                         <!-- Day 1 -->
-                                        <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1 text-xs">
+                                        <div class="p-3 rounded-xl space-y-1 text-xs">
                                             <div class="flex items-center justify-between">
                                                 <span class="font-extrabold text-[#780000] text-xs uppercase tracking-wider">Day 1</span>
                                                 <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"
@@ -485,7 +485,7 @@
                                         </div>
 
                                         <!-- Day 2 -->
-                                        <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1 text-xs">
+                                        <div class="p-3 rounded-xl space-y-1 text-xs">
                                             <div class="flex items-center justify-between">
                                                 <span class="font-extrabold text-[#00C3D0] text-xs uppercase tracking-wider">Day 2</span>
                                                 <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"

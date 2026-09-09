@@ -67,57 +67,117 @@
     <!-- Middle: Class Package Mix & Revenue Breakdown -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- Left 2 Cols: Package Revenue Table & Progress Bars -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <div class="flex items-center justify-between">
+        <!-- Left 2 Cols: Package Revenue Breakdown (Pie Chart + Details) -->
+        <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-6 shadow-2xs space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue by Class Package</h3>
+                    <p class="text-xs text-[#6E6E73]">Revenue share, bookings, and diver distribution per course.</p>
                 </div>
-                <span class="text-xs font-bold text-[#780000]">Total: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
+                <span class="text-xs font-bold text-[#780000] self-start sm:self-auto">Total: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
             </div>
 
-            <!-- Visual Progress Breakdown Bar -->
-            <div class="w-full h-3 rounded-full bg-[#E5E5EA] overflow-hidden flex shadow-inner">
-                @foreach($fin['packages'] ?? [] as $key => $pkg)
-                    <div class="h-full transition-all" 
-                         style="width: {{ $pkg['share'] ?? 0 }}%; background-color: {{ $pkg['color'] }};"
-                         title="{{ $pkg['name'] }}: {{ $pkg['share'] }}%"></div>
-                @endforeach
-            </div>
+            @php
+                $gradientStops = [];
+                $currentPercent = 0;
+                $hasRevenue = false;
 
-            <!-- Tabular Breakdown -->
-            <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
-                <table class="w-full text-left min-w-[550px]">
-                    <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">
-                        <tr>
-                            <th class="p-3.5 pl-5">Package</th>
-                            <th class="p-3.5 text-center">Bookings</th>
-                            <th class="p-3.5 text-center">Divers</th>
-                            <th class="p-3.5 text-right">Revenue</th>
-                            <th class="p-3.5 pr-5 text-right">Revenue Share</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-[#E5E5EA]">
-                        @foreach($fin['packages'] ?? [] as $key => $pkg)
-                            <tr class="hover:bg-[#FAFAFC] transition-colors text-xs sm:text-sm">
-                                <td class="p-3.5 pl-5 flex items-center gap-2">
-                                    <span class="w-3 h-3 rounded-full shrink-0" style="background-color: {{ $pkg['color'] }};"></span>
-                                    <span class="font-bold text-[#1D1D1F]">{{ $pkg['name'] }}</span>
-                                </td>
-                                <td class="p-3.5 text-center font-medium text-[#3A3A3C]">{{ $pkg['bookings_count'] }}</td>
-                                <td class="p-3.5 text-center font-medium text-[#3A3A3C]">{{ $pkg['pax_count'] }} pax</td>
-                                <td class="p-3.5 text-right font-extrabold text-[#1D1D1F]">₱{{ number_format($pkg['revenue'], 2) }}</td>
-                                <td class="p-3.5 pr-5 text-right font-bold text-[#780000]">{{ $pkg['share'] }}%</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                foreach($fin['packages'] ?? [] as $pKey => $pData) {
+                    $share = (float)($pData['share_percentage'] ?? $pData['share'] ?? 0);
+                    $color = $pData['color'] ?? match($pKey) {
+                        'discovery' => '#780000',
+                        'fundive' => '#A82020',
+                        'refinement' => '#D45D5D',
+                        default => '#780000'
+                    };
+
+                    if ($share > 0) {
+                        $hasRevenue = true;
+                        $nextPercent = $currentPercent + $share;
+                        $gradientStops[] = "{$color} {$currentPercent}% {$nextPercent}%";
+                        $currentPercent = $nextPercent;
+                    }
+                }
+
+                if ($currentPercent < 100 && $hasRevenue) {
+                    $gradientStops[] = ($color ?? '#780000') . " {$currentPercent}% 100%";
+                }
+
+                $conicBg = $hasRevenue 
+                    ? 'conic-gradient(' . implode(', ', $gradientStops) . ')' 
+                    : '#E5E5EA';
+            @endphp
+
+            <div class="flex flex-col lg:flex-row items-center gap-6 sm:gap-8 lg:gap-12 pt-2">
+                
+                <!-- Left: Pie / Donut Chart (Extra Large & Mobile Responsive) -->
+                <div class="relative shrink-0 flex items-center justify-center py-2 sm:py-3">
+                    <!-- Outer Conic Circle -->
+                    <div class="w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-full shadow-inner flex items-center justify-center transition-all"
+                         style="background: {{ $conicBg }};">
+                        
+                        <!-- Inner Hole for Donut Style -->
+                        <div class="w-34 h-34 sm:w-44 sm:h-44 lg:w-48 lg:h-48 bg-white rounded-full shadow-sm flex flex-col items-center justify-center text-center p-3 sm:p-4">
+                            <span class="text-[11px] sm:text-xs font-bold text-[#8E8E93] uppercase tracking-wider">Gross Total</span>
+                            <span class="text-sm sm:text-xl lg:text-2xl font-black text-[#1D1D1F] tracking-tight truncate max-w-full px-1 mt-0.5 sm:mt-1">
+                                ₱{{ number_format($fin['gross_revenue'] ?? 0) }}
+                            </span>
+                            <span class="text-[11px] sm:text-sm font-bold text-[#780000] mt-0.5 sm:mt-1">
+                                100%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Package Details Breakdown -->
+                <div class="flex-1 w-full space-y-2.5 sm:space-y-3">
+                    @foreach($fin['packages'] ?? [] as $pKey => $pData)
+                        @php
+                            $share = $pData['share_percentage'] ?? $pData['share'] ?? 0;
+                            $dotClass = $pData['dot_class'] ?? match($pKey) {
+                                'discovery' => 'bg-[#780000]',
+                                'fundive' => 'bg-[#A82020]',
+                                'refinement' => 'bg-[#D45D5D]',
+                                default => 'bg-[#780000]'
+                            };
+                            $textColor = $pData['text_color'] ?? match($pKey) {
+                                'discovery' => 'text-[#780000]',
+                                'fundive' => 'text-[#A82020]',
+                                'refinement' => 'text-[#D45D5D]',
+                                default => 'text-[#780000]'
+                            };
+                        @endphp
+                        <div class="p-3 sm:p-4 rounded-xl flex items-center justify-between gap-3 sm:gap-4  transition-all">
+                            <div class="space-y-0.5 min-w-0 flex-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full {{ $dotClass }} shrink-0"></span>
+                                    <span class="font-extrabold text-xs sm:text-base text-[#1D1D1F] truncate">{{ $pData['name'] }}</span>
+                                </div>
+                                <div class="text-[11px] sm:text-xs text-[#6E6E73] flex items-center flex-wrap gap-x-1.5 gap-y-0.5 pl-4.5">
+                                    <span class="font-semibold text-[#1D1D1F] whitespace-nowrap">{{ $pData['bookings_count'] }} {{ Str::plural('booking', $pData['bookings_count']) }}</span>
+                                    <span class="text-[#8E8E93]">•</span>
+                                    <span class="whitespace-nowrap">{{ $pData['pax_count'] }} {{ Str::plural('diver', $pData['pax_count']) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="text-right shrink-0">
+                                <div class="text-xs sm:text-base font-black text-[#1D1D1F] whitespace-nowrap">
+                                    ₱{{ number_format($pData['revenue'], 2) }}
+                                </div>
+                                <div class="text-[11px] sm:text-xs font-bold {{ $textColor }} mt-0.5 whitespace-nowrap">
+                                    {{ $share }}% share
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
             </div>
         </div>
 
         <!-- Right 1 Col: Add-ons & Ancillary Revenue -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Add-ons & Logistics</h3>
+            <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Add-ons & Logistics</h3>
             
             <!-- Manila Carpool Van -->
             <div class="p-3.5 rounded-xl bg-[#FAFAFC] space-y-2">
