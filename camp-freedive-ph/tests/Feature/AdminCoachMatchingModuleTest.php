@@ -77,12 +77,12 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $unassignedParticipant = BookingParticipant::first();
         $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
-        $batch2 = Batch::where('batch_code', 'Batch 2')->first();
+        $batch = $unassignedParticipant->booking->batch ?? Batch::first();
 
         $response = $this->post('/admin/coaches/matching/assign', [
             'participant_ids' => [$unassignedParticipant->id],
             'coach_id' => $coachMary->id,
-            'batch_id' => $batch2->id,
+            'batch_id' => $batch->id,
         ]);
 
         $response->assertRedirect();
@@ -91,7 +91,7 @@ class AdminCoachMatchingModuleTest extends TestCase
         $this->assertDatabaseHas('participant_assignments', [
             'participant_id' => $unassignedParticipant->id,
             'coach_id' => $coachMary->id,
-            'batch_id' => $batch2->id,
+            'batch_id' => $batch->id,
             'status' => 'assigned',
         ]);
     }
@@ -104,7 +104,20 @@ class AdminCoachMatchingModuleTest extends TestCase
         $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
         $batch1 = Batch::where('batch_code', 'Batch 1')->first();
 
-        $booking = $batch1->bookings->first() ?: Booking::factory()->create(['batch_id' => $batch1->id]);
+        $booking = $batch1->bookings->first() ?: Booking::create([
+            'batch_id' => $batch1->id,
+            'user_id' => $admin->id,
+            'booking_number' => 'BK-' . uniqid(),
+            'pin' => '1234',
+            'class_type' => 'intro',
+            'status' => 'confirmed',
+            'total_amount' => 5000,
+            'contact_name' => 'Extra Lead',
+            'contact_email' => 'lead@example.com',
+            'contact_phone' => '09123456789',
+            'start_date' => $batch1->start_date,
+            'end_date' => $batch1->end_date,
+        ]);
         $p1 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 1', 'age' => 20, 'price_per_person' => 2500.00]);
         $p2 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 2', 'age' => 21, 'price_per_person' => 2500.00]);
         $p3 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Extra Student 3', 'age' => 22, 'price_per_person' => 2500.00]);
@@ -197,10 +210,34 @@ class AdminCoachMatchingModuleTest extends TestCase
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         $this->actingAs($admin);
 
+        $batch = Batch::first();
         $coachMark = User::where('email', 'coach.mark@campfreedive.ph')->first();
         $coachChristine = User::where('email', 'coach.christine@campfreedive.ph')->first();
-        $requestMark = CoachRequest::where('coach_id', $coachMark->id)->first();
-        $requestChristine = CoachRequest::where('coach_id', $coachChristine->id)->first();
+
+        $opening = CoachOpening::create([
+            'batch_id' => $batch->id,
+            'dive_date' => $batch->start_date,
+            'needed_students_count' => 4,
+            'status' => 'open',
+            'posted_by' => $admin->id,
+            'notes' => 'Test opening',
+        ]);
+
+        $requestMark = CoachRequest::create([
+            'opening_id' => $opening->id,
+            'batch_id' => $batch->id,
+            'coach_id' => $coachMark->id,
+            'status' => 'pending',
+            'notes' => 'Mark available',
+        ]);
+
+        $requestChristine = CoachRequest::create([
+            'opening_id' => $opening->id,
+            'batch_id' => $batch->id,
+            'coach_id' => $coachChristine->id,
+            'status' => 'pending',
+            'notes' => 'Christine available',
+        ]);
 
         $response = $this->post("/admin/coaches/requests/{$requestMark->id}/approve");
         $response->assertRedirect();
@@ -218,7 +255,20 @@ class AdminCoachMatchingModuleTest extends TestCase
         $coachJose = User::where('email', 'coach.jose@campfreedive.ph')->first();
         $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
 
-        $booking = $batch->bookings->first() ?: Booking::factory()->create(['batch_id' => $batch->id]);
+        $booking = $batch->bookings->first() ?: Booking::create([
+            'batch_id' => $batch->id,
+            'user_id' => $admin->id,
+            'booking_number' => 'BK-' . uniqid(),
+            'pin' => '1234',
+            'class_type' => 'intro',
+            'status' => 'confirmed',
+            'total_amount' => 5000,
+            'contact_name' => 'Balance Lead',
+            'contact_email' => 'lead@example.com',
+            'contact_phone' => '09123456789',
+            'start_date' => $batch->start_date,
+            'end_date' => $batch->end_date,
+        ]);
         $p1 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Balance Test 1', 'age' => 20, 'price_per_person' => 2500]);
         $p2 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Balance Test 2', 'age' => 21, 'price_per_person' => 2500]);
         $p3 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Balance Test 3', 'age' => 22, 'price_per_person' => 2500]);
@@ -259,7 +309,20 @@ class AdminCoachMatchingModuleTest extends TestCase
         $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
 
         // 3 on Jose, 0 on Mary (imbalanced by 3)
-        $booking = $batch->bookings->first() ?: Booking::factory()->create(['batch_id' => $batch->id]);
+        $booking = $batch->bookings->first() ?: Booking::create([
+            'batch_id' => $batch->id,
+            'user_id' => $admin->id,
+            'booking_number' => 'BK-' . uniqid(),
+            'pin' => '1234',
+            'class_type' => 'intro',
+            'status' => 'confirmed',
+            'total_amount' => 5000,
+            'contact_name' => 'Imbalance Lead',
+            'contact_email' => 'lead@example.com',
+            'contact_phone' => '09123456789',
+            'start_date' => $batch->start_date,
+            'end_date' => $batch->end_date,
+        ]);
         $p1 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Imbalance 1', 'age' => 20, 'price_per_person' => 2500]);
         $p2 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Imbalance 2', 'age' => 21, 'price_per_person' => 2500]);
         $p3 = BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Imbalance 3', 'age' => 22, 'price_per_person' => 2500]);
@@ -288,6 +351,24 @@ class AdminCoachMatchingModuleTest extends TestCase
 
         $batch = Batch::where('batch_code', 'Batch 2')->first();
         $coachMary = User::where('email', 'coach.mary@campfreedive.ph')->first();
+
+        $booking = $batch->bookings->first() ?: Booking::create([
+            'batch_id' => $batch->id,
+            'user_id' => $admin->id,
+            'booking_number' => 'BK-' . uniqid(),
+            'pin' => '1234',
+            'class_type' => 'intro',
+            'status' => 'confirmed',
+            'total_amount' => 5000,
+            'contact_name' => 'Batch 2 Lead',
+            'contact_email' => 'lead@example.com',
+            'contact_phone' => '09123456789',
+            'start_date' => $batch->start_date,
+            'end_date' => $batch->end_date,
+        ]);
+        if ($booking->participants->isEmpty()) {
+            BookingParticipant::create(['booking_id' => $booking->id, 'name' => 'Batch 2 Student', 'age' => 20, 'price_per_person' => 2500]);
+        }
 
         // 1. Assign coach to batch directly (1-click or multi-coach)
         $response = $this->post('/admin/coaches/matching/assign', [

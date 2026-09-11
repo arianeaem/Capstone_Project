@@ -61,6 +61,19 @@
                     </div>
                 </div>
 
+                <!-- AI Model Recommended Staffing Pill -->
+                <template x-if="staffingRec && staffingRec.pill_text">
+                    <div class="p-3.5 rounded-xl bg-gradient-to-r from-[#F0FDF4] to-emerald-50/50 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
+                        <div class="flex items-center gap-2">
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-600 text-white font-black text-xs shrink-0">
+                                ⚡
+                            </span>
+                            <span class="font-extrabold text-xs sm:text-sm text-emerald-900" x-text="staffingRec.pill_text"></span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 self-start sm:self-auto" x-text="staffingRec.demand_level + ' Demand'"></span>
+                    </div>
+                </template>
+
                 <!-- Duplicate Batch Date Warning Alert & Direct Redirect -->
                 <template x-if="duplicateBatches.length > 0">
                     <div class="p-4 rounded-xl bg-[#FFFBEB] border border-amber-200 text-[#92400E] space-y-3">
@@ -249,6 +262,7 @@ function batchCreateForm() {
         selectedBookingIds: @json($selectedIds),
         existingBatches: @json($existingBatches ?? []),
         existingBatchesForSelectedDate: [],
+        staffingRec: @json($initialStaffingRec ?? null),
         loadingBookings: false,
         perPage: 5,
         currentPage: 1,
@@ -310,6 +324,9 @@ function batchCreateForm() {
                     }
                     if (data.existing_batches) {
                         this.existingBatchesForSelectedDate = data.existing_batches;
+                    }
+                    if (data.ml_recommendation) {
+                        this.staffingRec = data.ml_recommendation;
                     }
                     this.loadingBookings = false;
                 })

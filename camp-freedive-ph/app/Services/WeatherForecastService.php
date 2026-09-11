@@ -1126,7 +1126,13 @@ class WeatherForecastService
                 }
             }
 
-            // Desensitized Whole-Day Physical Hard-Gates
+            // Tier 2 Compound Precursor Check:
+            // A rapid barometric drop (>= 2.5 hPa / 3h) requires companion storm indicators
+            // (Squall Gusts >= 38.0 km/h OR Rain Rate >= 15.0 mm/hr) to trigger an emergency breach.
+            // Diurnal solar tides on calm sunny days will NOT trigger a false critical alarm.
+            $hasCompoundPressureBreach = ($maxPressureDrop3h >= 2.5 && ($maxDaytimeGust >= 38.0 || $daytimeMaxRainRate >= 15.0));
+
+            // Tier 1 Absolute Physical Hard-Gates (PCG Banca / Small Craft Safety Limits)
             $isDaytimePhysicalBreach = (
                 $meanDaytimeWind >= 42.0 ||
                 $maxDaytimeGust >= 48.0 ||
@@ -1136,7 +1142,7 @@ class WeatherForecastService
                 $daytimeRainTotal >= 25.0 ||
                 $daytimeMaxRainRate >= 25.0 ||
                 $meanDaytimePressure <= 998.0 ||
-                $maxPressureDrop3h >= 2.0
+                $hasCompoundPressureBreach
             );
 
             $daytimeScores = [

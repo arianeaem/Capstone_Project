@@ -43,10 +43,23 @@ class MLSyncController extends Controller
             ]);
 
             $totalParticipants = $validBookings->sum(fn($b) => $b->participants->count());
-            $totalRevenue = (float) $validBookings->sum(fn($b) => (float) $b->total_amount);
+            $grossRevenue = (float) $validBookings->sum(fn($b) => (float) $b->total_amount);
+            $lguFees = (float) $validBookings->sum(fn($b) => (float) ($b->lgu_fee ?? 0));
+            $envFees = (float) $validBookings->sum(fn($b) => (float) ($b->environmental_fee ?? 0));
+            $carpoolFees = (float) $validBookings->sum(fn($b) => (float) ($b->carpool_fee ?? 0));
+            $boatDiveFees = (float) $validBookings->sum(fn($b) => (float) ($b->boat_dive_fee ?? 0));
+
+            // Pure freediving class revenue only (excluding carpool transportation, boat dive add-on, LGU pass, and environmental fees)
+            $pureClassRevenue = (float) $validBookings->sum(fn($b) => (float) ($b->subtotal ?? 0));
+            if ($pureClassRevenue <= 0 && $grossRevenue > 0) {
+                $pureClassRevenue = max(0, $grossRevenue - ($lguFees + $envFees + $carpoolFees + $boatDiveFees));
+            }
+
+            $totalRevenue = $pureClassRevenue;
             $collectedRevenue = (float) $validBookings->flatMap->payments
                 ->where('status', 'verified')
                 ->sum(fn($p) => (float) $p->amount);
+
 
             $classBreakdown = [];
             foreach ($validBookings as $b) {
@@ -191,6 +204,9 @@ class MLSyncController extends Controller
             DemandForecast::query()->delete();
             DemandForecast::insert($recordsToInsert);
         });
+
+        // Invalidate cached forecast so UI immediately updates
+        \Illuminate\Support\Facades\Cache::forget('ml_demand_forecast');
 
         Log::info('ML Forecast successfully synced', [
             'count' => count($recordsToInsert),

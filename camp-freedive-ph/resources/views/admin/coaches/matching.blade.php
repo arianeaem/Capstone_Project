@@ -42,6 +42,7 @@
                 $assignedCount = $group['assigned_count'];
                 $availableCoaches = $group['available_coaches'];
                 $isStaffed = $assignedCount >= $neededCoaches;
+                $mlRec = $group['ml_recommendation'] ?? null;
             @endphp
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4 shadow-2xs flex flex-col justify-between" x-data="{ selectedCoaches: [] }">
                 
@@ -65,6 +66,16 @@
                                         <span class="text-[#8E8E93] italic font-medium">0 Coaches Needed (No Participants)</span>
                                     @endif
                                 </div>
+                                @if(!empty($mlRec))
+                                    <div class="pt-1.5">
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-indigo-50/80 text-indigo-700 border border-indigo-200/70 shadow-2xs" title="Forecasted demand level: {{ $mlRec['demand_level'] ?? 'Normal' }} ({{ $mlRec['season_period'] ?? 'Season' }})">
+                                            <svg class="w-3.5 h-3.5 text-indigo-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                            </svg>
+                                            <span>Model Suggestion: <strong class="text-indigo-950">{{ $mlRec['instructors_needed'] ?? 2 }} {{ Str::plural('Coach', $mlRec['instructors_needed'] ?? 2) }}</strong> ({{ $mlRec['demand_level'] ?? 'Medium' }} Demand)</span>
+                                        </span>
+                                    </div>
+                                @endif
                             </div>
                         </div>
 

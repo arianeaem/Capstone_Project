@@ -80,10 +80,17 @@ class CoachMatchingService
                 $dateStr2 = $batch->end_date ? $batch->end_date->format('Y-m-d') : $batch->start_date->copy()->addDay()->format('Y-m-d');
 
                 foreach ([$dateStr1, $dateStr2] as $dStr) {
-                    CoachAvailability::updateOrCreate(
-                        ['coach_id' => $coach->id, 'date' => $dStr],
-                        ['status' => 'assigned', 'notes' => "Assigned to {$batch->batch_number}"]
-                    );
+                    $avail = CoachAvailability::where('coach_id', $coach->id)->whereDate('date', $dStr)->first();
+                    if ($avail) {
+                        $avail->update(['status' => 'assigned', 'notes' => "Assigned to {$batch->batch_number}"]);
+                    } else {
+                        CoachAvailability::create([
+                            'coach_id' => $coach->id,
+                            'date' => $dStr,
+                            'status' => 'assigned',
+                            'notes' => "Assigned to {$batch->batch_number}",
+                        ]);
+                    }
                 }
             }
 
@@ -630,6 +637,18 @@ class CoachMatchingService
                 'reviewed_at' => now(),
             ]);
 
+            // Mark other pending requests for the same opening as not_selected
+            if ($request->opening_id) {
+                CoachRequest::where('opening_id', $request->opening_id)
+                    ->where('id', '!=', $request->id)
+                    ->where('status', 'pending')
+                    ->update([
+                        'status' => 'not_selected',
+                        'reviewed_by' => $reviewer->id,
+                        'reviewed_at' => now(),
+                    ]);
+            }
+
             $batch = $request->batch;
 
             // 2. Assign the coach to the batch
@@ -642,10 +661,17 @@ class CoachMatchingService
             $dateStr2 = $batch->end_date ? $batch->end_date->format('Y-m-d') : $batch->start_date->copy()->addDay()->format('Y-m-d');
 
             foreach ([$dateStr1, $dateStr2] as $dStr) {
-                CoachAvailability::updateOrCreate(
-                    ['coach_id' => $request->coach_id, 'date' => $dStr],
-                    ['status' => 'assigned', 'notes' => "Approved request for batch {$batch->batch_code}"]
-                );
+                $avail = CoachAvailability::where('coach_id', $request->coach_id)->whereDate('date', $dStr)->first();
+                if ($avail) {
+                    $avail->update(['status' => 'assigned', 'notes' => "Approved request for batch {$batch->batch_code}"]);
+                } else {
+                    CoachAvailability::create([
+                        'coach_id' => $request->coach_id,
+                        'date' => $dStr,
+                        'status' => 'assigned',
+                        'notes' => "Approved request for batch {$batch->batch_code}",
+                    ]);
+                }
             }
 
             AuditLogger::log(

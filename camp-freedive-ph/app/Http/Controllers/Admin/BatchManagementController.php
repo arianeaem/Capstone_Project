@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use App\Models\Booking;
 use App\Services\BatchManagementService;
+use App\Services\DemandForecastService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,8 @@ use Illuminate\View\View;
 class BatchManagementController extends Controller
 {
     public function __construct(
-        protected BatchManagementService $batchService
+        protected BatchManagementService $batchService,
+        protected DemandForecastService $forecastService
     ) {}
 
     /**
@@ -139,6 +141,7 @@ class BatchManagementController extends Controller
         })->values()->all();
 
         $selectedIds = $unbatchedBookings->pluck('id')->values()->all();
+        $initialStaffingRec = $this->forecastService->getStaffingRecommendationForDate($defaultDate);
 
         $existingBatches = Batch::all()->map(function ($b) {
             return [
@@ -162,7 +165,8 @@ class BatchManagementController extends Controller
             'unbatchedBookings',
             'initialBookings',
             'selectedIds',
-            'existingBatches'
+            'existingBatches',
+            'initialStaffingRec'
         ));
     }
 
@@ -175,6 +179,7 @@ class BatchManagementController extends Controller
         $date = Carbon::parse($dateStr);
         $bookings = $this->batchService->getUnbatchedBookingsForDate($date);
         $batchCount = Batch::count();
+        $mlRec = $this->forecastService->getStaffingRecommendationForDate($date);
 
         $existingForDate = Batch::whereDate('start_date', $date)->get()->map(function ($b) {
             return [
@@ -195,6 +200,7 @@ class BatchManagementController extends Controller
             'suggested_code' => 'Batch ' . ($batchCount + 1),
             'count' => $bookings->count(),
             'existing_batches' => $existingForDate,
+            'ml_recommendation' => $mlRec,
             'bookings' => $bookings->map(function ($b) {
                 return [
                     'id' => $b->id,

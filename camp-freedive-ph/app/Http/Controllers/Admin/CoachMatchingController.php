@@ -9,6 +9,7 @@ use App\Models\CoachOpening;
 use App\Models\CoachRequest;
 use App\Models\User;
 use App\Services\CoachMatchingService;
+use App\Services\DemandForecastService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +19,8 @@ use Illuminate\View\View;
 class CoachMatchingController extends Controller
 {
     public function __construct(
-        protected CoachMatchingService $matchingService
+        protected CoachMatchingService $matchingService,
+        protected DemandForecastService $forecastService
     ) {}
 
     /**
@@ -48,6 +50,9 @@ class CoachMatchingController extends Controller
 
             $startDateStr = $batch->start_date->format('Y-m-d');
             $endDateStr = $batch->end_date ? $batch->end_date->format('Y-m-d') : $startDateStr;
+
+            // Fetch Demand Forecast staffing suggestion for batch's start date
+            $mlRecommendation = $this->forecastService->getStaffingRecommendationForDate($batch->start_date);
 
             // Only include coaches who are available on this batch's dates (and NOT already assigned to this batch)
             $availableCoaches = $activeCoaches->filter(function ($coach) use ($startDateStr, $endDateStr, $assignedCoachIds) {
@@ -87,6 +92,7 @@ class CoachMatchingController extends Controller
                 'assigned_count' => $assignedCoaches->count(),
                 'available_coaches' => $availableCoaches,
                 'open_broadcast' => $openBroadcast,
+                'ml_recommendation' => $mlRecommendation,
             ];
         });
 
@@ -119,13 +125,22 @@ class CoachMatchingController extends Controller
                     return back()->with('error', "Cannot assign coaches to {$batch->batch_number} because there are no participants registered yet.");
                 }
 
-                $coachIds = array_keys($validated['assignments']);
-
-                $this->matchingService->assignCoachesToBatch(
-                    $batch,
-                    $coachIds,
-                    auth()->user()
-                );
+                $firstVal = reset($validated['assignments']);
+                if (is_array($firstVal)) {
+                    $this->matchingService->saveBatchBalancedAssignments(
+                        $batch,
+                        $validated['assignments'],
+                        auth()->user(),
+                        $validated['exception_note'] ?? null
+                    );
+                } else {
+                    $coachIds = array_keys($validated['assignments']);
+                    $this->matchingService->assignCoachesToBatch(
+                        $batch,
+                        $coachIds,
+                        auth()->user()
+                    );
+                }
 
                 return back()->with('success', "Coaches successfully assigned to {$batch->batch_number}.");
             } catch (Exception $e) {
@@ -279,13 +294,14 @@ class CoachMatchingController extends Controller
     /**
      * Approve a coach request for an open slot.
      */
-    public function approveRequest(CoachRequest $coachRequest): RedirectResponse
+    public function approveRequest($coachRequest): RedirectResponse
     {
         try {
-            $this->matchingService->approveCoachRequest($coachRequest, auth()->user());
-            $batch = $coachRequest->batch;
+            $requestModel = $coachRequest instanceof CoachRequest ? $coachRequest : CoachRequest::findOrFail($coachRequest);
+            $this->matchingService->approveCoachRequest($requestModel, auth()->user());
+            $batch = $requestModel->batch;
 
-            return back()->with('success', "Approved Coach {$coachRequest->coach->name} for {$batch->batch_code}.");
+            return back()->with('success', "Approved Coach " . ($requestModel->coach?->name ?? 'Coach') . " for " . ($batch?->batch_code ?? 'Batch') . ".");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -311,7 +327,7 @@ class CoachMatchingController extends Controller
                 if ($coachRequest && $coachRequest->status === 'pending') {
                     $this->matchingService->approveCoachRequest($coachRequest, auth()->user());
                     $approvedCount++;
-                    $coachNames[] = $coachRequest->coach->name;
+                    $coachNames[] = $coachRequest->coach?->name ?? 'Coach';
                     $batchCode = $coachRequest->batch?->batch_code ?? '';
                 }
             }
@@ -326,11 +342,15 @@ class CoachMatchingController extends Controller
     /**
      * Approve an emergency assignment release request.
      */
-    public function approveReleaseRequest(Request $request, \App\Models\AssignmentReleaseRequest $releaseRequest): RedirectResponse
+    public function approveReleaseRequest(Request $request, $releaseRequest): RedirectResponse
     {
+        $reqModel = $releaseRequest instanceof \App\Models\AssignmentReleaseRequest 
+            ? $releaseRequest 
+            : \App\Models\AssignmentReleaseRequest::findOrFail($releaseRequest);
+
         try {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($releaseRequest, $request) {
-                $releaseRequest->update([
+            \Illuminate\Support\Facades\DB::transaction(function () use ($reqModel, $request) {
+                $reqModel->update([
                     'status' => 'approved',
                     'reviewed_by' => auth()->id(),
                     'reviewed_at' => now(),
@@ -338,26 +358,26 @@ class CoachMatchingController extends Controller
                 ]);
 
                 // Unassign the coach's students for that batch
-                \App\Models\ParticipantAssignment::where('coach_id', $releaseRequest->coach_id)
-                    ->where('batch_id', $releaseRequest->batch_id)
+                \App\Models\ParticipantAssignment::where('coach_id', $reqModel->coach_id)
+                    ->where('batch_id', $reqModel->batch_id)
                     ->delete();
 
                 // Set coach availability for that date to unavailable
-                \App\Models\CoachAvailability::where('coach_id', $releaseRequest->coach_id)
-                    ->where('date', $releaseRequest->dive_date)
+                \App\Models\CoachAvailability::where('coach_id', $reqModel->coach_id)
+                    ->where('date', $reqModel->dive_date)
                     ->update(['status' => 'unavailable']);
 
                 // Pair date
-                $pairDate = $releaseRequest->dive_date->isSaturday() 
-                    ? $releaseRequest->dive_date->copy()->addDay() 
-                    : $releaseRequest->dive_date->copy()->subDay();
+                $pairDate = $reqModel->dive_date->isSaturday() 
+                    ? $reqModel->dive_date->copy()->addDay() 
+                    : $reqModel->dive_date->copy()->subDay();
 
-                \App\Models\CoachAvailability::where('coach_id', $releaseRequest->coach_id)
+                \App\Models\CoachAvailability::where('coach_id', $reqModel->coach_id)
                     ->where('date', $pairDate)
                     ->update(['status' => 'unavailable']);
             });
 
-            return back()->with('success', "Approved release request for Coach {$releaseRequest->coach->name}. Students have been moved back to the matching queue.");
+            return back()->with('success', "Approved release request for Coach " . ($reqModel->coach?->name ?? 'Coach') . ". Students have been moved back to the matching queue.");
         } catch (Exception $e) {
             return back()->with('error', 'Failed to approve release request: ' . $e->getMessage());
         }
@@ -366,15 +386,19 @@ class CoachMatchingController extends Controller
     /**
      * Reject an emergency assignment release request.
      */
-    public function rejectReleaseRequest(Request $request, \App\Models\AssignmentReleaseRequest $releaseRequest): RedirectResponse
+    public function rejectReleaseRequest(Request $request, $releaseRequest): RedirectResponse
     {
-        $releaseRequest->update([
+        $reqModel = $releaseRequest instanceof \App\Models\AssignmentReleaseRequest 
+            ? $releaseRequest 
+            : \App\Models\AssignmentReleaseRequest::findOrFail($releaseRequest);
+
+        $reqModel->update([
             'status' => 'rejected',
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
             'review_notes' => $request->input('notes', 'Request could not be accommodated due to staffing constraints.'),
         ]);
 
-        return back()->with('success', "Release request for Coach {$releaseRequest->coach->name} has been rejected.");
+        return back()->with('success', "Release request for Coach " . ($reqModel->coach?->name ?? 'Coach') . " has been rejected.");
     }
 }

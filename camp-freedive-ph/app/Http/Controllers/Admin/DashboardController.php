@@ -239,6 +239,9 @@ class DashboardController extends Controller
         // Governance & Audit Logs
         $recentAuditLogs = AuditLog::latest('created_at')->take(6)->get();
 
+        // AI Demand & Revenue Forecast
+        $forecastData = app(\App\Services\DemandForecastService::class)->getForecastData();
+
         return view('admin.dashboard', compact(
             'user',
             'isOwner',
@@ -250,7 +253,8 @@ class DashboardController extends Controller
             'financials',
             'packageAnalytics',
             'dynamicPricingStats',
-            'recentAuditLogs'
+            'recentAuditLogs',
+            'forecastData'
         ));
     }
 }
