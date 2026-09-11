@@ -45,7 +45,7 @@
                 </div>
             @endif
 
-            <form action="{{ route('password.force_change.update') }}" method="POST" class="space-y-5">
+            <form action="{{ route('password.force_change.update') }}" method="POST" class="space-y-5" data-no-spa data-native>
                 @csrf
 
                 <!-- Current Temporary Password -->
@@ -60,7 +60,7 @@
                                required 
                                autofocus
                                placeholder="Enter temporary password"
-                               class="w-full px-4 py-3 rounded-xl border {{ $errors->has('current_password') ? 'border-[#FF3B3C]' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-colors pr-11">
+                               class="w-full px-4 py-3 rounded-xl border {{ $errors->has('current_password') ? 'border-[#FF3B3C] ring-2 ring-[#FF3B3C]/20 bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm text-[#1D1D1F] bg-white transition-all pr-11">
                         <button type="button" 
                                 @click="show = !show" 
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93] hover:text-[#1D1D1F] p-1">
@@ -84,7 +84,7 @@
                                id="password" 
                                required 
                                placeholder="Min. 8 characters"
-                               class="w-full px-4 py-3 rounded-xl border {{ $errors->has('password') ? 'border-[#FF3B3C]' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-colors pr-11">
+                               class="w-full px-4 py-3 rounded-xl border {{ $errors->has('password') ? 'border-[#FF3B3C] ring-2 ring-[#FF3B3C]/20 bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm text-[#1D1D1F] bg-white transition-all pr-11">
                         <button type="button" 
                                 @click="show = !show" 
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93] hover:text-[#1D1D1F] p-1">
@@ -108,7 +108,7 @@
                                id="password_confirmation" 
                                required 
                                placeholder="Re-type new password"
-                               class="w-full px-4 py-3 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-colors pr-11">
+                               class="w-full px-4 py-3 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-all pr-11">
                         <button type="button" 
                                 @click="show = !show" 
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93] hover:text-[#1D1D1F] p-1">
@@ -119,13 +119,13 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md hover:bg-[#5E0000] transition-all">
+                <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md hover:bg-[#5E0000] transition-all cursor-pointer">
                     Set Password
                 </button>
             </form>
 
             <div class="mt-8 pt-6 border-t border-[#E5E5EA] text-center">
-                <form action="{{ route('logout') }}" method="POST">
+                <form action="{{ route('logout') }}" method="POST" data-no-spa data-native>
                     @csrf
                     <button type="submit" class="text-xs text-[#6E6E73] hover:text-[#780000] font-semibold underline cursor-pointer">
                         Sign Out

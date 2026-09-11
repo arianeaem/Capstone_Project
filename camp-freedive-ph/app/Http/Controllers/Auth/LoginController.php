@@ -108,10 +108,17 @@ class LoginController extends Controller
         RateLimiter::hit($throttleKey);
         AuditLogger::log('LOGIN_FAILED', "Failed login attempt for email: {$request->input('email')}", $user, $request->input('email'), $request);
 
+        $errorMessage = $user 
+            ? 'The password you entered is incorrect. Please check your password or click "Forgot password?".'
+            : 'These credentials do not match our records. Please check your email address and password.';
+
+        $fieldErrors = $user
+            ? ['password' => 'Incorrect password entered.']
+            : ['email' => 'These credentials do not match our records.'];
+
         return back()->withInput($request->only('email', 'remember'))
-            ->withErrors([
-                'email' => 'These credentials do not match our records.',
-            ]);
+            ->with('error', $errorMessage)
+            ->withErrors($fieldErrors);
     }
 
     /**

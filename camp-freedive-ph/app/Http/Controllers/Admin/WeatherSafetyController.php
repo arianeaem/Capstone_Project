@@ -56,8 +56,12 @@ class WeatherSafetyController extends Controller
             $query->whereDate('start_date', '<=', $request->input('date_to'));
         }
 
-        // Critical and High Risk count (within active monitoring horizon)
-        $criticalCount = (clone $query)->whereIn('risk_classification', ['high_risk', 'critical_risk'])->count();
+        // Critical and High Risk count (only for active/upcoming batches, excluding completed, cancelled, or past batches)
+        $criticalCount = (clone $query)
+            ->whereIn('risk_classification', ['high_risk', 'critical_risk'])
+            ->whereNotIn('status', ['completed', 'cancelled', 'cancelled_by_camp'])
+            ->whereDate('end_date', '>=', Carbon::today(WeatherForecastService::TIMEZONE))
+            ->count();
 
         // Sort safety monitoring to latest first
         $perPage = max(5, min(100, (int) $request->input('per_page', 10)));

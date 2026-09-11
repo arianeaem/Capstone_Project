@@ -6,7 +6,7 @@
 <div class="space-y-6 text-sm">
     
     <!-- Top Header & Actions -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Weather & Marine Safety</h1>
             <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
@@ -64,7 +64,7 @@
     <div class="p-4 bg-rose-50 rounded-xl border border-rose-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-rose-900">
         <div class="flex items-center gap-2.5">
             <div>
-                <strong>{{ $criticalCount }} batch(es)</strong> are currently classified as <strong>High Risk</strong> or <strong>Critical Risk</strong>. Review conditions immediately to confirm go/no-go or initiate cancellation flows.
+                <strong>{{ $criticalCount }} upcoming batch(es)</strong> are currently classified as <strong>High Risk</strong> or <strong>Critical Risk</strong>. Review conditions immediately to confirm go/no-go or initiate cancellation flows.
             </div>
         </div>
         <span class="font-bold uppercase tracking-wider text-xs text-[#780000]">Safety Advisory</span>

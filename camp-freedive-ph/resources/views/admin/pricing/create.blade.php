@@ -77,21 +77,21 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <!-- Rule Name -->
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Rule Name <span class="text-[#780000]">*</span></label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Rule Name <span class="text-[#780000]">*</span></label>
                     <input type="text" name="name" x-model="name" required placeholder="e.g. Peak Season Discovery Bump"
                            class="w-full text-xs rounded-lg border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                 </div>
 
                 <!-- Description -->
                 <div class="sm:col-span-2">
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Description (Optional)</label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Description (Optional)</label>
                     <textarea name="description" rows="2" placeholder="e.g. Applies during November to April high season to smooth capacity"
                               class="w-full text-xs rounded-lg border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">{{ old('description') }}</textarea>
                 </div>
 
                 <!-- Applies To -->
                 <div>
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Applies To <span class="text-[#780000]">*</span></label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Applies To <span class="text-[#780000]">*</span></label>
                     <select name="applies_to" x-model="applies_to" required
                             class="w-full text-xs rounded-lg border border-[#D1D1D6] px-2.5 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                         <option value="all">All Classes (Discovery, Fundive, Refinement)</option>
@@ -103,7 +103,7 @@
 
                 <!-- Execution Priority -->
                 <div>
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Execution Priority (1 = Highest)</label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Execution Priority (1 = Highest)</label>
                     <input type="number" name="priority" x-model="priority" min="1" max="999"
                             class="w-full text-xs rounded-lg border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                     <span class="text-xs text-[#6E6E73] mt-0.5 block">Determines stacking sequence when multiple rules trigger.</span>
@@ -196,7 +196,7 @@
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <!-- Adjustment Type -->
                 <div>
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Direction <span class="text-[#780000]">*</span></label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Direction <span class="text-[#780000]">*</span></label>
                     <select name="adjustment_type" x-model="adjustment_type" required
                             class="w-full text-xs rounded-lg border border-[#D1D1D6] px-2.5 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                         <option value="increase">Increase (+ Surcharge / Peak Bump)</option>
@@ -206,7 +206,7 @@
 
                 <!-- Adjustment Method -->
                 <div>
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Calculation Method <span class="text-[#780000]">*</span></label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Calculation Method <span class="text-[#780000]">*</span></label>
                     <select name="adjustment_method" x-model="adjustment_method" required
                             class="w-full text-xs rounded-lg border border-[#D1D1D6] px-2.5 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
                         <option value="percentage">Percentage (%)</option>
@@ -216,7 +216,7 @@
 
                 <!-- Adjustment Value -->
                 <div>
-                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1">Adjustment Value <span class="text-[#780000]">*</span></label>
+                    <label class="block text-xs font-bold text-[#1D1D1F] mb-1.5">Adjustment Value <span class="text-[#780000]">*</span></label>
                     <div class="relative">
                         <input type="number" step="0.01" min="0.01" name="adjustment_value" x-model="adjustment_value" required placeholder="e.g. 15"
                                class="w-full text-xs rounded-lg border border-[#D1D1D6] px-3 py-2 bg-[#FAFAFC] focus:bg-white focus:border-[#780000] pr-10">

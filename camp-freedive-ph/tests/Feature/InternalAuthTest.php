@@ -192,4 +192,35 @@ class InternalAuthTest extends TestCase
         $this->assertEquals('Coach Updated Name', $newCoach->fresh()->name);
         $this->assertEquals('active', $newCoach->fresh()->status);
     }
+
+    public function test_wrong_password_shows_explicit_error_and_validation_feedback(): void
+    {
+        $response = $this->from('/login')->post('/login', [
+            'email' => 'owner@campfreedive.ph',
+            'password' => 'WrongPassword123!',
+        ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHas('error', 'The password you entered is incorrect. Please check your password or click "Forgot password?".');
+        $response->assertSessionHasErrors(['password']);
+        $this->assertGuest();
+
+        // Follow redirect to verify single clean alert banner renders on login page
+        $followResponse = $this->get('/login');
+        $followResponse->assertStatus(200);
+        $followResponse->assertSee('The password you entered is incorrect. Please check your password or click &quot;Forgot password?&quot;.', false);
+    }
+
+    public function test_unknown_email_shows_invalid_credentials_error(): void
+    {
+        $response = $this->from('/login')->post('/login', [
+            'email' => 'unknown.user@campfreedive.ph',
+            'password' => 'SomePassword123!',
+        ]);
+
+        $response->assertRedirect('/login');
+        $response->assertSessionHas('error', 'These credentials do not match our records. Please check your email address and password.');
+        $response->assertSessionHasErrors(['email']);
+        $this->assertGuest();
+    }
 }

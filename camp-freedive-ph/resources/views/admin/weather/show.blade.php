@@ -118,7 +118,7 @@
 
     <div class="bg-white rounded-xl border {{ $overallConfig['border'] }} p-6 sm:p-7 space-y-4">
         
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <span class="text-xs font-extrabold uppercase tracking-widest text-[#6E6E73] block mb-1">
                     Overall Batch Assessment
@@ -184,14 +184,14 @@
                 </div>
 
                 <!-- Recommended Action after Day 1 Header -->
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs text-[#1D1D1F] space-y-1">
+                <div class="p-3.5 rounded-xl bg-[#FAFAFC] text-xs text-[#1D1D1F] space-y-1">
                     <span class="font-bold text-[#6E6E73] block uppercase text-[11px] tracking-wider">Recommended Action:</span>
                     <p class="font-semibold text-[#1D1D1F] leading-snug">{{ $day1Assessment->recommended_action }}</p>
                 </div>
 
                 <!-- Day 1 Quick Stat Chips -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                         <div>
                             <span class="text-[#6E6E73] block text-xs uppercase font-bold">Worst Hour</span>
                             <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -200,7 +200,7 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                         <div>
                             <span class="text-[#6E6E73] block text-xs uppercase font-bold">Forecast Horizon</span>
                             <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -209,7 +209,7 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1.5">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] space-y-1.5">
                         <div>
                             <div class="flex items-center gap-1.5 mt-0.5">
                                 <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border {{ $day1Assessment->reliability['badge_class'] }}">
@@ -332,14 +332,14 @@
                 </div>
 
                 <!-- Recommended Action after Day 2 Header -->
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs text-[#1D1D1F] space-y-1">
+                <div class="p-3.5 rounded-xl bg-[#FAFAFC] text-xs text-[#1D1D1F] space-y-1">
                     <span class="font-bold text-[#6E6E73] block uppercase text-[11px] tracking-wider">Recommended Action:</span>
                     <p class="font-semibold text-[#1D1D1F] leading-snug">{{ $day2Assessment->recommended_action }}</p>
                 </div>
 
                 <!-- Day 2 Quick Stat Chips -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                         <div>
                             <span class="text-[#6E6E73] block text-xs uppercase font-bold">Worst Hour</span>
                             <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -348,7 +348,7 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center justify-between">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
                         <div>
                             <span class="text-[#6E6E73] block text-xs uppercase font-bold">Forecast Horizon</span>
                             <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -357,7 +357,7 @@
                         </div>
                     </div>
 
-                    <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1.5">
+                    <div class="p-3 rounded-xl bg-[#FAFAFC] space-y-1.5">
                         <div>
                             <div class="flex items-center gap-1.5 mt-0.5">
                                 <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border {{ $day2Assessment->reliability['badge_class'] }}">

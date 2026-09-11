@@ -43,7 +43,7 @@
 
                 <!-- Call to Action Buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-                    <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-lg shadow-black/20 text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                    <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
                         <span>Book Slot Now</span>
                         <svg class="w-5 h-5 ml-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </a>
@@ -304,7 +304,7 @@
                 Join our 2D1N freedive camp. Discovery beginner classes, fundives, and refinement practice dives are open for booking.
             </p>
             <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] shadow-lg shadow-black/20 text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] text-[#1D1D1F] text-center transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
                     Book Your Freediving Adventure
                 </a>
                 <a href="{{ route('manage.index') }}" class="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-colors border border-white/20">

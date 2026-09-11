@@ -105,6 +105,31 @@ class SPARouter {
         });
     }
 
+    hasSpaContainer(doc = document) {
+        return !!(doc.getElementById('spa-page-content') || doc.getElementById('app-page-content'));
+    }
+
+    isAuthUrl(url) {
+        if (!url) return false;
+        try {
+            const urlObj = new URL(url, window.location.origin);
+            const path = urlObj.pathname.toLowerCase();
+            const authPrefixes = [
+                '/login',
+                '/admin/login',
+                '/staff/login',
+                '/staff',
+                '/logout',
+                '/forgot-password',
+                '/reset-password',
+                '/force-password-change'
+            ];
+            return authPrefixes.some(prefix => path === prefix || path.startsWith(prefix + '/') || path.startsWith(prefix + '?'));
+        } catch {
+            return false;
+        }
+    }
+
     shouldInterceptLink(link, event) {
         // Skip modifier keys or middle clicks
         if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) {
@@ -113,6 +138,11 @@ class SPARouter {
 
         const href = link.getAttribute('href');
         if (!href || href.startsWith('#') || href.startsWith('javascript:') || href.startsWith('mailto:') || href.startsWith('tel:')) {
+            return false;
+        }
+
+        // Only intercept if current document is inside an SPA layout container
+        if (!this.hasSpaContainer(document)) {
             return false;
         }
 
@@ -126,8 +156,8 @@ class SPARouter {
             return false;
         }
 
-        // Ignore logout or authentication actions
-        if (href.includes('/logout')) {
+        // Ignore auth and logout routes
+        if (this.isAuthUrl(link.href) || href.includes('/logout')) {
             return false;
         }
 
@@ -151,12 +181,17 @@ class SPARouter {
     }
 
     shouldInterceptForm(form) {
+        // Only intercept if current document is inside an SPA layout container
+        if (!this.hasSpaContainer(document)) {
+            return false;
+        }
+
         if (form.hasAttribute('data-native') || form.hasAttribute('data-no-spa')) {
             return false;
         }
 
         const action = form.getAttribute('action') || window.location.href;
-        if (action.includes('/logout')) {
+        if (this.isAuthUrl(action) || action.includes('/logout')) {
             return false;
         }
 
@@ -263,15 +298,23 @@ class SPARouter {
     }
 
     renderContent(htmlText, finalUrl, pushState = true) {
+        // If the destination is an auth page (login, logout, reset, etc.), do full reload
+        if (this.isAuthUrl(finalUrl)) {
+            window.location.href = finalUrl;
+            return;
+        }
+
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
         // Check if layout types match (Admin Portal vs Public Site)
         const isCurrentAdmin = !!document.getElementById('spa-page-content');
         const isNewAdmin = !!newDoc.getElementById('spa-page-content');
+        const isCurrentPublic = !!document.getElementById('app-page-content');
+        const isNewPublic = !!newDoc.getElementById('app-page-content');
 
-        if (isCurrentAdmin !== isNewAdmin) {
-            // Layout mismatch (e.g. logging out or navigating from public to admin), perform full navigation
+        if (isCurrentAdmin !== isNewAdmin || isCurrentPublic !== isNewPublic || !this.hasSpaContainer(document) || !this.hasSpaContainer(newDoc)) {
+            // Layout mismatch or non-SPA destination (e.g. logging out or navigating to login/landing), perform full navigation
             window.location.href = finalUrl;
             return;
         }
@@ -285,22 +328,25 @@ class SPARouter {
         const targetContainer = document.getElementById('spa-page-content') || document.getElementById('app-page-content');
         const sourceContainer = newDoc.getElementById('spa-page-content') || newDoc.getElementById('app-page-content');
 
-        if (targetContainer && sourceContainer) {
-            // Destroy existing Alpine components inside the dynamic zone cleanly
-            if (window.Alpine && typeof window.Alpine.destroyTree === 'function') {
-                window.Alpine.destroyTree(targetContainer);
-            }
+        if (!targetContainer || !sourceContainer) {
+            window.location.href = finalUrl;
+            return;
+        }
 
-            // Replace container inner HTML
-            targetContainer.innerHTML = sourceContainer.innerHTML;
+        // Destroy existing Alpine components inside the dynamic zone cleanly
+        if (window.Alpine && typeof window.Alpine.destroyTree === 'function') {
+            window.Alpine.destroyTree(targetContainer);
+        }
 
-            // Execute any embedded scripts
-            this.executeScripts(targetContainer);
+        // Replace container inner HTML
+        targetContainer.innerHTML = sourceContainer.innerHTML;
 
-            // Re-initialize Alpine.js on the new DOM tree
-            if (window.Alpine && typeof window.Alpine.initTree === 'function') {
-                window.Alpine.initTree(targetContainer);
-            }
+        // Execute any embedded scripts
+        this.executeScripts(targetContainer);
+
+        // Re-initialize Alpine.js on the new DOM tree
+        if (window.Alpine && typeof window.Alpine.initTree === 'function') {
+            window.Alpine.initTree(targetContainer);
         }
 
         // 3. Update Breadcrumbs in Top Header

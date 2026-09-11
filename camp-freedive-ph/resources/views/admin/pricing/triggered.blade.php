@@ -6,7 +6,7 @@
 <div class="space-y-6 text-sm">
 
     <!-- Top Header & Breadcrumb -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1.5">
                 <a href="{{ route('admin.pricing.index') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1">
