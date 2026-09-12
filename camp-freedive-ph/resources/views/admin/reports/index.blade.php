@@ -6,7 +6,7 @@
 <div class="space-y-6" x-data="{ activeTab: '{{ $activeTab }}' }">
 
     <!-- Page Header with Title, Description, and Actions on Right -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5">
         <div>
             <h1 class="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight">Reports & Analytics</h1>
             <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">

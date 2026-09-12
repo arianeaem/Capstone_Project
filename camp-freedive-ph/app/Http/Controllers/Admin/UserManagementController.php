@@ -8,6 +8,7 @@ use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -76,7 +77,7 @@ class UserManagementController extends Controller
             'temp_password' => ['nullable', 'string', 'min:8'],
         ]);
 
-        $tempPassword = $validated['temp_password'] ?: ('TempPass' . mt_rand(1000, 9999) . '!');
+        $tempPassword = !empty($validated['temp_password']) ? $validated['temp_password'] : ('TempPass' . mt_rand(1000, 9999) . '!');
 
         $user = User::create([
             'name' => $validated['name'],
@@ -97,7 +98,17 @@ class UserManagementController extends Controller
         );
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Account for {$user->name} created successfully! Temporary password: {$tempPassword}");
+            ->with('success', "Account for {$user->name} created successfully!")
+            ->with('new_user_credentials', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'role_label' => $user->role_badge['label'] ?? ucfirst($user->role),
+                'temp_password' => $tempPassword,
+                'login_url' => route('login'),
+                'is_reset' => false,
+            ]);
     }
 
     /**
@@ -139,10 +150,10 @@ class UserManagementController extends Controller
         ]);
 
         $changes = [];
-        if ($user->name !== $validated['name']) $changes[] = "Name: {$user->name} {$validated['name']}";
-        if ($user->email !== $validated['email']) $changes[] = "Email: {$user->email} {$validated['email']}";
-        if ($user->role !== $validated['role']) $changes[] = "Role: {$user->role} {$validated['role']}";
-        if ($user->status !== $validated['status']) $changes[] = "Status: {$user->status} {$validated['status']}";
+        if ($user->name !== $validated['name']) $changes[] = "Name: {$user->name} → {$validated['name']}";
+        if ($user->email !== $validated['email']) $changes[] = "Email: {$user->email} → {$validated['email']}";
+        if ($user->role !== $validated['role']) $changes[] = "Role: {$user->role} → {$validated['role']}";
+        if ($user->status !== $validated['status']) $changes[] = "Status: {$user->status} → {$validated['status']}";
 
         $updateData = [
             'name' => $validated['name'],
@@ -152,7 +163,8 @@ class UserManagementController extends Controller
             'status' => $validated['status'],
         ];
 
-        if (!empty($validated['new_password'])) {
+        $hasPasswordReset = !empty($validated['new_password']);
+        if ($hasPasswordReset) {
             $updateData['password'] = Hash::make($validated['new_password']);
             $updateData['must_change_password'] = true;
             $changes[] = "Password reset by admin (temporary password assigned)";
@@ -170,8 +182,23 @@ class UserManagementController extends Controller
             $request
         );
 
-        return redirect()->route('admin.users.index')
+        $response = redirect()->route('admin.users.index')
             ->with('success', "Profile for {$user->name} updated successfully.");
+
+        if ($hasPasswordReset) {
+            $response->with('new_user_credentials', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'role_label' => $user->role_badge['label'] ?? ucfirst($user->role),
+                'temp_password' => $validated['new_password'],
+                'login_url' => route('login'),
+                'is_reset' => true,
+            ]);
+        }
+
+        return $response;
     }
 
     /**
@@ -206,27 +233,31 @@ class UserManagementController extends Controller
     }
 
     /**
-     * Delete an internal user account (Owner only).
+     * Delete an internal user account (Owner or Admin for Coaches).
      */
     public function destroy(Request $request, User $user): RedirectResponse
     {
         $currentUser = Auth::user();
-
-        // Only Owner can delete accounts
-        if (!$currentUser->isOwner()) {
-            abort(403, 'Only the Camp Owner can delete user accounts.');
-        }
 
         // Prevent self-deletion
         if ($user->id === $currentUser->id) {
             return back()->with('error', 'You cannot delete your own account.');
         }
 
+        // Admins cannot delete other Admins or Owner
+        if (!$currentUser->isOwner() && ($user->isAdmin() || $user->isOwner())) {
+            abort(403, 'Admins can only delete Freediving Coach accounts.');
+        }
+
         $userEmail = $user->email;
         $userName = $user->name;
         $userRole = $user->role;
 
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            // Delete associated Coach profile record if exists
+            \App\Models\Coach::where('user_id', $user->id)->delete();
+            $user->delete();
+        });
 
         AuditLogger::log(
             'USER_DELETED',
@@ -237,6 +268,6 @@ class UserManagementController extends Controller
         );
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Account for {$userName} ({$userEmail}) has been deleted.");
+            ->with('success', "Account for {$userName} ({$userEmail}) has been deleted successfully.");
     }
 }

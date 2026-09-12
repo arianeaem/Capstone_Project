@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
 class WeatherSafetyController extends Controller
@@ -79,7 +80,51 @@ class WeatherSafetyController extends Controller
             }
         }
 
-        return view('admin.weather.index', compact('batches', 'criticalCount', 'lastUpdatedAt', 'masterForecast'));
+        // ML Microservice Health Check
+        $mlSafetyUrl = config('services.ml_safety.url', 'http://127.0.0.1:8001');
+        $isMLReachable = false;
+        try {
+            $res = Http::timeout(1)->get("{$mlSafetyUrl}/health");
+            $isMLReachable = $res->successful();
+        } catch (\Throwable $e) {
+            $isMLReachable = false;
+        }
+
+        // Prepare batch ML assessments for the ML tab
+        $batchMLAssessments = [];
+        if ($isMLReachable) {
+            foreach ($batches as $b) {
+                $d1Date = $b->start_date->format('Y-m-d');
+                $d2Date = $b->end_date ? $b->end_date->format('Y-m-d') : $b->start_date->copy()->addDay()->format('Y-m-d');
+                $d1ML = $this->forecastService->assessMLSafetyForDate($d1Date, '08:00', '18:00');
+                $d2ML = $this->forecastService->assessMLSafetyForDate($d2Date, '08:00', '18:00');
+                if ($d1ML || $d2ML) {
+                    $rec1 = $d1ML['overall_recommendation'] ?? 'Safe';
+                    $rec2 = $d2ML['overall_recommendation'] ?? 'Safe';
+                    $wRank = max(WeatherForecastService::RISK_RANK[$rec1] ?? 1, WeatherForecastService::RISK_RANK[$rec2] ?? 1);
+                    $wRec = array_search($wRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
+                    $batchMLAssessments[$b->id] = [
+                        'batch' => $b,
+                        'overall_recommendation' => $wRec,
+                        'operational_status' => $d1ML['operational_status'] ?? $d2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
+                        'operational_status_label' => $d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                        'day1' => $d1ML,
+                        'day2' => $d2ML,
+                        'hard_gate_triggered' => ($d1ML['hard_gate_triggered'] ?? false) || ($d2ML['hard_gate_triggered'] ?? false),
+                    ];
+                }
+            }
+        }
+
+        return view('admin.weather.index', compact(
+            'batches',
+            'criticalCount',
+            'lastUpdatedAt',
+            'masterForecast',
+            'isMLReachable',
+            'mlSafetyUrl',
+            'batchMLAssessments'
+        ));
     }
 
     /**
@@ -229,6 +274,36 @@ class WeatherSafetyController extends Controller
             ];
         }
 
+        // ML Safety Assessments (Dual-Engine microservice pipeline)
+        $overridesData = $latestOverride ? [
+            'tcws_signal' => $latestOverride->tcws_signal,
+            'gale_warning' => $latestOverride->gale_warning,
+            'tsunami_warning' => $latestOverride->tsunami_warning,
+        ] : null;
+
+        $day1MLAssessment = $this->forecastService->assessMLSafetyForDate($day1Date, '00:00', '23:00', $overridesData);
+        $day2MLAssessment = $this->forecastService->assessMLSafetyForDate($day2Date, '00:00', '23:00', $overridesData);
+
+        $batchMLAssessment = null;
+        if ($day1MLAssessment || $day2MLAssessment) {
+            $mlRec1 = $day1MLAssessment['overall_recommendation'] ?? 'Safe';
+            $mlRec2 = $day2MLAssessment['overall_recommendation'] ?? 'Safe';
+            $worseMLRank = max(WeatherForecastService::RISK_RANK[$mlRec1] ?? 1, WeatherForecastService::RISK_RANK[$mlRec2] ?? 1);
+            $worseMLRec = array_search($worseMLRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
+
+            $batchMLAssessment = [
+                'overall_recommendation' => $worseMLRec,
+                'ml_recommendation' => $worseMLRec,
+                'ml_classification' => $worseMLRec,
+                'operational_status' => $day1MLAssessment['operational_status'] ?? $day2MLAssessment['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
+                'operational_status_label' => $day1MLAssessment['operational_status_label'] ?? $day2MLAssessment['operational_status_label'] ?? 'Provisional Trend Outlook',
+                'day1' => $day1MLAssessment,
+                'day2' => $day2MLAssessment,
+                'is_authoritative_go' => ($day1MLAssessment['is_authoritative_go'] ?? false) && ($day2MLAssessment['is_authoritative_go'] ?? false),
+                'hard_gate_triggered' => ($day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['hard_gate_triggered'] ?? false),
+            ];
+        }
+
         return view('admin.weather.show', compact(
             'batch',
             'day1Assessment',
@@ -237,7 +312,10 @@ class WeatherSafetyController extends Controller
             'overallClassification',
             'assessmentRuns',
             'day1Continuous24h',
-            'day2Continuous24h'
+            'day2Continuous24h',
+            'day1MLAssessment',
+            'day2MLAssessment',
+            'batchMLAssessment'
         ));
     }
 

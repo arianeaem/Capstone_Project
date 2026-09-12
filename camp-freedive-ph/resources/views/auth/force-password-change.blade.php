@@ -34,7 +34,7 @@
             </div>
 
             @if(session('warning'))
-                <div class="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200 text-xs font-semibold text-amber-900 leading-relaxed">
+                <div class="mb-6 p-4 rounded-xl bg-amber-50 text-xs font-semibold text-amber-900 leading-relaxed">
                     {{ session('warning') }}
                 </div>
             @endif

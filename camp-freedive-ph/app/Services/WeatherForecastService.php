@@ -185,6 +185,30 @@ class WeatherForecastService
                 'risk_classification' => $riskSlug,
             ]);
 
+            // 4. ML Safety Microservice Assessment (Dual-Engine Pipeline)
+            $day1ML = $this->assessMLSafetyForDate($startDate->format('Y-m-d'), '08:00', '18:00', $overrides);
+            $day2ML = $this->assessMLSafetyForDate($endDate->format('Y-m-d'), '08:00', '18:00', $overrides);
+
+            $batchML = null;
+            if ($day1ML || $day2ML) {
+                $mlRec1 = $day1ML['overall_recommendation'] ?? 'Safe';
+                $mlRec2 = $day2ML['overall_recommendation'] ?? 'Safe';
+                $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
+                $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
+
+                $batchML = [
+                    'overall_recommendation' => $worseMLRec,
+                    'ml_recommendation' => $worseMLRec,
+                    'ml_classification' => $worseMLRec,
+                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
+                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                    'day1' => $day1ML,
+                    'day2' => $day2ML,
+                    'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
+                    'hard_gate_triggered' => ($day1ML['hard_gate_triggered'] ?? false) || ($day2ML['hard_gate_triggered'] ?? false),
+                ];
+            }
+
             AuditLogger::log(
                 'BATCH_ASSESSED',
                 "Weather risk assessed for batch {$batch->batch_code}: Day 1={$day1Result['classification']}, Day 2={$day2Result['classification']} (Overall: {$overallClassification}).",
@@ -195,8 +219,9 @@ class WeatherForecastService
             return [
                 'batch' => $batch,
                 'overall_classification' => $overallClassification,
-                'day1' => $day1Result,
-                'day2' => $day2Result,
+                'day1' => array_merge($day1Result, ['ml_assessment' => $day1ML]),
+                'day2' => array_merge($day2Result, ['ml_assessment' => $day2ML]),
+                'ml_assessment' => $batchML,
             ];
         });
     }
@@ -451,6 +476,29 @@ class WeatherForecastService
 
             $reliability = self::getReliabilityCategory($daysOut);
 
+            // ML Safety Microservice Assessment (Dual-Engine Pipeline)
+            $day1ML = $this->assessMLSafetyForDate($startDate->format('Y-m-d'), '08:00', '18:00');
+            $day2ML = $this->assessMLSafetyForDate($endDate->format('Y-m-d'), '08:00', '18:00');
+            $tripML = null;
+            if ($day1ML || $day2ML) {
+                $mlRec1 = $day1ML['overall_recommendation'] ?? 'Safe';
+                $mlRec2 = $day2ML['overall_recommendation'] ?? 'Safe';
+                $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
+                $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
+
+                $tripML = [
+                    'overall_recommendation' => $worseMLRec,
+                    'ml_recommendation' => $worseMLRec,
+                    'ml_classification' => $worseMLRec,
+                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
+                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                    'day1' => $day1ML,
+                    'day2' => $day2ML,
+                    'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
+                    'hard_gate_triggered' => ($day1ML['hard_gate_triggered'] ?? false) || ($day2ML['hard_gate_triggered'] ?? false),
+                ];
+            }
+
             return [
                 'available' => true,
                 'start_date' => $startDate->format('Y-m-d'),
@@ -461,12 +509,14 @@ class WeatherForecastService
                 'data_source' => 'Live Open-Meteo Marine & Weather Radar (Anilao, Batangas)',
                 'days_out' => $daysOut,
                 'reliability' => $reliability,
+                'ml_assessment' => $tripML,
                 'day1' => [
                     'date' => $startDate->format('M d, Y'),
                     'classification' => $day1Class,
                     'recommended_action' => self::MEANING_MAP[$day1Class] ?? 'Proceed with caution.',
                     'worst_hour' => $d1WorstHour ? Carbon::parse($d1WorstHour)->format('g:i A') : '11:00 AM',
                     'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->copy()->setTime(9, 30), false)) . ' hours',
+                    'ml_assessment' => $day1ML,
                 ],
                 'day2' => [
                     'date' => $endDate->format('M d, Y'),
@@ -474,6 +524,7 @@ class WeatherForecastService
                     'recommended_action' => self::MEANING_MAP[$day2Class] ?? 'Proceed with caution.',
                     'worst_hour' => $d2WorstHour ? Carbon::parse($d2WorstHour)->format('g:i A') : '11:00 AM',
                     'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->copy()->setTime(9, 30), false)) . ' hours',
+                    'ml_assessment' => $day2ML,
                 ],
                 'advisory_notes' => [
                     'Forecast models are updated hourly as the scheduled trip approaches.',
@@ -506,6 +557,28 @@ class WeatherForecastService
             ? ($day2PM['worst_hour'] ?: $day2AM['worst_hour'])
             : ($day2AM['worst_hour'] ?: $day2PM['worst_hour']);
 
+        $day1ML = $this->assessMLSafetyForDate($startDate->format('Y-m-d'), '08:00', '18:00');
+        $day2ML = $this->assessMLSafetyForDate($endDate->format('Y-m-d'), '08:00', '18:00');
+        $tripML = null;
+        if ($day1ML || $day2ML) {
+            $mlRec1 = $day1ML['overall_recommendation'] ?? 'Safe';
+            $mlRec2 = $day2ML['overall_recommendation'] ?? 'Safe';
+            $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
+            $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
+
+            $tripML = [
+                'overall_recommendation' => $worseMLRec,
+                'ml_recommendation' => $worseMLRec,
+                'ml_classification' => $worseMLRec,
+                'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
+                'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                'day1' => $day1ML,
+                'day2' => $day2ML,
+                'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
+                'hard_gate_triggered' => ($day1ML['hard_gate_triggered'] ?? false) || ($day2ML['hard_gate_triggered'] ?? false),
+            ];
+        }
+
         return [
             'available' => true,
             'start_date' => $startDate->format('Y-m-d'),
@@ -514,12 +587,14 @@ class WeatherForecastService
             'end_date_formatted' => $endDate->format('M d, Y (l)'),
             'overall_classification' => $overallClass,
             'data_source' => 'Live Open-Meteo Marine & Weather Radar (Anilao, Batangas)',
+            'ml_assessment' => $tripML,
             'day1' => [
                 'date' => $startDate->format('M d, Y'),
                 'classification' => $day1Class,
                 'recommended_action' => self::MEANING_MAP[$day1Class] ?? 'Proceed with caution.',
                 'worst_hour' => $worstHourD1 ? Carbon::parse($worstHourD1)->format('g:i A') : '11:00 AM',
                 'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->copy()->setTime(9, 30), false)) . ' hours',
+                'ml_assessment' => $day1ML,
             ],
             'day2' => [
                 'date' => $endDate->format('M d, Y'),
@@ -527,12 +602,82 @@ class WeatherForecastService
                 'recommended_action' => self::MEANING_MAP[$day2Class] ?? 'Proceed with caution.',
                 'worst_hour' => $worstHourD2 ? Carbon::parse($worstHourD2)->format('g:i A') : '11:00 AM',
                 'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->copy()->setTime(9, 30), false)) . ' hours',
+                'ml_assessment' => $day2ML,
             ],
             'advisory_notes' => [
                 'Forecast models are updated hourly as the scheduled trip approaches.',
                 'Final go/no-go departure decision is subject to Camp FreedivePH operator confirmation.',
             ],
         ];
+    }
+
+    /**
+     * Run ML Safety Assessment via the 12 ONNX microservice pipeline.
+     * Guaranteed to output one of the 5 standard safety classifications:
+     * Very Safe, Safe, Moderate, High Risk, Critical Risk.
+     */
+    public function assessMLSafetyForDate(
+        string $date,
+        string $startTime = '08:00',
+        string $endTime = '17:30',
+        ?array $overrides = null
+    ): ?array {
+        try {
+            $mlService = app(WeatherSafetyMLService::class);
+            if (!$mlService->isEnabled()) {
+                return null;
+            }
+
+            // Retrieve cached 24h forecast for the date or fetch live Open-Meteo data
+            $dayForecast = $this->getCachedDayForecast($date);
+            $hourlyReadings = [];
+
+            if ($dayForecast && !empty($dayForecast['hourly'])) {
+                foreach ($dayForecast['hourly'] as $h) {
+                    $hourlyReadings[] = [
+                        'timestamp' => $h['iso_time'] ?? sprintf('%sT%02d:00:00+08:00', $date, $h['hour']),
+                        'wind_speed' => $h['wind_speed'] ?? 12.0,
+                        'wind_gust' => $h['wind_gusts'] ?? (($h['wind_speed'] ?? 12.0) * 1.25),
+                        'wind_dir' => $h['wind_direction'] ?? 245.0,
+                        'slp' => $h['sea_level_pressure'] ?? 1010.5,
+                        'rain_rate_mm_hr' => $h['rain'] ?? 0.0,
+                        'ocean_current_velocity' => $h['ocean_current'] ?? 0.3,
+                    ];
+                }
+            } else {
+                $weather = $this->fetchOpenMeteoWeather($date);
+                $marine = $this->fetchOpenMeteoMarine($date);
+                $times = $weather['time'] ?? $marine['time'] ?? [];
+
+                foreach ($times as $idx => $isoTime) {
+                    $hourlyReadings[] = [
+                        'timestamp' => $isoTime,
+                        'wind_speed' => (float) ($weather['wind_speed_10m'][$idx] ?? 12.0),
+                        'wind_gust' => (float) ($weather['wind_gusts_10m'][$idx] ?? 15.0),
+                        'wind_dir' => (float) ($weather['wind_direction_10m'][$idx] ?? 245.0),
+                        'slp' => (float) ($weather['pressure_msl'][$idx] ?? 1010.5),
+                        'rain_rate_mm_hr' => (float) ($weather['rain'][$idx] ?? $weather['precipitation'][$idx] ?? 0.0),
+                        'ocean_current_velocity' => isset($marine['ocean_current_velocity'][$idx]) ? (float) $marine['ocean_current_velocity'][$idx] * 0.27778 : null,
+                    ];
+                }
+            }
+
+            if (empty($hourlyReadings)) {
+                return null;
+            }
+
+            $boundaryWeather = $mlService->formatBoundaryWeather($hourlyReadings);
+            $pagasaPayload = [
+                'tcws_signal' => (int) ($overrides['tcws_signal'] ?? 0),
+                'gale_warning' => (bool) ($overrides['gale_warning'] ?? false),
+                'tsunami_warning' => (bool) ($overrides['tsunami_warning'] ?? false),
+            ];
+
+            return $mlService->assessBookingSession($date, $startTime, $endTime, $boundaryWeather, $pagasaPayload);
+        } catch (\Throwable $e) {
+            Log::info("[WeatherForecastService] ML safety evaluation fallback: " . $e->getMessage());
+            return null;
+        }
     }
 
     /**

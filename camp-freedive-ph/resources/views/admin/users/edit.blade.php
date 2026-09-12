@@ -29,7 +29,7 @@
 
             <!-- Name -->
             <div>
-                <label for="name" class="block font-bold text-[#1D1D1F] mb-1 text-xs">
+                <label for="name" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
                     First & Last Name <span class="text-[#780000]">*</span>
                 </label>
                 <input type="text" 
@@ -46,7 +46,7 @@
 
             <!-- Email -->
             <div>
-                <label for="email" class="block font-bold text-[#1D1D1F] mb-1 text-xs">
+                <label for="email" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
                     Email Address <span class="text-[#780000]">*</span>
                 </label>
                 <input type="email" 
@@ -62,7 +62,7 @@
 
             <!-- Phone -->
             <div>
-                <label for="phone" class="block font-bold text-[#1D1D1F] mb-1 text-xs">
+                <label for="phone" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
                     Mobile / Phone Number
                 </label>
                 <input type="tel" 
@@ -79,7 +79,7 @@
             <!-- Role & Status -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="role" class="block font-bold text-[#1D1D1F] mb-1 text-xs">
+                    <label for="role" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
                         Assigned Role <span class="text-[#780000]">*</span>
                     </label>
                     <select name="role" id="role" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
@@ -92,7 +92,7 @@
                 </div>
 
                 <div>
-                    <label for="status" class="block font-bold text-[#1D1D1F] mb-1 text-xs">
+                    <label for="status" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
                         Account Status <span class="text-[#780000]">*</span>
                     </label>
                     <select name="status" id="status" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
@@ -104,7 +104,7 @@
 
             <!-- Optional Password Reset by Admin/Owner -->
             <div class="pt-3 border-t border-[#E5E5EA]">
-                <label for="new_password" class="block font-bold text-[#1D1D1F] mb-1 text-xs">
+                <label for="new_password" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
                     Assign New Temporary Password (Optional)
                 </label>
                 <input type="text" 
@@ -118,7 +118,7 @@
             </div>
 
             <!-- Submit Controls -->
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+            <div class="flex items-center justify-end gap-2 pt-3">
                 <a href="{{ route('admin.users.index') }}" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold">Cancel</a>
                 <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
                     Save Profile Changes
@@ -126,6 +126,51 @@
             </div>
         </form>
     </div>
+
+    <!-- Danger Zone (Delete Account) -->
+    @if($user->id !== $currentUser->id && ($currentUser->isOwner() || ($currentUser->isAdmin() && $user->isCoach())))
+    <div class="bg-white rounded-xl border border-[#FECACA] p-5 sm:p-6 shadow-2xs space-y-4" x-data="{ openDeleteConfirm: false }">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+                <h3 class="text-sm font-extrabold text-[#780000]">Danger Zone</h3>
+                <p class="text-xs text-[#6E6E73] mt-0.5">Permanently delete this staff account and all associated portal access.</p>
+            </div>
+            <button type="button" 
+                    @click="openDeleteConfirm = true" 
+                    class="btn-danger px-3.5 py-2 text-xs font-bold shrink-0 self-start sm:self-auto cursor-pointer">
+                Delete Account
+            </button>
+        </div>
+
+        <!-- Delete Modal inside Edit Page -->
+        <div x-show="openDeleteConfirm" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openDeleteConfirm = false">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div>
+                            <h3 class="text-base font-extrabold text-[#780000]">Delete {{ $user->name }}</h3>
+                            <p class="text-xs text-[#6E6E73]">Irreversible permanent deletion.</p>
+                        </div>
+                    </div>
+                    <button type="button" @click="openDeleteConfirm = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                </div>
+
+                <p class="text-xs text-[#1D1D1F]">
+                    Are you sure you want to permanently delete the account for <strong>{{ $user->name }}</strong> (<span class="font-mono text-[#6E6E73]">{{ $user->email }}</span>)? This action cannot be undone.
+                </p>
+
+                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="pt-2 flex items-center justify-end gap-2">
+                    @csrf
+                    @method('DELETE')
+                    <button type="button" @click="openDeleteConfirm = false" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold cursor-pointer">Cancel</button>
+                    <button type="submit" class="btn-danger px-4 py-1.5 text-xs font-bold shadow-2xs cursor-pointer">
+                        Permanently Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 
 </div>
 @endsection

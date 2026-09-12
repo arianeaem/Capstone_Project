@@ -145,7 +145,7 @@
                     <textarea name="notes" rows="2" placeholder="e.g. Open for Discovery & Practice Dive students" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3">
                     <button type="button" @click="openBatchModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
                     <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold">Create Schedule</button>
                 </div>
@@ -180,7 +180,7 @@
                     <strong>Validation Rules:</strong> The system automatically verifies that the coach's certification is active on the dive date and checks against double-booking conflicts.
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3">
                     <button type="button" @click="openAssignModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
                     <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold">Confirm Assignment</button>
                 </div>

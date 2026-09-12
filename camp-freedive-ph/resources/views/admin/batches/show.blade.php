@@ -437,7 +437,7 @@
                     <textarea name="note" required rows="3" placeholder="e.g. Typhoon storm signal #2 in Batangas / Severe localized marine surge" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
                     <button type="submit" class="btn-danger px-4 py-1.5 text-xs font-bold shadow-2xs">
                         Confirm Cancellation
@@ -466,7 +466,7 @@
                     <textarea name="note" required rows="3" placeholder="e.g. Venue maintenance on resort / Weather shift. Please choose a new weekend." class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3">
                     <button type="button" @click="openRescheduleModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
                     <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
                         Confirm Batch Reschedule
@@ -505,7 +505,7 @@
                     <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
                 </div>
 
-                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center justify-end gap-2 pt-3">
                     <button type="button" @click="openMoveModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
                     <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
                         Confirm Move

@@ -335,9 +335,6 @@
         <!-- Empty State: No Immediate Dives -->
         <div class="space-y-6">
             <div class="bg-white rounded-2xl border border-[#E5E5EA] p-8 text-center space-y-3">
-                <div class="w-12 h-12 rounded-full bg-[#F2F2F7] text-[#8E8E93] flex items-center justify-center mx-auto">
-                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                </div>
                 <div>
                     <h3 class="text-base font-extrabold text-[#1D1D1F]">No Immediate Dive Assignments</h3>
                     <p class="text-xs text-[#6E6E73] mt-1 max-w-md mx-auto">
@@ -506,7 +503,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1.5">Reason for Release <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] mb-1.5.5">Reason for Release <span class="text-[#780000]">*</span></label>
                     <textarea name="reason" rows="3" required placeholder="e.g. Medical emergency, urgent personal conflict" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white focus:border-[#780000] focus:ring-[#780000]"></textarea>
                 </div>
 
