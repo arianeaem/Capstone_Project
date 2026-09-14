@@ -6,8 +6,24 @@ use App\Models\BookingParticipant;
 use App\Models\PricingRule;
 use Carbon\Carbon;
 
+/**
+ * Dynamic Yield Management & Pricing Rule Engine.
+ *
+ * Business Model & Economic Rationale:
+ * 1. Multi-Factor Dynamic Pricing: Evaluates seasonal trends, occupancy velocity, and booking lead times
+ *    to optimize freediving camp capacity utilization across the year.
+ * 2. Strict ±30% Price Clamping Cap (ADJUSTMENT_PERCENTAGE_CAP):
+ *    Protects customer trust and transparent pricing by strictly bounding cumulative discounts/surcharges
+ *    between -30% and +30% of the base class tier price.
+ * 3. Batangas Micro-Climate Seasonality:
+ *    - Peak (Nov - Apr): Amihan northeast monsoon delivers dry, calm conditions and peak tourism demand.
+ *    - Shoulder (May, Oct): Monsoon transitional months with moderate occupancy.
+ *    - Off-Peak (Jun - Sep): Habagat southwest monsoon brings wet weather; discounts incentivize advance bookings.
+ */
 class PricingRuleEngine
 {
+    // TODO: Connect pricing rule evaluation with Prophet/XGBoost seasonal demand forecasts to dynamically adjust lead-time pricing tiers.
+
     /**
      * Percentage cap to clamp stacked adjustments (+/- 30% of base price).
      */

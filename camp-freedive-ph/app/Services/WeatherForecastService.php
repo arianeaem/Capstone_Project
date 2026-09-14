@@ -20,9 +20,26 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Core Weather & Marine Safety Engine for Anilao, Batangas Freediving Operations.
+ *
+ * Core Responsibilities & Domain Algorithms:
+ * 1. 9-Parameter Physical Risk Scoring: Evaluates wave height, swell height, wave period,
+ *    wind waves, wind speed & gusts, ocean current, rain rate, sea level pressure, and wind direction.
+ * 2. Synergy Hazard Multipliers: Detects when multiple moderate ocean hazards occur concurrently
+ *    (e.g., strong currents opposing wind chop) and penalizes the composite risk score non-linearly (+15% to +25%).
+ * 3. 16-Day 24-Hour Continuous Sliding Cache: Pre-fetches hourly marine parameters across the entire 16-day
+ *    horizon in a single Open-Meteo batch, caching results in Redis/File cache for instant sub-millisecond retrieval.
+ * 4. Dual-Engine Orchestration: Interfaces with WeatherSafetyMLService to provide side-by-side comparison
+ *    between heuristic rule-based assessments and 12 multi-horizon ONNX ML models.
+ * 5. Batch Safety Lifecycle & Automated Force Majeure: Manages batch risk transitions, admin manual overrides,
+ *    and automated customer cancellation notifications with 100% refund entitlement.
+ */
 class WeatherForecastService
 {
-    // Anilao / Mabini, Batangas Site Coordinates
+    // TODO: Implement an automated nightly archive task to persist historical forecast accuracy logs for post-season verification.
+
+    // Anilao / Mabini, Batangas Site Coordinates (Camp FreedivePH primary training basin)
     public const LATITUDE = 13.7481;
     public const LONGITUDE = 120.9408;
     public const TIMEZONE = 'Asia/Manila';

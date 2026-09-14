@@ -14,6 +14,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Administrative Batch Management & Logistics Controller.
+ *
+ * Operational Responsibilities:
+ * 1. Batch Lifecycle Management: Handles creation, confirmation, active execution,
+ *    and completion of weekend freediving batches.
+ * 2. Passenger Manifest & Roster Generation: Groups confirmed bookings into coherent batch rosters
+ *    ensuring coach-to-student ratios (1:4) and van seating capacities are balanced.
+ * 3. Demand Forecasting & Capacity Allocation: Integrates demand predictions to recommend
+ *    opening additional weekend slots or allocating extra safety divers during peak seasons.
+ */
 class BatchManagementController extends Controller
 {
     public function __construct(
@@ -21,8 +32,13 @@ class BatchManagementController extends Controller
         protected DemandForecastService $forecastService
     ) {}
 
+    // TODO: Implement iCal / Google Calendar synchronization feed for coaches to import scheduled batches directly to mobile devices.
+
     /**
-     * Page 1: Batch List.
+     * Page 1: Batch List Roster.
+     *
+     * @param Request $request Filter parameters (status, date_from, date_to, search, sort).
+     * @return View Renders the batch management index table.
      */
     public function index(Request $request): View
     {

@@ -13,14 +13,31 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
+/**
+ * Administrative Weather & Marine Safety Operations Controller.
+ *
+ * Operational Responsibilities:
+ * 1. Batch Monitoring Roster (Page 1): Tracks all active freediving batches within the 16-day forecast window.
+ * 2. Deep-Dive Weather Dashboard (Page 2): Renders 24-hour continuous physical profiles and dual-engine
+ *    comparisons (Native 9-variable heuristic vs Python ML ONNX models).
+ * 3. Administrative Manual Overrides: Allows authorized operators to enforce storm signals (TCWS 1-5),
+ *    gale warnings, or local squall alerts, escalating batches to Critical Risk.
+ * 4. Automated Cancellation & Refund Trigger: Integrates one-click batch cancellation, triggering 100% force
+ *    majeure refund entitlements and automated customer cancellation emails.
+ */
 class WeatherSafetyController extends Controller
 {
     public function __construct(
         protected WeatherForecastService $forecastService
     ) {}
 
+    // TODO: Transition customer cancellation email dispatch to background queue workers for high-volume batches.
+
     /**
      * Page 1: Weather & Safety Monitoring Batch Roster.
+     *
+     * @param Request $request Contains filters for risk classification, status, and date range.
+     * @return View Renders the administrative batch safety roster.
      */
     public function index(Request $request): View
     {

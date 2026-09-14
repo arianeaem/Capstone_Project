@@ -1297,6 +1297,23 @@
 
 @push('scripts')
 <script>
+/**
+ * Alpine.js Client-Side Booking Flow State Machine.
+ *
+ * Workflow Architecture:
+ * - Step 1 (Package Selection): Class tier configuration and diver certification prerequisite checking.
+ * - Step 2 (Date & Weather Selection): Interactive dual-calendar picker with live 16-day Open-Meteo & ML risk preview.
+ * - Step 3 (Contact & Add-ons): Dynamic participant repeater, medical questionnaires, carpool hubs, and live pricing quote.
+ * - Step 4 (Downpayment Checkout): 15-minute slot-hold countdown timer and PayMongo payment gateway integration.
+ * - Step 5 (Voucher & PIN): Booking reference confirmation and credential copy tool.
+ *
+ * State Persistence:
+ * Automatically synchronizes draft state to localStorage to prevent data loss on accidental page refresh.
+ *
+ * @param {Object} config Initial configuration (initialClass, pickupPoints).
+ * @return {Object} Reactive Alpine.js component scope.
+ */
+// TODO: Implement Web Worker background sync for offline draft storage in IndexedDB.
 function bookingForm(config) {
     return {
         currentStep: 1,

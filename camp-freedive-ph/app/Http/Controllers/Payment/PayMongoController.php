@@ -14,10 +14,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * PayMongo Payment Gateway Integration & Webhook Controller.
+ *
+ * Architecture & Payment Lifecycle:
+ * 1. Hosted Checkout v2: Dispatches guests to PayMongo's PCI-DSS compliant checkout session
+ *    supporting GCash, Maya, Credit/Debit cards, and GrabPay.
+ * 2. Dual-Verification Protocol:
+ *    - Synchronous Return (Success Route): Reconciles payment status immediately upon browser redirect.
+ *    - Asynchronous Webhook (Webhook Route): Verifies cryptographic HMAC signatures (`Paymongo-Signature`)
+ *      to ensure payments are captured even if the customer accidentally closes their mobile browser.
+ * 3. Automated State Machine: Updates booking status from `pending_downpayment` -> `confirmed`,
+ *    records transaction fee audits, and dispatches customer confirmation emails.
+ */
 class PayMongoController extends Controller
 {
     protected PayMongoGateway $gateway;
     protected AuditLogger $auditLogger;
+
+    // TODO: Implement an Redis-backed webhook idempotency deduplication table to discard duplicate PayMongo retry payloads.
 
     public function __construct(PayMongoGateway $gateway, AuditLogger $auditLogger)
     {

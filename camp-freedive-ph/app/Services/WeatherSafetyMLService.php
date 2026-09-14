@@ -7,6 +7,21 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Weather Safety Machine Learning Microservice Client.
+ *
+ * Architecture & Dual-Engine Rationale:
+ * This service communicates with the standalone Python FastAPI / ONNX inference microservice.
+ * Camp FreedivePH uses a dual-engine architecture:
+ * 1. Native PHP Heuristic Engine (WeatherForecastService): Evaluates 9 marine variables against Coast Guard safety rules.
+ * 2. Predictive ONNX Microservice (WeatherSafetyMLService): Runs 12 multi-horizon regressor and classifier models
+ *    predicting wave dynamics, wind speeds, and ocean currents up to 16 days ahead.
+ *
+ * Fault Tolerance:
+ * If the ML microservice is unreachable, times out, or returns a 5xx error, the client catches the exception,
+ * logs an info notice, and gracefully returns `null`. The calling controllers automatically fall back to the
+ * native PHP heuristic engine ensuring zero downtime for customers booking sessions.
+ */
 class WeatherSafetyMLService
 {
     protected string $baseUrl;
@@ -35,6 +50,12 @@ class WeatherSafetyMLService
         'EXTENDED_TREND_OUTLOOK' => 'Extended Trend Outlook (H ≥ 48h)',
     ];
 
+    /**
+     * Initializes the ML client from configuration.
+     *
+     * Note: Timeout is deliberately capped at 4s so slow network conditions
+     * never block the customer-facing booking checkout page.
+     */
     public function __construct()
     {
         $this->baseUrl = rtrim((string) config('services.ml_safety.url', 'http://127.0.0.1:8001'), '/');
@@ -44,11 +65,15 @@ class WeatherSafetyMLService
 
     /**
      * Check if ML Safety microservice is enabled and configured.
+     *
+     * @return bool True if enabled and baseUrl is present.
      */
     public function isEnabled(): bool
     {
         return $this->enabled && !empty($this->baseUrl);
     }
+
+    // TODO: Implement a circuit breaker pattern (e.g., via Redis) to prevent HTTP connection spam when the microservice is temporarily down.
 
     /**
      * Assess a dive booking session through the 12 ONNX ML inference pipeline.
