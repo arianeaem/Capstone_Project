@@ -15,11 +15,11 @@
         
         <div class="pt-4 flex items-center justify-center gap-3">
             <a href="{{ route('admin.bookings.index') }}" 
-               class="px-5 py-2.5 rounded-xl bg-[#780000] text-white text-xs sm:text-sm font-bold hover:bg-[#5a0000] transition-colors">
-                ← Go to Booking Management
+               class="btn-primary px-5 py-2.5 text-sm font-bold">
+                Go to Booking Management
             </a>
             <a href="{{ route('admin.payments.index') }}" 
-               class="px-5 py-2.5 rounded-xl border border-[#D1D1D6] hover:bg-[#F2F2F7] text-[#1D1D1F] text-xs sm:text-sm font-semibold transition-colors">
+               class="btn-secondary px-5 py-2.5 text-sm font-semibold">
                 Go to Payments
             </a>
         </div>

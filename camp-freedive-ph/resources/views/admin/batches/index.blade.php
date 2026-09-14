@@ -9,7 +9,7 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Batches & Schedules</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Organize weekend dive trips, group guest bookings, and check coach assignments and occupancy.
             </p>
         </div>
@@ -17,15 +17,14 @@
         <div class="flex items-center gap-2.5 flex-wrap">
             @if(isset($unbatchedCount) && $unbatchedCount > 0)
                 <a href="{{ route('admin.bookings.index', ['batch_status' => 'unassigned']) }}" 
-                   class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 border border-amber-200 text-xs font-bold text-amber-900 hover:bg-amber-100 transition-all shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-amber-600"></span>
+                   class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-50 text-sm font-bold text-amber-900 hover:bg-amber-100 transition-all shadow-2xs">
                     <span>{{ $unbatchedCount }} Confirmed Booking(s) Have No Batch Assigned</span>
                 </a>
             @endif
 
             <a href="{{ route('admin.batches.create') }}" 
-               class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0 shadow-2xs">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+               class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5 shrink-0 shadow-2xs">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                 <span>Add Batch</span>
             </a>
         </div>
@@ -38,23 +37,23 @@
             <!-- Batch Status Filters -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none -mx-0.5 px-0.5">
                 <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     All Batches
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'confirmed']) }}" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'confirmed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('status') === 'confirmed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Confirmed
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'completed']) }}" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'completed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('status') === 'completed' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Completed
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'rescheduled']) }}" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'rescheduled' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('status') === 'rescheduled' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Rescheduled
                 </a>
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'cancelled_by_camp']) }}" 
-                    class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('status') === 'cancelled_by_camp' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('status') === 'cancelled_by_camp' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                     Cancelled
                 </a>
             </div>
@@ -77,7 +76,7 @@
                                name="search" 
                                value="{{ request('search') }}" 
                                placeholder="Search batch (e.g. Batch 4)..." 
-                               class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
+                               class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-[#F2F2F7] focus:bg-white focus:border-[#780000]">
                         <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -89,10 +88,8 @@
                 <div class="relative shrink-0">
                     <button type="button" 
                             @click="openFilters = !openFilters" 
-                            class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer">
-                        <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
+                            class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer">
+                        <img src="{{ asset('icons/icons8-filter-60.png') }}" alt="Filter" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
                         <span class="whitespace-nowrap">Filter & Sort</span>
                         @if(request()->anyFilled(['staffing', 'sort', 'date_from', 'date_to']))
                             <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
@@ -105,11 +102,11 @@
                          @click.outside="openFilters = false" 
                          class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl shadow-xl border border-[#E5E5EA] p-4 z-30 space-y-3">
                         <div class="flex items-center justify-between pb-2">
-                            <h4 class="font-bold text-xs text-[#1D1D1F]">Filter & Sort Batches</h4>
-                            <a href="{{ route('admin.batches.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
+                            <h4 class="font-bold text-sm text-[#1D1D1F]">Filter & Sort Batches</h4>
+                            <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
                         </div>
 
-                        <form action="{{ route('admin.batches.index') }}" method="GET" class="space-y-3 text-xs">
+                        <form action="{{ route('admin.batches.index') }}" method="GET" class="space-y-3 text-sm">
                             @if(request('status'))
                                 <input type="hidden" name="status" value="{{ request('status') }}">
                             @endif
@@ -119,7 +116,7 @@
 
                             <div>
                                 <label class="block font-semibold text-[#6E6E73] mb-1">Sort By</label>
-                                <select name="sort" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                <select name="sort" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
                                     <option value="date_asc" {{ request('sort', 'date_asc') === 'date_asc' ? 'selected' : '' }}>Soonest Dive Date (Upcoming First)</option>
                                     <option value="date_desc" {{ request('sort') === 'date_desc' ? 'selected' : '' }}>Latest Dive Date (Newest to Oldest)</option>
                                     <option value="batch_asc" {{ request('sort') === 'batch_asc' ? 'selected' : '' }}>Batch Number (Ascending)</option>
@@ -132,7 +129,7 @@
 
                             <div>
                                 <label class="block font-semibold text-[#6E6E73] mb-1">Staffing Status</label>
-                                <select name="staffing" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                <select name="staffing" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
                                     <option value="">All Staffing States</option>
                                     <option value="pending" {{ request('staffing') === 'pending' ? 'selected' : '' }}>Instructor Pending</option>
                                     <option value="staffed" {{ request('staffing') === 'staffed' ? 'selected' : '' }}>Fully Staffed</option>
@@ -140,7 +137,7 @@
                             </div>
 
                             <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                <button type="submit" class="btn-primary w-full py-1.5 text-xs font-bold">
+                                <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
                                     Apply Filter & Sort
                                 </button>
                             </div>
@@ -165,43 +162,43 @@
                             {{ $batch->batch_number }}
                         </span>
                     </div>
-                    <span class="px-2 py-0.5 rounded-md text-xs font-bold border shrink-0 {{ $batch->status_badge['class'] }}">
+                    <span class="px-2 py-0.5 rounded-md text-sm font-bold shrink-0 {{ $batch->status_badge['class'] }}">
                         {{ $batch->status_badge['label'] }}
                     </span>
                 </div>
                 <div class="mt-1">
-                    <strong class="text-[#1D1D1F] font-bold text-xs">{{ $batch->start_date->format('M d') }} – {{ $batch->end_date->format('M d, Y') }}</strong>
+                    <strong class="text-[#1D1D1F] font-bold text-sm">{{ $batch->start_date->format('M d') }} to {{ $batch->end_date->format('M d, Y') }}</strong>
                 </div>
                 @if($batch->capacity_note)
-                    <div class="mt-1.5 text-[11px] text-[#6E6E73] italic">
+                    <div class="mt-1.5 text-sm text-[#6E6E73] italic">
                         {{ $batch->capacity_note }}
                     </div>
                 @endif
 
                 <!-- Metrics and Operational Status -->
-                <div class="mt-3 space-y-2 text-xs">
+                <div class="mt-3 space-y-2 text-sm">
 
                     <!-- Staffing and Capacity Overview -->
                     <div class="space-y-1.5">
-                        <div class="flex items-center justify-between text-xs">
+                        <div class="flex items-center justify-between text-sm">
                             <span class="font-bold text-[#1D1D1F]">
                                 {{ $batch->total_participants_count }} Pax ({{ $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])->count() }} bookings)
                             </span>
                             @if($batch->total_participants_count > 0 && $batch->is_coach_pending)
-                                <span class="text-xs font-bold text-amber-700">
+                                <span class="text-sm font-bold text-amber-700">
                                     Instructor Pending
                                 </span>
                             @elseif($batch->assigned_coaches_count > 0)
-                                <span class="text-xs text-emerald-700 font-bold">
+                                <span class="text-sm text-emerald-700 font-bold">
                                     {{ $batch->assigned_coaches_count }} Coach(es)
                                 </span>
                             @else
-                                <span class="text-xs text-[#8E8E93] font-medium">
+                                <span class="text-sm text-[#8E8E93] font-medium">
                                     No Bookings Yet
                                 </span>
                             @endif
                         </div>
-                        <div class="flex items-center justify-between text-xs text-[#6E6E73]">
+                        <div class="flex items-center justify-between text-sm text-[#6E6E73]">
                             <span>{{ $batch->occupancy_percentage }}% Full</span>
                             <span class="text-[#8E8E93]">{{ $batch->remaining_capacity }} free slot(s)</span>
                         </div>
@@ -218,13 +215,13 @@
         @empty
         <div class="col-span-full py-10 text-center text-[#6E6E73] bg-white rounded-xl border border-[#E5E5EA]">
             <p class="text-base font-bold text-[#1D1D1F]">No batches found</p>
-            <p class="text-xs text-[#6E6E73] mt-1">Try adjusting your search criteria or create a new batch schedule.</p>
+            <p class="text-sm text-[#6E6E73] mt-1">Try adjusting your search criteria or create a new batch schedule.</p>
         </div>
         @endforelse
     </div>
 
     <!-- Pagination -->
-    <div class="bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] overflow-hidden [&>*]:border-t-0">
+    <div class="bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] overflow-hidden [&>*]:border-t-0">
         {{ $batches->links() }}
     </div>
 

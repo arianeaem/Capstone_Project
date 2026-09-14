@@ -11,17 +11,17 @@
 }">
     
     <!-- Top Header Bar -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
             <!-- Breadcrumbs -->
             <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.weather.index', ['tab' => request('profile') === 'ml_model' ? 'ml_model' : 'batches']) }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                <a href="{{ route('admin.weather.index', ['tab' => request('profile') === 'ml_model' ? 'ml_model' : 'batches']) }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                     <span>Weather & Safety Roster</span>
                 </a>
                 @if($batch->status === 'cancelled_by_camp')
                     <span class="text-[#D1D1D6]">/</span>
-                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
+                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
                         Cancelled by Camp
                     </span>
                 @endif
@@ -31,7 +31,7 @@
                 {{ $batch->batch_number }}
             </h1>
             
-            <div class="mt-1.5 text-xs text-[#6E6E73] space-y-1">
+            <div class="mt-1.5 text-sm text-[#6E6E73] space-y-1">
                 <div class="flex items-center gap-1 font-medium text-[#1D1D1F]">
                     <span>{{ $batch->start_date->format('F d, Y (l)') }} to {{ $batch->end_date->format('F d, Y (l)') }}</span>
                 </div>
@@ -44,7 +44,7 @@
             <!-- Refresh / Run Live Assessment -->
             <form action="{{ route('admin.weather.assess', $batch) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
+                <button type="submit" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
                     <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     <span>Run Live Assessment</span>
                 </button>
@@ -53,7 +53,7 @@
             <!-- Manual Override Modal Trigger -->
             <button type="button" 
                     @click="openOverrideModal = true"
-                    class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
+                    class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5">
                 <span>Manual Override</span>
             </button>
 
@@ -61,7 +61,7 @@
             @if($batch->status !== 'cancelled_by_camp')
                 <button type="button" 
                         @click="openCancelModal = true"
-                        class="btn-danger px-3.5 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                        class="btn-danger px-3.5 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5">
                     <span>Cancel Batch</span>
                 </button>
             @endif
@@ -73,14 +73,14 @@
     <div class="border-b border-[#E5E5EA] flex items-center gap-6 overflow-x-auto no-scrollbar">
         <button type="button" 
                 @click="activeProfile = 'operations'"
-                class="pb-3 text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap cursor-pointer"
+                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap cursor-pointer"
                 :class="activeProfile === 'operations' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
             Batch Operations Profile
         </button>
 
         <button type="button" 
                 @click="activeProfile = 'ml_model'"
-                class="pb-3 text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap cursor-pointer"
+                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap cursor-pointer"
                 :class="activeProfile === 'ml_model' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
             ML Safety Model Profile
         </button>
@@ -143,12 +143,11 @@
             
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <span class="text-xs font-extrabold uppercase tracking-widest text-[#6E6E73] block mb-1">
+                    <span class="text-sm font-extrabold uppercase tracking-widest text-[#6E6E73] block mb-1">
                         Overall Batch Assessment
                     </span>
                     <div class="flex flex-wrap items-center gap-3">
-                        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase {{ $overallConfig['pill'] }}">
-                            <span class="w-2.5 h-2.5 rounded-full {{ $overallConfig['dot'] }} animate-pulse"></span>
+                        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase {{ $overallConfig['pill'] }}">
                             <span>{{ $overallClassification }}</span>
                         </span>
                     </div>
@@ -156,14 +155,14 @@
 
                 <!-- Override Status Badge -->
                 <div class="md:text-right">
-                    <span class="text-xs uppercase font-bold text-[#6E6E73] block">Override Advisory Status</span>
+                    <span class="text-sm uppercase font-bold text-[#6E6E73] block">Override Advisory Status</span>
                     @if($latestOverride && count($latestOverride->active_advisories) > 0)
-                        <span class="text-xs font-bold text-[#991B1B] bg-[#FEF2F2] px-3 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5 mt-1">
+                        <span class="text-sm font-bold text-[#991B1B] bg-[#FEF2F2] px-3 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5 mt-1">
                             <span>Active: {{ implode(', ', $latestOverride->active_advisories) }}</span>
                         </span>
                     @else
-                        <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5 mt-1">
-                            <span>✓</span>
+                        <span class="text-sm font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5 mt-1">
+                            <svg class="w-3.5 h-3.5 text-[#065F46]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             <span>NOT OVERRIDDEN</span>
                         </span>
                     @endif
@@ -193,7 +192,7 @@
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                            <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                                 DAY 1
                             </span>
                             <h2 class="text-lg font-black text-[#1D1D1F]">
@@ -201,46 +200,46 @@
                             </h2>
                         </div>
 
-                        <span class="px-3 py-1 rounded-full text-xs font-black uppercase border {{ $day1Assessment->classification_badge['class'] }}">
+                        <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $day1Assessment->classification_badge['class'] }}">
                             {{ $day1Assessment->overall_classification }}
                         </span>
                     </div>
 
                     <!-- Recommended Action after Day 1 Header -->
-                    <div class="p-3.5 rounded-xl bg-[#FAFAFC] text-xs text-[#1D1D1F] space-y-1">
-                        <span class="font-bold text-[#6E6E73] block uppercase text-[11px] tracking-wider">Recommended Action:</span>
+                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] text-sm text-[#1D1D1F] space-y-1">
+                        <span class="font-bold text-[#6E6E73] block uppercase text-sm tracking-wider">Recommended Action:</span>
                         <p class="font-semibold text-[#1D1D1F] leading-snug">{{ $day1Assessment->recommended_action }}</p>
                     </div>
 
                     <!-- Day 1 Quick Stat Chips -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                             <div>
-                                <span class="text-[#6E6E73] block text-xs uppercase font-bold">Worst Hour</span>
+                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Worst Hour</span>
                                 <strong class="text-sm font-extrabold text-[#1D1D1F]">
                                     {{ $day1Assessment->worst_hour ? $day1Assessment->worst_hour->format('g:i A') : 'N/A' }}
                                 </strong>
                             </div>
                         </div>
 
-                        <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                             <div>
-                                <span class="text-[#6E6E73] block text-xs uppercase font-bold">Forecast Horizon</span>
+                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Forecast Horizon</span>
                                 <strong class="text-sm font-extrabold text-[#1D1D1F]">
                                     {{ round($day1Assessment->lead_time_hours) }}h before dive
                                 </strong>
                             </div>
                         </div>
 
-                        <div class="p-3 rounded-xl bg-[#FAFAFC] space-y-1.5">
+                        <div class="p-3 rounded-xl bg-[#F2F2F7] space-y-1.5">
                             <div>
                                 <div class="flex items-center gap-1.5 mt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border {{ $day1Assessment->reliability['badge_class'] }}">
+                                    <span class="px-2 py-0.5 rounded-md text-sm font-extrabold {{ $day1Assessment->reliability['badge_class'] }}">
                                         {{ $day1Assessment->reliability['label'] }}
                                     </span>
                                 </div>
                             </div>
-                            <div class="text-[11px] text-[#6E6E73] font-medium leading-tight pt-1">
+                            <div class="text-sm text-[#6E6E73] font-medium leading-tight pt-1">
                                 {{ $day1Assessment->reliability['description'] }}
                             </div>
                         </div>
@@ -253,7 +252,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <button type="button" 
                                 @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
                             <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
                             <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
@@ -261,8 +260,8 @@
 
                     <!-- Comprehensive Weather Forecast Table -->
                     <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-extrabold text-[#6E6E73]">
                                 <tr>
                                     <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
                                     <th class="py-3 px-2 whitespace-nowrap">Risk Rating</th>
@@ -282,28 +281,28 @@
                                     $isAmHour = in_array($h['hour'], [10, 11, 12]);
                                     $isPmHour = in_array($h['hour'], [16, 17]);
                                     $badgeClass = match($h['classification'] ?? 'Safe') {
-                                        'Very Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Moderate' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                        'High Risk' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                        'Critical Risk' => 'bg-red-50 text-red-700 border-red-200',
-                                        default => 'bg-gray-50 text-gray-700 border-gray-200',
+                                        'Very Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Moderate' => 'bg-amber-50 text-amber-700',
+                                        'High Risk' => 'bg-rose-50 text-rose-700',
+                                        'Critical Risk' => 'bg-red-50 text-red-700',
+                                        default => 'bg-gray-50 text-gray-700',
                                     };
                                 @endphp
                                 <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#FAFAFC] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
+                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
                                     <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
                                         <div class="flex items-center gap-1.5">
                                             <span>{{ sprintf('%02d:00', $h['hour']) }}</span>
                                             @if($isAmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
                                             @elseif($isPmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="py-2.5 px-2 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border {{ $badgeClass }}">
+                                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $badgeClass }}">
                                             {{ $h['classification'] }}
                                         </span>
                                     </td>
@@ -323,7 +322,7 @@
                 </div>
                 @else
                 <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
                         <span class="font-bold text-[#1D1D1F] block">Detailed Hourly Forecast Not Yet Available</span>
                         <span>Detailed hourly marine & weather forecasts become available 16 days prior to the dive date (available on {{ $batch->start_date->copy()->subDays(16)->format('M d, Y') }}).</span>
                     </div>
@@ -339,7 +338,7 @@
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2.5">
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                            <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                                 DAY 2
                             </span>
                             <h2 class="text-lg font-black text-[#1D1D1F]">
@@ -347,46 +346,46 @@
                             </h2>
                         </div>
 
-                        <span class="px-3 py-1 rounded-full text-xs font-black uppercase border {{ $day2Assessment->classification_badge['class'] }}">
+                        <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $day2Assessment->classification_badge['class'] }}">
                             {{ $day2Assessment->overall_classification }}
                         </span>
                     </div>
 
                     <!-- Recommended Action after Day 2 Header -->
-                    <div class="p-3.5 rounded-xl bg-[#FAFAFC] text-xs text-[#1D1D1F] space-y-1">
-                        <span class="font-bold text-[#6E6E73] block uppercase text-[11px] tracking-wider">Recommended Action:</span>
+                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] text-sm text-[#1D1D1F] space-y-1">
+                        <span class="font-bold text-[#6E6E73] block uppercase text-sm tracking-wider">Recommended Action:</span>
                         <p class="font-semibold text-[#1D1D1F] leading-snug">{{ $day2Assessment->recommended_action }}</p>
                     </div>
 
                     <!-- Day 2 Quick Stat Chips -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                        <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                             <div>
-                                <span class="text-[#6E6E73] block text-xs uppercase font-bold">Worst Hour</span>
+                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Worst Hour</span>
                                 <strong class="text-sm font-extrabold text-[#1D1D1F]">
                                     {{ $day2Assessment->worst_hour ? $day2Assessment->worst_hour->format('g:i A') : 'N/A' }}
                                 </strong>
                             </div>
                         </div>
 
-                        <div class="p-3 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                             <div>
-                                <span class="text-[#6E6E73] block text-xs uppercase font-bold">Forecast Horizon</span>
+                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Forecast Horizon</span>
                                 <strong class="text-sm font-extrabold text-[#1D1D1F]">
                                     {{ round($day2Assessment->lead_time_hours) }}h before dive
                                 </strong>
                             </div>
                         </div>
 
-                        <div class="p-3 rounded-xl bg-[#FAFAFC] space-y-1.5">
+                        <div class="p-3 rounded-xl bg-[#F2F2F7] space-y-1.5">
                             <div>
                                 <div class="flex items-center gap-1.5 mt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md text-[11px] font-extrabold border {{ $day2Assessment->reliability['badge_class'] }}">
+                                    <span class="px-2 py-0.5 rounded-md text-sm font-extrabold {{ $day2Assessment->reliability['badge_class'] }}">
                                         {{ $day2Assessment->reliability['label'] }}
                                     </span>
                                 </div>
                             </div>
-                            <div class="text-[11px] text-[#6E6E73] font-medium leading-tight pt-1">
+                            <div class="text-sm text-[#6E6E73] font-medium leading-tight pt-1">
                                 {{ $day2Assessment->reliability['description'] }}
                             </div>
                         </div>
@@ -399,7 +398,7 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <button type="button" 
                                 @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
                             <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
                             <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
@@ -407,8 +406,8 @@
 
                     <!-- Comprehensive Weather Forecast Table -->
                     <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-extrabold text-[#6E6E73]">
                                 <tr>
                                     <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
                                     <th class="py-3 px-2 whitespace-nowrap">Risk Rating</th>
@@ -428,28 +427,28 @@
                                     $isAmHour = in_array($h['hour'], [10, 11, 12]);
                                     $isPmHour = in_array($h['hour'], [16, 17]);
                                     $badgeClass = match($h['classification'] ?? 'Safe') {
-                                        'Very Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Moderate' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                        'High Risk' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                        'Critical Risk' => 'bg-red-50 text-red-700 border-red-200',
-                                        default => 'bg-gray-50 text-gray-700 border-gray-200',
+                                        'Very Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Moderate' => 'bg-amber-50 text-amber-700',
+                                        'High Risk' => 'bg-rose-50 text-rose-700',
+                                        'Critical Risk' => 'bg-red-50 text-red-700',
+                                        default => 'bg-gray-50 text-gray-700',
                                     };
                                 @endphp
                                 <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#FAFAFC] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
+                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
                                     <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
                                         <div class="flex items-center gap-1.5">
                                             <span>{{ sprintf('%02d:00', $h['hour']) }}</span>
                                             @if($isAmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
                                             @elseif($isPmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="py-2.5 px-2 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border {{ $badgeClass }}">
+                                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $badgeClass }}">
                                             {{ $h['classification'] }}
                                         </span>
                                     </td>
@@ -469,7 +468,7 @@
                 </div>
                 @else
                 <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
                         <span class="font-bold text-[#1D1D1F] block">Detailed Hourly Forecast Not Yet Available</span>
                         <span>Detailed hourly marine & weather forecasts become available 16 days prior to the dive date (available on {{ ($batch->end_date ?? $batch->start_date->copy()->addDay())->copy()->subDays(16)->format('M d, Y') }}).</span>
                     </div>
@@ -500,10 +499,10 @@
             };
             $opStatus = $batchMLAssessment['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK';
             $opBadgeClass = match($opStatus) {
-                'TACTICAL_CLEARANCE' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                'PROVISIONAL_TREND_OUTLOOK' => 'bg-blue-50 text-blue-700 border-blue-200',
-                'EXTENDED_TREND_OUTLOOK' => 'bg-purple-50 text-purple-700 border-purple-200',
-                default => 'bg-gray-50 text-gray-700 border-gray-200',
+                'TACTICAL_CLEARANCE' => 'bg-emerald-50 text-emerald-700',
+                'PROVISIONAL_TREND_OUTLOOK' => 'bg-blue-50 text-blue-700',
+                'EXTENDED_TREND_OUTLOOK' => 'bg-purple-50 text-purple-700',
+                default => 'bg-gray-50 text-gray-700',
             };
         @endphp
 
@@ -511,31 +510,30 @@
             
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <span class="text-xs font-extrabold uppercase tracking-widest text-[#6E6E73] block mb-1">
+                    <span class="text-sm font-extrabold uppercase tracking-widest text-[#6E6E73] block mb-1">
                         Machine Learning Safety Assessment & Verdict
                     </span>
                     <div class="flex flex-wrap items-center gap-3">
-                        <span class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase {{ $mlConfig['pill'] }}">
-                            <span class="w-2.5 h-2.5 rounded-full {{ $mlConfig['dot'] }} animate-pulse"></span>
+                        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase {{ $mlConfig['pill'] }}">
                             <span>{{ $mlRec }}</span>
                         </span>
                         
-                        <span class="text-xs font-bold px-3 py-1 rounded-lg border {{ $opBadgeClass }}">
-                            {{ $batchMLAssessment['operational_status_label'] ?? 'Provisional Trend Outlook (6h–24h)' }}
+                        <span class="text-sm font-bold px-3 py-1 rounded-lg {{ $opBadgeClass }}">
+                            {{ $batchMLAssessment['operational_status_label'] ?? 'Provisional Trend Outlook (6h-24h)' }}
                         </span>
                     </div>
                 </div>
 
                 <div class="md:text-right">
-                    <span class="text-xs uppercase font-bold text-[#6E6E73] block">Physical Hard-Gate Status</span>
+                    <span class="text-sm uppercase font-bold text-[#6E6E73] block">Mandatory Safety Limits</span>
                     @if($batchMLAssessment && ($batchMLAssessment['hard_gate_triggered'] ?? false))
-                        <span class="text-xs font-bold text-[#991B1B] bg-[#FEF2F2] px-3 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5 mt-1">
-                            <span>Hard-Gate Limit Breached</span>
+                        <span class="text-sm font-bold text-[#991B1B] bg-[#FEF2F2] px-3 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5 mt-1">
+                            <span>Safety Limit Exceeded</span>
                         </span>
                     @else
-                        <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5 mt-1">
-                            <span>✓</span>
-                            <span>All PCG & Hard-Gates Cleared</span>
+                        <span class="text-sm font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5 mt-1">
+                            <svg class="w-3.5 h-3.5 text-[#065F46]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>All Safety Limits Cleared</span>
                         </span>
                     @endif
                 </div>
@@ -544,29 +542,29 @@
             <!-- Dual-Engine Architecture Section -->
             <div class="pt-4 border-t border-[#E5E5EA]">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Engine 1 -->
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-1.5">
+                    <!-- Rule-Based Assessment -->
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] space-y-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-extrabold uppercase text-[#6E6E73]">Engine 1: Native Heuristic</span>
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase {{ $overallConfig['pill'] }}">
+                            <span class="text-sm font-extrabold uppercase text-[#6E6E73]">Rule-Based Marine Safety</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-sm font-black uppercase {{ $overallConfig['pill'] }}">
                                 {{ $overallClassification }}
                             </span>
                         </div>
-                        <p class="text-xs text-[#6E6E73]">
-                            9-variable physics rules with Tier-2 compound precursor hard-gates.
+                        <p class="text-sm text-[#6E6E73]">
+                            9-variable marine parameters with standard Coast Guard safety limits.
                         </p>
                     </div>
 
-                    <!-- Engine 2 -->
-                    <div class="p-4 rounded-xl {{ $batchMLAssessment ? 'bg-[#F0FDF4] border border-[#BBF7D0]' : 'bg-[#FAFAFC] border border-[#E5E5EA]' }} space-y-1.5">
+                    <!-- Predictive Model Assessment -->
+                    <div class="p-4 rounded-xl {{ $batchMLAssessment ? 'bg-[#F0FDF4] border border-[#BBF7D0]' : 'bg-[#F2F2F7] border border-[#E5E5EA]' }} space-y-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-extrabold uppercase {{ $batchMLAssessment ? 'text-[#166534]' : 'text-[#6E6E73]' }}">Engine 2: ML ONNX Pipeline</span>
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase {{ $mlConfig['pill'] }}">
+                            <span class="text-sm font-extrabold uppercase {{ $batchMLAssessment ? 'text-[#166534]' : 'text-[#6E6E73]' }}">Predictive Risk Model</span>
+                            <span class="px-2.5 py-0.5 rounded-full text-sm font-black uppercase {{ $mlConfig['pill'] }}">
                                 {{ $mlRec }}
                             </span>
                         </div>
-                        <p class="text-xs {{ $batchMLAssessment ? 'text-[#15803D]' : 'text-[#6E6E73]' }}">
-                            12 ONNX forecasters & XGBoost safety classifier on port <code>8001</code>.
+                        <p class="text-sm {{ $batchMLAssessment ? 'text-[#15803D]' : 'text-[#6E6E73]' }}">
+                            12-variable hydrodynamic forecasts & machine learning risk classifier.
                         </p>
                     </div>
                 </div>
@@ -586,15 +584,15 @@
             $avgCurrent = !empty($mlList) ? collect($mlList)->avg('predicted_current_speed') : ($day1Continuous24h['daily']['avg_ocean_current'] ?? 0.30);
         @endphp
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4 shadow-2xs">
-            <h3 class="text-base font-extrabold text-[#1D1D1F]">12-Variable ONNX Machine Learning Inference Matrix</h3>
-            <p class="text-xs text-[#6E6E73]">
+            <h3 class="text-base font-extrabold text-[#1D1D1F]">12-Variable Marine Risk Model Readings</h3>
+            <p class="text-sm text-[#6E6E73]">
                 Atmospheric boundary layer pressure, drag coefficients, and current velocity predictions for Mabini, Batangas.
             </p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-sm">
                 <!-- Wave Dynamics -->
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
-                    <span class="text-[#6E6E73] font-bold uppercase text-[11px] block">Wave Dynamics Forecasters</span>
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
+                    <span class="text-[#6E6E73] font-bold uppercase text-sm block">Wave Dynamics Forecasters</span>
                     <div class="space-y-1 text-[#1D1D1F]">
                         <div class="flex justify-between"><span>Significant Wave Height ($H_s$):</span> <strong class="font-mono">{{ number_format($avgHs, 2) }} m</strong></div>
                         <div class="flex justify-between"><span>Peak Wave Period ($T_p$):</span> <strong class="font-mono">{{ number_format($avgTp, 1) }} s</strong></div>
@@ -604,8 +602,8 @@
                 </div>
 
                 <!-- Wind & Pressure -->
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
-                    <span class="text-[#6E6E73] font-bold uppercase text-[11px] block">Wind & Atmospheric Forecasters</span>
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
+                    <span class="text-[#6E6E73] font-bold uppercase text-sm block">Wind & Atmospheric Forecasters</span>
                     <div class="space-y-1 text-[#1D1D1F]">
                         <div class="flex justify-between"><span>10m Sustained Wind Speed:</span> <strong class="font-mono">{{ round($avgWindSpeed) }} km/h</strong></div>
                         <div class="flex justify-between"><span>Instantaneous Wind Gusts:</span> <strong class="font-mono">{{ round($maxGust) }} km/h</strong></div>
@@ -615,13 +613,13 @@
                 </div>
 
                 <!-- Hydrodynamic Currents & XGBoost -->
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
-                    <span class="text-[#6E6E73] font-bold uppercase text-[11px] block">Currents & XGBoost Classifier</span>
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
+                    <span class="text-[#6E6E73] font-bold uppercase text-sm block">Currents & XGBoost Classifier</span>
                     <div class="space-y-1 text-[#1D1D1F]">
                         <div class="flex justify-between"><span>Ocean Current Velocity:</span> <strong class="font-mono">{{ number_format($avgCurrent, 2) }} m/s</strong></div>
                         <div class="flex justify-between"><span>Current Drift Vector ($U, V$):</span> <strong class="font-mono">+0.22, -0.15 m/s</strong></div>
                         <div class="flex justify-between"><span>Classifier Output Tier:</span> <strong class="font-mono uppercase text-[#780000]">{{ $mlRec }}</strong></div>
-                        <div class="flex justify-between"><span>Inference Engine:</span> <strong class="font-mono text-emerald-700">12 ONNX Sessions</strong></div>
+                        <div class="flex justify-between"><span>Model Sessions:</span> <strong class="font-mono text-emerald-700">12 ONNX Sessions</strong></div>
                     </div>
                 </div>
             </div>
@@ -643,9 +641,9 @@
                 };
             @endphp
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between pb-3">
                     <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                        <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                             DAY 1 ML
                         </span>
                         <h3 class="text-base font-extrabold text-[#1D1D1F]">
@@ -653,7 +651,7 @@
                         </h3>
                     </div>
 
-                    <span class="px-3 py-1 rounded-full text-xs font-black uppercase {{ $d1Badge }}">
+                    <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $d1Badge }}">
                         {{ $d1Rec }}
                     </span>
                 </div>
@@ -663,15 +661,15 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <button type="button" 
                                 @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
                             <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
                             <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </div>
 
                     <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-extrabold text-[#6E6E73]">
                                 <tr>
                                     <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
                                     <th class="py-3 px-2 whitespace-nowrap">ML Risk Rating</th>
@@ -693,28 +691,28 @@
                                     $isPmHour = in_array($hourNum, [16, 17]);
                                     $mlRisk = $h['final_tier_name'] ?? $h['ml_raw_tier_name'] ?? $h['classification'] ?? 'Safe';
                                     $badgeClass = match($mlRisk) {
-                                        'Very Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Moderate' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                        'High Risk' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                        'Critical Risk' => 'bg-red-50 text-red-700 border-red-200',
-                                        default => 'bg-gray-50 text-gray-700 border-gray-200',
+                                        'Very Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Moderate' => 'bg-amber-50 text-amber-700',
+                                        'High Risk' => 'bg-rose-50 text-rose-700',
+                                        'Critical Risk' => 'bg-red-50 text-red-700',
+                                        default => 'bg-gray-50 text-gray-700',
                                     };
                                 @endphp
                                 <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#FAFAFC] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
+                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
                                     <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
                                         <div class="flex items-center gap-1.5">
                                             <span>{{ sprintf('%02d:00', $hourNum) }}</span>
                                             @if($isAmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
                                             @elseif($isPmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="py-2.5 px-2 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border {{ $badgeClass }}">
+                                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $badgeClass }}">
                                             {{ $mlRisk }}
                                         </span>
                                     </td>
@@ -736,7 +734,7 @@
                 </div>
                 @else
                 <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
                         <span class="font-bold text-[#1D1D1F] block">ML Forecast Data Generating</span>
                         <span>Ensure the ML microservice on port 8001 is running.</span>
                     </div>
@@ -757,9 +755,9 @@
                 };
             @endphp
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+                <div class="flex items-center justify-between pb-3">
                     <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                        <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                             DAY 2 ML
                         </span>
                         <h3 class="text-base font-extrabold text-[#1D1D1F]">
@@ -767,7 +765,7 @@
                         </h3>
                     </div>
 
-                    <span class="px-3 py-1 rounded-full text-xs font-black uppercase {{ $d2Badge }}">
+                    <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $d2Badge }}">
                         {{ $d2Rec }}
                     </span>
                 </div>
@@ -777,15 +775,15 @@
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                         <button type="button" 
                                 @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#FAFAFC] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
                             <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
                             <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                         </button>
                     </div>
 
                     <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[11px] uppercase font-extrabold text-[#6E6E73]">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-extrabold text-[#6E6E73]">
                                 <tr>
                                     <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
                                     <th class="py-3 px-2 whitespace-nowrap">ML Risk Rating</th>
@@ -807,28 +805,28 @@
                                     $isPmHour = in_array($hourNum, [16, 17]);
                                     $mlRisk = $h['final_tier_name'] ?? $h['ml_raw_tier_name'] ?? $h['classification'] ?? 'Safe';
                                     $badgeClass = match($mlRisk) {
-                                        'Very Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Safe' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
-                                        'Moderate' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                        'High Risk' => 'bg-rose-50 text-rose-700 border-rose-200',
-                                        'Critical Risk' => 'bg-red-50 text-red-700 border-red-200',
-                                        default => 'bg-gray-50 text-gray-700 border-gray-200',
+                                        'Very Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Safe' => 'bg-emerald-50 text-emerald-700',
+                                        'Moderate' => 'bg-amber-50 text-amber-700',
+                                        'High Risk' => 'bg-rose-50 text-rose-700',
+                                        'Critical Risk' => 'bg-red-50 text-red-700',
+                                        default => 'bg-gray-50 text-gray-700',
                                     };
                                 @endphp
                                 <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#FAFAFC] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
+                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
                                     <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
                                         <div class="flex items-center gap-1.5">
                                             <span>{{ sprintf('%02d:00', $hourNum) }}</span>
                                             @if($isAmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
                                             @elseif($isPmHour)
-                                                <span class="text-[9px] px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
+                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
                                             @endif
                                         </div>
                                     </td>
                                     <td class="py-2.5 px-2 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold border {{ $badgeClass }}">
+                                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $badgeClass }}">
                                             {{ $mlRisk }}
                                         </span>
                                     </td>
@@ -850,7 +848,7 @@
                 </div>
                 @else
                 <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-center text-xs text-[#6E6E73] space-y-1">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
                         <span class="font-bold text-[#1D1D1F] block">ML Forecast Data Generating</span>
                         <span>Ensure the ML microservice on port 8001 is running.</span>
                     </div>
@@ -860,79 +858,79 @@
 
         </div>
 
-        <!-- Philippine Coast Guard Hard-Gate Ceilings Audit -->
+        <!-- Philippine Coast Guard Safety Limits Audit -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-            <h3 class="text-base font-extrabold text-[#1D1D1F]">Anilao Marine Physical Hard-Gate Audit</h3>
-            <p class="text-xs text-[#6E6E73]">
-                Deterministic Philippine Coast Guard boundaries. Any breach triggers immediate Critical Risk cancellation cascade.
+            <h3 class="text-base font-extrabold text-[#1D1D1F]">Anilao Marine Safety Ceilings & Limits</h3>
+            <p class="text-sm text-[#6E6E73]">
+                Official Philippine Coast Guard safety boundaries. Any breach triggers immediate Critical Risk and cancellation protection.
             </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-[11px]">Sustained Wind Speed</span>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
+                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Sustained Wind Speed</span>
                     <strong class="text-base font-black text-[#1D1D1F]">&ge; 42.0 km/h</strong>
-                    <span class="text-[11px] text-[#8E8E93] block">PCG Banca / Small Craft Limit</span>
+                    <span class="text-sm text-[#8E8E93] block">PCG Banca / Small Craft Limit</span>
                 </div>
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-[11px]">Squall Wind Gusts</span>
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
+                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Squall Wind Gusts</span>
                     <strong class="text-base font-black text-[#1D1D1F]">&ge; 48.0 km/h</strong>
-                    <span class="text-[11px] text-[#8E8E93] block">Instantaneous squall threshold</span>
+                    <span class="text-sm text-[#8E8E93] block">Instantaneous squall threshold</span>
                 </div>
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-[11px]">Significant Wave Height ($H_s$)</span>
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
+                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Significant Wave Height ($H_s$)</span>
                     <strong class="text-base font-black text-[#1D1D1F]">&ge; 1.80 m</strong>
-                    <span class="text-[11px] text-[#8E8E93] block">30-min rolling mean limit</span>
+                    <span class="text-sm text-[#8E8E93] block">30-min rolling mean limit</span>
                 </div>
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-[11px]">Ocean Current Velocity</span>
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
+                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Ocean Current Velocity</span>
                     <strong class="text-base font-black text-[#1D1D1F]">&ge; 0.80 m/s</strong>
-                    <span class="text-[11px] text-[#8E8E93] block">Line drift hazard threshold</span>
+                    <span class="text-sm text-[#8E8E93] block">Line drift hazard threshold</span>
                 </div>
             </div>
         </div>
 
-        <!-- Telemetry Data Sources & Model Attribution -->
+        <!-- Marine Data Sources & Model Attribution -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-3">
+            <div class="flex items-center justify-between pb-3">
                 <div>
                     <h3 class="text-base font-extrabold text-[#1D1D1F]">Meteorological Data Sources & Attribution</h3>
-                    <p class="text-xs text-[#6E6E73]">Multi-agency numerical weather predictions and marine assimilation feeds for Anilao / Mabini.</p>
+                    <p class="text-sm text-[#6E6E73]">Multi-agency numerical weather predictions and marine assimilation feeds for Anilao / Mabini.</p>
                 </div>
-                <span class="px-2.5 py-1 rounded-md text-xs font-black uppercase bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
+                <span class="px-2.5 py-1 rounded-md text-sm font-black uppercase bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
                     Open-Meteo High-Resolution Ensemble
                 </span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-xs">
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-sm">
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
                     <div class="flex items-center justify-between">
                         <strong class="font-bold text-[#1D1D1F]">ECMWF IFS / AIFS</strong>
-                        <span class="text-[10px] px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 font-extrabold uppercase">Europe</span>
+                        <span class="text-sm px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 font-extrabold uppercase">Europe</span>
                     </div>
-                    <p class="text-[11px] text-[#6E6E73]">0.25° European Centre global atmospheric model. Gold standard for wind shear & pressure fields.</p>
+                    <p class="text-sm text-[#6E6E73]">0.25° European Centre global atmospheric model. Gold standard for wind shear & pressure fields.</p>
                 </div>
 
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
                     <div class="flex items-center justify-between">
                         <strong class="font-bold text-[#1D1D1F]">NOAA GFS & WaveWatch III</strong>
-                        <span class="text-[10px] px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-800 font-extrabold uppercase">USA</span>
+                        <span class="text-sm px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-800 font-extrabold uppercase">USA</span>
                     </div>
-                    <p class="text-[11px] text-[#6E6E73]">Global Forecast System 13km atmospheric model + global ocean wave dynamics and swell spectra.</p>
+                    <p class="text-sm text-[#6E6E73]">Global Forecast System 13km atmospheric model + global ocean wave dynamics and swell spectra.</p>
                 </div>
 
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
                     <div class="flex items-center justify-between">
                         <strong class="font-bold text-[#1D1D1F]">Copernicus Marine (CMEMS)</strong>
-                        <span class="text-[10px] px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-extrabold uppercase">Mercator Ocean</span>
+                        <span class="text-sm px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-extrabold uppercase">Mercator Ocean</span>
                     </div>
-                    <p class="text-[11px] text-[#6E6E73]">0.083° global ocean current analysis ($U/V$ drift vectors), sea surface temperature, and tides.</p>
+                    <p class="text-sm text-[#6E6E73]">0.083° global ocean current analysis ($U/V$ drift vectors), sea surface temperature, and tides.</p>
                 </div>
 
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-1.5">
+                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
                     <div class="flex items-center justify-between">
                         <strong class="font-bold text-[#1D1D1F]">PAGASA & JMA Himawari-9</strong>
-                        <span class="text-[10px] px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-extrabold uppercase">PH / Japan</span>
+                        <span class="text-sm px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-extrabold uppercase">PH / Japan</span>
                     </div>
-                    <p class="text-[11px] text-[#6E6E73]">Tropical Cyclone Wind Signals (TCWS), gale warnings, and geostationary satellite nowcasting.</p>
+                    <p class="text-sm text-[#6E6E73]">Tropical Cyclone Wind Signals (TCWS), gale warnings, and geostationary satellite nowcasting.</p>
                 </div>
             </div>
         </div>
@@ -947,23 +945,23 @@
     <div x-data="{ openAuditTrail: false }" class="mt-8 bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
         <button type="button" 
                 @click="openAuditTrail = !openAuditTrail" 
-                class="w-full p-5 sm:p-6 flex items-center justify-between text-left hover:bg-[#FAFAFC] transition-colors cursor-pointer select-none">
+                class="w-full p-5 sm:p-6 flex items-center justify-between text-left hover:bg-[#F2F2F7] transition-colors cursor-pointer select-none">
             <div class="flex items-center gap-3">
                 <span class="text-base font-extrabold text-[#1D1D1F]">Assessment Audit Trail & History</span>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
+                <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
                     {{ count($assessmentRuns) }} run(s)
                 </span>
             </div>
-            <div class="flex items-center gap-2 text-xs font-bold text-[#780000]">
+            <div class="flex items-center gap-2 text-sm font-bold text-[#780000]">
                 <span x-text="openAuditTrail ? 'Hide History' : 'View Audit History'"></span>
                 <svg class="w-4 h-4 transition-transform duration-200" :class="openAuditTrail ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
         </button>
 
         <div x-show="openAuditTrail" x-cloak class="p-5 sm:p-6 pt-0 border-t border-[#E5E5EA] space-y-3">
-            <div class="flex items-center justify-between text-xs text-[#6E6E73] pt-4 pb-1">
+            <div class="flex items-center justify-between text-sm text-[#6E6E73] pt-4 pb-1">
                 <span>Chronological assessment history (Newest first)</span>
-                <span>Auto-logged by Open-Meteo engine & staff</span>
+                <span>Auto-logged by marine forecast service & staff</span>
             </div>
 
             @forelse($assessmentRuns as $timestamp => $records)
@@ -971,17 +969,17 @@
                 $d1 = $records->firstWhere('day_number', 1);
                 $d2 = $records->firstWhere('day_number', 2);
                 $primary = $d1 ?: $d2;
-                $runAssessor = ($d1 && $d1->assessor) ? $d1->assessor->name : (($d2 && $d2->assessor) ? $d2->assessor->name : 'Operator / Auto Engine');
+                $runAssessor = ($d1 && $d1->assessor) ? $d1->assessor->name : (($d2 && $d2->assessor) ? $d2->assessor->name : 'Camp Operator / Automated Evaluation');
                 $runTime = ($primary && $primary->assessed_at) ? $primary->assessed_at->format('M d, Y, h:i A') : $timestamp;
             @endphp
-            <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div class="p-3.5 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
                 <div class="flex items-center gap-3">
                     <div class="w-2.5 h-2.5 rounded-full bg-[#780000] shrink-0"></div>
                     <div>
                         <strong class="text-[#1D1D1F] font-bold">
                             Run at {{ $runTime }}
                         </strong>
-                        <span class="text-xs text-[#6E6E73] block mt-0.5">
+                        <span class="text-sm text-[#6E6E73] block mt-0.5">
                             Assessed by: <strong>{{ $runAssessor }}</strong>
                         </span>
                     </div>
@@ -990,46 +988,46 @@
                 <div class="flex items-center gap-4 self-end sm:self-center">
                     <div class="flex items-center gap-1.5">
                         <span class="text-[#6E6E73] font-semibold">Day 1:</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $d1 ? $d1->classification_badge['class'] : 'bg-gray-100 text-gray-600 border-gray-200' }}">
+                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $d1 ? $d1->classification_badge['class'] : 'bg-gray-100 text-gray-600' }}">
                             {{ $d1 ? $d1->overall_classification : 'N/A' }}
                         </span>
                     </div>
 
                     <div class="flex items-center gap-1.5">
                         <span class="text-[#6E6E73] font-semibold">Day 2:</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $d2 ? $d2->classification_badge['class'] : 'bg-gray-100 text-gray-600 border-gray-200' }}">
+                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $d2 ? $d2->classification_badge['class'] : 'bg-gray-100 text-gray-600' }}">
                             {{ $d2 ? $d2->overall_classification : 'N/A' }}
                         </span>
                     </div>
 
                     @if(($d1 && $d1->override_triggered) || ($d2 && $d2->override_triggered))
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#FEF2F2] text-[#991B1B] border border-[#FECACA]">
+                        <span class="px-2.5 py-0.5 rounded-full text-sm font-black bg-[#FEF2F2] text-[#991B1B]">
                             Manual Override
                         </span>
                     @endif
                 </div>
             </div>
             @empty
-            <p class="text-xs text-[#6E6E73] py-2 text-center">No past assessment runs recorded yet.</p>
+            <p class="text-sm text-[#6E6E73] py-2 text-center">No past assessment runs recorded yet.</p>
             @endforelse
         </div>
     </div>
 
     <!-- Manual Safety Override Modal -->
-    <div x-show="openOverrideModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div x-show="openOverrideModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openOverrideModal = false">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <h3 class="text-lg font-bold text-[#1D1D1F]">Apply Manual PAGASA Override</h3>
                 </div>
-                <button type="button" @click="openOverrideModal = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                <button type="button" @click="openOverrideModal = false" aria-label="Close override modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
-            <p class="text-xs text-[#6E6E73]">
+            <p class="text-sm text-[#6E6E73]">
                 Forces both <strong>Day 1</strong> and <strong>Day 2</strong> to <strong>Critical Risk</strong> due to official PAGASA gale warnings, tropical cyclones, or severe marine advisories.
             </p>
 
-            <form action="{{ route('admin.weather.override', $batch) }}" method="POST" class="space-y-4 text-xs">
+            <form action="{{ route('admin.weather.override', $batch) }}" method="POST" class="space-y-4 text-sm">
                 @csrf
 
                 <!-- TCWS Signal -->
@@ -1037,7 +1035,7 @@
                     <label class="block font-bold text-[#1D1D1F] mb-2">
                         Tropical Cyclone Wind Signal (TCWS)
                     </label>
-                    <select name="tcws_signal" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <select name="tcws_signal" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         <option value="0">No Active TCWS Signal</option>
                         <option value="1">Signal No. 1</option>
                         <option value="2">Signal No. 2</option>
@@ -1048,27 +1046,27 @@
                 </div>
 
                 <!-- Boolean Advisory Checkboxes -->
-                <div class="space-y-2 bg-[#FAFAFC] p-3.5 rounded-xl border border-[#E5E5EA]">
-                    <span class="block font-bold text-[#1D1D1F] mb-2 text-xs uppercase tracking-wider">Active Severe Marine Advisories</span>
+                <div class="space-y-2 bg-[#F2F2F7] p-3.5 rounded-xl border border-[#E5E5EA]">
+                    <span class="block font-bold text-[#1D1D1F] mb-2 text-sm uppercase tracking-wider">Active Severe Marine Advisories</span>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="gale_warning" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-xs font-semibold text-[#1D1D1F]">PAGASA Marine Gale Warning</span>
+                        <span class="text-sm font-semibold text-[#1D1D1F]">PAGASA Marine Gale Warning</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="thunderstorm_advisory" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-xs font-semibold text-[#1D1D1F]">Severe Thunderstorm / Lightning Advisory</span>
+                        <span class="text-sm font-semibold text-[#1D1D1F]">Severe Thunderstorm / Lightning Advisory</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="typhoon_within_distance" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-xs font-semibold text-[#1D1D1F]">Typhoon within Safety Distance (Batangas Coast)</span>
+                        <span class="text-sm font-semibold text-[#1D1D1F]">Typhoon within Safety Distance (Batangas Coast)</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="tsunami_warning" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-xs font-semibold text-[#1D1D1F]">Tsunami / Severe Marine Hazard Warning</span>
+                        <span class="text-sm font-semibold text-[#1D1D1F]">Tsunami / Severe Marine Hazard Warning</span>
                     </label>
                 </div>
 
@@ -1077,22 +1075,22 @@
                     <label class="block font-bold text-[#1D1D1F] mb-2">
                         Advisory Details / Source <span class="text-[#780000]">*</span>
                     </label>
-                    <textarea name="reason" required rows="2" placeholder="e.g. PAGASA Severe Weather Bulletin #4 - Gale Warning in Southern Luzon coasts" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="reason" required rows="2" placeholder="e.g. PAGASA Severe Weather Bulletin #4 - Gale Warning in Southern Luzon coasts" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
                 <!-- Auto-Cancel Option -->
                 <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA]">
                     <label class="flex items-start gap-2 cursor-pointer">
                         <input type="checkbox" name="cancel_batch" value="1" class="rounded border-[#D1D1D6] text-[#780000] mt-0.5">
-                        <span class="text-xs font-bold text-[#991B1B]">
+                        <span class="text-sm font-bold text-[#991B1B]">
                             Cancel batch immediately, trigger 100% force majeure refunds, and dispatch cancellation emails.
                         </span>
                     </label>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
-                    <button type="button" @click="openOverrideModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold">
+                    <button type="button" @click="openOverrideModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-1.5 text-sm font-bold">
                         Apply Override
                     </button>
                 </div>
@@ -1101,20 +1099,20 @@
     </div>
 
     <!-- Batch Cancellation Modal -->
-    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <h3 class="text-lg font-bold text-[#FF3B3C]">Cancel Batch & Dispatch Customer Notifications</h3>
                 </div>
-                <button type="button" @click="openCancelModal = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                <button type="button" @click="openCancelModal = false" aria-label="Close cancellation modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
-            <p class="text-xs text-[#6E6E73]">
-                Confirming whole-batch cancellation will cascade to all connected bookings, trigger <strong>100% full refund eligibility</strong>, and send the official cancellation notice to all customers.
+            <p class="text-sm text-[#6E6E73]">
+                Confirming whole-batch cancellation will automatically update all connected bookings, initiate <strong>100% full refund eligibility</strong>, and send official cancellation notices to all customers.
             </p>
 
-            <form action="{{ route('admin.weather.cancel', $batch) }}" method="POST" class="space-y-4 text-xs">
+            <form action="{{ route('admin.weather.cancel', $batch) }}" method="POST" class="space-y-4 text-sm">
                 @csrf
 
                 <div>
@@ -1125,14 +1123,14 @@
                            name="cancellation_reason" 
                            x-model="cancelReason" 
                            required 
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                 </div>
 
                 <!-- Email Notification Preview -->
                 <div class="space-y-1.5">
-                    <span class="block font-bold text-[#6E6E73] text-xs uppercase tracking-wider">Outbound Email Notification Preview</span>
-                    <div class="p-4 bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] font-sans text-xs text-[#1D1D1F] whitespace-pre-line leading-relaxed">
-Good day, <strong class="text-[#780000]">[Customer Name]</strong>. Your scheduled date for <strong class="text-[#780000]">{{ $batch->start_date->format('M d') }} – {{ $batch->end_date->format('M d, Y') }}</strong> will be canceled due to:
+                    <span class="block font-bold text-[#6E6E73] text-sm uppercase tracking-wider">Outbound Email Notification Preview</span>
+                    <div class="p-4 bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] font-sans text-sm text-[#1D1D1F] whitespace-pre-line leading-relaxed">
+Good day, <strong class="text-[#780000]">[Customer Name]</strong>. Your scheduled date for <strong class="text-[#780000]">{{ $batch->start_date->format('M d') }} to {{ $batch->end_date->format('M d, Y') }}</strong> will be canceled due to:
 
 - <span x-text="cancelReason" class="font-bold"></span>
 
@@ -1145,8 +1143,8 @@ You can select your preferred option by entering your booking number and PIN in 
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
-                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-danger px-4 py-2 text-xs font-bold shadow-2xs">
+                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
+                    <button type="submit" class="btn-danger px-4 py-2 text-sm font-bold shadow-2xs">
                         Confirm Cancellation & Send Emails
                     </button>
                 </div>

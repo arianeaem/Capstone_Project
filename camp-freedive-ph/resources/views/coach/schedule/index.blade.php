@@ -25,7 +25,7 @@
     <div class="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5E5EA] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-xl sm:text-2xl font-black text-[#1D1D1F] mt-1">My Assigned Schedule & Student Rosters</h1>
-            <p class="text-xs text-[#6E6E73] leading-relaxed">
+            <p class="text-sm text-[#6E6E73] leading-relaxed">
                 Review your upcoming dive assignments, student health conditions, live weather safety ratings, and historical dive records.
             </p>
         </div>
@@ -35,13 +35,13 @@
             <button type="button" 
                     @click="activeTab = 'upcoming'"
                     :class="activeTab === 'upcoming' ? 'bg-white text-[#1D1D1F] font-bold' : 'text-[#6E6E73] font-semibold hover:text-[#1D1D1F]'"
-                    class="flex-1 md:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs transition-all flex items-center justify-center gap-2">
+                    class="flex-1 md:flex-initial px-3 sm:px-4 py-2 rounded-lg text-sm transition-all flex items-center justify-center gap-2">
                 <span>Upcoming Dives ({{ count($upcomingBatches) }})</span>
             </button>
             <button type="button" 
                     @click="activeTab = 'history'"
                     :class="activeTab === 'history' ? 'bg-white text-[#1D1D1F] font-bold' : 'text-[#6E6E73] font-semibold hover:text-[#1D1D1F]'"
-                    class="flex-1 md:flex-initial px-3 sm:px-4 py-2 rounded-lg text-xs transition-all flex items-center justify-center gap-2">
+                    class="flex-1 md:flex-initial px-3 sm:px-4 py-2 rounded-lg text-sm transition-all flex items-center justify-center gap-2">
                 <span>Past History ({{ $totalCompletedBatchesCount }})</span>
             </button>
         </div>
@@ -76,18 +76,17 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] hover:border-[#D1D1D6] transition-all overflow-hidden">
                 
                 <!-- Clickable Batch Header Banner -->
-                <div class="p-4 sm:p-6 cursor-pointer select-none flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white hover:bg-[#FAFAFC] transition-colors"
+                <div class="p-4 sm:p-6 cursor-pointer select-none flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white hover:bg-[#F2F2F7] transition-colors"
                      @click="toggleBatch({{ $batch->id }})">
                     
                     <!-- Left Column: Weather + Batch Title + Dive Dates & Students -->
                     <div class="space-y-2.5 flex-1 min-w-0">
                         <!-- Weather Safety Badge & Description -->
                         <div class="flex items-center gap-2.5 flex-wrap">
-                            <span class="px-2.5 py-1 rounded-lg text-xs font-black {{ $wBg }} inline-flex items-center gap-1.5 shadow-2xs shrink-0">
-                                <span class="w-2 h-2 rounded-full {{ $wDot }} animate-pulse"></span>
+                            <span class="px-2.5 py-1 rounded-lg text-sm font-black {{ $wBg }} inline-flex items-center shadow-2xs shrink-0">
                                 <span>{{ $item['weather_class'] }}</span>
                             </span>
-                            <span class="text-xs text-[#6E6E73] font-medium leading-tight">
+                            <span class="text-sm text-[#6E6E73] font-medium leading-tight">
                                 {{ \App\Services\WeatherForecastService::MEANING_MAP[$item['weather_class']] ?? ($assessment?->recommended_action ?? 'Standard marine safety protocols in effect.') }}
                             </span>
                         </div>
@@ -96,7 +95,7 @@
                             <h2 class="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight">
                                 {{ $batch->batch_number }}
                             </h2>
-                            <div class="space-y-1 mt-1 text-xs text-[#6E6E73]">
+                            <div class="space-y-1 mt-1 text-sm text-[#6E6E73]">
                                 <p>
                                     Dive Dates: <strong class="text-[#1D1D1F]">{{ $batch->start_date->format('M d') }} - {{ $batch->end_date->format('d, Y') }} ({{ $batch->start_date->format('D') }} - {{ $batch->end_date->format('D') }})</strong>
                                 </p>
@@ -123,24 +122,24 @@
                     <div class="flex items-center gap-2.5 shrink-0 self-start md:self-center">
                         <!-- Release Action -->
                         @if($releaseReq)
-                            <span class="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold shadow-2xs" @click.stop>
+                            <span class="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-300 text-sm font-bold shadow-2xs" @click.stop>
                                 Release Requested
                             </span>
                         @elseif($item['can_request_release'])
                             <button type="button" 
                                     @click.stop="selectedBatch = {{ json_encode($item) }}; releaseModalOpen = true"
-                                    class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-xs font-bold transition-all">
+                                    class="px-3.5 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 text-sm font-bold transition-all">
                                 Request Release
                             </button>
                         @else
-                            <span class="px-3 py-2 rounded-xl text-xs font-bold bg-[#F2F2F7] text-[#8E8E93]" title="Release requests are locked within 48 hours of dive start" @click.stop>
+                            <span class="px-3 py-2 rounded-xl text-sm font-bold bg-[#F2F2F7] text-[#8E8E93]" title="Release requests are locked within 48 hours of dive start" @click.stop>
                                 Locked (&lt;48h)
                             </span>
                         @endif
 
                         <!-- Expand / Collapse Roster Toggle Button -->
                         <button type="button" 
-                                class="px-4 py-2 rounded-xl bg-white hover:bg-[#F2F2F7] border border-[#E5E5EA] text-xs font-bold text-[#1D1D1F] flex items-center gap-2 transition-all cursor-pointer">
+                                class="px-4 py-2 rounded-xl bg-white hover:bg-[#F2F2F7] border border-[#E5E5EA] text-sm font-bold text-[#1D1D1F] flex items-center gap-2 transition-all cursor-pointer">
                             <span x-text="isBatchOpen({{ $batch->id }}) ? 'Hide Roster' : 'View Student Roster'"></span>
                             <svg class="w-4 h-4 text-[#6E6E73] transition-transform duration-200" 
                                  :class="isBatchOpen({{ $batch->id }}) ? 'rotate-180' : ''"
@@ -155,14 +154,14 @@
                 <!-- Expandable Assigned Student Roster Section (Dashboard Card Format) -->
                 <div x-show="isBatchOpen({{ $batch->id }})" 
                      x-cloak 
-                     class="border-t border-[#E5E5EA] bg-[#FAFAFC]/60 p-4 sm:p-6 space-y-4">
+                     class="border-t border-[#E5E5EA] bg-[#F2F2F7]/80 p-4 sm:p-6 space-y-4">
                     
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-1">
                         <div>
                             <h3 class="text-base font-black text-[#1D1D1F]">Assigned Student Roster</h3>
-                            <p class="text-xs text-[#6E6E73]">Review student swimming abilities and health conditions prior to boat departure</p>
+                            <p class="text-sm text-[#6E6E73]">Review student swimming abilities and health conditions prior to boat departure</p>
                         </div>
-                        <span class="text-xs font-extrabold text-[#1D1D1F] bg-white border border-[#E5E5EA] px-3 py-1 rounded-xl self-start sm:self-auto shadow-2xs">
+                        <span class="text-sm font-extrabold text-[#1D1D1F] bg-white border border-[#E5E5EA] px-3 py-1 rounded-xl self-start sm:self-auto shadow-2xs">
                             {{ $item['students_count'] }} Diver(s) in Group
                         </span>
                     </div>
@@ -194,60 +193,57 @@
                                 <!-- Card Header: Student Name & Compact Package Badge -->
                                 <div class="flex items-start justify-between gap-2.5">
                                     <div class="min-w-0 flex-1">
-                                        <span class="text-[10px] uppercase font-bold text-[#8E8E93] tracking-wider block">Student</span>
+                                        <span class="text-sm uppercase font-bold text-[#8E8E93] tracking-wider block">Student</span>
                                         <h4 class="font-black text-[#1D1D1F] text-base sm:text-lg tracking-tight mt-0.5 truncate">{{ $student->name }}</h4>
                                     </div>
-                                    <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] shrink-0">
+                                    <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] shrink-0">
                                         {{ $shortClassType }}
                                     </span>
                                 </div>
 
                                 <!-- Information Rows (3 Semantic Rows) -->
-                                <div class="space-y-3.5 text-xs">
+                                <div class="space-y-3.5 text-sm">
                                     
                                     <!-- Row 1: Age & Package -->
                                     <div class="grid grid-cols-2 gap-3 sm:gap-4 items-start">
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Age</span>
+                                            <span class="text-sm font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Age</span>
                                             <span class="font-extrabold text-sm sm:text-base text-[#1D1D1F] block">{{ $student->age }} yrs</span>
                                         </div>
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Package</span>
-                                            <span class="font-extrabold text-xs sm:text-sm text-[#1D1D1F] block leading-snug">{{ $classType }}</span>
+                                            <span class="text-sm font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Package</span>
+                                            <span class="font-extrabold text-sm sm:text-sm text-[#1D1D1F] block leading-snug">{{ $classType }}</span>
                                         </div>
                                     </div>
 
                                     <!-- Row 2: Swimming Ability & Health/Medical -->
                                     <div class="grid grid-cols-2 gap-3 sm:gap-4 items-start">
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider block mb-1">Swimming Ability</span>
+                                            <span class="text-sm font-bold text-[#8E8E93] uppercase tracking-wider block mb-1">Swimming Ability</span>
                                             @if($swim === 'confident' || $swim === 'confident_swimmer')
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-black text-xs bg-emerald-100 text-emerald-900 shadow-2xs">
-                                                    <span class="w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg font-black text-sm bg-emerald-100 text-emerald-900 shadow-2xs">
                                                     <span>Confident Swimmer</span>
                                                 </span>
                                             @elseif($swim === 'non_swimmer')
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-black text-xs bg-rose-100 text-rose-900 shadow-2xs">
-                                                    <span class="w-2 h-2 rounded-full bg-rose-600 shrink-0"></span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg font-black text-sm bg-rose-100 text-rose-900 shadow-2xs">
                                                     <span>Non-Swimmer</span>
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-black text-xs bg-blue-100 text-blue-900 shadow-2xs">
-                                                    <span class="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+                                                <span class="inline-flex items-center px-2.5 py-1 rounded-lg font-black text-sm bg-blue-100 text-blue-900 shadow-2xs">
                                                     <span>Swimmer</span>
                                                 </span>
                                             @endif
                                         </div>
 
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider block mb-1">Health / Medical</span>
+                                            <span class="text-sm font-bold text-[#8E8E93] uppercase tracking-wider block mb-1">Health / Medical</span>
                                             @if($hasMedical)
-                                                <span class="font-bold text-xs text-amber-900 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-100 shadow-2xs">
-                                                    <span>⚠️</span>
+                                                <span class="font-bold text-sm text-amber-900 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-100 shadow-2xs">
+                                                    <svg class="w-3.5 h-3.5 text-amber-800 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                                     <span class="truncate">{{ $student->health_condition }}</span>
                                                 </span>
                                             @else
-                                                <span class="text-xs sm:text-sm text-[#8E8E93] font-bold block pt-1">None declared</span>
+                                                <span class="text-sm sm:text-sm text-[#8E8E93] font-bold block pt-1">None declared</span>
                                             @endif
                                         </div>
                                     </div>
@@ -255,12 +251,12 @@
                                     <!-- Row 3: Lead Booker & Contact -->
                                     <div class="grid grid-cols-2 gap-3 sm:gap-4 items-start">
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Lead Booker</span>
-                                            <span class="font-extrabold text-xs sm:text-sm text-[#1D1D1F] truncate block">{{ $student->booking?->contact_name ?? $student->name }}</span>
+                                            <span class="text-sm font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Lead Booker</span>
+                                            <span class="font-extrabold text-sm sm:text-sm text-[#1D1D1F] truncate block">{{ $student->booking?->contact_name ?? $student->name }}</span>
                                         </div>
                                         <div>
-                                            <span class="text-[10px] font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Contact</span>
-                                            <a href="tel:{{ $student->booking?->contact_phone ?: '09185559876' }}" class="font-extrabold text-xs sm:text-sm text-[#780000] hover:underline block truncate">
+                                            <span class="text-sm font-bold text-[#8E8E93] uppercase tracking-wider block mb-0.5">Contact</span>
+                                            <a href="tel:{{ $student->booking?->contact_phone ?: '09185559876' }}" class="font-extrabold text-sm sm:text-sm text-[#780000] hover:underline block truncate">
                                                 {{ $student->booking?->contact_phone ?: ($student->booking?->contact_email ?: '0918 555 9876') }}
                                             </a>
                                         </div>
@@ -276,11 +272,11 @@
         @empty
             <div class="bg-white rounded-2xl p-12 border border-[#E5E5EA] text-center space-y-3">
                 <h3 class="text-base font-bold text-[#1D1D1F]">No Upcoming Confirmed Assignments</h3>
-                <p class="text-xs text-[#6E6E73] max-w-md mx-auto leading-relaxed">
+                <p class="text-sm text-[#6E6E73] max-w-md mx-auto leading-relaxed">
                     You currently have no students assigned for upcoming dates. Make sure your availability calendar is marked free or browse the Open Slot Requests board.
                 </p>
                 <div class="pt-2">
-                    <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl bg-[#00C3D0] text-white text-xs font-bold hover:bg-[#00AAB6] transition-colors inline-flex items-center gap-2">
+                    <a href="{{ route('coach.availability.index') }}" class="px-4 py-2 rounded-xl bg-[#00C3D0] text-white text-sm font-bold hover:bg-[#00AAB6] transition-colors inline-flex items-center gap-2">
                         <span>Open Availability Calendar</span>
                     </a>
                 </div>
@@ -298,19 +294,19 @@
                 <!-- Quick Class Package Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => '', 'tab' => 'history']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('class_type') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ !request('class_type') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Classes
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => 'discovery', 'tab' => 'history']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'discovery' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('class_type') === 'discovery' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Discovery
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => 'fundive', 'tab' => 'history']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'fundive' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('class_type') === 'fundive' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Fundive
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['class_type' => 'refinement', 'tab' => 'history']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('class_type') === 'refinement' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('class_type') === 'refinement' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Refinement
                     </a>
                 </div>
@@ -319,11 +315,9 @@
                 <div class="flex items-center gap-2 self-end lg:self-auto shrink-0 relative">
                     <button type="button" 
                             @click="openFilters = !openFilters" 
-                            class="px-3.5 py-1.5 rounded-xl border border-[#E5E5EA] bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all">
-                        <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                        </svg>
-                        <span>Filter</span>
+                            class="px-3.5 py-1.5 rounded-xl border border-[#E5E5EA] bg-white hover:bg-[#F2F2F7] text-[#1D1D1F] text-sm font-semibold flex items-center justify-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer transition-all">
+                        <img src="{{ asset('icons/icons8-filter-60.png') }}" alt="Filter" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
+                        <span class="whitespace-nowrap">Filter</span>
                         @if(request()->filled('date_from') || request()->filled('date_to') || request()->filled('class_type'))
                             <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
                         @endif
@@ -335,11 +329,11 @@
                          x-cloak 
                          class="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
                         <div class="flex items-center justify-between pb-2 border-b border-[#E5E5EA]">
-                            <h4 class="font-black text-xs text-[#1D1D1F]">Filter Past History</h4>
-                            <a href="{{ route('coach.schedule.index', ['tab' => 'history']) }}" class="text-[11px] text-[#780000] hover:underline font-bold">Reset</a>
+                            <h4 class="font-black text-sm text-[#1D1D1F]">Filter Past History</h4>
+                            <a href="{{ route('coach.schedule.index', ['tab' => 'history']) }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
                         </div>
 
-                        <form method="GET" action="{{ route('coach.schedule.index') }}" class="space-y-3 text-xs">
+                        <form method="GET" action="{{ route('coach.schedule.index') }}" class="space-y-3 text-sm">
                             <input type="hidden" name="tab" value="history">
 
                             <div>
@@ -347,7 +341,7 @@
                                 <input type="date" 
                                        name="date_from" 
                                        value="{{ request('date_from') }}" 
-                                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs focus:border-[#780000] focus:ring-[#780000]">
+                                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm focus:border-[#780000] focus:ring-[#780000]">
                             </div>
 
                             <div>
@@ -355,12 +349,12 @@
                                 <input type="date" 
                                        name="date_to" 
                                        value="{{ request('date_to') }}" 
-                                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs focus:border-[#780000] focus:ring-[#780000]">
+                                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm focus:border-[#780000] focus:ring-[#780000]">
                             </div>
 
                             <div>
                                 <label class="block font-bold text-[#6E6E73] mb-1">Class Type</label>
-                                <select name="class_type" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs focus:border-[#780000] focus:ring-[#780000]">
+                                <select name="class_type" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm focus:border-[#780000] focus:ring-[#780000]">
                                     <option value="">All Class Types</option>
                                     <option value="discovery" {{ request('class_type') === 'discovery' ? 'selected' : '' }}>Discovery</option>
                                     <option value="fundive" {{ request('class_type') === 'fundive' ? 'selected' : '' }}>Fundive</option>
@@ -369,7 +363,7 @@
                             </div>
 
                             <div class="pt-2 border-t border-[#E5E5EA]">
-                                <button type="submit" class="w-full py-2 rounded-xl bg-[#780000] hover:bg-[#5E0000] text-white text-xs font-bold transition-all">
+                                <button type="submit" class="w-full py-2 rounded-xl bg-[#780000] hover:bg-[#5E0000] text-white text-sm font-bold transition-all">
                                     Apply Filter
                                 </button>
                             </div>
@@ -384,13 +378,13 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="p-4 sm:p-5 rounded-2xl bg-white border border-[#E5E5EA] flex items-center justify-between">
                 <div>
-                    <div class="text-[11px] text-[#8E8E93] font-bold uppercase tracking-wider">Completed Sessions</div>
+                    <div class="text-sm text-[#8E8E93] font-bold uppercase tracking-wider">Completed Sessions</div>
                     <div class="text-2xl sm:text-3xl font-black text-[#1D1D1F] mt-1">{{ $totalCompletedBatchesCount }} Batches</div>
                 </div>
             </div>
             <div class="p-4 sm:p-5 rounded-2xl bg-white border border-[#E5E5EA] flex items-center justify-between">
                 <div>
-                    <div class="text-[11px] text-[#8E8E93] font-bold uppercase tracking-wider">Total Students Coached</div>
+                    <div class="text-sm text-[#8E8E93] font-bold uppercase tracking-wider">Total Students Coached</div>
                     <div class="text-2xl sm:text-3xl font-black text-[#1D1D1F] mt-1">{{ $totalPastStudentsCount }} Students</div>
                 </div>
             </div>
@@ -405,11 +399,11 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] hover:border-[#D1D1D6] transition-all overflow-hidden">
                 
                 <!-- Clickable Past Batch Header -->
-                <div class="p-4 sm:p-5 cursor-pointer select-none flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-[#FAFAFC] transition-colors"
+                <div class="p-4 sm:p-5 cursor-pointer select-none flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white hover:bg-[#F2F2F7] transition-colors"
                      @click="toggleBatch('hist_{{ $batch->id }}')">
                     <div class="min-w-0 flex-1">
                         <h3 class="text-base font-black text-[#1D1D1F]">{{ $batch->batch_number }}</h3>
-                        <div class="space-y-0.5 mt-1 text-xs text-[#6E6E73]">
+                        <div class="space-y-0.5 mt-1 text-sm text-[#6E6E73]">
                             <p>
                                 Dive Dates: <strong class="text-[#1D1D1F]">{{ $batch->start_date->format('M d') }} - {{ $batch->end_date->format('d, Y') }} ({{ $batch->start_date->format('D') }} - {{ $batch->end_date->format('D') }})</strong>
                             </p>
@@ -432,7 +426,7 @@
                     </div>
 
                     <button type="button" 
-                            class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-[#F2F2F7] border border-[#E5E5EA] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto">
+                            class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-[#F2F2F7] border border-[#E5E5EA] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto">
                         <span x-text="isBatchOpen('hist_{{ $batch->id }}') ? 'Hide Past Roster' : 'View Past Roster'"></span>
                         <svg class="w-3.5 h-3.5 text-[#6E6E73] transition-transform duration-200" 
                              :class="isBatchOpen('hist_{{ $batch->id }}') ? 'rotate-180' : ''"
@@ -445,10 +439,10 @@
                 <!-- Expandable Past Student Roster -->
                 <div x-show="isBatchOpen('hist_{{ $batch->id }}')" 
                      x-cloak 
-                     class="border-t border-[#E5E5EA] p-4 sm:p-5 bg-[#FAFAFC]/60 space-y-3">
+                     class="border-t border-[#E5E5EA] p-4 sm:p-5 bg-[#F2F2F7]/80 space-y-3">
                     <div class="overflow-x-auto border border-[#E5E5EA] rounded-xl bg-white">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#8E8E93] font-bold uppercase text-[11px]">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#8E8E93] font-bold uppercase text-sm">
                                 <tr>
                                     <th class="px-4 py-3">Student Name</th>
                                     <th class="px-4 py-3">Age</th>
@@ -459,24 +453,21 @@
                             <tbody class="divide-y divide-[#E5E5EA] bg-white text-[#1D1D1F]">
                                 @foreach($students as $s)
                                     @php $swimStatus = strtolower($s->swimmer_status ?? 'swimmer'); @endphp
-                                    <tr class="hover:bg-[#FAFAFC] transition-colors">
+                                    <tr class="hover:bg-[#F2F2F7] transition-colors">
                                         <td class="px-4 py-3 font-bold text-[#1D1D1F]">{{ $s->name }}</td>
                                         <td class="px-4 py-3 text-[#6E6E73] font-semibold">{{ $s->age }} yrs</td>
                                         <td class="px-4 py-3 text-[#780000] font-bold">{{ $s->booking?->formatted_class_type ?? 'Discovery' }}</td>
                                         <td class="px-4 py-3">
                                             @if($swimStatus === 'confident' || $swimStatus === 'confident_swimmer')
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-black bg-emerald-100 text-emerald-900 shadow-2xs">
-                                                    <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-sm font-black bg-emerald-100 text-emerald-900 shadow-2xs">
                                                     <span>Confident Swimmer</span>
                                                 </span>
                                             @elseif($swimStatus === 'non_swimmer')
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-black bg-rose-100 text-rose-900 shadow-2xs">
-                                                    <span class="w-2 h-2 rounded-full bg-rose-600"></span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-sm font-black bg-rose-100 text-rose-900 shadow-2xs">
                                                     <span>Non-Swimmer</span>
                                                 </span>
                                             @else
-                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-black bg-blue-100 text-blue-900 shadow-2xs">
-                                                    <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+                                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-sm font-black bg-blue-100 text-blue-900 shadow-2xs">
                                                     <span>Swimmer</span>
                                                 </span>
                                             @endif
@@ -489,7 +480,7 @@
                 </div>
             </div>
         @empty
-            <div class="bg-white rounded-2xl p-10 border border-[#E5E5EA] text-center text-[#8E8E93] text-xs">
+            <div class="bg-white rounded-2xl p-10 border border-[#E5E5EA] text-center text-[#8E8E93] text-sm">
                 No past completed dive history found for the selected criteria.
             </div>
         @endforelse
@@ -499,15 +490,15 @@
     <!-- Emergency Release Modal -->
     <div x-show="releaseModalOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#E5E5EA] space-y-6 relative" @click.away="releaseModalOpen = false">
             
             <div class="flex items-start justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-rose-600">Emergency Staffing Request</div>
-                    <h3 class="text-lg font-black text-[#1D1D1F] mt-0.5">Request Assignment Release</h3>
+                    <h3 class="text-lg font-black text-[#1D1D1F]">Request Assignment Release</h3>
+                    <p class="text-sm font-semibold text-rose-600 mt-0.5">Emergency Staffing Request</p>
                 </div>
-                <button type="button" @click="releaseModalOpen = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                <button type="button" @click="releaseModalOpen = false" aria-label="Close release modal" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
             </div>
 
             <template x-if="selectedBatch">
@@ -516,27 +507,27 @@
                     <input type="hidden" name="batch_id" :value="selectedBatch.batch?.id">
                     <input type="hidden" name="dive_date" :value="selectedBatch.dive_date">
 
-                    <div class="p-3.5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-xs space-y-1">
+                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] text-sm space-y-1 shadow-2xs">
                         <div class="font-bold text-[#1D1D1F]" x-text="selectedBatch.batch?.name || selectedBatch.batch?.batch_number"></div>
                         <div class="text-[#6E6E73]">Students Assigned: <strong x-text="selectedBatch.students_count"></strong></div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="block text-xs font-bold text-[#1D1D1F]">
+                        <label class="block text-sm font-bold text-[#1D1D1F]">
                             Reason for Emergency Release <span class="text-rose-500">*</span>
                         </label>
                         <textarea name="reason" 
                                   rows="4" 
                                   required 
                                   placeholder="Please explain the emergency or unavoidable circumstance..."
-                                  class="w-full text-xs rounded-xl border-[#E5E5EA] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
+                                  class="w-full text-sm rounded-xl border-[#E5E5EA] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-2">
-                        <button type="button" @click="releaseModalOpen = false" class="px-4 py-2.5 rounded-xl border border-[#E5E5EA] text-xs font-bold text-[#6E6E73] hover:bg-[#F2F2F7]">
+                        <button type="button" @click="releaseModalOpen = false" class="btn-secondary px-4 py-2 text-sm">
                             Cancel
                         </button>
-                        <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700">
+                        <button type="submit" class="btn-danger px-5 py-2 text-sm font-bold">
                             Submit Release Request
                         </button>
                     </div>

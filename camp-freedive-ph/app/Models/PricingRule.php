@@ -100,19 +100,19 @@ class PricingRule extends Model
         return match ($this->rule_type) {
             'demand' => [
                 'label' => 'Demand Surge',
-                'class' => 'bg-blue-50 text-blue-800 border-blue-200',
+                'class' => 'bg-blue-50 text-blue-800',
             ],
             'seasonality' => [
                 'label' => 'Seasonality',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-200',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'lead_time' => [
                 'label' => 'Lead Time',
-                'class' => 'bg-purple-50 text-purple-800 border-purple-200',
+                'class' => 'bg-purple-50 text-purple-800',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', (string) $this->rule_type)),
-                'class' => 'bg-gray-50 text-gray-800 border-gray-200',
+                'class' => 'bg-gray-50 text-gray-800',
             ],
         };
     }

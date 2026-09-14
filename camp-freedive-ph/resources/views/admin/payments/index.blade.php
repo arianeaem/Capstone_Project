@@ -9,22 +9,23 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Payments & Refunds</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Keep track of guest downpayments, balances, online transactions, and refunds.
             </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-2">
+            <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-2">
                 <span>Pending Refunds</span>
                 @if(isset($stats['pending_refunds']) && $stats['pending_refunds'] > 0)
-                    <span class="px-2 py-0.2 rounded-full text-xs font-bold bg-[#780000] text-white">
+                    <span class="px-2 py-0.2 rounded-full text-sm font-bold bg-[#780000] text-white">
                         {{ $stats['pending_refunds'] }}
                     </span>
                 @endif
             </a>
 
-            <a href="{{ route('admin.payments.create') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
+            <a href="{{ route('admin.payments.create') }}" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                 <span>Record Payment</span>
             </a>
         </div>
@@ -35,33 +36,33 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-2 sm:gap-4">
             <!-- Total Collections -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Total Collections</span>
+                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Total Collections</span>
                 <div class="text-base sm:text-2xl font-extrabold text-emerald-700 mt-0.5">₱{{ number_format($stats['total_gross'] ?? 0, 2) }}</div>
-                <span class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Verified completed payments</span>
+                <span class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Verified completed payments</span>
             </div>
 
             <!-- Net Received -->
             <div class="relative px-2 sm:px-4 py-1 border-l border-[#E5E5EA] sm:border-l-0">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Net Received</span>
+                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Net Received</span>
                 <div class="text-base sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5">₱{{ number_format($stats['total_net'] ?? 0, 2) }}</div>
-                <span class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Net of gateway processing fees</span>
+                <span class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Net of gateway processing fees</span>
             </div>
 
             <!-- Total Refunded -->
             <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-[#E5E5EA]">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Total Refunded</span>
+                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Total Refunded</span>
                 <div class="text-base sm:text-2xl font-extrabold text-[#780000] mt-0.5">₱{{ number_format($stats['total_refunded'] ?? 0, 2) }}</div>
-                <span class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Returned to guest accounts</span>
+                <span class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Returned to guest accounts</span>
             </div>
 
             <!-- Forfeited -->
             <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-l border-[#E5E5EA] sm:border-l-0">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-[10px] sm:text-xs font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Forfeited</span>
+                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Forfeited</span>
                 <div class="text-base sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5">₱{{ number_format($stats['total_forfeited'] ?? 0, 2) }}</div>
-                <span class="text-[11px] text-[#8E8E93] hidden sm:block mt-0.5">Non-refundable cancellations</span>
+                <span class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Non-refundable cancellations</span>
             </div>
         </div>
     </div>
@@ -76,19 +77,19 @@
                 <!-- Payment Stage Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none -mx-0.5 px-0.5">
                     <a href="{{ request()->fullUrlWithQuery(['stage' => '']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('stage') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ !request('stage') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Stages
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['stage' => 'downpayment']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('stage') === 'downpayment' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('stage') === 'downpayment' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Downpayment
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['stage' => 'balance_settlement']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('stage') === 'balance_settlement' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('stage') === 'balance_settlement' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Balance Settlement
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['stage' => 'full']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('stage') === 'full' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('stage') === 'full' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Full Payment
                     </a>
                 </div>
@@ -111,7 +112,7 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search booking, txn, guest..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
+                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-[#F2F2F7] focus:bg-white focus:border-[#780000]">
                             <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -123,10 +124,8 @@
                     <div class="relative shrink-0">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
-                                class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer">
-                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                            </svg>
+                                class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer">
+                            <img src="{{ asset('icons/icons8-filter-60.png') }}" alt="Filter" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
                             <span class="whitespace-nowrap">Filter</span>
                             @if(request()->anyFilled(['status', 'method', 'date_from', 'date_to']))
                                 <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
@@ -139,11 +138,11 @@
                              x-cloak 
                              class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
                             <div class="flex items-center justify-between pb-2">
-                                <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Payments</h4>
-                                <a href="{{ route('admin.payments.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
+                                <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Payments</h4>
+                                <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
                             </div>
 
-                            <form method="GET" action="{{ route('admin.payments.index') }}" class="space-y-3 text-xs">
+                            <form method="GET" action="{{ route('admin.payments.index') }}" class="space-y-3 text-sm">
                                 @if(request('stage'))
                                     <input type="hidden" name="stage" value="{{ request('stage') }}">
                                 @endif
@@ -153,7 +152,7 @@
 
                                 <div>
                                     <label class="block font-semibold text-[#6E6E73] mb-1">Payment Status</label>
-                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
                                         <option value="">All Statuses</option>
                                         <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
                                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
@@ -166,7 +165,7 @@
 
                                 <div>
                                     <label class="block font-semibold text-[#6E6E73] mb-1">Payment Method</label>
-                                    <select name="method" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                    <select name="method" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
                                         <option value="">All Methods</option>
                                         <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
                                         <option value="bpi_bank_transfer" {{ request('method') === 'bpi_bank_transfer' ? 'selected' : '' }}>BPI Bank Transfer</option>
@@ -176,7 +175,7 @@
                                 </div>
 
                                 <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                    <button type="submit" class="btn-primary w-full py-1.5 text-xs font-bold">
+                                    <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
                                         Apply Filter
                                     </button>
                                 </div>
@@ -189,8 +188,8 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                     <tr>
                         <th class="py-3 px-4 text-left">Transaction ID</th>
                         <th class="py-3 px-4 text-left">Booking #</th>
@@ -204,12 +203,12 @@
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($payments as $payment)
-                    <tr onclick="window.location='{{ route('admin.payments.show', $payment) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group">
+                    <tr onclick="window.location='{{ route('admin.payments.show', $payment) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors group">
                         <!-- Transaction Details -->
                         <td class="py-3 px-4 text-left font-mono font-bold text-[#1D1D1F] group-hover:text-[#780000]">
                             {{ $payment->transaction_id ?? ('TXN-' . $payment->id) }}
                             @if($payment->paymongo_payment_id)
-                                <span class="block text-[10px] font-normal text-[#6E6E73]">{{ $payment->paymongo_payment_id }}</span>
+                                <span class="block text-sm font-normal text-[#6E6E73]">{{ $payment->paymongo_payment_id }}</span>
                             @endif
                         </td>
 
@@ -228,7 +227,7 @@
                         <td class="py-3 px-4 text-left">
                             @if($payment->booking)
                                 <strong class="text-[#1D1D1F] block">{{ $payment->booking->contact_name }}</strong>
-                                <span class="text-[#6E6E73] text-[11px] block">{{ $payment->booking->contact_phone }}</span>
+                                <span class="text-[#6E6E73] text-sm block">{{ $payment->booking->contact_phone }}</span>
                             @else
                                 <span class="text-[#8E8E93]">N/A</span>
                             @endif
@@ -236,7 +235,7 @@
 
                         <!-- Payment Stage -->
                         <td class="py-3 px-4 text-left">
-                            <span class="px-2 py-0.5 rounded-md bg-[#F2F2F7] text-[#1D1D1F] font-semibold text-[11px]">
+                            <span class="px-2 py-0.5 rounded-md bg-[#F2F2F7] text-[#1D1D1F] font-semibold text-sm">
                                 {{ $payment->payment_stage_label }}
                             </span>
                         </td>
@@ -253,7 +252,7 @@
 
                         <!-- Payment Status -->
                         <td class="py-3 px-4 text-left">
-                            <span class="px-2 py-0.5 rounded-md text-xs font-bold border inline-block {{ $payment->status_badge['class'] }}">
+                            <span class="px-2 py-0.5 rounded-md text-sm font-bold inline-block {{ $payment->status_badge['class'] }}">
                                 {{ $payment->status_badge['label'] }}
                             </span>
                         </td>
@@ -265,7 +264,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="8" class="py-8 text-center text-xs text-[#8E8E93]">
+                        <td colspan="8" class="py-8 text-center text-sm text-[#8E8E93]">
                             No payment transactions matching your search criteria found.
                         </td>
                     </tr>

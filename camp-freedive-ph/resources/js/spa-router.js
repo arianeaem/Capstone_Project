@@ -42,7 +42,7 @@ class SPARouter {
             z-index: 99999;
             pointer-events: none;
             transition: width 0.25s ease-out, opacity 0.3s ease-in-out;
-            box-shadow: 0 0 8px rgba(120, 0, 0, 0.4);
+            box-shadow: none;
             opacity: 0;
         `;
         document.body.appendChild(bar);
@@ -106,7 +106,7 @@ class SPARouter {
     }
 
     hasSpaContainer(doc = document) {
-        return !!(doc.getElementById('spa-page-content') || doc.getElementById('app-page-content'));
+        return !!doc.getElementById('spa-page-content');
     }
 
     isAuthUrl(url) {
@@ -307,14 +307,12 @@ class SPARouter {
         const parser = new DOMParser();
         const newDoc = parser.parseFromString(htmlText, 'text/html');
 
-        // Check if layout types match (Admin Portal vs Public Site)
+        // Check if both current and new page are inside the SPA container (#spa-page-content)
         const isCurrentAdmin = !!document.getElementById('spa-page-content');
         const isNewAdmin = !!newDoc.getElementById('spa-page-content');
-        const isCurrentPublic = !!document.getElementById('app-page-content');
-        const isNewPublic = !!newDoc.getElementById('app-page-content');
 
-        if (isCurrentAdmin !== isNewAdmin || isCurrentPublic !== isNewPublic || !this.hasSpaContainer(document) || !this.hasSpaContainer(newDoc)) {
-            // Layout mismatch or non-SPA destination (e.g. logging out or navigating to login/landing), perform full navigation
+        if (!isCurrentAdmin || !isNewAdmin) {
+            // Non-SPA destination or exiting admin portal, perform full native navigation
             window.location.href = finalUrl;
             return;
         }
@@ -325,8 +323,8 @@ class SPARouter {
         }
 
         // 2. Swap Main Page Content
-        const targetContainer = document.getElementById('spa-page-content') || document.getElementById('app-page-content');
-        const sourceContainer = newDoc.getElementById('spa-page-content') || newDoc.getElementById('app-page-content');
+        const targetContainer = document.getElementById('spa-page-content');
+        const sourceContainer = newDoc.getElementById('spa-page-content');
 
         if (!targetContainer || !sourceContainer) {
             window.location.href = finalUrl;
@@ -357,8 +355,8 @@ class SPARouter {
         }
 
         // 4. Update Flash Messages
-        const targetFlash = document.getElementById('flash-messages-container') || document.getElementById('app-flash-messages');
-        const sourceFlash = newDoc.getElementById('flash-messages-container') || newDoc.getElementById('app-flash-messages');
+        const targetFlash = document.getElementById('flash-messages-container');
+        const sourceFlash = newDoc.getElementById('flash-messages-container');
         if (targetFlash && sourceFlash) {
             targetFlash.innerHTML = sourceFlash.innerHTML;
         }

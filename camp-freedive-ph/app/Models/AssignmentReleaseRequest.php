@@ -50,19 +50,19 @@ class AssignmentReleaseRequest extends Model
         return match ($this->status) {
             'pending' => [
                 'label' => 'Pending Review',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'approved' => [
                 'label' => 'Approved & Released',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'rejected' => [
                 'label' => 'Rejected',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
             ],
             default => [
                 'label' => ucfirst($this->status),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

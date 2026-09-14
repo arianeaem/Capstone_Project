@@ -55,7 +55,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">User Management</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Create and manage staff accounts for coaches, administrators, and owners.
             </p>
         </div>
@@ -63,7 +63,8 @@
         <div>
             <button type="button" 
                     @click="openAddModal = true"
-                    class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs">
+                    class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                 <span>New Account</span>
             </button>
         </div>
@@ -75,28 +76,28 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-2 sm:gap-4">
             <!-- Total Staff -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-[10px] sm:text-xs text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Total Staff</span>
+                <span class="text-sm sm:text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Total Staff</span>
                 <div class="text-lg sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $stats['total'] }}</div>
             </div>
 
             <!-- Coaches -->
             <div class="relative px-2 sm:px-4 py-1 border-l border-[#E5E5EA] sm:border-l-0">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-[10px] sm:text-xs text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Coaches</span>
+                <span class="text-sm sm:text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Coaches</span>
                 <div class="text-lg sm:text-2xl font-extrabold text-[#780000] mt-0.5">{{ $stats['coaches'] }}</div>
             </div>
 
             <!-- Admins & Owners -->
             <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-[#E5E5EA]">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-[10px] sm:text-xs text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Admins & Owners</span>
+                <span class="text-sm sm:text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Admins & Owners</span>
                 <div class="text-lg sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ $stats['admins'] }}</div>
             </div>
 
             <!-- Active Accounts -->
             <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-l border-[#E5E5EA] sm:border-l-0">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-[10px] sm:text-xs text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Active Accounts</span>
+                <span class="text-sm sm:text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Active Accounts</span>
                 <div class="text-lg sm:text-2xl font-extrabold text-emerald-700 mt-0.5">{{ $stats['active'] }}</div>
             </div>
         </div>
@@ -113,19 +114,19 @@
                 <!-- Role Filter Tabs -->
                 <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none -mx-0.5 px-0.5">
                     <a href="{{ request()->fullUrlWithQuery(['role' => '']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ !request('role') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ !request('role') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Staff
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['role' => 'coach']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('role') === 'coach' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('role') === 'coach' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Coaches
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['role' => 'admin']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('role') === 'admin' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('role') === 'admin' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Admins
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['role' => 'owner']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 {{ request('role') === 'owner' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('role') === 'owner' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Owners
                     </a>
                 </div>
@@ -145,7 +146,7 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search name, email, phone..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#D1D1D6] bg-[#FAFAFC] focus:bg-white focus:border-[#780000]">
+                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-[#F2F2F7] focus:bg-white focus:border-[#780000]">
                             <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -157,10 +158,8 @@
                     <div class="relative shrink-0">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
-                                class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold whitespace-nowrap shrink-0 cursor-pointer">
-                            <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-                            </svg>
+                                class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer">
+                            <img src="{{ asset('icons/icons8-filter-60.png') }}" alt="Filter" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
                             <span class="whitespace-nowrap">Filter</span>
                             @if(request()->filled('status'))
                                 <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
@@ -173,11 +172,11 @@
                              x-cloak 
                              class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
                             <div class="flex items-center justify-between pb-2">
-                                <h4 class="font-bold text-xs text-[#1D1D1F]">Filter Staff</h4>
-                                <a href="{{ route('admin.users.index') }}" class="text-[11px] text-[#780000] hover:underline font-semibold">Reset</a>
+                                <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Staff</h4>
+                                <a href="{{ route('admin.users.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
                             </div>
 
-                            <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-3 text-xs">
+                            <form method="GET" action="{{ route('admin.users.index') }}" class="space-y-3 text-sm">
                                 @if(request('role'))
                                     <input type="hidden" name="role" value="{{ request('role') }}">
                                 @endif
@@ -187,7 +186,7 @@
 
                                 <div>
                                     <label class="block font-semibold text-[#6E6E73] mb-1">Account Status</label>
-                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-xs">
+                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
                                         <option value="">All Statuses</option>
                                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active</option>
                                         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
@@ -195,7 +194,7 @@
                                 </div>
 
                                 <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                    <button type="submit" class="btn-primary w-full py-1.5 text-xs font-bold">
+                                    <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
                                         Apply Filter
                                     </button>
                                 </div>
@@ -208,8 +207,8 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs">
-                <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                     <tr>
                         <th class="py-3 px-4 text-left">Staff Member</th>
                         <th class="py-3 px-4 text-left">Contact Phone</th>
@@ -221,16 +220,16 @@
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($users as $user)
-                    <tr onclick="window.location='{{ route('admin.users.edit', $user) }}'" class="hover:bg-[#FAFAFC] cursor-pointer transition-colors group">
+                    <tr onclick="window.location='{{ route('admin.users.edit', $user) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors group">
                         <!-- Staff Details -->
                         <td class="py-3 px-4 text-left">
                             <div class="font-bold text-sm text-[#1D1D1F] group-hover:text-[#780000]">
                                 {{ $user->name }}
                                 @if($user->id === $currentUser->id)
-                                    <span class="text-[10px] px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 font-bold ml-1">You</span>
+                                    <span class="text-sm px-1.5 py-0.2 rounded bg-gray-100 text-gray-700 font-bold ml-1">You</span>
                                 @endif
                             </div>
-                            <span class="text-xs text-[#6E6E73] block mt-0.5">{{ $user->email }}</span>
+                            <span class="text-sm text-[#6E6E73] block mt-0.5">{{ $user->email }}</span>
                         </td>
 
                         <!-- Phone Number -->
@@ -240,7 +239,7 @@
 
                         <!-- Role Badge -->
                         <td class="py-3 px-4 text-left">
-                            <span class="px-2 py-0.5 rounded-md text-xs font-bold border inline-block {{ $user->role_badge['class'] }}">
+                            <span class="px-2 py-0.5 rounded-md text-sm font-bold inline-block {{ $user->role_badge['class'] }}">
                                 {{ $user->role_badge['label'] }}
                             </span>
                         </td>
@@ -248,13 +247,11 @@
                         <!-- Status Badge -->
                         <td class="py-3 px-4 text-left">
                             @if($user->isActive())
-                                <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 inline-flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-emerald-50 text-emerald-700 inline-block">
                                     Active
                                 </span>
                             @else
-                                <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200 inline-flex items-center gap-1">
-                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                                <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-rose-50 text-rose-700 inline-block">
                                     Inactive
                                 </span>
                             @endif
@@ -288,8 +285,8 @@
                                         
                                         <!-- Edit Account -->
                                         <a href="{{ route('admin.users.edit', $user) }}" 
-                                           class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
-                                            <svg class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                           class="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
+                                            <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-3.5 h-3.5 object-contain inline-block shrink-0">
                                             <span>Edit Profile</span>
                                         </a>
 
@@ -300,7 +297,7 @@
                                                 @method('PATCH')
                                                 <button type="submit" 
                                                         onclick="return confirm('Are you sure you want to {{ $user->isActive() ? 'deactivate' : 'activate' }} this account?')"
-                                                        class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold {{ $user->isActive() ? 'text-amber-700 hover:bg-amber-50' : 'text-emerald-700 hover:bg-emerald-50' }} rounded-lg transition-colors text-left cursor-pointer">
+                                                        class="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold {{ $user->isActive() ? 'text-amber-700 hover:bg-amber-50' : 'text-emerald-700 hover:bg-emerald-50' }} rounded-lg transition-colors text-left cursor-pointer">
                                                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/></svg>
                                                     <span>{{ $user->isActive() ? 'Deactivate' : 'Activate' }}</span>
                                                 </button>
@@ -317,7 +314,7 @@
                                                         role: '{{ addslashes($user->role_badge['label']) }}',
                                                         url: '{{ route('admin.users.destroy', $user) }}'
                                                     }); openMenu = false;"
-                                                    class="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-[#780000] hover:bg-[#FEF2F2] rounded-lg transition-colors text-left cursor-pointer">
+                                                    class="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[#780000] hover:bg-[#FEF2F2] rounded-lg transition-colors text-left cursor-pointer">
                                                 <svg class="w-3.5 h-3.5 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                                 <span>Delete User</span>
                                             </button>
@@ -325,13 +322,13 @@
                                     </div>
                                 </div>
                             @else
-                                <span class="text-xs text-[#8E8E93] italic">Owner only</span>
+                                <span class="text-sm text-[#8E8E93] italic">Owner only</span>
                             @endif
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="6" class="py-8 text-center text-xs text-[#8E8E93]">
+                        <td colspan="6" class="py-8 text-center text-sm text-[#8E8E93]">
                             No staff accounts found matching your search.
                         </td>
                     </tr>
@@ -344,37 +341,37 @@
     </div>
 
     <!-- Provision Account Modal -->
-    <div x-show="openAddModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div x-show="openAddModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-[#E5E5EA]" @click.outside="openAddModal = false">
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-lg font-bold text-[#1D1D1F]">Provision Staff Account</h3>
-                    <p class="text-xs text-[#6E6E73] mt-0.5">Create login credentials for a new instructor or administrative team member.</p>
+                    <p class="text-sm text-[#6E6E73] mt-0.5">Create login credentials for a new instructor or administrative team member.</p>
                 </div>
-                <button type="button" @click="openAddModal = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                <button type="button" @click="openAddModal = false" aria-label="Close provision modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
-            <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-3.5 text-xs">
+            <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-3.5 text-sm">
                 @csrf
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">First & Last Name <span class="text-[#780000]">*</span></label>
-                    <input type="text" name="name" required placeholder="e.g. Maria Santos" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <input type="text" name="name" required placeholder="e.g. Maria Santos" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">Email Address (Login Username) <span class="text-[#780000]">*</span></label>
-                    <input type="email" name="email" required placeholder="name@campfreedive.ph" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <input type="email" name="email" required placeholder="name@campfreedive.ph" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">Mobile Phone Number</label>
-                    <input type="text" name="phone" placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <input type="text" name="phone" placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">Assigned Staff Role <span class="text-[#780000]">*</span></label>
-                    <select name="role" required class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                    <select name="role" required class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="coach" selected>Freediving Coach (Instructor Portal Access)</option>
                         @if($currentUser->isOwner())
                             <option value="admin">Camp Admin (Operations & Booking Coordinator)</option>
@@ -384,13 +381,13 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">Temporary Initial Password (Optional)</label>
-                    <input type="text" name="temp_password" placeholder="Leave blank to auto-generate secure password" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-                    <span class="text-xs text-[#6E6E73] mt-1 block">Staff member will be prompted to change password on first login.</span>
+                    <input type="text" name="temp_password" placeholder="Leave blank to auto-generate secure password" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <span class="text-sm text-[#6E6E73] mt-1 block">Staff member will be prompted to change password on first login.</span>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">
-                    <button type="button" @click="openAddModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">Provision Account</button>
+                    <button type="button" @click="openAddModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">Provision Account</button>
                 </div>
             </form>
         </div>
@@ -410,7 +407,7 @@
             . "Temporary Password: " . ($creds['temp_password'] ?? '') . "\n\n"
             . "(Note: You will be required to change your temporary password upon your first login.)";
     @endphp
-    <div x-show="showCredentialsModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div x-show="showCredentialsModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-[#E5E5EA] relative" @click.outside="showCredentialsModal = false">
             
             <!-- Modal Header -->
@@ -423,37 +420,37 @@
                         <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">
                             {{ !empty($creds['is_reset']) ? 'Password Reset Successfully' : 'Account Provisioned Successfully' }}
                         </h3>
-                        <p class="text-xs text-[#6E6E73]">Copy and share these initial login credentials with the staff member.</p>
+                        <p class="text-sm text-[#6E6E73]">Copy and share these initial login credentials with the staff member.</p>
                     </div>
                 </div>
-                <button type="button" @click="showCredentialsModal = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                <button type="button" @click="showCredentialsModal = false" aria-label="Close credentials modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
             <!-- Credentials Box -->
-            <div class="bg-[#FAFAFC] rounded-xl p-4 space-y-3.5">
+            <div class="bg-[#F2F2F7] rounded-xl p-4 space-y-3.5">
                 
                 <!-- Staff Info -->
                 <div class="flex items-center justify-between pb-3 border-b border-[#E5E5EA]">
                     <div>
-                        <span class="text-xs text-[#6E6E73] block">Staff Name</span>
+                        <span class="text-sm text-[#6E6E73] block">Staff Name</span>
                         <strong class="text-sm font-bold text-[#1D1D1F]">{{ $creds['name'] }}</strong>
                     </div>
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-white border border-[#E5E5EA] text-[#1D1D1F]">
+                    <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-white border border-[#E5E5EA] text-[#1D1D1F]">
                         {{ $creds['role_label'] }}
                     </span>
                 </div>
 
                 <!-- Username / Email Field -->
                 <div>
-                    <label class="block text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider mb-1.5">Email (Username)</label>
+                    <label class="block text-sm font-bold text-[#6E6E73] uppercase tracking-wider mb-1.5">Email (Username)</label>
                     <div class="flex items-center gap-2">
                         <input type="text" 
                                readonly 
                                value="{{ $creds['email'] }}" 
-                               class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] bg-white font-mono text-xs text-[#1D1D1F] select-all">
+                               class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] bg-white font-mono text-sm text-[#1D1D1F] select-all">
                         <button type="button" 
                                 @click="copyToClipboard('{{ addslashes($creds['email']) }}', 'email')" 
-                                class="btn-secondary px-3 py-2 text-xs font-bold whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                                class="btn-secondary px-3 py-2 text-sm font-bold whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
                             <span x-text="copiedEmail ? 'Copied!' : 'Copy'"></span>
                             <svg x-show="!copiedEmail" class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                             <svg x-show="copiedEmail" class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -464,10 +461,10 @@
                 <!-- Temporary Password Field -->
                 <div>
                     <div class="flex items-center justify-between mb-1">
-                        <label class="text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider">Temporary Password</label>
+                        <label class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider">Temporary Password</label>
                         <button type="button" 
                                 @click="showPassword = !showPassword" 
-                                class="text-[11px] font-semibold text-[#780000] hover:underline cursor-pointer">
+                                class="text-sm font-semibold text-[#780000] hover:underline cursor-pointer">
                             <span x-text="showPassword ? 'Hide' : 'Reveal'"></span>
                         </button>
                     </div>
@@ -475,10 +472,10 @@
                         <input :type="showPassword ? 'text' : 'password'" 
                                readonly 
                                value="{{ $creds['temp_password'] }}" 
-                               class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] bg-white font-mono text-xs text-[#1D1D1F] font-bold tracking-wider select-all">
+                               class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] bg-white font-mono text-sm text-[#1D1D1F] font-bold tracking-wider select-all">
                         <button type="button" 
                                 @click="copyToClipboard('{{ addslashes($creds['temp_password']) }}', 'password')" 
-                                class="btn-secondary px-3 py-2 text-xs font-bold whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                                class="btn-secondary px-3 py-2 text-sm font-bold whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
                             <span x-text="copiedPassword ? 'Copied!' : 'Copy'"></span>
                             <svg x-show="!copiedPassword" class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                             <svg x-show="copiedPassword" class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
@@ -488,8 +485,8 @@
 
                 <!-- Login URL -->
                 <div>
-                    <label class="block text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider mb-1.5">Login Portal</label>
-                    <span class="block px-3 py-2 rounded-lg border border-[#E5E5EA] bg-white text-xs font-mono text-[#6E6E73] truncate">
+                    <label class="block text-sm font-bold text-[#6E6E73] uppercase tracking-wider mb-1.5">Login Portal</label>
+                    <span class="block px-3 py-2 rounded-lg border border-[#E5E5EA] bg-white text-sm font-mono text-[#6E6E73] truncate">
                         {{ $creds['login_url'] }}
                     </span>
                 </div>
@@ -497,7 +494,7 @@
             </div>
 
             <!-- Notice & Instructions -->
-            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 flex items-start gap-2.5 text-xs text-amber-900">
+            <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 flex items-start gap-2.5 text-sm text-amber-900">
                 <div class="space-y-0.5 leading-relaxed">
                     <strong class="font-bold block">First Login Password Change Required</strong>
                     <span>When logging in with this temporary password, the system will immediately require the user to set a permanent private password.</span>
@@ -508,14 +505,15 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-[#E5E5EA]">
                 <button type="button" 
                         @click="copyToClipboard({{ json_encode($fullDetails) }}, 'all')" 
-                        class="w-full sm:w-auto btn-primary px-4 py-2 text-xs font-bold flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    <span x-text="copiedAll ? '✓ All Credentials Copied!' : 'Copy Complete Login Details'"></span>
+                        class="w-full sm:w-auto btn-primary px-4 py-2 text-sm font-bold flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" x-show="!copiedAll"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" x-show="copiedAll" x-cloak><polyline points="20 6 9 17 4 12"/></svg>
+                    <span x-text="copiedAll ? 'All Credentials Copied!' : 'Copy Complete Login Details'"></span>
                 </button>
 
                 <button type="button" 
                         @click="showCredentialsModal = false" 
-                        class="w-full sm:w-auto btn-secondary px-4 py-2 text-xs font-bold cursor-pointer">
+                        class="w-full sm:w-auto btn-secondary px-4 py-2 text-sm font-bold cursor-pointer">
                     Done
                 </button>
             </div>
@@ -527,35 +525,35 @@
     <!-- ==================================================================== -->
     <!-- DELETE USER CONFIRMATION MODAL -->
     <!-- ==================================================================== -->
-    <div x-show="openDeleteModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div x-show="openDeleteModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openDeleteModal = false">
             
             <div class="flex items-start justify-between">
                 <div class="flex items-center gap-3">
                     <div>
                         <h3 class="text-base sm:text-lg font-extrabold text-[#780000]">Delete Staff Account</h3>
-                        <p class="text-xs text-[#6E6E73]">Permanently remove internal user account.</p>
+                        <p class="text-sm text-[#6E6E73]">Permanently remove internal user account.</p>
                     </div>
                 </div>
-                <button type="button" @click="openDeleteModal = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                <button type="button" @click="openDeleteModal = false" aria-label="Close delete modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
-            <div class="space-y-3 text-xs">
+            <div class="space-y-3 text-sm">
                 <p class="text-[#1D1D1F]">
                     Are you sure you want to permanently delete the account for <strong x-text="deleteUser.name" class="text-[#780000]"></strong> (<span x-text="deleteUser.email" class="font-mono"></span>)?
                 </p>
 
-                <div class="p-3 bg-[#FEF2F2] rounded-xl text-[#991B1B] text-xs space-y-1">
+                <div class="p-3 bg-[#FEF2F2] rounded-xl text-[#991B1B] text-sm space-y-1">
                     <strong class="font-bold block">Warning: Irreversible Action</strong>
                     <span>This will permanently delete the user's login access, profile, and associated coach records.</span>
                 </div>
             </div>
 
-            <form :action="deleteUser.url" method="POST" class="pt-2 flex items-center justify-end gap-2">
+            <form :action="deleteUser.url" method="POST" class="pt-2 flex items-center justify-end border-t border-[#F2F2F7] gap-2">
                 @csrf
                 @method('DELETE')
-                <button type="button" @click="openDeleteModal = false" class="btn-secondary px-3.5 py-2 text-xs font-semibold cursor-pointer">Cancel</button>
-                <button type="submit" class="btn-danger px-4 py-2 text-xs font-bold shadow-2xs cursor-pointer">
+                <button type="button" @click="openDeleteModal = false" class="btn-secondary px-3.5 py-2 text-sm font-semibold cursor-pointer">Cancel</button>
+                <button type="submit" class="btn-danger px-4 py-2 text-sm font-bold shadow-2xs cursor-pointer">
                     Permanently Delete
                 </button>
             </form>

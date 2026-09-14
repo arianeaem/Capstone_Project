@@ -15,13 +15,14 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                    ← Back to Batches
+                <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span>Back to Batches</span>
                 </a>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">{{ $batch->batch_number }}</h1>
-            <span class="text-xs sm:text-sm text-[#1D1D1F] font-bold block mt-0.5">
-                {{ $batch->start_date->format('F d, Y (l)') }} - {{ $batch->end_date->format('F d, Y (l)') }} (2 Days)
+            <span class="text-sm sm:text-sm text-[#1D1D1F] font-bold block mt-0.5">
+                {{ $batch->start_date->format('F d, Y (l)') }} - {{ $batch->end_date->format('F d, Y (l)') }}
             </span>
         </div>
 
@@ -36,7 +37,7 @@
                     @csrf
                     <input type="hidden" name="status" value="completed">
                     <input type="hidden" name="note" value="2D1N dive schedule concluded successfully.">
-                    <button type="submit" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
+                    <button type="submit" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
                         <span>Mark as Completed</span>
                     </button>
@@ -45,14 +46,14 @@
                 <!-- Reschedule Action Trigger -->
                 <button type="button" 
                         @click="openRescheduleModal = true"
-                        class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
+                        class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5">
                     <span>Reschedule Batch</span>
                 </button>
 
                 <!-- Cancel by Camp Action Trigger -->
                 <button type="button" 
                         @click="openCancelModal = true"
-                        class="btn-danger px-3.5 py-2 text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                        class="btn-danger px-3.5 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5">
                     <span>Cancel Batch (by Camp)</span>
                 </button>
 
@@ -63,7 +64,7 @@
                     @csrf
                     <input type="hidden" name="status" value="confirmed">
                     <input type="hidden" name="note" value="Reactivated batch to Confirmed status.">
-                    <button type="submit" class="btn-secondary px-4 py-2 text-xs sm:text-sm font-bold">
+                    <button type="submit" class="btn-secondary px-4 py-2 text-sm sm:text-sm font-bold">
                         Reactivate Batch
                     </button>
                 </form>
@@ -84,15 +85,14 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3.5">
                     <div>
                         <div class="flex items-center gap-2 flex-wrap">
-                            <h3 class="text-base font-extrabold text-[#1D1D1F]">Connected Customer Bookings</h3>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                                {{ $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])->count() }} {{ Str::plural('Booking', $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])->count()) }}
-                            </span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FAFAFC] text-[#1D1D1F] border border-[#E5E5EA]">
-                                {{ $batch->total_participants_count }} {{ Str::plural('Student', $batch->total_participants_count) }}
-                            </span>
+                            @php
+                                $connectedBookingsCount = $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])->count();
+                            @endphp
+                            <h3 class="text-base font-extrabold text-[#1D1D1F]">
+                                {{ $connectedBookingsCount }} Connected Customer {{ Str::plural('Booking', $connectedBookingsCount) }}
+                            </h3>
                         </div>
-                        <p class="text-xs text-[#6E6E73] mt-1">Guest reservations and on-site coaching groups in this batch.</p>
+                        <p class="text-sm text-[#6E6E73] mt-0.5">Guest reservations and on-site coaching groups in this batch.</p>
                     </div>
                 </div>
 
@@ -109,13 +109,13 @@
                                         {{ $booking->booking_number }}
                                     </a>
 
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border shrink-0 whitespace-nowrap {{ $booking->status_badge['class'] }}">
+                                    <span class="px-2.5 py-0.5 rounded-full text-sm font-bold shrink-0 whitespace-nowrap {{ $booking->status_badge['class'] }}">
                                         {{ $booking->status_badge['label'] }}
                                     </span>
                                 </div>
 
-                                <div class="flex items-center gap-2 flex-wrap text-xs">
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gray-100 text-[#48484A] shrink-0">
+                                <div class="flex items-center gap-2 flex-wrap text-sm">
+                                    <span class="px-2 py-0.5 rounded-full text-sm font-bold uppercase tracking-wider bg-gray-100 text-[#48484A] shrink-0">
                                         {{ ucfirst($booking->class_type ?? 'Discovery') }}
                                     </span>
                                 </div>
@@ -123,11 +123,11 @@
 
                             <!-- Students & Pod Assignment List -->
                             <div class="space-y-2">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">
+                                <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">
                                     Students & Coaches ({{ $booking->participants->count() }})
                                 </span>
 
-                                <div class="space-y-2">
+                                <div class="space-y-2.5">
                                     @foreach($booking->participants as $p)
                                         @php 
                                              $coach = $p->coach; 
@@ -143,38 +143,38 @@
                                                  || str_starts_with($cleanHealth, 'working on frenzel');
                                              $hasMedical = !$isNoneOrGeneral && !empty($rawCondition);
                                         @endphp
-                                        <div class="bg-[#F8F9FA] rounded-xl p-3 space-y-2">
-                                            <!-- Row 1: Student Name, Age, Swimmer Pill -->
-                                            <div class="flex items-center justify-between gap-2">
-                                                <div class="min-w-0 flex items-center gap-1.5 flex-wrap">
-                                                    <strong class="text-xs font-bold text-[#1D1D1F]">{{ $p->name }}</strong>
-                                                    <span class="text-[11px] text-[#8E8E93] shrink-0 font-normal">({{ $p->age }} yrs)</span>
+                                        <div class="bg-[#F8F9FA] rounded-xl p-3 sm:p-3.5 space-y-2">
+                                            <!-- Line 1: Student Name, Age, Swimmer Badge -->
+                                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                                <div class="flex items-center gap-1.5 flex-wrap">
+                                                    <strong class="text-sm font-bold text-[#1D1D1F]">{{ $p->name }}</strong>
+                                                    <span class="text-xs text-[#8E8E93] font-normal">({{ $p->age }} yrs old)</span>
                                                 </div>
-                                                <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 {{ strtolower($p->swimmer_status) === 'non_swimmer' ? 'bg-rose-50 text-rose-700' : 'bg-white text-[#48484A] shadow-2xs' }}">
+                                                <span class="px-2 py-0.5 rounded-md text-xs font-semibold shrink-0 {{ strtolower($p->swimmer_status) === 'non_swimmer' ? 'bg-rose-50 text-rose-700' : 'bg-white text-[#1D1D1F] shadow-2xs' }}">
                                                     {{ ucfirst(str_replace('_', ' ', $p->swimmer_status ?? 'Swimmer')) }}
                                                 </span>
                                             </div>
 
                                             @if($hasMedical)
-                                                <div class="text-[11px] font-medium text-amber-900 bg-amber-50/80 px-2.5 py-1 rounded-lg flex items-start gap-1.5" title="{{ $p->health_condition }}">
-                                                    <span class="shrink-0 text-xs">⚠️</span>
+                                                <div class="text-xs font-medium text-amber-900 bg-amber-50/80 px-2.5 py-1 rounded-lg flex items-start gap-1.5" title="{{ $p->health_condition }}">
+                                                    <svg class="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                                     <span class="break-words leading-tight">{{ $p->health_condition }}</span>
                                                 </div>
                                             @endif
 
-                                            <!-- Row 2: Coach Assignment -->
-                                            <div class="flex items-center justify-between gap-2">
-                                                <span class="text-[11px] text-[#8E8E93] font-medium shrink-0">Coach:</span>
+                                            <!-- Line 2: Coach Assignment on dedicated row -->
+                                            <div class="space-y-1 pt-0.5">
+                                                <span class="text-xs text-[#8E8E93] font-semibold uppercase tracking-wider block">Assigned Coach:</span>
                                                 @if(isset($assignedCoaches) && count($assignedCoaches) > 0)
                                                     <form action="{{ auth()->user()->isOwner() ? route('owner.batches.assign_participant', $batch) : route('admin.batches.assign_participant', $batch) }}" 
                                                           method="POST"
-                                                          class="min-w-0 flex-1 flex justify-end">
+                                                          class="w-full">
                                                         @csrf
                                                         <input type="hidden" name="participant_id" value="{{ $p->id }}">
                                                         <select name="coach_id" 
                                                                 onchange="this.form.submit()" 
-                                                                class="w-full sm:w-auto max-w-[200px] text-xs font-semibold py-1 px-2.5 rounded-lg border border-[#E5E5EA] bg-white text-[#1D1D1F] hover:border-[#D1D1D6] focus:ring-1 focus:ring-[#780000] focus:outline-hidden cursor-pointer transition-all shadow-2xs {{ $coach ? 'text-[#780000] font-bold bg-[#FDF5F5] border-[#F1D5D5]' : '' }}">
-                                                            <option value="" {{ !$coach ? 'selected' : '' }}>-- Shared Pool --</option>
+                                                                class="w-full text-xs sm:text-sm font-semibold py-1.5 px-2.5 rounded-lg border border-[#E5E5EA] bg-white text-[#1D1D1F] hover:border-[#D1D1D6] focus:ring-1 focus:ring-[#780000] focus:outline-hidden cursor-pointer transition-all shadow-2xs {{ $coach ? 'text-[#780000] font-bold bg-[#FDF5F5] border-[#F1D5D5]' : '' }}">
+                                                            <option value="" {{ !$coach ? 'selected' : '' }}>-- Shared Pool (Unassigned) --</option>
                                                             @foreach($assignedCoaches as $batchCoach)
                                                                 <option value="{{ $batchCoach->id }}" {{ $coach && $coach->id === $batchCoach->id ? 'selected' : '' }}>
                                                                     Coach {{ $batchCoach->name }}
@@ -183,7 +183,7 @@
                                                         </select>
                                                     </form>
                                                 @else
-                                                    <span class="text-xs font-medium text-[#8E8E93] italic px-2 py-0.5 rounded bg-white">
+                                                    <span class="text-xs sm:text-sm font-medium text-[#8E8E93] italic block">
                                                         {{ $coach ? 'Coach ' . $coach->name : 'Shared Pool' }}
                                                     </span>
                                                 @endif
@@ -198,50 +198,21 @@
                         <div class="flex items-center justify-between pt-3 border-t border-[#F2F2F7]">
                             <button type="button" 
                                     @click="selectedBookingId = {{ $booking->id }}; selectedBookingNumber = '{{ $booking->booking_number }}'; openMoveModal = true"
-                                    class="text-xs font-semibold text-[#6E6E73] hover:text-[#1D1D1F] py-1 px-2 rounded-md hover:bg-gray-100 transition-colors"
+                                    class="text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] py-1 px-2 rounded-md hover:bg-gray-100 transition-colors"
                                     title="Move to another batch">
                                 Move Batch
                             </button>
 
                             <a href="{{ route('admin.bookings.show', $booking) }}" 
-                               class="btn-secondary py-1.5 px-3 text-xs font-semibold text-center">
+                               class="btn-secondary py-1.5 px-3 text-sm font-semibold text-center">
                                 View Details
                             </a>
                         </div>
                     </div>
                     @empty
-                    <div class="col-span-full bg-white rounded-2xl border border-[#E5E5EA] p-8 text-center text-xs text-[#8E8E93]">
+                    <div class="col-span-full bg-white rounded-2xl border border-[#E5E5EA] p-8 text-center text-sm text-[#8E8E93]">
                         No customer bookings connected to this batch yet.
                     </div>
-                    @endforelse
-                </div>
-            </div>
-
-            <!-- Batch Status History -->
-            <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Batch Status History</h3>
-
-                <div class="space-y-4">
-                    @forelse($batch->statusLogs as $log)
-                    <div class="flex items-start gap-3 text-xs">
-                        <div class="w-2.5 h-2.5 rounded-full bg-[#780000] mt-1.5 shrink-0"></div>
-                        <div class="space-y-0.5 flex-grow">
-                            <div class="flex items-center justify-between">
-                                <strong class="text-[#1D1D1F]">
-                                    Status: <span class="uppercase">{{ str_replace('_', ' ', $log->new_status) }}</span>
-                                </strong>
-                                <span class="text-[#8E8E93] text-xs">{{ $log->created_at->format('M d, Y h:i A') }}</span>
-                            </div>
-                            @if($log->note)
-                                <p class="text-[#6E6E73]">{{ $log->note }}</p>
-                            @endif
-                            <span class="text-xs text-[#8E8E93] block">
-                                By: {{ $log->changer ? $log->changer->name : 'System Trigger' }}
-                            </span>
-                        </div>
-                    </div>
-                    @empty
-                    <p class="text-xs text-[#6E6E73] py-2 text-center">No status history logged yet.</p>
                     @endforelse
                 </div>
             </div>
@@ -255,19 +226,19 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Batch Status & Capacity</h3>
-                    <span class="px-2.5 py-0.5 rounded-md text-xs font-bold border {{ $batch->status_badge['class'] }}">
+                    <span class="px-2.5 py-0.5 rounded-md text-sm font-bold {{ $batch->status_badge['class'] }}">
                         {{ $batch->status_badge['label'] }}
                     </span>
                 </div>
 
                 @if($batch->capacity_note)
-                    <p class="text-xs text-[#6E6E73] font-medium italic">
+                    <p class="text-sm text-[#6E6E73] font-medium italic">
                         Note: {{ $batch->capacity_note }}
                     </p>
                 @endif
 
                 @if($batch->status === 'cancelled_by_camp' && $batch->cancellation_reason)
-                    <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-rose-800">
+                    <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-sm text-rose-800">
                         <strong>Camp Cancellation Advisory:</strong> {{ $batch->cancellation_reason }} (Logged at {{ $batch->cancelled_at ? $batch->cancelled_at->format('M d, Y h:i A') : 'N/A' }})
                     </div>
                 @endif
@@ -275,14 +246,14 @@
                 <!-- Occupancy & Capacity -->
                 <div class="space-y-2 pt-1">
                     @if($batch->total_participants_count > 0 && $batch->is_coach_pending)
-                        <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-left text-xs text-amber-900">
+                        <div class="p-2.5 bg-amber-50 rounded-lg border border-amber-200 text-left text-sm text-amber-900">
                             <strong class="block">Instructor Pending</strong>
                         </div>
                     @else
                         <div class="flex items-baseline justify-between">
-                            <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider">Occupancy</span>
+                            <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider">Occupancy</span>
                             <div class="text-xl font-extrabold text-[#1D1D1F]">
-                                {{ $batch->total_participants_count }} <span class="text-xs font-semibold text-[#6E6E73]">/ {{ $batch->computed_capacity }} Pax</span>
+                                {{ $batch->total_participants_count }} <span class="text-sm font-semibold text-[#6E6E73]">/ {{ $batch->computed_capacity }} Pax</span>
                             </div>
                         </div>
                         
@@ -295,7 +266,7 @@
 
                 <!-- Assigned Coaches Count & Status -->
                 <div class="space-y-2">
-                    <div class="flex items-center justify-between text-xs">
+                    <div class="flex items-center justify-between text-sm">
                         <span class="text-[#6E6E73] font-medium">Assigned Instructors:</span>
                         <strong class="font-bold text-[#1D1D1F]">
                             {{ $batch->coachAssignments->unique('coach_id')->count() }} Coach(es)
@@ -303,7 +274,7 @@
                     </div>
 
                     <div class="pt-2">
-                        <a href="{{ route('admin.coaches.matching') }}" class="btn-secondary w-full py-2 text-xs font-semibold text-center block">
+                        <a href="{{ route('admin.coaches.matching') }}" class="btn-secondary w-full py-2 text-sm font-semibold text-center block">
                             Manage Coach Assignments
                         </a>
                     </div>
@@ -319,17 +290,17 @@
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Transportation Logistics</h3>
                     @if($totalCarpoolPax > 0)
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                             {{ $totalCarpoolPax }} Carpool Pax
                         </span>
                     @else
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#FAFAFC] text-[#6E6E73] border border-[#E5E5EA]">
+                        <span class="px-2.5 py-0.5 rounded-full text-sm font-semibold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
                             Own Transpo Only
                         </span>
                     @endif
                 </div>
 
-                <div class="text-xs">
+                <div class="text-sm">
                     @if($carpoolBookingsList->isNotEmpty())
                         <div class="space-y-2 pt-1">
                             <div class="divide-y divide-[#F2F2F7]">
@@ -339,11 +310,11 @@
                                             <span class="font-bold text-[#1D1D1F] block truncate">
                                                 {{ $cb->pickup_location ?: 'Metro Manila Hub' }}
                                             </span>
-                                            <span class="text-[11px] text-[#6E6E73] block truncate">
+                                            <span class="text-sm text-[#6E6E73] block truncate">
                                                 {{ $cb->contact_name }} ({{ $cb->participants->count() }} pax)
                                             </span>
                                         </div>
-                                        <a href="{{ route('admin.bookings.show', $cb) }}" class="text-xs font-semibold text-[#780000] hover:underline shrink-0">
+                                        <a href="{{ route('admin.bookings.show', $cb) }}" class="text-sm font-semibold text-[#780000] hover:underline shrink-0">
                                             View
                                         </a>
                                     </div>
@@ -351,7 +322,7 @@
                             </div>
                         </div>
                     @else
-                        <p class="text-xs text-[#8E8E93] text-center py-2">
+                        <p class="text-sm text-[#8E8E93] text-center py-2">
                             All students are using own transportation.
                         </p>
                     @endif
@@ -362,12 +333,12 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Financial Overview</h3>
-                    <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#780000] font-bold hover:underline">
+                    <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#780000] font-bold hover:underline">
                         Ledger →
                     </a>
                 </div>
 
-                <div class="space-y-3.5 text-xs">
+                <div class="space-y-3.5 text-sm">
                     <div class="flex items-center justify-between">
                         <span class="text-[#6E6E73] font-medium">Total Expected Revenue:</span>
                         <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -394,7 +365,7 @@
                         @if($batch->outstanding_balance_bookings->isNotEmpty())
                             <div class="space-y-1 pt-1">
                                 @foreach($batch->outstanding_balance_bookings as $balBooking)
-                                    <div class="flex items-center justify-between text-[11px] bg-amber-50/70 rounded-lg px-2.5 py-1 text-amber-900">
+                                    <div class="flex items-center justify-between text-sm bg-amber-50/70 rounded-lg px-2.5 py-1 text-amber-900">
                                         <a href="{{ route('admin.bookings.show', $balBooking) }}" class="font-bold hover:underline text-[#780000] flex items-center gap-1 font-mono truncate mr-2">
                                             <span>{{ $balBooking->booking_number }}</span>
                                         </a>
@@ -418,15 +389,44 @@
 
     </div>
 
+    <!-- Batch Status History (Placed at bottom for clean mobile layout) -->
+    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+        <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-3">Batch Status History</h3>
+
+        <div class="space-y-4">
+            @forelse($batch->statusLogs as $log)
+            <div class="flex items-start gap-3 text-sm">
+                <div class="w-2.5 h-2.5 rounded-full bg-[#780000] mt-1.5 shrink-0"></div>
+                <div class="space-y-0.5 flex-grow">
+                    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                        <strong class="text-[#1D1D1F]">
+                            Status: <span class="uppercase">{{ str_replace('_', ' ', $log->new_status) }}</span>
+                        </strong>
+                        <span class="text-[#8E8E93] text-xs sm:text-sm shrink-0">{{ $log->created_at->format('M d, Y h:i A') }}</span>
+                    </div>
+                    @if($log->note)
+                        <p class="text-[#6E6E73] break-words">{{ $log->note }}</p>
+                    @endif
+                    <span class="text-xs sm:text-sm text-[#8E8E93] block">
+                        By: {{ $log->changer ? $log->changer->name : 'System Trigger' }}
+                    </span>
+                </div>
+            </div>
+            @empty
+            <p class="text-sm text-[#6E6E73] py-2 text-center">No status history logged yet.</p>
+            @endforelse
+        </div>
+    </div>
+
     <!-- Cancel Batch Modal -->
-    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <h3 class="text-lg font-bold text-[#780000]">Cancel Batch (by Camp)</h3>
-            <p class="text-xs text-[#6E6E73]">
-                Cancelling <strong class="text-[#1D1D1F]">{{ $batch->display_name }}</strong> will automatically cascade to all connected bookings, set them to <strong>Cancelled by Camp</strong>, trigger <strong>100% force majeure refund eligibility</strong>, and send custom cancellation emails to all customers.
+            <p class="text-sm text-[#6E6E73]">
+                Cancelling <strong class="text-[#1D1D1F]">{{ $batch->display_name }}</strong> will automatically update all connected bookings, set them to <strong>Cancelled by Camp</strong>, trigger <strong>100% force majeure refund eligibility</strong>, and send custom cancellation emails to all customers.
             </p>
 
-            <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" class="space-y-3 text-xs">
+            <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" class="space-y-3 text-sm">
                 @csrf
                 <input type="hidden" name="status" value="cancelled_by_camp">
 
@@ -434,12 +434,12 @@
                     <label class="block font-bold text-[#1D1D1F] mb-2">
                         Camp Advisory / Cancellation Reason <span class="text-[#780000]">*</span>
                     </label>
-                    <textarea name="note" required rows="3" placeholder="e.g. Typhoon storm signal #2 in Batangas / Severe localized marine surge" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="note" required rows="3" placeholder="e.g. Typhoon storm signal #2 in Batangas / Severe localized marine surge" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">
-                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
-                    <button type="submit" class="btn-danger px-4 py-1.5 text-xs font-bold shadow-2xs">
+                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Close</button>
+                    <button type="submit" class="btn-danger px-4 py-1.5 text-sm font-bold shadow-2xs">
                         Confirm Cancellation
                     </button>
                 </div>
@@ -448,14 +448,14 @@
     </div>
 
     <!-- Reschedule Batch Modal -->
-    <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedule Batch (by Camp)</h3>
-            <p class="text-xs text-[#6E6E73]">
+            <p class="text-sm text-[#6E6E73]">
                 Rescheduling <strong class="text-[#1D1D1F]">{{ $batch->display_name }}</strong> will set connected bookings to <strong>Rescheduled</strong> and send a custom email notifying customers to pick their preferred new date through the <strong>Manage Booking</strong> portal.
             </p>
 
-            <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" class="space-y-3 text-xs">
+            <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" class="space-y-3 text-sm">
                 @csrf
                 <input type="hidden" name="status" value="rescheduled">
 
@@ -463,12 +463,12 @@
                     <label class="block font-bold text-[#1D1D1F] mb-2">
                         Reschedule Explanation / Instructions <span class="text-[#780000]">*</span>
                     </label>
-                    <textarea name="note" required rows="3" placeholder="e.g. Venue maintenance on resort / Weather shift. Please choose a new weekend." class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="note" required rows="3" placeholder="e.g. Venue maintenance on resort / Weather shift. Please choose a new weekend." class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">
-                    <button type="button" @click="openRescheduleModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Close</button>
-                    <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
+                    <button type="button" @click="openRescheduleModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Close</button>
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">
                         Confirm Batch Reschedule
                     </button>
                 </div>
@@ -477,24 +477,24 @@
     </div>
 
     <!-- Move Booking Modal -->
-    <div x-show="openMoveModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div x-show="openMoveModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openMoveModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Move Booking to Another Batch</h3>
-            <p class="text-xs text-[#6E6E73]">
+            <p class="text-sm text-[#6E6E73]">
                 Reassign booking <strong class="text-[#780000] font-mono" x-text="selectedBookingNumber"></strong> to another scheduled 2D1N batch or unbatch it.
             </p>
 
-            <form action="{{ route('admin.batches.move_booking', $batch) }}" method="POST" class="space-y-3 text-xs">
+            <form action="{{ route('admin.batches.move_booking', $batch) }}" method="POST" class="space-y-3 text-sm">
                 @csrf
                 <input type="hidden" name="booking_id" :value="selectedBookingId">
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Target Batch</label>
-                    <select name="target_batch_id" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                    <select name="target_batch_id" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="">-- Remove from Batch (Unbatch) --</option>
                         @foreach($otherBatches as $ob)
                             <option value="{{ $ob->id }}">
-                                {{ $ob->display_name }} ({{ $ob->start_date->format('M d') }} – {{ $ob->end_date->format('M d, Y') }})
+                                {{ $ob->display_name }} ({{ $ob->start_date->format('M d') }} to {{ $ob->end_date->format('M d, Y') }})
                             </option>
                         @endforeach
                     </select>
@@ -502,12 +502,12 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Reason / Note</label>
-                    <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">
-                    <button type="button" @click="openMoveModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
+                    <button type="button" @click="openMoveModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">
                         Confirm Move
                     </button>
                 </div>

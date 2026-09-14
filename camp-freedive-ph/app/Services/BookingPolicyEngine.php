@@ -46,8 +46,8 @@ class BookingPolicyEngine
             $calculatedRefund = 0.00;
             $rescheduleAllowed = true;
             $cancelAllowed = true;
-            $rescheduleMessage = 'Allowed: Within 7–14 days window. Free reschedule to another available date.';
-            $cancelMessage = '0% Refund (Downpayment Forfeited): Cancellations made within 7–14 days forfeit downpayment (free reschedule is permitted).';
+            $rescheduleMessage = 'Allowed: Within 7 to 14 days window. Free reschedule to another available date.';
+            $cancelMessage = '0% Refund (Downpayment Forfeited): Cancellations made within 7 to 14 days forfeit downpayment (free reschedule is permitted).';
         } else {
             // < 7 days
             $policyTier = 'within_one_week';

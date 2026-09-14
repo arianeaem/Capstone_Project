@@ -11,52 +11,52 @@
             
             <!-- Average Occupancy -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Average Occupancy</span>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Average Occupancy</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     {{ $op['avg_occupancy'] ?? 0 }}%
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $op['total_booked_pax'] ?? 0 }} of {{ $op['total_capacity_slots'] ?? 0 }} slots</span>
-                    <span class="px-1.5 py-0.5 rounded text-[11px] font-bold text-[#780000] bg-[#F8EAEA] border border-[#F1D5D5] shrink-0">{{ $op['total_batches'] ?? 0 }} batches</span>
+                    <span class="px-1.5 py-0.5 rounded text-sm font-bold text-[#780000] bg-[#F8EAEA] border border-[#F1D5D5] shrink-0">{{ $op['total_batches'] ?? 0 }} batches</span>
                 </div>
             </div>
 
             <!-- Weekend vs Weekday Utilization -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Weekend vs Weekday</span>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Weekend vs Weekday</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
-                    {{ $op['weekend_occupancy'] ?? 0 }}% <span class="text-xs font-semibold text-[#8E8E93]">Weekend</span>
+                    {{ $op['weekend_occupancy'] ?? 0 }}% <span class="text-sm font-semibold text-[#8E8E93]">Weekend</span>
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>Weekday Avg: {{ $op['weekday_occupancy'] ?? 0 }}%</span>
-                    <span class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Peak Demand</span>
+                    <span class="px-1.5 py-0.5 rounded text-sm font-semibold text-emerald-700 bg-emerald-50 shrink-0">Peak Demand</span>
                 </div>
             </div>
 
             <!-- Staffing Fulfillment -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Staffing Fulfillment</span>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Staffing Fulfillment</span>
                 <div class="text-xl sm:text-2xl font-extrabold mt-0.5 break-words {{ ($op['safety_compliance_rate'] ?? 100) >= 95 ? 'text-emerald-700' : 'text-amber-600' }}">
                     {{ $op['safety_compliance_rate'] ?? 100 }}%
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $op['compliant_batches_count'] ?? 0 }} of {{ $op['total_batches'] ?? 0 }} batches</span>
-                    <span class="px-1.5 py-0.5 rounded text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Staffed</span>
+                    <span class="px-1.5 py-0.5 rounded text-sm font-semibold text-emerald-700 bg-emerald-50 shrink-0">Staffed</span>
                 </div>
             </div>
 
             <!-- Coach Roster Output -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs font-bold text-[#6E6E73] uppercase tracking-wider block">Coach Roster Output</span>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Coach Roster Output</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#00C3D0] mt-0.5 break-words">
-                    {{ $co['total_assignments_period'] ?? 0 }} <span class="text-xs font-semibold text-[#8E8E93]">shifts</span>
+                    {{ $co['total_assignments_period'] ?? 0 }} <span class="text-sm font-semibold text-[#8E8E93]">shifts</span>
                 </div>
-                <div class="text-xs text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $co['total_active_coaches'] ?? 0 }} active coaches</span>
-                    <span class="text-[11px] font-semibold text-[#6E6E73] shrink-0">{{ ($co['total_assignments_period'] ?? 0) * 2 }} dive days</span>
+                    <span class="text-sm font-semibold text-[#6E6E73] shrink-0">{{ ($co['total_assignments_period'] ?? 0) * 2 }} dive days</span>
                 </div>
             </div>
 
@@ -71,13 +71,13 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Coach Workload & Shift Allocation</h3>
-                    <p class="text-xs text-[#6E6E73]">Total trips and student coverage assigned to each coach in the selected period.</p>
+                    <p class="text-sm text-[#6E6E73]">Total trips and student coverage assigned to each coach in the selected period.</p>
                 </div>
             </div>
 
             <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
                 <table class="w-full text-left min-w-[550px]">
-                    <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">
+                    <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-bold text-[#6E6E73]">
                         <tr>
                             <th class="p-3.5 pl-5">Coach Name</th>
                             <th class="p-3.5 text-center">Status</th>
@@ -88,20 +88,15 @@
                     </thead>
                     <tbody class="divide-y divide-[#E5E5EA]">
                         @forelse($co['coaches'] ?? [] as $coach)
-                            <tr class="hover:bg-[#FAFAFC] transition-colors text-xs sm:text-sm">
+                            <tr class="hover:bg-[#F2F2F7] transition-colors text-sm sm:text-sm">
                                 <td class="p-3.5 pl-5">
-                                    <div class="flex items-center gap-2.5">
-                                        <div class="w-7 h-7 rounded-full bg-[#F8EAEA] text-[#780000] font-bold flex items-center justify-center shrink-0 border border-[#F1D5D5] text-xs">
-                                            {{ substr($coach['name'], 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <span class="font-bold text-[#1D1D1F] block">{{ $coach['name'] }}</span>
-                                            <span class="text-xs text-[#8E8E93]">{{ $coach['email'] }}</span>
-                                        </div>
+                                    <div>
+                                        <span class="font-bold text-[#1D1D1F] block">{{ $coach['name'] }}</span>
+                                        <span class="text-sm text-[#8E8E93]">{{ $coach['email'] }}</span>
                                     </div>
                                 </td>
                                 <td class="p-3.5 text-center">
-                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold {{ $coach['status'] === 'active' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gray-100 text-gray-600' }}">
+                                    <span class="px-2 py-0.5 rounded-full text-sm font-bold {{ $coach['status'] === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">
                                         {{ ucfirst($coach['status']) }}
                                     </span>
                                 </td>
@@ -115,7 +110,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="p-6 text-center text-xs text-[#8E8E93]">No coaches found.</td>
+                                <td colspan="5" class="p-6 text-center text-sm text-[#8E8E93]">No coaches found.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -127,35 +122,35 @@
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
             <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Operational Highlights</h3>
             
-            <div class="space-y-3 text-xs">
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+            <div class="space-y-3 text-sm">
+                <div class="p-3.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Batches at Full Capacity (≥90%)</span>
-                        <span class="text-[11px] text-[#6E6E73]">High demand sell-outs</span>
+                        <span class="text-sm text-[#6E6E73]">High demand sell-outs</span>
                     </div>
                     <span class="text-base font-extrabold text-[#780000]">{{ $op['full_capacity_batches'] ?? 0 }}</span>
                 </div>
 
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Completed Trips</span>
-                        <span class="text-[11px] text-[#6E6E73]">Successfully concluded</span>
+                        <span class="text-sm text-[#6E6E73]">Successfully concluded</span>
                     </div>
                     <span class="text-base font-extrabold text-emerald-700">{{ $op['completed_batches'] ?? 0 }}</span>
                 </div>
 
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Active / Upcoming</span>
-                        <span class="text-[11px] text-[#6E6E73]">Currently open for booking</span>
+                        <span class="text-sm text-[#6E6E73]">Currently open for booking</span>
                     </div>
                     <span class="text-base font-extrabold text-[#00C3D0]">{{ $op['active_batches'] ?? 0 }}</span>
                 </div>
 
-                <div class="p-3.5 rounded-xl bg-[#FAFAFC] flex items-center justify-between">
+                <div class="p-3.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
                     <div>
                         <span class="font-bold text-[#1D1D1F] block">Cancelled Trips</span>
-                        <span class="text-[11px] text-[#6E6E73]">Weather / Admin cancelled</span>
+                        <span class="text-sm text-[#6E6E73]">Weather / Admin cancelled</span>
                     </div>
                     <span class="text-base font-extrabold text-rose-700">{{ $op['cancelled_batches'] ?? 0 }}</span>
                 </div>
@@ -169,13 +164,13 @@
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Batch Runway & Roster Log</h3>
-                <p class="text-xs text-[#6E6E73]">Trip-by-trip occupancy, distinct coach allocation, and recommended staffing tracking.</p>
+                <p class="text-sm text-[#6E6E73]">Trip-by-trip occupancy, distinct coach allocation, and recommended staffing tracking.</p>
             </div>
         </div>
 
         <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
             <table class="w-full text-left min-w-[900px]">
-                <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">
+                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-bold text-[#6E6E73]">
                     <tr>
                         <th class="p-4 pl-6">Batch / Dates</th>
                         <th class="p-4">Class Package</th>
@@ -196,11 +191,11 @@
                             $coachesCnt = $distinctCoaches->count();
                             $required = $pax > 0 ? (int) ceil($pax / 4) : 0;
                         @endphp
-                        <tr class="hover:bg-[#FAFAFC] transition-colors text-xs sm:text-sm">
+                        <tr onclick="window.location='{{ route('admin.batches.show', $batch) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors text-sm sm:text-sm group">
                             <td class="p-4 pl-6 font-mono">
-                                <span class="font-bold text-[#780000] block text-sm">Batch #{{ $batch->id }}</span>
-                                <span class="text-xs text-[#8E8E93]">
-                                    {{ \Carbon\Carbon::parse($batch->start_date)->format('M d') }} – {{ \Carbon\Carbon::parse($batch->end_date)->format('M d, Y') }}
+                                <span class="font-bold text-[#780000] block text-sm group-hover:underline">{{ $batch->display_name }}</span>
+                                <span class="text-sm text-[#8E8E93]">
+                                    {{ \Carbon\Carbon::parse($batch->start_date)->format('M d') }} to {{ \Carbon\Carbon::parse($batch->end_date)->format('M d, Y') }}
                                 </span>
                             </td>
                             <td class="p-4">
@@ -209,7 +204,7 @@
                             <td class="p-4 text-center font-bold text-[#1D1D1F]">{{ $pax }} / {{ $cap }}</td>
                             <td class="p-4 min-w-[150px]">
                                 <div class="space-y-1">
-                                    <div class="flex items-center justify-between text-xs">
+                                    <div class="flex items-center justify-between text-sm">
                                         <span class="font-bold {{ $occ >= 90 ? 'text-[#780000]' : 'text-[#3A3A3C]' }}">{{ $occ }}%</span>
                                     </div>
                                     <div class="w-full h-1.5 rounded-full bg-[#E5E5EA] overflow-hidden">
@@ -220,31 +215,31 @@
                             <td class="p-4 min-w-[200px]">
                                 <div class="flex items-center gap-1.5 flex-wrap">
                                     @forelse($distinctCoaches as $coach)
-                                        <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
+                                        <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
                                             {{ $coach->name }}
                                         </span>
                                     @empty
-                                        <span class="text-xs text-rose-600 font-semibold">No coach assigned</span>
+                                        <span class="text-sm text-rose-600 font-semibold">No coach assigned</span>
                                     @endforelse
                                 </div>
                             </td>
                             <td class="p-4 text-center">
-                                <div class="text-xs font-bold text-[#1D1D1F]">
+                                <div class="text-sm font-bold text-[#1D1D1F]">
                                     {{ $coachesCnt }} Assigned
                                 </div>
-                                <div class="text-[11px] text-[#8E8E93]">
+                                <div class="text-sm text-[#8E8E93]">
                                     Rec: {{ $required }} {{ Str::plural('coach', $required) }}
                                 </div>
                             </td>
                             <td class="p-4 pr-6 text-center">
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $batch->status === 'completed' ? 'bg-emerald-50 text-emerald-700' : ($batch->status === 'confirmed' ? 'bg-sky-50 text-sky-700' : ($batch->status === 'rescheduled' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-700')) }}">
+                                <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $batch->status === 'completed' ? 'bg-emerald-50 text-emerald-700' : ($batch->status === 'confirmed' ? 'bg-sky-50 text-sky-700' : ($batch->status === 'rescheduled' ? 'bg-amber-50 text-amber-700' : 'bg-gray-100 text-gray-700')) }}">
                                     {{ ucfirst($batch->status) }}
                                 </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="p-6 text-center text-xs text-[#8E8E93]">No batches found for the selected reporting period.</td>
+                            <td colspan="7" class="p-6 text-center text-sm text-[#8E8E93]">No batches found for the selected reporting period.</td>
                         </tr>
                     @endforelse
                 </tbody>

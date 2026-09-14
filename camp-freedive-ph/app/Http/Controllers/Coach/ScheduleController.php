@@ -62,7 +62,7 @@ class ScheduleController extends Controller
             $weatherClass = $d1 ? $d1->overall_classification : 'Safe';
             $weatherBadge = $d1 ? $d1->classification_badge : [
                 'label' => 'Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ];
 
             // 48-Hour Cutoff check (06:30 AM start)

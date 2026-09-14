@@ -63,18 +63,18 @@ class WeatherForecastService
      * Determine Forecast Reliability Category based on Lead Time Horizon.
      *
      * Range         | Reliability Category      | Operational Impact
-     * Days 1–3      | High Reliability       | Highly actionable. Use directly for operational safety window greenlighting.
-     * Days 4–7      | Medium Reliability     | Excellent for spotting long-range trends, shifting winds, or monsoon setups.
-     * Days 8–16     | Low Reliability        | Climatological trend only. Do not use for safety-critical go/no-go logic.
+     * Days 1-3      | High Reliability       | Highly actionable. Use directly for operational safety window greenlighting.
+     * Days 4-7      | Medium Reliability     | Excellent for spotting long-range trends, shifting winds, or monsoon setups.
+     * Days 8-16     | Low Reliability        | Climatological trend only. Do not use for safety-critical go/no-go logic.
      */
     public static function getReliabilityCategory(int|float $daysOut): array
     {
         if ($daysOut <= 3) {
             return [
                 'level' => 'high',
-                'range' => 'Days 1–3',
+                'range' => 'Days 1-3',
                 'label' => 'High Reliability',
-                'badge_class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'badge_class' => 'bg-emerald-50 text-emerald-700',
                 'dot_color' => 'bg-emerald-500',
                 'description' => 'Highly actionable. Use directly for operational safety window greenlighting.',
                 'actionable' => true,
@@ -82,9 +82,9 @@ class WeatherForecastService
         } elseif ($daysOut <= 7) {
             return [
                 'level' => 'medium',
-                'range' => 'Days 4–7',
+                'range' => 'Days 4-7',
                 'label' => 'Medium Reliability',
-                'badge_class' => 'bg-amber-50 text-amber-700 border-amber-200',
+                'badge_class' => 'bg-amber-50 text-amber-700',
                 'dot_color' => 'bg-amber-500',
                 'description' => 'Excellent for spotting long-range trends, shifting winds, or monsoon setups.',
                 'actionable' => true,
@@ -92,9 +92,9 @@ class WeatherForecastService
         } else {
             return [
                 'level' => 'low',
-                'range' => 'Days 8–16',
+                'range' => 'Days 8-16',
                 'label' => 'Low Reliability',
-                'badge_class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'badge_class' => 'bg-rose-50 text-rose-700',
                 'dot_color' => 'bg-rose-500',
                 'description' => 'Climatological trend only. Do not use for safety-critical go/no-go logic.',
                 'actionable' => false,
@@ -104,8 +104,8 @@ class WeatherForecastService
 
     /**
      * Run full risk assessment for a 2D1N Batch across all 4 fixed windows:
-     * - Day 1 AM (09:30–12:00) & PM (15:30–17:30)
-     * - Day 2 AM (09:30–12:00) & PM (15:30–17:30)
+     * - Day 1 AM (09:30-12:00) & PM (15:30-17:30)
+     * - Day 2 AM (09:30-12:00) & PM (15:30-17:30)
      */
     public function assessBatch(Batch $batch, ?array $overrides = null, ?User $assessedBy = null): array
     {
@@ -774,7 +774,7 @@ class WeatherForecastService
             }
 
             // Generate Templated Cancellation Message (PRD Section 9)
-            $scheduledDateStr = $booking->start_date->format('M d, Y') . ' – ' . $booking->end_date->format('M d, Y');
+            $scheduledDateStr = $booking->start_date->format('M d, Y') . ' to ' . $booking->end_date->format('M d, Y');
             $messageBody = "Good day, {$booking->contact_name}. Your scheduled date for {$scheduledDateStr} will be canceled due to:\n\n- {$cancellationReason}\n\nThere will be options for this cancelled schedule:\n- Full refund\n- Reschedule\n\nYou can select your preferred option by entering your booking number ({$booking->booking_number}) and PIN in Manage Booking.";
 
             NotificationLog::create([

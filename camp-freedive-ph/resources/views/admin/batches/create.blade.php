@@ -8,12 +8,12 @@
     <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-4">
         <div>
-            <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+            <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 <span>Back to Batches</span>
             </a>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Create 2D1N Batch Schedule</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Set up a new weekend trip schedule for guest bookings and coach assignments.
             </p>
         </div>
@@ -30,7 +30,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="start_date" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="start_date" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Start Date (Day 1) <span class="text-[#780000]">*</span>
                         </label>
                         <input type="date" 
@@ -41,12 +41,12 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('start_date')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="end_date" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="end_date" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             End Date (Day 2) <span class="text-[#780000]">*</span>
                         </label>
                         <input type="date" 
@@ -56,7 +56,7 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('end_date')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -65,12 +65,12 @@
                 <template x-if="staffingRec && staffingRec.pill_text">
                     <div class="p-3.5 rounded-xl bg-gradient-to-r from-[#F0FDF4] to-emerald-50/50 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
                         <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-600 text-white font-black text-xs shrink-0">
-                                ⚡
+                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-600 text-white shrink-0">
+                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                             </span>
-                            <span class="font-extrabold text-xs sm:text-sm text-emerald-900" x-text="staffingRec.pill_text"></span>
+                            <span class="font-extrabold text-sm sm:text-sm text-emerald-900" x-text="staffingRec.pill_text"></span>
                         </div>
-                        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 self-start sm:self-auto" x-text="staffingRec.demand_level + ' Demand'"></span>
+                        <span class="px-2 py-0.5 rounded text-sm font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 self-start sm:self-auto" x-text="staffingRec.demand_level + ' Demand'"></span>
                     </div>
                 </template>
 
@@ -83,20 +83,23 @@
                             </div>
                         </div>
                         
-                        <p class="text-xs text-[#A16207] leading-relaxed">
+                        <p class="text-sm text-[#A16207] leading-relaxed">
                             To avoid double-scheduling the same weekend, an active batch is already handling <strong x-text="startDate"></strong>. Open the existing batch to manage participants and coaches instead of creating a duplicate:
                         </p>
                         
                         <div class="space-y-2">
                             <template x-for="dup in duplicateBatches" :key="dup.id">
-                                <div class="p-3 rounded-xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                <div class="p-3 rounded-xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
                                     <div>
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <strong class="text-[#1D1D1F] text-sm" x-text="dup.name || dup.batch_number"></strong>
                                         </div>
-                                        <span class="text-[#6E6E73] mt-0.5 block" x-text="(dup.participants_count || 0) + ' Pax assigned • ' + (dup.coaches_count || 0) + ' Coach(es) staffed'"></span>
+                                        <div class="text-xs text-[#6E6E73] space-y-0.5 mt-0.5">
+                                            <span class="block" x-text="(dup.participants_count || 0) + ' Pax assigned'"></span>
+                                            <span class="block" x-text="(dup.coaches_count || 0) + ' Coach(es) staffed'"></span>
+                                        </div>
                                     </div>
-                                    <a :href="'/admin/batches/' + dup.id" class="btn-primary px-4 py-2 text-xs font-bold shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                    <a :href="'/admin/batches/' + dup.id" class="btn-primary px-4 py-2 text-sm font-bold shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap">
                                         <span>Open Existing Batch</span>
                                     </a>
                                 </div>
@@ -106,17 +109,25 @@
                 </template>
 
                 <div>
-                    <label for="batch_number" class="block font-bold text-[#1D1D1F] text-xs mb-2">
-                        Batch Number <span class="text-[#780000]">*</span>
+                    <label for="batch_number_digits" class="block font-bold text-[#1D1D1F] text-sm mb-2">
+                        Batch Identifier <span class="text-[#780000]">*</span>
                     </label>
-                    <input type="text" 
-                           name="batch_number" 
-                           id="batch_number" 
-                           x-model="batchNumber" 
-                           required 
-                           placeholder="e.g. Batch 4"
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] font-mono text-sm font-bold text-[#1D1D1F] bg-white">
-                    <span class="text-xs text-[#6E6E73] mt-0.5 block">Unique operational batch number identifier.</span>
+                    <div class="relative flex items-center rounded-xl border border-[#D1D1D6] bg-white overflow-hidden focus-within:border-[#780000] focus-within:ring-2 focus-within:ring-[#780000]/20 max-w-xs">
+                        <span class="px-4 py-2.5 bg-[#F2F2F7] border-r border-[#D1D1D6] text-sm font-extrabold text-[#1D1D1F] select-none shrink-0">
+                            Batch
+                        </span>
+                        <input type="number" 
+                               name="batch_number_digits" 
+                               id="batch_number_digits" 
+                               x-model="batchNumberOnly" 
+                               min="1" 
+                               step="1" 
+                               required 
+                               placeholder="e.g. 10"
+                               class="w-full px-3.5 py-2.5 font-mono text-sm font-bold text-[#1D1D1F] bg-transparent border-0 focus:ring-0 focus:outline-none">
+                        <input type="hidden" name="batch_number" :value="'Batch ' + (batchNumberOnly || '')">
+                    </div>
+                    <span class="text-sm text-[#6E6E73] mt-1.5 block">Unique batch identifier is always formatted as <strong>Batch [Number]</strong> in chronological order.</span>
                 </div>
 
             </div>
@@ -126,24 +137,24 @@
                 <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-2">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">2. Group Confirmed Bookings for this Date</h3>
-                        <p class="text-xs text-[#6E6E73] mt-0.5">
+                        <p class="text-sm text-[#6E6E73] mt-0.5">
                             Auto-suggested bookings matching this dive date. Uncheck any private or custom arrangements.
                         </p>
                     </div>
 
-                    <div class="text-xs text-[#780000] font-bold">
+                    <div class="text-sm text-[#780000] font-bold">
                         <span x-text="selectedBookingIds.length"></span> / <span x-text="unbatchedBookings.length"></span> Bookings Selected
                     </div>
                 </div>
 
-                <div x-show="loadingBookings" class="py-6 text-center text-xs text-[#6E6E73]">
+                <div x-show="loadingBookings" class="py-6 text-center text-sm text-[#6E6E73]">
                     Scanning confirmed bookings for selected date...
                 </div>
 
                 <!-- Bookings Table Container -->
                 <div x-show="!loadingBookings && unbatchedBookings.length > 0" class="border border-[#D1D1D6] rounded-xl overflow-hidden">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-[#FAFAFC] border-b border-[#D1D1D6] text-[#6E6E73] font-bold">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-[#F2F2F7] border-b border-[#D1D1D6] text-[#6E6E73] font-bold">
                             <tr>
                                 <th class="py-2.5 px-3 w-8">
                                     <input type="checkbox" @change="toggleAll($event.target.checked)" checked class="w-3.5 h-3.5 rounded text-[#780000] focus:ring-[#780000]">
@@ -157,7 +168,7 @@
                         </thead>
                         <tbody class="divide-y divide-[#D1D1D6]">
                             <template x-for="b in paginatedBookings" :key="b.id">
-                                <tr class="hover:bg-[#FAFAFC]">
+                                <tr class="hover:bg-[#F2F2F7]">
                                     <td class="py-2.5 px-3">
                                         <input type="checkbox" 
                                                name="booking_ids[]" 
@@ -176,9 +187,9 @@
                     </table>
 
                     <!-- Pagination Controls -->
-                    <div x-show="totalPages > 1" class="bg-[#FAFAFC] px-3.5 py-2.5 border-t border-[#E5E5EA] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs text-[#6E6E73] rounded-b-xl select-none">
+                    <div x-show="totalPages > 1" class="bg-[#F2F2F7] px-3.5 py-2.5 border-t border-[#E5E5EA] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-sm text-[#6E6E73] rounded-b-xl select-none">
                         <div class="font-medium text-[#6E6E73] text-center sm:text-left">
-                            Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span>–<span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span> results
+                            Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span> to <span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span> results
                         </div>
                         <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
                             <span class="font-medium text-[#6E6E73]">
@@ -188,7 +199,7 @@
                                 <button type="button" 
                                         @click="currentPage--" 
                                         :disabled="currentPage <= 1"
-                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-xs hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all">
+                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all">
                                     <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                                     </svg>
@@ -197,7 +208,7 @@
                                 <button type="button" 
                                         @click="currentPage++" 
                                         :disabled="currentPage >= totalPages"
-                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-xs hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all">
+                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all">
                                     Next
                                     <svg class="w-3.5 h-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
@@ -208,7 +219,7 @@
                     </div>
                 </div>
 
-                <div x-show="!loadingBookings && unbatchedBookings.length === 0" class="py-6 text-center text-xs text-[#8E8E93] bg-[#FAFAFC] rounded-xl border border-dashed border-[#D1D1D6]">
+                <div x-show="!loadingBookings && unbatchedBookings.length === 0" class="py-6 text-center text-sm text-[#8E8E93] bg-[#F2F2F7] rounded-xl border border-dashed border-[#D1D1D6]">
                     No unbatched confirmed bookings found for this start date. You can add bookings later from the batch dashboard.
                 </div>
             </div>
@@ -218,7 +229,7 @@
                 <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">3. Operational Notes & Overrides</h3>
 
                 <div>
-                    <label for="capacity_note" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="capacity_note" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         Capacity / Group Structure Tag (Optional)
                     </label>
                     <input type="text" 
@@ -229,7 +240,7 @@
                 </div>
 
                 <div>
-                    <label for="notes" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="notes" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         Internal Staff Notes
                     </label>
                     <textarea name="notes" 
@@ -257,7 +268,7 @@ function batchCreateForm() {
     return {
         startDate: @json(old('start_date', $defaultStartDateStr)),
         endDate: @json(old('end_date', $defaultEndDateStr)),
-        batchNumber: @json(old('batch_number', $defaultBatchNumber)),
+        batchNumberOnly: @json(preg_replace('/^Batch\s*/i', '', old('batch_number', $defaultBatchNumber))),
         unbatchedBookings: @json($initialBookings),
         selectedBookingIds: @json($selectedIds),
         existingBatches: @json($existingBatches ?? []),
@@ -266,6 +277,10 @@ function batchCreateForm() {
         loadingBookings: false,
         perPage: 5,
         currentPage: 1,
+
+        get batchNumber() {
+            return 'Batch ' + (this.batchNumberOnly || '');
+        },
 
         get duplicateBatches() {
             if (this.existingBatchesForSelectedDate && this.existingBatchesForSelectedDate.length > 0) {
@@ -315,12 +330,10 @@ function batchCreateForm() {
                 .then(data => {
                     this.unbatchedBookings = data.bookings || [];
                     this.selectedBookingIds = (data.bookings || []).map(b => b.id);
-                    if (!this.batchNumber || this.batchNumber.startsWith('Batch #')) {
-                        if (data.suggested_batch_number) {
-                            this.batchNumber = data.suggested_batch_number;
-                        } else if (data.suggested_code) {
-                            this.batchNumber = data.suggested_code;
-                        }
+                    if (data.suggested_batch_number_only) {
+                        this.batchNumberOnly = data.suggested_batch_number_only;
+                    } else if (data.suggested_batch_number) {
+                        this.batchNumberOnly = data.suggested_batch_number.replace(/^Batch\s*/i, '');
                     }
                     if (data.existing_batches) {
                         this.existingBatchesForSelectedDate = data.existing_batches;

@@ -99,7 +99,7 @@ class LandingController extends Controller
             ],
             [
                 'q' => 'How does transportation and carpool work?',
-                'a' => 'We arrange carpools with pickup points in Monumento, Shell Tiendesitas, Market! Market!, Starmall Alabang, and Sto. Tomas Exit. If you choose carpool, the booking downpayment is 2,000 php. If you bring your own transpo, the downpayment is 1,200 php.',
+                'a' => 'We arrange carpools with pickup points in Monumento, Shell Tiendesitas, Market! Market!, Starmall Alabang, and Sto. Tomas Exit. If you choose carpool, the booking downpayment is 3,000 php per person. If you bring your own transpo, the downpayment is 2,000 php per person.',
             ],
             [
                 'q' => 'What are the required local municipal fees?',

@@ -6,10 +6,10 @@
 <div class="space-y-6" x-data="{ activeTab: '{{ $activeTab }}' }">
 
     <!-- Page Header with Title, Description, and Actions on Right -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
             <h1 class="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight">Reports & Analytics</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-0.5">
                 Comprehensive performance metrics, financial yield, operational capacity, and diver insights.
             </p>
         </div>
@@ -21,7 +21,7 @@
             <div class="relative">
                 <button type="button" 
                         @click="exportOpen = !exportOpen" 
-                        class="btn-secondary px-3.5 py-2 text-xs font-bold flex items-center gap-2">
+                        class="btn-secondary px-3.5 py-2 text-sm font-bold flex items-center gap-2">
                     <img src="{{ asset('icons/icons8-download-60.png') }}" class="w-4 h-4 shrink-0" alt="Export CSV">
                     <span>Export CSV</span>
                     <svg class="w-3 h-3 text-[#8E8E93]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -33,18 +33,18 @@
                      class="absolute right-0 mt-2 w-52 bg-white rounded-xl border border-[#E5E5EA] p-1.5 shadow-xl z-30 space-y-1">
                     @if($isOwner)
                         <a href="{{ (auth()->user()->isOwner() ? route('owner.reports.export') : route('admin.reports.export')) . '?' . http_build_query(['type' => 'financials', 'preset' => $range['preset'], 'start_date' => $range['start']->format('Y-m-d'), 'end_date' => $range['end']->format('Y-m-d')]) }}" 
-                           class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-[#1D1D1F] hover:bg-[#F8EAEA] hover:text-[#780000] transition-colors">
+                           class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-[#1D1D1F] hover:bg-[#F8EAEA] hover:text-[#780000] transition-colors">
                             <span>Financial Transactions</span>
                         </a>
                     @endif
 
                     <a href="{{ (auth()->user()->isOwner() ? route('owner.reports.export') : route('admin.reports.export')) . '?' . http_build_query(['type' => 'batches', 'preset' => $range['preset'], 'start_date' => $range['start']->format('Y-m-d'), 'end_date' => $range['end']->format('Y-m-d')]) }}" 
-                       class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
+                       class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
                         <span>Batch Performance</span>
                     </a>
 
                     <a href="{{ (auth()->user()->isOwner() ? route('owner.reports.export') : route('admin.reports.export')) . '?' . http_build_query(['type' => 'divers', 'preset' => $range['preset'], 'start_date' => $range['start']->format('Y-m-d'), 'end_date' => $range['end']->format('Y-m-d')]) }}" 
-                       class="flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
+                       class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
                         <span>Diver Roster</span>
                     </a>
                 </div>
@@ -53,7 +53,7 @@
             <!-- Print / PDF Summary Button -->
             <a href="{{ (auth()->user()->isOwner() ? route('owner.reports.print') : route('admin.reports.print')) . '?' . http_build_query(['preset' => $range['preset'], 'start_date' => $range['start']->format('Y-m-d'), 'end_date' => $range['end']->format('Y-m-d')]) }}" 
                target="_blank" 
-               class="btn-secondary px-3.5 py-2 text-xs font-bold flex items-center gap-2">
+               class="btn-secondary px-3.5 py-2 text-sm font-bold flex items-center gap-2">
                 <img src="{{ asset('icons/icons8-print-60.png') }}" class="w-4 h-4 shrink-0" alt="Print Summary">
                 <span>Print Summary</span>
             </a>
@@ -69,7 +69,7 @@
         @if($isOwner)
             <button type="button" 
                     @click="activeTab = 'financial'"
-                    class="pb-3 text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap"
+                    class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap"
                     :class="activeTab === 'financial' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
                 Financial & Revenue
             </button>
@@ -77,21 +77,21 @@
 
         <button type="button" 
                 @click="activeTab = 'bookings'"
-                class="pb-3 text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap"
+                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap"
                 :class="activeTab === 'bookings' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
             Bookings & Demographics
         </button>
 
         <button type="button" 
                 @click="activeTab = 'operations'"
-                class="pb-3 text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap"
+                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap"
                 :class="activeTab === 'operations' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
             Batch Capacity & Coaches
         </button>
 
         <button type="button" 
                 @click="activeTab = 'forecast'"
-                class="pb-3 text-xs sm:text-sm transition-all border-b-2 whitespace-nowrap"
+                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap"
                 :class="activeTab === 'forecast' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
             Demand Forecast
         </button>

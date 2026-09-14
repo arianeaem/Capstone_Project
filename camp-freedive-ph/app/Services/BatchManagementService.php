@@ -33,22 +33,16 @@ class BatchManagementService
             return $existing;
         }
 
-        // Determine next sequential batch number
-        $maxNum = 0;
-        foreach (Batch::pluck('batch_code') as $code) {
-            if (preg_match('/(?:Batch|BATCH)[- ]*(\d+)/i', (string) $code, $m)) {
-                $maxNum = max($maxNum, (int) $m[1]);
-            }
-        }
-        $nextBatchNum = $maxNum + 1;
-        $batchCode = "Batch {$nextBatchNum}";
-        $batchName = "{$batchCode} ({$startDate->format('M d')} - {$endDate->format('d, Y')})";
+        // Determine chronological batch number based on start date
+        $priorCount = Batch::whereDate('start_date', '<=', $startDate)->count();
+        $nextBatchNum = $priorCount + 1;
+        $batchIdentifier = "Batch {$nextBatchNum}";
 
         $creatorId = $creator?->id ?? \Illuminate\Support\Facades\Auth::id() ?? null;
 
         $batch = Batch::create([
-            'name' => $batchName,
-            'batch_code' => $batchCode,
+            'name' => $batchIdentifier,
+            'batch_code' => $batchIdentifier,
             'start_date' => $startDate,
             'end_date' => $endDate,
             'status' => 'confirmed',
@@ -62,7 +56,7 @@ class BatchManagementService
             'old_status' => null,
             'new_status' => 'confirmed',
             'changed_by' => $creatorId,
-            'note' => "Auto-created {$batchCode} for dive date {$startDate->format('M d, Y')}.",
+            'note' => "Auto-created {$batchIdentifier} for dive date {$startDate->format('M d, Y')}.",
         ]);
 
         try {
@@ -84,29 +78,25 @@ class BatchManagementService
             $startDate = Carbon::parse($data['start_date'])->startOfDay();
             $endDate = isset($data['end_date']) ? Carbon::parse($data['end_date'])->startOfDay() : $startDate->copy()->addDay();
 
-            // Auto-generate or sanitize unified batch number / code
-            $batchNumber = trim($data['batch_number'] ?? '');
-            $name = trim($data['name'] ?? '');
-            $batchCode = trim($data['batch_code'] ?? '');
-
-            if ($batchNumber) {
-                $name = $name ?: $batchNumber;
-                $batchCode = $batchCode ?: $batchNumber;
+            // Auto-generate or sanitize unified batch identifier to always be 'Batch [Number]'
+            $batchNumberInput = trim($data['batch_number'] ?? $data['name'] ?? $data['batch_code'] ?? '');
+            if (preg_match('/(\d+)/', $batchNumberInput, $matches)) {
+                $batchIdentifier = 'Batch ' . $matches[1];
             } else {
-                $name = $name ?: ($startDate->format('M d') . '-' . $endDate->format('d') . ' Batch');
-                $batchCode = $batchCode ?: ('Batch #' . $startDate->format('Y-m-d'));
+                $priorCount = Batch::whereDate('start_date', '<=', $startDate)->count();
+                $batchIdentifier = 'Batch ' . ($priorCount + 1);
             }
 
             // Guarantee unique batch_code even if pre-filled duplicate was submitted
+            $batchCode = $batchIdentifier;
             $counter = 1;
-            $origCode = $batchCode;
             while (Batch::where('batch_code', $batchCode)->exists()) {
-                $batchCode = $origCode . '-' . $counter;
+                $batchCode = $batchIdentifier . '-' . $counter;
                 $counter++;
             }
 
             $batch = Batch::create([
-                'name' => $name,
+                'name' => $batchIdentifier,
                 'batch_code' => $batchCode,
                 'start_date' => $startDate,
                 'end_date' => $endDate,

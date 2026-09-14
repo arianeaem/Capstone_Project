@@ -113,7 +113,7 @@ class AnalyticsService
                 $diffDays = max(1, $start->diffInDays($end));
                 $priorStart = $start->copy()->subDays($diffDays)->startOfDay();
                 $priorEnd = $start->copy()->subSecond();
-                $label = $start->format('M d, Y') . ' – ' . $end->format('M d, Y');
+                $label = $start->format('M d, Y') . ' to ' . $end->format('M d, Y');
                 break;
 
             default:

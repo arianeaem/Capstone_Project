@@ -16,10 +16,11 @@
 
     <!-- Back Navigation -->
     <div class="flex items-center justify-between mb-6">
-        <a href="{{ route('manage.index') }}" class="text-xs sm:text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5">
-            ← Switch to another bookings
+        <a href="{{ route('manage.index') }}" class="text-sm sm:text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Switch to another booking</span>
         </a>
-        <div class="text-xs sm:text-sm text-[#8E8E93]">
+        <div class="text-sm sm:text-sm text-[#8E8E93]">
             Booking Created: {{ $booking->created_at->format('M d, Y') }}
         </div>
     </div>
@@ -32,13 +33,13 @@
                 <svg class="w-5 h-5 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 <span>Downpayment Required</span>
             </div>
-            <p class="text-xs text-amber-800 leading-relaxed">
+            <p class="text-sm text-amber-800 leading-relaxed">
                 Your reservation has not gone through the system yet because the required reservation downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is unpaid. Please complete your payment via PayMongo to confirm your slots.
             </p>
         </div>
         <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST" class="shrink-0">
             @csrf
-            <button type="submit" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-[#780000] text-white font-bold text-xs hover:bg-[#5a0000] transition-colors shadow-2xs cursor-pointer">
+            <button type="submit" class="btn-primary w-full sm:w-auto px-5 py-2.5 text-sm font-bold">
                 Pay Downpayment
             </button>
         </form>
@@ -49,42 +50,42 @@
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6">
             <div>
-                <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Reservation Details</span>
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
+                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                     <h1 class="text-xl sm:text-3xl font-extrabold text-[#1D1D1F] font-mono tracking-wide">
-                        {{ $booking->booking_number }}
+                        Reservation {{ $booking->booking_number }}
                     </h1>
-                    <span class="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-xs font-bold border {{ $booking->status_badge['bg'] }}">
+                    <span class="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-sm font-bold {{ $booking->status_badge['bg'] }}">
                         {{ $booking->status_badge['label'] }}
                     </span>
                 </div>
+                <p class="text-sm text-[#6E6E73] mt-1">Booking overview, scheduled dates, and management actions.</p>
             </div>
 
             <!-- Security PIN -->
-            <div class="bg-[#F8EAEA] border border-[#780000]/20 rounded-xl p-3 sm:p-3.5 sm:text-right shrink-0">
-                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] block">Security PIN</span>
+            <div class="bg-[#F8EAEA] border border-[#F1D5D5] rounded-xl p-3 sm:p-3.5 sm:text-right shrink-0">
+                <span class="text-sm font-bold text-[#780000] block">Security PIN</span>
                 <span class="text-base sm:text-lg font-mono font-extrabold text-[#780000] tracking-widest">{{ $booking->pin }}</span>
             </div>
         </div>
 
         <!-- Booking Key Information -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-sm">
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                <span class="text-xs text-[#6E6E73] block mb-1">Lead Booker:</span>
+            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                <span class="text-sm text-[#6E6E73] block mb-1">Lead Booker:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->contact_name }}</strong>
-                <span class="text-xs text-[#6E6E73] break-all">{{ $booking->contact_email }}</span>
+                <span class="text-sm text-[#6E6E73] break-all">{{ $booking->contact_email }}</span>
             </div>
 
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                <span class="text-xs text-[#6E6E73] block mb-1">Class Package:</span>
+            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                <span class="text-sm text-[#6E6E73] block mb-1">Class Package:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->formatted_class_type }}</strong>
-                <span class="text-xs text-[#6E6E73]">{{ $booking->participants->count() }} Participant(s)</span>
+                <span class="text-sm text-[#6E6E73]">{{ $booking->participants->count() }} Participant(s)</span>
             </div>
 
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                <span class="text-xs text-[#6E6E73] block mb-1">Trip Dates:</span>
+            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                <span class="text-sm text-[#6E6E73] block mb-1">Trip Dates:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</strong>
-                <span class="text-xs text-[#780000] font-semibold">
+                <span class="text-sm text-[#780000] font-semibold">
                     @if($policy['days_until_dive'] > 0)
                         {{ $policy['days_until_dive'] }} days until dive trip
                     @elseif($policy['days_until_dive'] === 0)
@@ -95,14 +96,14 @@
                 </span>
             </div>
 
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                <span class="text-xs text-[#6E6E73] block mb-1">Payment Status:</span>
+            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                <span class="text-sm text-[#6E6E73] block mb-1">Payment Status:</span>
                 @if($booking->status === 'pending_downpayment')
                     <strong class="text-sm text-amber-700 block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Unpaid</strong>
-                    <span class="text-xs text-rose-600 font-bold">Unconfirmed Reservation</span>
+                    <span class="text-sm text-rose-600 font-bold">Unconfirmed Reservation</span>
                 @else
                     <strong class="text-sm text-[#34C759] block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Paid</strong>
-                    <span class="text-xs text-[#780000] font-bold">₱{{ number_format($booking->balance_amount, 2) }} balance due at camp</span>
+                    <span class="text-sm text-[#780000] font-bold">₱{{ number_format($booking->balance_amount, 2) }} balance due at camp</span>
                 @endif
             </div>
         </div>
@@ -119,12 +120,12 @@
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 space-y-3">
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Price Breakdown & Applied Rules</h3>
-                    <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-[#F8EAEA] text-[#780000]">
+                    <span class="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-[#F8EAEA] text-[#780000]">
                         Dynamic Pricing Applied
                     </span>
                 </div>
 
-                <div class="space-y-2 text-xs">
+                <div class="space-y-2 text-sm">
                     <div class="flex justify-between items-center text-[#6E6E73]">
                         <span>Base Class Rate:</span>
                         <span class="font-bold text-[#1D1D1F]">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} / person</span>
@@ -134,9 +135,8 @@
                         @foreach($booking->priceAdjustments as $adj)
                         <div class="flex justify-between items-center">
                             <div class="flex items-center gap-2">
-                                <span class="w-1.5 h-1.5 rounded-full {{ $adj->adjustment_amount >= 0 ? 'bg-rose-500' : 'bg-emerald-500' }}"></span>
                                 <span class="font-medium text-[#1D1D1F]">{{ $adj->rule_name }}</span>
-                                <span class="text-[10px] text-[#6E6E73]">({{ $adj->condition_summary }})</span>
+                                <span class="text-sm text-[#6E6E73]">({{ $adj->condition_summary }})</span>
                             </div>
                             <span class="font-bold {{ $adj->adjustment_amount >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
                                 {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }} / person
@@ -161,13 +161,13 @@
                     <div class="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
                         <div>
                             <span class="font-bold text-[#1D1D1F]">{{ $p->name }}</span>
-                            <span class="text-xs text-[#6E6E73] ml-1.5">Age {{ $p->age }}</span>
-                            <div class="text-xs text-[#6E6E73] mt-0.5">
+                            <span class="text-sm text-[#6E6E73] ml-1.5">Age {{ $p->age }}</span>
+                            <div class="text-sm text-[#6E6E73] mt-0.5">
                                 <strong>Medical Notes:</strong> {{ $p->health_condition ?: 'None declared' }}
                             </div>
                         </div>
                         <div class="text-left sm:text-right">
-                            <span class="px-2.5 py-0.5 rounded text-xs font-semibold bg-[#F2F2F7] text-[#1D1D1F]">
+                            <span class="px-2.5 py-0.5 rounded text-sm font-semibold bg-[#F2F2F7] text-[#1D1D1F]">
                                 {{ ucfirst(str_replace('_', ' ', $p->swimmer_status ?: 'Swimmer')) }}
                             </span>
                         </div>
@@ -180,22 +180,22 @@
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8">
                 <h3 class="text-base font-bold text-[#1D1D1F] mb-4">Transportation & Add-ons</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                        <span class="text-xs text-[#6E6E73] block mb-1">Transportation:</span>
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                        <span class="text-sm text-[#6E6E73] block mb-1">Transportation:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->pickup_option === 'carpool' ? 'Manila Carpool Service' : 'Own Transportation' }}
                         </strong>
                         @if($booking->pickup_location)
-                            <span class="text-xs text-[#780000] font-medium block mt-1">Pickup Hub: {{ $booking->pickup_location }}</span>
+                            <span class="text-sm text-[#780000] font-medium block mt-1">Pickup Hub: {{ $booking->pickup_location }}</span>
                         @endif
                     </div>
 
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA]">
-                        <span class="text-xs text-[#6E6E73] block mb-1">Boat Dive:</span>
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                        <span class="text-sm text-[#6E6E73] block mb-1">Boat Dive:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->boat_dive ? 'Included (+₱600 / person)' : 'Not Included' }}
                         </strong>
-                        <span class="text-xs text-[#6E6E73] block mt-1">Mabini LGU pass included</span>
+                        <span class="text-sm text-[#6E6E73] block mt-1">Mabini LGU pass included</span>
                     </div>
                 </div>
             </div>
@@ -206,27 +206,27 @@
                 <h3 class="text-base font-bold text-[#1D1D1F]">Request History</h3>
 
                 @foreach($booking->rescheduleRequests as $req)
-                <div class="p-4 rounded-xl bg-[#FFFBEB] border border-[#FDE68A] text-sm text-[#92400E] space-y-1">
+                <div class="p-4 rounded-xl bg-[#FFFBEB] text-sm text-[#92400E] space-y-1 shadow-2xs">
                     <div class="flex items-center justify-between font-bold">
                         <span>Reschedule Request ({{ $req->created_at->format('M d, Y') }})</span>
-                        <span class="uppercase tracking-wider px-2 py-0.5 rounded bg-white text-xs font-bold">{{ $req->status }}</span>
+                        <span class="uppercase tracking-wider px-2 py-0.5 rounded bg-white text-sm font-bold">{{ $req->status }}</span>
                     </div>
                     <p>Requested Move: {{ $req->requested_start_date->format('M d, Y') }} - {{ $req->requested_end_date->format('M d, Y') }}</p>
                     @if($req->reason)
-                        <p class="text-xs text-[#78350F]">Reason: {{ $req->reason }}</p>
+                        <p class="text-sm text-[#78350F]">Reason: {{ $req->reason }}</p>
                     @endif
                 </div>
                 @endforeach
 
                 @foreach($booking->cancellationRequests as $cReq)
-                <div class="p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-sm text-[#991B1B] space-y-1">
+                <div class="p-4 rounded-xl bg-[#FEF2F2] text-sm text-[#991B1B] space-y-1 shadow-2xs">
                     <div class="flex items-center justify-between font-bold">
                         <span>Cancellation Request ({{ $cReq->created_at->format('M d, Y') }})</span>
-                        <span class="uppercase tracking-wider px-2 py-0.5 rounded bg-white text-xs font-bold">{{ $cReq->status }}</span>
+                        <span class="uppercase tracking-wider px-2 py-0.5 rounded bg-white text-sm font-bold">{{ $cReq->status }}</span>
                     </div>
                     <p>Calculated Refund: ₱{{ number_format($cReq->calculated_refund_amount, 2) }}</p>
                     @if($cReq->reason)
-                        <p class="text-xs">Reason: {{ $cReq->reason }}</p>
+                        <p class="text-sm">Reason: {{ $cReq->reason }}</p>
                     @endif
                 </div>
                 @endforeach
@@ -241,60 +241,60 @@
             <!-- Policy Status -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-5">
                 <div>
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#780000]">Cancellation & Rescheduling Policy</span>
-                    <p class="text-xs text-[#6E6E73] mt-1">Policy based on days before your dive date.</p>
+                    <span class="text-sm font-bold uppercase tracking-wider text-[#780000]">Cancellation & Rescheduling Policy</span>
+                    <p class="text-sm text-[#6E6E73] mt-1">Policy based on days before your dive date.</p>
                 </div>
 
                 @if($booking->status === 'pending_downpayment')
                 <!-- Unpaid Downpayment Notice -->
-                <div class="p-4 rounded-xl border border-amber-300 bg-amber-50 text-amber-900 space-y-3">
+                <div class="p-4 rounded-xl bg-amber-50 text-amber-900 space-y-3 shadow-2xs">
                     <div class="font-bold text-sm text-amber-900">
                         Downpayment Required
                     </div>
-                    <p class="text-xs text-amber-800 leading-relaxed">
+                    <p class="text-sm text-amber-800 leading-relaxed">
                         Self-service rescheduling and cancellations are enabled once your required downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is paid.
                     </p>
                     <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn-primary w-full py-2.5 text-xs font-bold shadow-2xs cursor-pointer">
+                        <button type="submit" class="btn-primary w-full py-2.5 text-sm font-bold cursor-pointer">
                             Pay ₱{{ number_format($booking->downpayment_amount, 2) }}
                         </button>
                     </form>
                 </div>
                 @else
                 <!-- Reschedule Status -->
-                <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-2">
+                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 shadow-2xs">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Reschedule</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['reschedule_allowed'] ? 'bg-[#ECFDF5] text-emerald-800 border border-emerald-200' : 'bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]' }}">
+                        <span class="text-sm font-bold px-2 py-0.5 rounded {{ $policy['reschedule_allowed'] ? 'bg-[#ECFDF5] text-emerald-800' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">
                             {{ $policy['reschedule_allowed'] ? 'Allowed' : 'Closed' }}
                         </span>
                     </div>
-                    <p class="text-xs text-[#6E6E73] leading-relaxed">{{ $policy['reschedule_message'] }}</p>
+                    <p class="text-sm text-[#6E6E73] leading-relaxed">{{ $policy['reschedule_message'] }}</p>
                     
                     @if($policy['reschedule_allowed'])
                         <button type="button" 
                                 @click="openRescheduleModal = true" 
-                                class="btn-primary w-full py-2.5 text-xs font-bold mt-1">
+                                class="btn-secondary w-full py-2.5 text-sm font-bold mt-1">
                             Reschedule Booking Date
                         </button>
                     @endif
                 </div>
 
                 <!-- Cancellation Status -->
-                <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-2">
+                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 shadow-2xs">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Cancel / Refund</span>
-                        <span class="text-xs font-bold px-2 py-0.5 rounded {{ $policy['cancel_allowed'] ? 'bg-[#FEF3C7] text-amber-900 border border-amber-200' : 'bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]' }}">
+                        <span class="text-sm font-bold px-2 py-0.5 rounded {{ $policy['cancel_allowed'] ? 'bg-[#FEF3C7] text-amber-900' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">
                             {{ $policy['cancel_allowed'] ? 'Eligible' : 'Non-Refundable' }}
                         </span>
                     </div>
-                    <p class="text-xs text-[#6E6E73] leading-relaxed">{{ $policy['cancel_message'] }}</p>
+                    <p class="text-sm text-[#6E6E73] leading-relaxed">{{ $policy['cancel_message'] }}</p>
 
                     @if($policy['cancel_allowed'] || $booking->status === 'confirmed')
                         <button type="button" 
                                 @click="openCancelModal = true" 
-                                class="btn-secondary w-full py-2.5 text-xs font-bold mt-1">
+                                class="btn-secondary w-full py-2.5 text-sm font-bold mt-1">
                             Request Cancellation
                         </button>
                     @endif
@@ -303,26 +303,39 @@
 
                 <!-- Marine Safety Advisory Notice -->
                 @if($policy['is_force_majeure'])
-                <div class="p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-sm text-[#991B1B] space-y-1">
-                    <div class="font-bold">
-                        Marine Safety Advisory Active
+                <div class="p-4 rounded-xl bg-sky-50 text-sky-950 space-y-1.5 shadow-2xs">
+                    <div class="font-bold text-sm text-sky-950 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-sky-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        <span>Advisory: Weather Force Majeure Active</span>
                     </div>
-                    <p class="text-xs leading-relaxed">
-                        A storm signal or high risk marine advisory is active for your dive dates. Free reschedules and full refunds are enabled under camp policy.
+                    <p class="text-sm text-sky-900 leading-relaxed">
+                        PAGASA gale warnings or severe sea surges have triggered camp-wide safety protocols. All rescheduling restrictions are waived. Full refunds are eligible upon cancellation.
                     </p>
                 </div>
                 @endif
             </div>
 
             <!-- Coordinator Contact -->
-            <div class="p-5 sm:p-6 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-sm text-[#6E6E73] space-y-2">
+            <div class="p-5 sm:p-6 rounded-xl bg-[#F2F2F7] text-sm text-[#6E6E73] space-y-3 shadow-2xs border border-[#E5E5EA]">
                 <h4 class="font-bold text-[#1D1D1F] text-sm">Need Special Assistance?</h4>
-                <p class="text-xs">For custom requests, contact our coordinators:</p>
-                <div class="pt-1 text-sm font-bold text-[#780000]">
-                    0927 887 9894
-                </div>
-                <div class="text-xs">
-                    <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="underline hover:text-[#780000]">Facebook Messenger</a>
+                <p class="text-sm text-[#6E6E73]">You may contact us through any of our support channels:</p>
+                <div class="space-y-2 text-sm text-[#1D1D1F] pt-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#6E6E73] font-medium w-20">Facebook:</span>
+                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold hover:underline">@Campfreediveph</a>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#6E6E73] font-medium w-20">Instagram:</span>
+                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold hover:underline">@campfreediveph</a>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#6E6E73] font-medium w-20">Email:</span>
+                        <a href="mailto:campfreediveph@gmail.com" class="text-[#780000] font-bold hover:underline break-all">campfreediveph@gmail.com</a>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[#6E6E73] font-medium w-20">Phone:</span>
+                        <a href="tel:+639278879894" class="text-[#780000] font-bold hover:underline">+63 927 887 9894</a>
+                    </div>
                 </div>
             </div>
 
@@ -330,14 +343,14 @@
     </div>
 
     <!-- Reschedule Modal -->
-    <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
                     <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedules</h3>
-                    <p class="text-xs text-[#6E6E73]">Pick a new 2D1N date pair.</p>
+                    <p class="text-sm text-[#6E6E73]">Pick a new 2D1N date pair.</p>
                 </div>
-                <button type="button" @click="openRescheduleModal = false" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
+                <button type="button" @click="openRescheduleModal = false" aria-label="Close reschedule modal" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
             </div>
 
             <form action="{{ route('manage.reschedule', $booking->booking_number) }}" method="POST" class="space-y-4 text-sm">
@@ -367,13 +380,13 @@
                 </div>
 
                 <!-- Weather Forecast Check -->
-                <div x-show="rescheduleForecast" x-cloak class="p-3.5 rounded-xl text-xs space-y-1"
+                <div x-show="rescheduleForecast" x-cloak class="p-3.5 rounded-xl text-sm space-y-1"
                      :style="'background-color: ' + (rescheduleForecast?.bg_color || '#F2F2F7') + '; color: ' + (rescheduleForecast?.text_color || '#1D1D1F')">
                     <div class="font-bold flex items-center justify-between">
                         <span x-text="'Safety: ' + (rescheduleForecast?.title || '')"></span>
                         <span x-text="rescheduleForecast?.is_bookable ? 'Safe' : 'Storm Warning'"></span>
                     </div>
-                    <p class="text-xs" x-text="rescheduleForecast?.description"></p>
+                    <p class="text-sm" x-text="rescheduleForecast?.description"></p>
                 </div>
 
                 <div>
@@ -381,7 +394,7 @@
                     <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <div class="p-3.5 bg-[#FFFBEB] rounded-xl text-xs text-[#92400E] border border-[#FDE68A]">
+                <div class="p-3.5 bg-[#FFFBEB] rounded-xl text-sm text-[#92400E] border border-[#FDE68A]">
                     <strong>Note:</strong> On submission, your request status is set to <strong>Pending Approval</strong>. The camp will review coach availability and notify you via email.
                 </div>
 
@@ -398,14 +411,14 @@
     </div>
 
     <!-- Cancellation Modal -->
-    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
                     <h3 class="text-lg font-bold text-[#1D1D1F]">Request Booking Cancellation</h3>
-                    <p class="text-xs text-[#6E6E73]">Review your refund calculation according to camp policy.</p>
+                    <p class="text-sm text-[#6E6E73]">Review your refund calculation according to camp policy.</p>
                 </div>
-                <button type="button" @click="openCancelModal = false" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
+                <button type="button" @click="openCancelModal = false" aria-label="Close cancellation modal" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
             </div>
 
             <form action="{{ route('manage.cancel', $booking->booking_number) }}" method="POST" class="space-y-4 text-sm">
@@ -413,7 +426,7 @@
                 <input type="hidden" name="pin" value="{{ $booking->pin }}">
 
                 <!-- Refund Calculation Breakdown -->
-                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
+                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 text-sm shadow-2xs">
                     <div class="flex justify-between">
                         <span class="text-[#6E6E73]">Downpayment Paid:</span>
                         <span class="font-bold text-[#1D1D1F]">₱{{ number_format($booking->downpayment_amount, 2) }}</span>
@@ -426,11 +439,11 @@
                         <span class="font-bold text-[#1D1D1F]">Calculated Refund Amount:</span>
                         <span class="font-extrabold text-[#780000]">₱{{ number_format($policy['calculated_refund'], 2) }}</span>
                     </div>
-                    <p class="text-xs text-[#6E6E73] mt-1">{{ $policy['cancel_message'] }}</p>
+                    <p class="text-sm text-[#6E6E73] mt-1">{{ $policy['cancel_message'] }}</p>
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">Reason for Cancellation</label>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-1.5">Reason for Cancellation</label>
                     <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
@@ -438,7 +451,7 @@
                 <div class="pt-1">
                     <label class="flex items-start gap-2.5 cursor-pointer">
                         <input type="checkbox" name="confirm_cancel_ack" required class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5">
-                        <span class="text-xs text-[#1D1D1F]">
+                        <span class="text-sm text-[#1D1D1F]">
                             I confirm that I want to cancel this booking and understand the refund amount will be reviewed by the camp.
                         </span>
                     </label>
@@ -446,7 +459,7 @@
 
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary px-4 py-2 text-sm">Keep My Booking</button>
-                    <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold shadow-2xs">
+                    <button type="submit" class="btn-danger px-5 py-2 text-sm font-bold">
                         Confirm Cancellation Request
                     </button>
                 </div>

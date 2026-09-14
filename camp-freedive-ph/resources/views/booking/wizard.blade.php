@@ -23,11 +23,12 @@
             <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain bg-white">
             <div>
                 <span class="font-extrabold text-base sm:text-lg tracking-tight text-[#1D1D1F] block leading-none">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>
+                <span class="text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>
             </div>
         </a>
-        <a href="{{ route('landing') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] flex items-center gap-1.5 transition-colors">
-            <span>← Exit to Home</span>
+        <a href="{{ route('landing') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] flex items-center gap-1.5 transition-colors">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Exit to Home</span>
         </a>
     </div>
 
@@ -38,9 +39,9 @@
                 <h1 class="text-xl sm:text-3xl font-extrabold text-[#1D1D1F]" x-text="stepTitles[currentStep - 1]"></h1>
             </div>
             <div class="text-right shrink-0">
-                <span class="text-xs sm:text-sm text-[#6E6E73] font-semibold">Step</span>
+                <span class="text-sm text-[#6E6E73] font-semibold">Step</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000]">
-                    <span x-text="currentStep"></span> <span class="text-xs sm:text-sm text-[#8E8E93] font-normal">/ 5</span>
+                    <span x-text="currentStep"></span> <span class="text-sm text-[#8E8E93] font-normal">/ 5</span>
                 </div>
             </div>
         </div>
@@ -57,19 +58,19 @@
         <div class="flex items-center gap-2">
             <span x-text="errorMessage"></span>
         </div>
-        <button @click="errorMessage = ''" class="text-[#991B1B] font-bold text-sm">✕</button>
+        <button @click="errorMessage = ''" aria-label="Dismiss error message" class="text-[#991B1B] font-bold text-sm">✕</button>
     </div>
 
     <!-- Draft Restored Notification Banner -->
-    <div x-show="draftRestored" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#F0FDF4] text-[#166534] text-xs sm:text-sm flex items-center justify-between gap-3 shadow-2xs">
+    <div x-show="draftRestored" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#F0FDF4] text-[#166534] text-sm flex items-center justify-between gap-3 shadow-2xs">
         <div class="flex items-center gap-2">
             <span>Your saved booking progress has been automatically restored.</span>
         </div>
         <div class="flex items-center gap-3 shrink-0">
-            <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-xs">
+            <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-sm">
                 Clear
             </button>
-            <button type="button" @click="draftRestored = false" class="text-[#166534] font-bold text-sm">✕</button>
+            <button type="button" @click="draftRestored = false" aria-label="Dismiss restored draft notification" class="text-[#166534] font-bold text-sm">✕</button>
         </div>
     </div>
 
@@ -80,70 +81,88 @@
         <div x-show="currentStep === 1" x-cloak class="space-y-6">
             <div class="border-b border-[#E5E5EA] pb-4">
                 <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Freediving Class</h2>
-                <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select the course or dive experience you want to join. Beginners and non-swimmers are welcome!</p>
+                <p class="text-sm text-[#6E6E73] mt-1">Select the course or dive experience you want to join. Beginners and non-swimmers are welcome!</p>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:gap-6">
+            <div class="grid grid-cols-1 gap-4 sm:gap-6" role="radiogroup" aria-label="Freediving Class Packages">
                 <!-- Discovery Package Option -->
                 <div @click="form.class_type = 'discovery'" 
-                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                     :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#F8EAEA]/30' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
+                     @keydown.enter.prevent="form.class_type = 'discovery'"
+                     @keydown.space.prevent="form.class_type = 'discovery'"
+                     tabindex="0"
+                     role="radio"
+                     :aria-checked="form.class_type === 'discovery'"
+                     aria-label="Discovery beginner class, 4,250 php per person"
+                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                     :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#F8EAEA]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                     <div class="flex items-start gap-3 sm:gap-4">
                         <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
                              :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
                             <span x-show="form.class_type === 'discovery'" class="w-2 h-2 rounded-full bg-white"></span>
                         </div>
                         <div>
-                            <div class="inline-block px-2 py-0.5 rounded text-xs font-bold uppercase bg-[#780000] text-white mb-1">BEGINNER CLASS</div>
                             <h3 class="text-lg sm:text-xl font-bold text-[#1D1D1F]">Discovery</h3>
-                            <p class="text-sm text-[#6E6E73] mt-1">Open to solo joiners and non-swimmers. Includes theory, pool session, and 2 open water dive sessions.</p>
+                            <span class="font-bold text-[#780000] block text-xs uppercase tracking-wider mt-0.5 mb-1">Beginner Class</span>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">Open to solo joiners and non-swimmers. Includes theory, pool session, and 2 open water dive sessions.</p>
                         </div>
                     </div>
                     <div class="text-left sm:text-right shrink-0 pl-8 sm:pl-0">
                         <span class="text-xl sm:text-2xl font-extrabold text-[#780000]">4,250 php</span>
-                        <span class="text-xs sm:text-sm text-[#6E6E73] block">/ person</span>
+                        <span class="text-sm sm:text-sm text-[#6E6E73] block">/ person</span>
                     </div>
                 </div>
 
                 <!-- Fun Dive Package Option -->
                 <div @click="form.class_type = 'fundive'" 
-                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                     :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#F8EAEA]/30' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
+                     @keydown.enter.prevent="form.class_type = 'fundive'"
+                     @keydown.space.prevent="form.class_type = 'fundive'"
+                     tabindex="0"
+                     role="radio"
+                     :aria-checked="form.class_type === 'fundive'"
+                     aria-label="Fundive class, prerequisite discovery class"
+                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                     :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#F8EAEA]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                     <div class="flex items-start gap-3 sm:gap-4">
                         <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
                              :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
                             <span x-show="form.class_type === 'fundive'" class="w-2 h-2 rounded-full bg-white"></span>
                         </div>
                         <div>
-                            <div class="inline-block px-2 py-0.5 rounded text-xs font-bold uppercase bg-[#00C3D0] text-[#004D54] mb-1">PREREQUISITE: DISCOVERY CLASS</div>
                             <h3 class="text-lg sm:text-xl font-bold text-[#1D1D1F]">Fundive</h3>
-                            <p class="text-sm text-[#6E6E73] mt-1">2 open water dives, pool session, 2D1N accommodation, safety coach fee, photos and videos.</p>
+                            <span class="font-bold text-[#00838F] block text-xs uppercase tracking-wider mt-0.5 mb-1">Prerequisite: Discovery Class</span>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">2 open water dives, pool session, 2D1N accommodation, safety coach fee, photos and videos.</p>
                         </div>
                     </div>
                     <div class="text-left sm:text-right shrink-0 pl-8 sm:pl-0">
                         <span class="text-xl sm:text-2xl font-extrabold text-[#780000]" x-text="form.is_certified_diver ? '2,500 php' : '3,300 php'"></span>
-                        <span class="text-xs sm:text-sm text-[#6E6E73] block" x-text="form.is_certified_diver ? 'Certified Diver' : 'Non-Certified Diver'"></span>
+                        <span class="text-sm sm:text-sm text-[#6E6E73] block" x-text="form.is_certified_diver ? 'Certified Diver' : 'Non-Certified Diver'"></span>
                     </div>
                 </div>
 
                 <!-- Skill Refinement Package Option -->
                 <div @click="form.class_type = 'refinement'" 
-                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                     :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#F8EAEA]/30' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
+                     @keydown.enter.prevent="form.class_type = 'refinement'"
+                     @keydown.space.prevent="form.class_type = 'refinement'"
+                     tabindex="0"
+                     role="radio"
+                     :aria-checked="form.class_type === 'refinement'"
+                     aria-label="Skill refinement practice dive, 4,100 php per person"
+                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                     :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#F8EAEA]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                     <div class="flex items-start gap-3 sm:gap-4">
                         <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
                              :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
                             <span x-show="form.class_type === 'refinement'" class="w-2 h-2 rounded-full bg-white"></span>
                         </div>
                         <div>
-                            <div class="inline-block px-2 py-0.5 rounded text-xs font-bold uppercase bg-[#2C2C2E] text-white mb-1">PRACTICE DIVE</div>
                             <h3 class="text-lg sm:text-xl font-bold text-[#1D1D1F]">Refinement</h3>
-                            <p class="text-sm text-[#6E6E73] mt-1">Practice dive with 2 open water sessions, pool access, coach fee, 3 meals, and photo/video coverage.</p>
+                            <span class="font-bold text-[#2C2C2E] block text-xs uppercase tracking-wider mt-0.5 mb-1">Practice Dive</span>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">Practice dive with 2 open water sessions, pool access, coach fee, 3 meals, and photo/video coverage.</p>
                         </div>
                     </div>
                     <div class="text-left sm:text-right shrink-0 pl-8 sm:pl-0">
                         <span class="text-xl sm:text-2xl font-extrabold text-[#780000]">4,100 php</span>
-                        <span class="text-xs sm:text-sm text-[#6E6E73] block">/ person</span>
+                        <span class="text-sm sm:text-sm text-[#6E6E73] block">/ person</span>
                     </div>
                 </div>
             </div>
@@ -185,23 +204,23 @@
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Dive Dates</h2>
-                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">Select your preferred 2D1N trip start date on the calendar. All freediving camps run for 2 consecutive days.</p>
+                        <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">Select your preferred 2D1N trip start date on the calendar. All freediving camps run for 2 consecutive days.</p>
                     </div>
 
                     <!-- Information Icon with Hover Notice -->
                     <div class="relative group inline-flex items-center self-start sm:self-center">
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-xs font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
+                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-sm font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
                             <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain" alt="About Forecast">
                             <span>About Forecast</span>
                         </div>
 
                         <!-- Interactive Date Help Tooltip -->
-                        <div class="absolute right-0 sm:right-auto sm:left-0 top-full mt-2 w-80 p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
+                        <div class="absolute right-0 sm:right-auto sm:left-0 top-full mt-2 w-80 p-3.5 bg-[#1D1D1F] text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
                             <div class="font-bold flex items-center gap-1.5 text-[#00C3D0]">
                                 <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-3.5 h-3.5 shrink-0 object-contain brightness-0 invert" alt="Weather Note">
                                 <span>Weather & Sea Conditions Note</span>
                             </div>
-                            <p class="text-[11px] text-gray-200">
+                            <p class="text-sm text-gray-200">
                                 Safety ratings shown are automated predictions based on coastal forecast models. Actual water conditions can change naturally, and our safety team continuously checks the water before every dive.
                             </p>
                         </div>
@@ -222,18 +241,18 @@
                             <!-- Depart (Day 1) -->
                             <div class="pr-3 sm:pr-4">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#6E6E73]">Depart</span>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#F8EAEA] text-[#780000]">Day 1</span>
+                                    <span class="text-sm font-extrabold uppercase tracking-wider text-[#6E6E73]">Depart</span>
+                                    <span class="text-sm font-bold px-2 py-0.5 rounded bg-[#F8EAEA] text-[#780000]">Day 1</span>
                                 </div>
                                 <div class="mt-1.5">
                                     <template x-if="form.start_date">
                                         <div>
                                             <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.start_date)"></div>
-                                            <div class="text-xs font-semibold text-[#780000] mt-0.5" x-text="formatDateDayOfWeek(form.start_date)"></div>
+                                            <div class="text-sm font-semibold text-[#780000] mt-0.5" x-text="formatDateDayOfWeek(form.start_date)"></div>
                                         </div>
                                     </template>
                                     <template x-if="!form.start_date">
-                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                        <div class="text-sm sm:text-sm font-medium text-[#8E8E93] italic py-1">
                                             Select start date below
                                         </div>
                                     </template>
@@ -243,18 +262,18 @@
                             <!-- Return (Day 2) -->
                             <div class="pl-3 sm:pl-4">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-[11px] font-extrabold uppercase tracking-wider text-[#6E6E73]">Return</span>
-                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#00C3D0]">Day 2</span>
+                                    <span class="text-sm font-extrabold uppercase tracking-wider text-[#6E6E73]">Return</span>
+                                    <span class="text-sm font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#00C3D0]">Day 2</span>
                                 </div>
                                 <div class="mt-1.5">
                                     <template x-if="form.end_date">
                                         <div>
                                             <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.end_date)"></div>
-                                            <div class="text-xs font-semibold text-[#00C3D0] mt-0.5" x-text="formatDateDayOfWeek(form.end_date)"></div>
+                                            <div class="text-sm font-semibold text-[#00C3D0] mt-0.5" x-text="formatDateDayOfWeek(form.end_date)"></div>
                                         </div>
                                     </template>
                                     <template x-if="!form.end_date">
-                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                        <div class="text-sm sm:text-sm font-medium text-[#8E8E93] italic py-1">
                                             Next day return
                                         </div>
                                     </template>
@@ -278,7 +297,8 @@
                                             @click="prevMonth()" 
                                             :disabled="!canGoPrev()"
                                             class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] disabled:opacity-20 disabled:cursor-not-allowed transition-all text-[#1D1D1F] shrink-0"
-                                            title="Previous Month">
+                                            title="Previous Month"
+                                            aria-label="Previous Month">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
                                     </button>
 
@@ -291,13 +311,14 @@
                                     <button type="button" 
                                             @click="nextMonth()" 
                                             class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] md:hidden shrink-0"
-                                            title="Next Month">
+                                            title="Next Month"
+                                            aria-label="Next Month">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
                                     </button>
                                 </div>
                                 
                                 <!-- Weekday Headers -->
-                                <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#6E6E73] py-1">
+                                <div class="grid grid-cols-7 text-center text-sm font-semibold text-[#6E6E73] py-1">
                                     <span class="text-[#780000] font-bold">Sun</span>
                                     <span>Mon</span>
                                     <span>Tue</span>
@@ -308,7 +329,7 @@
                                 </div>
 
                                 <!-- Month Calendar Days -->
-                                <div class="grid grid-cols-7 gap-y-2 text-center text-xs sm:text-sm">
+                                <div class="grid grid-cols-7 gap-y-2 text-center text-sm sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month1Year, month1Month)" :key="'m1-' + idx">
                                         <div class="h-9 flex items-center justify-center relative">
                                             <template x-if="dObj.isBlank">
@@ -318,7 +339,9 @@
                                                 <button type="button"
                                                         @click="!dObj.isDisabled && selectDate(dObj.dateStr)"
                                                         :disabled="dObj.isDisabled"
-                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
+                                                        :aria-label="dObj.dateStr + (dObj.isDisabled ? ' (Unavailable)' : '')"
+                                                        :aria-pressed="dObj.dateStr === form.start_date"
+                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-sm sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
@@ -347,13 +370,14 @@
                                     <button type="button" 
                                             @click="nextMonth()" 
                                             class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] hidden md:flex shrink-0"
-                                            title="Next Month">
+                                            title="Next Month"
+                                            aria-label="Next Month">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
                                     </button>
                                 </div>
                                 
                                 <!-- Weekday Headers -->
-                                <div class="grid grid-cols-7 text-center text-xs font-semibold text-[#6E6E73] py-1">
+                                <div class="grid grid-cols-7 text-center text-sm font-semibold text-[#6E6E73] py-1">
                                     <span class="text-[#780000] font-bold">Sun</span>
                                     <span>Mon</span>
                                     <span>Tue</span>
@@ -364,7 +388,7 @@
                                 </div>
 
                                 <!-- Month Calendar Days -->
-                                <div class="grid grid-cols-7 gap-y-2 text-center text-xs sm:text-sm">
+                                <div class="grid grid-cols-7 gap-y-2 text-center text-sm sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month2Year, month2Month)" :key="'m2-' + idx">
                                         <div class="h-9 flex items-center justify-center relative">
                                             <template x-if="dObj.isBlank">
@@ -374,7 +398,9 @@
                                                 <button type="button"
                                                         @click="!dObj.isDisabled && selectDate(dObj.dateStr)"
                                                         :disabled="dObj.isDisabled"
-                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10"
+                                                        :aria-label="dObj.dateStr + (dObj.isDisabled ? ' (Unavailable)' : '')"
+                                                        :aria-pressed="dObj.dateStr === form.start_date"
+                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-sm sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
@@ -407,7 +433,7 @@
                             </div>
                             
                             <template x-if="weatherLoading">
-                                <span class="text-xs text-[#00C3D0] font-bold flex items-center gap-1">
+                                <span class="text-sm text-[#00C3D0] font-bold flex items-center gap-1">
                                     <svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                                     Checking...
                                 </span>
@@ -417,7 +443,7 @@
                         <!-- Forecast Loading State -->
                         <div x-show="weatherLoading" x-cloak class="space-y-4 py-2">
                             <div class="space-y-2">
-                                <div class="flex items-center justify-between text-xs">
+                                <div class="flex items-center justify-between text-sm">
                                     <span class="font-semibold text-[#1D1D1F]">Checking weather & marine conditions...</span>
                                     <span class="font-mono font-bold text-[#00C3D0]" x-text="weatherProgress + '%'"></span>
                                 </div>
@@ -429,18 +455,18 @@
 
                             <!-- Weather Assessment Loading State -->
                             <div class="space-y-2.5 pt-1 animate-pulse">
-                                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2">
+                                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2">
                                     <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
-                                    <div class="h-3 w-40 bg-[#F2F2F7] rounded"></div>
+                                    <div class="h-3 w-40 bg-[#E5E5EA] rounded"></div>
                                 </div>
-                                <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2">
+                                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2">
                                     <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
-                                    <div class="h-3 w-40 bg-[#F2F2F7] rounded"></div>
+                                    <div class="h-3 w-40 bg-[#E5E5EA] rounded"></div>
                                 </div>
                             </div>
 
                             <!-- Rotating Tip -->
-                            <div class="p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] flex items-center gap-2.5 text-xs text-[#6E6E73]">
+                            <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center gap-2.5 text-sm text-[#6E6E73]">
                                 <div class="flex-1 min-w-0">
                                     <span class="font-bold text-[#1D1D1F]" x-text="currentTip.title + ': '"></span>
                                     <span x-text="currentTip.text"></span>
@@ -456,19 +482,19 @@
                                      :style="'background-color: ' + forecast.bg_color + '; border-color: ' + forecast.border_color + '; color: ' + forecast.text_color">
                                     <div class="flex items-center justify-between gap-2">
                                         <h4 class="font-extrabold text-sm sm:text-base" x-text="forecast.title"></h4>
-                                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-white/60" x-text="forecast.classification"></span>
+                                        <span class="text-sm font-black uppercase px-2 py-0.5 rounded-full bg-white text-black border border-black/10" x-text="forecast.classification"></span>
                                     </div>
-                                    <p class="text-xs leading-relaxed opacity-90" x-text="forecast.description"></p>
+                                    <p class="text-sm leading-relaxed opacity-90" x-text="forecast.description"></p>
                                 </div>
 
                                 <!-- Day 1 & Day 2 Breakdown -->
                                 <template x-if="forecast.day1 && forecast.day2">
                                     <div class="space-y-2.5">
                                         <!-- Day 1 -->
-                                        <div class="p-3 rounded-xl space-y-1 text-xs">
+                                        <div class="p-3 rounded-xl space-y-1 text-sm">
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#780000] text-xs uppercase tracking-wider">Day 1</span>
-                                                <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"
+                                                <span class="font-extrabold text-[#780000] text-sm uppercase tracking-wider">Day 1</span>
+                                                <span class="font-bold px-2 py-0.5 rounded-full text-sm"
                                                       :class="{
                                                           'bg-emerald-100 text-emerald-800': forecast.day1.classification === 'Very Safe' || forecast.day1.classification === 'Safe',
                                                           'bg-amber-100 text-amber-800': forecast.day1.classification === 'Moderate',
@@ -477,18 +503,18 @@
                                                       }"
                                                       x-text="forecast.day1.classification"></span>
                                             </div>
-                                            <div class="text-[#6E6E73] text-[11px] flex items-center justify-between">
+                                            <div class="text-[#6E6E73] text-sm flex items-center justify-between">
                                                 <span class="font-bold text-[#1D1D1F]" x-text="forecast.day1.date"></span>
                                                 <span>Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day1.worst_hour"></strong></span>
                                             </div>
-                                            <p class="text-[11px] text-[#6E6E73] pt-0.5" x-text="forecast.day1.recommended_action"></p>
+                                            <p class="text-sm text-[#6E6E73] pt-0.5" x-text="forecast.day1.recommended_action"></p>
                                         </div>
 
                                         <!-- Day 2 -->
-                                        <div class="p-3 rounded-xl space-y-1 text-xs">
+                                        <div class="p-3 rounded-xl space-y-1 text-sm">
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#00C3D0] text-xs uppercase tracking-wider">Day 2</span>
-                                                <span class="font-bold px-2 py-0.5 rounded-full text-[10px]"
+                                                <span class="font-extrabold text-[#00C3D0] text-sm uppercase tracking-wider">Day 2</span>
+                                                <span class="font-bold px-2 py-0.5 rounded-full text-sm"
                                                       :class="{
                                                           'bg-emerald-100 text-emerald-800': forecast.day2.classification === 'Very Safe' || forecast.day2.classification === 'Safe',
                                                           'bg-amber-100 text-amber-800': forecast.day2.classification === 'Moderate',
@@ -497,11 +523,11 @@
                                                       }"
                                                       x-text="forecast.day2.classification"></span>
                                             </div>
-                                            <div class="text-[#6E6E73] text-[11px] flex items-center justify-between">
+                                            <div class="text-[#6E6E73] text-sm flex items-center justify-between">
                                                 <span class="font-bold text-[#1D1D1F]" x-text="forecast.day2.date"></span>
                                                 <span>Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day2.worst_hour"></strong></span>
                                             </div>
-                                            <p class="text-[11px] text-[#6E6E73] pt-0.5" x-text="forecast.day2.recommended_action"></p>
+                                            <p class="text-sm text-[#6E6E73] pt-0.5" x-text="forecast.day2.recommended_action"></p>
                                         </div>
                                     </div>
                                 </template>
@@ -530,21 +556,21 @@
                             <h4 class="text-lg font-bold text-[#1D1D1F]">1. Participants</h4>
                             <button type="button" 
                                     @click="addParticipant()" 
-                                    class="px-3.5 py-1.5 rounded-xl border border-[#780000] text-[#780000] font-bold text-xs bg-[#F8EAEA]/30 hover:bg-[#F8EAEA] transition-colors flex items-center gap-1.5 shadow-2xs">
-                                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                    class="px-3.5 py-1.5 rounded-xl border border-[#780000] text-[#780000] font-bold text-sm bg-[#F8EAEA]/30 hover:bg-[#F8EAEA] transition-colors flex items-center gap-1.5 shadow-2xs">
+                                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                                 <span>Add Participant</span>
                             </button>
                         </div>
                         
                         <div class="space-y-4">
                             <template x-for="(participant, index) in form.participants" :key="index">
-                                <div class="p-4 sm:p-5 rounded-xl bg-[#FAFAFC] relative space-y-4 shadow-2xs">
+                                <div class="p-4 sm:p-5 rounded-xl bg-[#F2F2F7] relative space-y-4 shadow-2xs">
                                     <div class="flex items-center justify-between">
                                         <span class="font-bold text-[#780000] text-sm" x-text="'Participant #' + (index + 1)"></span>
                                         <button type="button" 
                                                 x-show="form.participants.length > 1" 
                                                 @click="removeParticipant(index)"
-                                                class="text-xs font-semibold text-[#FF3B3C] hover:underline cursor-pointer">
+                                                class="text-sm font-semibold text-[#FF3B3C] hover:underline cursor-pointer">
                                             Remove
                                         </button>
                                     </div>
@@ -552,27 +578,27 @@
                                     <!-- Participant Name -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First Name <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
                                                    x-model="participant.first_name" 
                                                    @input="participant.first_name = participant.first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = (participant.first_name + ' ' + (participant.last_name || '')).trim()"
                                                    placeholder="e.g. Maria" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateName(participant.first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.first_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                            <span x-show="touchedStep3 && !validateName(participant.first_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                                 Please enter a valid first name (letters only, min 2 chars).
                                             </span>
                                         </div>
 
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Last Name <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Last Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
                                                    x-model="participant.last_name" 
                                                    @input="participant.last_name = participant.last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = ((participant.first_name || '') + ' ' + participant.last_name).trim()"
                                                    placeholder="e.g. Santos" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateName(participant.last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.last_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                            <span x-show="touchedStep3 && !validateName(participant.last_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                                 Please enter a valid last name (letters only, min 2 chars).
                                             </span>
                                         </div>
@@ -581,7 +607,7 @@
                                     <!-- Age & Swimming Ability -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Age (8–85 yrs) <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age (8-85 yrs) <span class="text-[#780000]">*</span></label>
                                             <input type="number" 
                                                    x-model="participant.age" 
                                                    min="8" 
@@ -591,13 +617,13 @@
                                                    placeholder="e.g. 24" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateAge(participant.age) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateAge(participant.age)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                            <span x-show="touchedStep3 && !validateAge(participant.age)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                                 Age must be between 8 and 85 years old.
                                             </span>
                                         </div>
 
                                         <div x-show="form.class_type === 'discovery'">
-                                            <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Swimming Ability</label>
+                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Ability</label>
                                             <select x-model="participant.swimmer_status" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                                                 <option value="non_swimmer">Non-Swimmer</option>
                                                 <option value="casual_swimmer">Casual / Beginner Swimmer</option>
@@ -607,7 +633,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                                        <label class="block font-bold text-[#1D1D1F] text-sm mb-2">
                                             Health Condition / Medical Notes
                                         </label>
                                         <input type="text" 
@@ -626,45 +652,45 @@
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Lead First Name <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Lead First Name <span class="text-[#780000]">*</span></label>
                                 <input type="text" 
                                        x-model="form.contact_first_name" 
                                        @input="form.contact_first_name = form.contact_first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = (form.contact_first_name + ' ' + (form.contact_last_name || '')).trim()"
                                        placeholder="Juan" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                     Please enter a valid first name (min 2 chars).
                                 </span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Lead Last Name <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Lead Last Name <span class="text-[#780000]">*</span></label>
                                 <input type="text" 
                                        x-model="form.contact_last_name" 
                                        @input="form.contact_last_name = form.contact_last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = ((form.contact_first_name || '') + ' ' + form.contact_last_name).trim()"
                                        placeholder="Dela Cruz" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                     Please enter a valid last name (min 2 chars).
                                 </span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Email Address <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Email Address <span class="text-[#780000]">*</span></label>
                                 <input type="email" 
                                        x-model="form.contact_email" 
                                        placeholder="juan@example.com" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validateEmail(form.contact_email) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateEmail(form.contact_email)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validateEmail(form.contact_email)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                     Please enter a valid email address with @ (e.g. name@example.com).
                                 </span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Mobile Number (PH) <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Mobile Number (PH) <span class="text-[#780000]">*</span></label>
                                 <input type="tel" 
                                        x-model="form.contact_phone" 
                                        @input="form.contact_phone = form.contact_phone.replace(/[^0-9+\s-]/g, '')"
@@ -672,13 +698,13 @@
                                        maxlength="16"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validatePhone(form.contact_phone) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                     Valid 11-digit PH mobile number required (e.g. 09171234567 or +639171234567).
                                 </span>
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Facebook Profile Link (Optional)</label>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Facebook Profile Link (Optional)</label>
                                 <input type="text" x-model="form.contact_facebook" placeholder="facebook.com/juandelacruz" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
@@ -689,47 +715,57 @@
                         <h4 class="text-lg font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h4>
                         
                         <div class="space-y-3">
-                            <label class="block font-bold text-[#1D1D1F] text-xs">Transportation Option:</label>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none"
+                            <label class="block font-bold text-[#1D1D1F] text-sm">Transportation Option:</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Transportation Option">
+                                <label tabindex="0"
+                                       role="radio"
+                                       :aria-checked="form.pickup_option === 'carpool'"
+                                       @keydown.enter.prevent="form.pickup_option = 'carpool'"
+                                       @keydown.space.prevent="form.pickup_option = 'carpool'"
+                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                        :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
-                                             <span class="font-extrabold text-xs sm:text-sm text-[#1D1D1F]">Manila Carpool Van</span>
+                                             <span class="font-extrabold text-sm sm:text-sm text-[#1D1D1F]">Manila Carpool Van</span>
                                             <span x-show="form.pickup_option === 'carpool'" class="w-2.5 h-2.5 rounded-full bg-[#780000]"></span>
                                         </div>
-                                        <span class="font-bold text-[#780000] text-xs block">₱1,200 / person</span>
-                                        <span class="text-[11px] text-[#780000] font-semibold block">(DP: ₱3,000 / head)</span>
+                                        <span class="font-bold text-[#780000] text-sm block">₱1,200 / person</span>
+                                        <span class="text-sm text-[#780000] font-semibold block">(DP: ₱3,000 / head)</span>
                                     </div>
                                 </label>
 
-                                <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none"
+                                <label tabindex="0"
+                                       role="radio"
+                                       :aria-checked="form.pickup_option === 'own'"
+                                       @keydown.enter.prevent="form.pickup_option = 'own'"
+                                       @keydown.space.prevent="form.pickup_option = 'own'"
+                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                        :class="form.pickup_option === 'own' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
-                                            <span class="font-extrabold text-xs sm:text-sm text-[#1D1D1F]">Own Vehicle / Commute</span>
+                                            <span class="font-extrabold text-sm sm:text-sm text-[#1D1D1F]">Own Vehicle / Commute</span>
                                             <span x-show="form.pickup_option === 'own'" class="w-2.5 h-2.5 rounded-full bg-[#780000]"></span>
                                         </div>
-                                        <span class="font-bold text-[#1D1D1F] text-xs block">₱0 (Self-arranged)</span>
-                                        <span class="text-[11px] text-[#6E6E73] font-semibold block">(DP: ₱2,000 / head)</span>
+                                        <span class="font-bold text-[#1D1D1F] text-sm block">₱0 (Self-arranged)</span>
+                                        <span class="text-sm text-[#6E6E73] font-semibold block">(DP: ₱2,000 / head)</span>
                                     </div>
                                 </label>
                             </div>
 
                             <!-- Pickup Hub Selection with Times -->
                             <div x-show="form.pickup_option === 'carpool'" x-cloak class="pt-1">
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Carpool Pickup Hub & Schedule: <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Carpool Pickup Hub & Schedule: <span class="text-[#780000]">*</span></label>
                                 <select x-model="form.pickup_location" 
-                                        class="w-full px-3.5 py-2.5 rounded-xl border text-xs text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#780000]"
                                         :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                     <option value="" disabled selected>-- Select Carpool Pickup Hub & Schedule --</option>
                                     <template x-for="p in pickupPoints" :key="p.id">
                                         <option :value="p.name" x-text="p.name"></option>
                                     </template>
                                 </select>
-                                <span x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-[11px] text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
                                     Please select your preferred Carpool Pickup Hub to continue.
                                 </span>
                             </div>
@@ -737,18 +773,23 @@
 
                         <!-- Optional Boat Dive -->
                         <div class="pt-1">
-                            <label class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3"
+                            <label tabindex="0"
+                                   role="checkbox"
+                                   :aria-checked="form.boat_dive"
+                                   @keydown.enter.prevent="form.boat_dive = !form.boat_dive"
+                                   @keydown.space.prevent="form.boat_dive = !form.boat_dive"
+                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0]"
                                    :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white'">
                                 <div class="flex items-start gap-2.5">
                                     <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#00C3D0] focus:ring-[#00C3D0] mt-0.5">
                                     <div>
-                                        <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">Boat Dive (Optional)</span>
-                                        <span class="text-xs text-[#6E6E73] block">Boat ride to deeper marine sanctuaries.</span>
+                                        <span class="font-bold text-sm sm:text-sm text-[#1D1D1F] block">Boat Dive (Optional)</span>
+                                        <span class="text-sm text-[#6E6E73] block">Boat ride to deeper marine sanctuaries.</span>
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <span class="font-extrabold text-[#00C3D0] text-xs sm:text-sm">+₱600</span>
-                                    <span class="text-[10px] text-[#6E6E73] block">/ person</span>
+                                    <span class="font-extrabold text-[#00C3D0] text-sm sm:text-sm">+₱600</span>
+                                    <span class="text-sm text-[#6E6E73] block">/ person</span>
                                 </div>
                             </label>
                         </div>
@@ -757,9 +798,14 @@
                     <!-- Accuracy Verification -->
                     <div class="pt-2">
                         <div class="p-3.5 rounded-xl bg-[#F8EAEA] border border-[#780000]/30">
-                            <label class="flex items-start gap-2.5 cursor-pointer">
+                            <label tabindex="0"
+                                   role="checkbox"
+                                   :aria-checked="form.confirmation_ack"
+                                   @keydown.enter.prevent="form.confirmation_ack = !form.confirmation_ack"
+                                   @keydown.space.prevent="form.confirmation_ack = !form.confirmation_ack"
+                                   class="flex items-start gap-2.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] rounded-lg">
                                 <input type="checkbox" x-model="form.confirmation_ack" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
-                                <span class="font-bold text-[#780000] text-xs leading-relaxed">
+                                <span class="font-bold text-[#780000] text-sm leading-relaxed">
                                     I confirm that all information provided is accurate. <span class="text-red-500">*</span>
                                 </span>
                             </label>
@@ -773,12 +819,12 @@
                     
                     <!-- Itemized Price Calculation Summary -->
                     <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden shadow-2xs">
-                        <div class="bg-[#FAFAFC] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
+                        <div class="bg-[#F2F2F7] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F] text-sm">Booking Summary</span>
-                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize" x-text="form.class_type"></span>
+                            <span class="text-sm font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize" x-text="form.class_type"></span>
                         </div>
 
-                        <div class="p-4 space-y-3 text-xs">
+                        <div class="p-4 space-y-3 text-sm">
                             <div class="flex justify-between items-center text-[#6E6E73]">
                                 <span>Base Class Rate (<span class="capitalize" x-text="form.class_type"></span> × <span x-text="form.participants.length"></span>)</span>
                                 <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber((pricingQuote ? pricingQuote.base_price_per_pax : calculateBasePriceUnit()) * form.participants.length)"></span>
@@ -787,13 +833,12 @@
                             <!-- Dynamic Pricing Adjustments -->
                             <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
                                 <div class="space-y-1.5 py-2 border-y border-dashed border-[#E5E5EA]">
-                                    <div class="text-[10px] uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
+                                    <div class="text-sm uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
                                     <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
-                                        <div class="flex justify-between items-center text-xs">
+                                        <div class="flex justify-between items-center text-sm">
                                             <div class="flex items-center gap-1.5">
-                                                <span class="w-1.5 h-1.5 rounded-full" :class="adj.delta_per_pax >= 0 ? 'bg-rose-500' : 'bg-emerald-500'"></span>
                                                 <span class="text-[#1D1D1F]" x-text="adj.rule_name"></span>
-                                                <span class="text-[10px] px-1.5 py-0.5 rounded font-bold" :class="adj.delta_per_pax >= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" x-text="adj.formatted_adjustment"></span>
+                                                <span class="text-sm px-1.5 py-0.5 rounded font-bold" :class="adj.delta_per_pax >= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" x-text="adj.formatted_adjustment"></span>
                                             </div>
                                             <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
                                         </div>
@@ -829,16 +874,16 @@
                             <!-- Downpayment Box -->
                             <div class="p-3 rounded-xl bg-[#ECFDF5] flex justify-between items-center">
                                 <div>
-                                    <span class="font-extrabold text-[#065F46] block text-xs">Downpayment Due Now</span>
-                                    <span class="text-[10px] text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '3,000' : '2,000') + ' php / head)'"></span>
+                                    <span class="font-extrabold text-[#065F46] block text-sm">Downpayment Due Now</span>
+                                    <span class="text-sm text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '3,000' : '2,000') + ' php / head)'"></span>
                                 </div>
                                 <span class="text-base sm:text-lg font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
                             </div>
 
                             <!-- Balance Box -->
                             <div class="p-2.5 rounded-xl bg-[#FFFBEB] flex justify-between items-center text-[#92400E]">
-                                <span class="font-semibold text-[11px]">Remaining Balance at Camp</span>
-                                <span class="font-bold text-xs" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                                <span class="font-semibold text-sm">Remaining Balance at Camp</span>
+                                <span class="font-bold text-sm" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
                             </div>
                         </div>
                     </div>
@@ -850,122 +895,161 @@
         <!-- Step 4: Downpayment -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
-            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-6 sm:p-8 space-y-6">
+            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-8 space-y-6 shadow-2xs">
                 <!-- Top Navigation & Header -->
                 <div class="flex items-center justify-between border-b border-[#F2F2F7] pb-4">
                     <button type="button" 
                             @click="prevStep()" 
-                            class="text-xs font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors cursor-pointer">
+                            class="text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors cursor-pointer">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Back to Booking Details</span>
                     </button>
                     <div class="text-right">
-                        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-[#FF3B3C] block">Slot Hold Timer:</span>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#FF3B3C] block">Slot Hold Timer</span>
                         <span class="text-sm sm:text-base font-mono font-black text-[#FF3B3C]" x-text="timerDisplay"></span>
                     </div>
                 </div>
 
-                <div class="space-y-1.5">
-                    <p class="text-xs sm:text-sm text-[#6E6E73]">
-                        Pay your required reservation downpayment via PayMongo's secure hosted checkout page. The remaining balance will be settled at camp.
-                    </p>
-                </div>
-
-                <!-- Downpayment Breakdown Box -->
-                <div class="p-4 sm:p-5 rounded-2xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-3">
-                    <div class="flex justify-between items-center text-xs text-[#6E6E73]">
-                        <span>Package: <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type"></strong> (<span x-text="form.participants.length"></span> pax)</span>
-                        <span class="font-bold text-[#1D1D1F]" x-text="'Total: ₱' + formatNumber(calculateTotal())"></span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs text-[#6E6E73]">
-                        <span>Remaining Balance (Payable at Camp):</span>
-                        <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
-                    </div>
-                    <div class="pt-3 border-t border-[#E5E5EA] flex justify-between items-center">
-                        <div>
-                            <span class="font-bold text-[#065F46] text-xs sm:text-sm block">Downpayment Due Now:</span>
-                            <span class="text-[10px] sm:text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
-                        </div>
-                        <strong class="text-xl sm:text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
-                    </div>
-                </div>
-
-                <!-- Supported Hosted Payment Channels -->
+                <!-- 1. Cancellation and Reschedule Policy (First on Step 4) -->
                 <div class="space-y-3">
-                    <label class="block text-xs font-bold text-[#1D1D1F] uppercase tracking-wider">
-                        Supported Payment Channels on Hosted Checkout:
-                    </label>
+                    <div>
+                        <h3 class="text-base font-extrabold text-[#1D1D1F]">
+                            Cancellation & Reschedule Policy
+                        </h3>
+                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
+                            Please review our reservation policies before completing your downpayment.
+                        </p>
+                    </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        <!-- QR Ph -->
-                        <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
-                            <div>
-                                <span class="font-bold text-xs text-[#1D1D1F] block">QR Ph</span>
-                                <span class="text-[10px] text-[#6E6E73] block">Any PH Bank / App</span>
+                    <div class="space-y-2.5 text-sm text-[#6E6E73]">
+                        <!-- Tier 1: > 14 Days -->
+                        <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-1">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given > 14 Days</strong>
+                                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
+                                    100% Refund or 1 Free Reschedule
+                                </span>
                             </div>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                                Eligible for full downpayment refund or one free date transfer to any future open schedule.
+                            </p>
                         </div>
 
-                        <!-- GCash -->
-                        <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
-                            <div>
-                                <span class="font-bold text-xs text-[#1D1D1F] block">GCash</span>
-                                <span class="text-[10px] text-[#6E6E73] block">Direct E-Wallet</span>
+                        <!-- Tier 2: 7 to 14 Days -->
+                        <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-1">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given 7 to 14 Days</strong>
+                                <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
+                                    1 Free Date Reschedule
+                                </span>
                             </div>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                                Free date reschedule to another available schedule. Downpayment is non-refundable.
+                            </p>
                         </div>
 
-                        <!-- Maya -->
-                        <div class="p-3 rounded-xl border border-[#E5E5EA] bg-white flex items-center gap-2.5">
-                            <div>
-                                <span class="font-bold text-xs text-[#1D1D1F] block">Maya</span>
-                                <span class="text-[10px] text-[#6E6E73] block">Direct E-Wallet</span>
+                        <!-- Tier 3: < 7 Days (Locked) -->
+                        <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-1">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days (Locked Window)</strong>
+                                <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">
+                                    Non-Refundable
+                                </span>
                             </div>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                                Slots and resort/boat allocations are finalized. Cannot be refunded or rescheduled.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Downpayment Breakdown & Summary Card -->
+                <div class="space-y-3 pt-2 border-t border-[#F2F2F7]">
+                    <div>
+                        <h3 class="text-base font-extrabold text-[#1D1D1F]">
+                            Reservation Breakdown
+                        </h3>
+                    </div>
+
+                    <div class="p-4 sm:p-5 rounded-2xl space-y-3">
+                        <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                            <span>Package</span>
+                            <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type + ' (' + form.participants.length + ' pax)'"></strong>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-[#6E6E73]" x-show="form.start_date && form.end_date">
+                            <span>Dive Dates</span>
+                            <span class="font-medium text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                            <span>Total Trip Cost</span>
+                            <strong class="text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal())"></strong>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                            <span>Remaining Balance (at Camp)</span>
+                            <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                        </div>
+
+                        <!-- Downpayment Highlight -->
+                        <div class="pt-3 border-t border-[#E5E5EA] flex justify-between items-center">
+                            <div>
+                                <span class="font-bold text-[#065F46] text-sm block">Downpayment Due Now:</span>
+                                <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
+                            </div>
+                            <strong class="text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Supported Hosted Payment Channels -->
+                <div class="space-y-2.5 pt-2 border-t border-[#F2F2F7]">
+                    <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">
+                        Accepted on PayMongo Hosted Checkout:
+                    </span>
+
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5">
+                            <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">QR Ph</span>
+                            <span class="text-xs text-[#8E8E93] block">All PH Banks</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5">
+                            <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">GCash</span>
+                            <span class="text-xs text-[#8E8E93] block">E-Wallet</span>
+                        </div>
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5">
+                            <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">Maya & Cards</span>
+                            <span class="text-xs text-[#8E8E93] block">Visa / Master</span>
                         </div>
                     </div>
 
-                    <p class="text-[11px] text-[#6E6E73] text-center">
-                        Cards (Visa/Mastercard), GrabPay, and all Philippine banks (via QR Ph) are supported on the PayMongo checkout page.
+                    <p class="text-xs text-[#6E6E73] text-center pt-1">
+                        You will be redirected to PayMongo's secure hosted checkout page to complete your payment.
                     </p>
                 </div>
 
-                <!-- Cancellation and Reschedule Policy -->
-                <div class="p-4 sm:p-5 rounded-2xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2.5">
-                    <h4 class="font-bold text-[#780000] text-xs">
-                        Cancellation & Reschedule Policy
-                    </h4>
-                    <div class="space-y-2 text-[11px] text-[#6E6E73]">
-                        <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                            <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
-                                <span>Notice Given More than 2 Weeks (> 14 Days)</span>
-                            </div>
-                            <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
-                                Eligible for 100% full downpayment refund or 1 free date reschedule to any future open schedule.
-                            </p>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                            <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
-                                <span>Notice Given 7 to 14 Days Before Trip</span>
-                            </div>
-                            <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
-                                Free date reschedule allowed to another available schedule. Downpayment is non-refundable.
-                            </p>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-white space-y-0.5 border border-[#E5E5EA]">
-                            <div class="flex items-center gap-1.5 font-bold text-[#1D1D1F] text-xs">
-                                <span>Notice Given Less than 7 Days (Locked Window)</span>
-                            </div>
-                            <p class="text-[11px] text-[#4A4A4F] leading-normal pl-4">
-                                Slot is strictly locked with resort/boat allocations. Non-refundable and cannot be rescheduled.
-                            </p>
-                        </div>
+                <!-- 4. Explicit Consent & Hosted Checkout Action Button -->
+                <div class="space-y-4 pt-2">
+                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] border transition-all"
+                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#E5E5EA]'">
+                        <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                            <input type="checkbox" 
+                                   x-model="form.hasAgreedToTerms" 
+                                   class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
+                            <span class="text-xs sm:text-sm text-[#1D1D1F] leading-relaxed">
+                                I have read and agree to the 
+                                <a href="{{ route('legal.terms') }}" target="_blank" class="text-[#780000] font-bold underline hover:text-[#500000]">Terms &amp; Conditions</a>, 
+                                <a href="{{ route('legal.privacy') }}" target="_blank" class="text-[#780000] font-bold underline hover:text-[#500000]">Privacy Policy</a>, 
+                                and 14-Day Cancellation Policy. <span class="text-[#780000]">*</span>
+                            </span>
+                        </label>
+                        <span x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#FF3B3C] font-semibold mt-1.5 block">
+                            Please check the box above to accept the terms before proceeding to payment.
+                        </span>
                     </div>
-                </div>
 
-                <!-- Hosted Checkout Action Button -->
-                <div class="space-y-3 pt-2">
                     <button type="button" 
-                            @click="processPayment(false, true)" 
-                            :disabled="submittingPayment"
-                            class="w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-[#780000] hover:bg-[#5E0000] active:scale-[0.99] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50">
+                            @click="if (!form.hasAgreedToTerms) { touchedStep4 = true; errorMessage = 'Please read and agree to the Terms & Conditions and Privacy Policy to proceed.'; window.scrollTo({ top: 0, behavior: 'smooth' }); return; } processPayment(false, true)" 
+                            :disabled="submittingPayment || !form.hasAgreedToTerms"
+                            class="btn-primary w-full py-3.5 px-6 text-base font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                         <span x-show="!submittingPayment" class="flex items-center gap-2">
                             <span>Proceed to PayMongo Hosted Checkout</span>
                         </span>
@@ -987,15 +1071,15 @@
 
         <!-- Step 5: Confirmation & Credentials -->
         <div x-show="currentStep === 5" x-cloak class="space-y-6 text-center">
-            <div class="w-16 h-16 bg-[#ECFDF5] text-[#34C759] rounded-full flex items-center justify-center mx-auto text-3xl font-extrabold border border-[#A7F3D0]">
-                ✓
+            <div class="w-16 h-16 bg-[#ECFDF5] text-[#34C759] rounded-full flex items-center justify-center mx-auto border border-[#A7F3D0]">
+                <svg class="w-8 h-8 text-[#166534]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
 
             <div class="space-y-2">
                 <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">
                     Booking Confirmed!
                 </h2>
-                <p class="text-xs sm:text-sm text-[#6E6E73] max-w-md mx-auto">
+                <p class="text-sm sm:text-sm text-[#6E6E73] max-w-md mx-auto">
                     We've emailed your booking confirmation to <strong class="text-[#1D1D1F]" x-text="form.contact_email"></strong>. Please save your reference number and PIN below.
                 </p>
             </div>
@@ -1003,27 +1087,27 @@
             <!-- Booking Credentials Voucher -->
             <div class="max-w-md mx-auto p-5 rounded-2xl bg-[#F8EAEA]/40 border border-[#780000]/20 space-y-4">
                 <div>
-                    <span class="text-xs uppercase tracking-wider text-[#6E6E73] font-bold">Booking Reference Number</span>
+                    <span class="text-sm uppercase tracking-wider text-[#6E6E73] font-bold">Booking Reference Number</span>
                     <div class="text-2xl sm:text-3xl font-mono font-extrabold text-[#780000] tracking-wider" x-text="confirmedBooking.booking_number"></div>
                 </div>
 
                 <div class="pt-2 border-t border-[#780000]/20">
-                    <span class="text-xs uppercase tracking-wider text-[#6E6E73] font-bold">4-Digit Security PIN</span>
+                    <span class="text-sm uppercase tracking-wider text-[#6E6E73] font-bold">4-Digit Security PIN</span>
                     <div class="text-2xl font-mono font-bold text-[#1D1D1F] tracking-widest" x-text="confirmedBooking.pin"></div>
-                    <span class="text-xs text-[#6E6E73] block mt-1">Keep this PIN safe to manage or update your booking anytime.</span>
+                    <span class="text-sm text-[#6E6E73] block mt-1">Keep this PIN safe to manage or update your booking anytime.</span>
                 </div>
 
                 <div class="pt-2">
                     <button type="button" 
                             @click="copyCredentials()" 
-                            class="px-4 py-2 rounded-lg bg-white text-[#780000] border border-[#780000]/30 hover:bg-[#F8EAEA] text-xs font-bold transition-colors shadow-2xs">
+                            class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] px-4 py-2 text-sm font-bold shadow-2xs">
                         <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
                     </button>
                 </div>
             </div>
 
             <!-- Recap Summary -->
-            <div class="max-w-lg mx-auto p-4 sm:p-5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5">
+            <div class="max-w-lg mx-auto p-4 sm:p-5 rounded-xl bg-[#F2F2F7] text-left text-sm sm:text-sm space-y-2.5 shadow-2xs">
                 <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
                     <span class="text-[#6E6E73]">Package:</span>
                     <span class="font-bold text-[#1D1D1F] capitalize" x-text="form.class_type"></span>
@@ -1040,9 +1124,9 @@
                 <!-- Applied Dynamic Pricing Rules -->
                 <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
                     <div class="py-2 border-b border-[#E5E5EA] space-y-1.5">
-                        <div class="text-[10px] uppercase font-bold tracking-wider text-[#6E6E73]">Applied Dynamic Pricing Rules:</div>
+                        <div class="text-sm uppercase font-bold tracking-wider text-[#6E6E73]">Applied Dynamic Pricing Rules:</div>
                         <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
-                            <div class="flex justify-between items-center text-xs">
+                            <div class="flex justify-between items-center text-sm">
                                 <span class="text-[#1D1D1F]" x-text="adj.rule_name + ' (' + adj.formatted_adjustment + ')'"></span>
                                 <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
                             </div>
@@ -1065,15 +1149,15 @@
             </div>
 
             <!-- Things to Bring Checklist -->
-            <div class="max-w-lg mx-auto p-5 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2">
+            <div class="max-w-lg mx-auto p-5 rounded-xl bg-[#F2F2F7] text-left text-sm sm:text-sm space-y-2 shadow-2xs">
                 <h4 class="font-bold text-[#1D1D1F]">Things to Bring:</h4>
-                <ul class="space-y-1 text-xs sm:text-sm text-[#6E6E73] list-disc list-inside">
+                <ul class="space-y-1 text-sm sm:text-sm text-[#6E6E73] list-disc list-inside">
                     <li>Swimming clothes (anything you’re comfortable wearing)</li>
                     <li>Toiletries</li>
                     <li>Personal things</li>
                     <li>A pair of socks (in any kind) for fin fitting</li>
                 </ul>
-                <p class="text-[11px] text-[#065F46] font-semibold pt-1">
+                <p class="text-sm text-[#065F46] font-semibold pt-1">
                     (Towels, shampoo and soap are all provided)
                 </p>
             </div>
@@ -1094,8 +1178,9 @@
             <button type="button" 
                     @click="prevStep()" 
                     x-show="currentStep > 1"
-                    class="btn-secondary px-4 sm:px-5 py-2.5 text-sm">
-                ← Back
+                    class="btn-secondary px-4 sm:px-5 py-2.5 text-sm flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back</span>
             </button>
             <div x-show="currentStep === 1"></div>
 
@@ -1142,6 +1227,7 @@ contact_phone: '',
             pickup_location: '',
             boat_dive: false,
             confirmation_ack: false,
+            hasAgreedToTerms: false,
             payment_method: 'paymongo'
         },
         forecast: null,
@@ -1156,7 +1242,7 @@ contact_phone: '',
             {title: 'Freediving Tip', text: 'Equalization is key: always equalize early and frequently before feeling ear pressure.' },
             {title: 'Marine Conditions', text: 'Our forecast monitors wave height (<1.0m is ideal), ocean currents, and wind speed.' },
             {title: 'Sanctuary Dives', text: 'Camp FreedivePH operates in Mabini Marine Protected Areas with clear year-round visibility.' },
-            {title: 'Carpool Hubs', text: 'Weekend carpool vans depart Manila hubs at 2:30 AM – 3:30 AM directly to camp resort.' }
+            {title: 'Carpool Hubs', text: 'Weekend carpool vans depart Manila hubs at 2:30 AM - 3:30 AM directly to camp resort.' }
         ],
         get currentTip() {
             return this.weatherTips[this.weatherTipIndex] || this.weatherTips[0];
@@ -1400,12 +1486,14 @@ contact_phone: '',
                 pickup_location: '',
                 boat_dive: false,
                 confirmation_ack: false,
+                hasAgreedToTerms: false,
                 payment_method: 'paymongo'
             };
             this.forecast = null;
             this.pricingQuote = null;
             this.errorMessage = '';
             this.touchedStep3 = false;
+            this.touchedStep4 = false;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
@@ -1565,6 +1653,7 @@ contact_phone: '',
         },
 
         touchedStep3: false,
+        touchedStep4: false,
 
         validateName(name) {
             if (!name) return false;
@@ -1717,6 +1806,13 @@ contact_phone: '',
         },
 
         async processPayment(instantSimulation = false, hostedCheckout = true) {
+            if (!this.form.hasAgreedToTerms) {
+                this.touchedStep4 = true;
+                this.errorMessage = "Please read and agree to the Terms & Conditions and Privacy Policy to proceed.";
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return;
+            }
+
             this.submittingPayment = true;
             this.errorMessage = '';
 

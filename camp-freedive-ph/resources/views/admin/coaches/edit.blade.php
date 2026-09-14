@@ -8,8 +8,9 @@
     <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
         <div>
-            <a href="{{ route('admin.coaches.show', $coach) }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                ← Back to {{ $coach->full_name }} Profile
+            <a href="{{ route('admin.coaches.show', $coach) }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back to {{ $coach->full_name }} Profile</span>
             </a>
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Edit Coach Profile</h1>
         </div>
@@ -26,7 +27,7 @@
                 <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Personal & Contact Details</h3>
 
                 <div>
-                    <label for="full_name" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="full_name" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         First & Last Name <span class="text-[#780000]">*</span>
                     </label>
                     <input type="text" 
@@ -37,13 +38,13 @@
                            placeholder="First & Last Name"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                     @error('full_name')
-                        <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                        <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="email" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="email" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Email Address <span class="text-[#780000]">*</span>
                         </label>
                         <input type="email" 
@@ -53,12 +54,12 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('email')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="phone" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="phone" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Phone Number <span class="text-[#780000]">*</span>
                         </label>
                         <input type="text" 
@@ -68,7 +69,7 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('phone')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -79,7 +80,7 @@
                 <h3 class="text-base font-bold text-[#1D1D1F] pb-2">2. Freediving Credentials & Expiry</h3>
 
                 <div>
-                    <label for="certification_level" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="certification_level" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         Certification Level / Credential <span class="text-[#780000]">*</span>
                     </label>
                     <input type="text" 
@@ -89,15 +90,15 @@
                            required 
                            placeholder="e.g. AIDA 4 Master Freediver / PADI Freediver Instructor"
                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
-                    <span class="text-xs text-[#6E6E73] mt-1 block">Free-text credential title or agency certification.</span>
+                    <span class="text-sm text-[#6E6E73] mt-1 block">Free-text credential title or agency certification.</span>
                     @error('certification_level')
-                        <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                        <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="certification_number" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="certification_number" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Certification Number <span class="text-[#780000]">*</span>
                         </label>
                         <input type="text" 
@@ -107,12 +108,12 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('certification_number')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="certification_expiry" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="certification_expiry" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Certification Expiry Date <span class="text-[#780000]">*</span>
                         </label>
                         <input type="date" 
@@ -122,7 +123,7 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('certification_expiry')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
                 </div>
@@ -134,7 +135,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="status" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="status" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Status <span class="text-[#780000]">*</span>
                         </label>
                         <select name="status" id="status" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -146,7 +147,7 @@
                     </div>
 
                     <div>
-                        <label for="joined_at" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="joined_at" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Date Joined Camp
                         </label>
                         <input type="date" 
@@ -158,7 +159,7 @@
                 </div>
 
                 <div>
-                    <label for="specialties_notes" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="specialties_notes" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         Specialties & Notes
                     </label>
                     <textarea name="specialties_notes" 

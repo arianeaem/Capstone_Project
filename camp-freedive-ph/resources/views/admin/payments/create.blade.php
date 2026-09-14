@@ -12,8 +12,9 @@
     <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
         <div>
-            <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                ← Back to Payments & Refunds
+            <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back to Payments & Refunds</span>
             </a>
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Record Manual Payment</h1>
         </div>
@@ -37,7 +38,7 @@
                         </option>
                     @endforeach
                 </select>
-                <span class="text-xs text-[#6E6E73] mt-1 block">
+                <span class="text-sm text-[#6E6E73] mt-1 block">
                     Listing confirmed bookings with remaining balances.
                 </span>
             </div>

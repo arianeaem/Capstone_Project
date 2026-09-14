@@ -59,7 +59,7 @@ class PortalController extends Controller
             $weatherClass = $d1Assessment ? $d1Assessment->overall_classification : 'Safe';
             $weatherBadge = $d1Assessment ? $d1Assessment->classification_badge : [
                 'label' => 'Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ];
 
             // Check if within 48 hours of dive date (06:30 AM start)
@@ -106,7 +106,7 @@ class PortalController extends Controller
                 $weatherClass = $d1Assessment ? $d1Assessment->overall_classification : 'Safe';
                 $weatherBadge = $d1Assessment ? $d1Assessment->classification_badge : [
                     'label' => 'Safe',
-                    'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                    'class' => 'bg-emerald-50 text-emerald-700',
                 ];
 
                 $diveStart = $batch->start_date->copy()->setTime(6, 30);

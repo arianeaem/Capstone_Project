@@ -9,19 +9,20 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.coaches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                    ← Back to Coach Roster
+                <a href="{{ route('admin.coaches.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span>Back to Coach Roster</span>
                 </a>
                 <span class="text-[#D1D1D6]">/</span>
                 <span class="font-bold text-[#FF3B3C]">Deactivation Requests</span>
             </div>
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Pending Coach Deactivations</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Owner review queue for staff-proposed coach deactivations.
             </p>
         </div>
 
-        <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2 text-xs sm:text-sm font-semibold">
+        <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2 text-sm sm:text-sm font-semibold">
             View Active Roster
         </a>
     </div>
@@ -30,11 +31,11 @@
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-x-auto">
         <div class="p-5 border-b border-[#E5E5EA] flex items-center justify-between">
             <h3 class="font-bold text-[#1D1D1F]">Pending Requests Awaiting Owner Confirmation</h3>
-            <span class="text-xs font-bold text-[#7E22CE]">{{ $pendingRequests->count() }} Request(s)</span>
+            <span class="text-sm font-bold text-[#7E22CE]">{{ $pendingRequests->count() }} Request(s)</span>
         </div>
 
         <table class="w-full text-left min-w-[850px]">
-            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">
+            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-bold text-[#6E6E73]">
                 <tr>
                     <th class="p-4 pl-6">Coach Name</th>
                     <th class="p-4">Certification</th>
@@ -46,7 +47,7 @@
             </thead>
             <tbody class="divide-y divide-[#E5E5EA]">
                 @forelse($pendingRequests as $req)
-                <tr class="hover:bg-[#FAFAFC]/60 transition-colors text-xs sm:text-sm">
+                <tr class="hover:bg-[#F2F2F7]/60 transition-colors text-sm sm:text-sm">
                     <td class="p-4 pl-6 font-bold text-[#1D1D1F]">
                         <a href="{{ route('admin.coaches.show', $req->coach) }}" class="text-[#780000] hover:underline">
                             {{ $req->coach->full_name }}
@@ -61,11 +62,11 @@
                         {{ $req->requester->name }}
                     </td>
 
-                    <td class="p-4 text-xs text-[#6E6E73] max-w-xs">
+                    <td class="p-4 text-sm text-[#6E6E73] max-w-xs">
                         {{ $req->reason ?: 'No explanation provided.' }}
                     </td>
 
-                    <td class="p-4 text-xs text-[#6E6E73] whitespace-nowrap">
+                    <td class="p-4 text-sm text-[#6E6E73] whitespace-nowrap">
                         {{ $req->created_at->format('M d, Y h:i A') }}
                     </td>
 
@@ -74,19 +75,19 @@
                             <div class="flex items-center justify-end gap-2">
                                 <button type="button" 
                                         @click="selectedRequest = {{ json_encode($req) }}; openConfirmModal = true"
-                                        class="px-3 py-1.5 text-xs font-bold text-white bg-[#FF3B3C] hover:bg-[#D32F2F] rounded-xl transition-colors">
+                                        class="px-3 py-1.5 text-sm font-bold text-white bg-[#FF3B3C] hover:bg-[#D32F2F] rounded-xl transition-colors">
                                     Confirm Deactivation
                                 </button>
 
                                 <form action="{{ route('admin.coaches.deactivate.dismiss', $req) }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="btn-secondary px-3 py-1.5 text-xs font-bold">
+                                    <button type="submit" class="btn-secondary px-3 py-1.5 text-sm font-bold">
                                         Dismiss
                                     </button>
                                 </form>
                             </div>
                         @else
-                            <span class="text-xs text-[#8E8E93] italic">Owner review required</span>
+                            <span class="text-sm text-[#8E8E93] italic">Owner review required</span>
                         @endif
                     </td>
                 </tr>
@@ -108,7 +109,7 @@
         </div>
 
         <table class="w-full text-left min-w-[800px]">
-            <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-xs uppercase font-bold text-[#6E6E73]">
+            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-bold text-[#6E6E73]">
                 <tr>
                     <th class="p-4 pl-6">Coach Name</th>
                     <th class="p-4">Decision</th>
@@ -119,26 +120,26 @@
             </thead>
             <tbody class="divide-y divide-[#E5E5EA]">
                 @forelse($processedRequests as $pReq)
-                <tr class="hover:bg-[#FAFAFC]/60 transition-colors text-xs sm:text-sm">
-                    <td class="p-4 pl-6 font-bold text-[#1D1D1F]">
+                <tr @if($pReq->coach) onclick="window.location='{{ route('admin.coaches.show', $pReq->coach) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors text-sm sm:text-sm group" @else class="hover:bg-[#F2F2F7]/60 transition-colors text-sm sm:text-sm" @endif>
+                    <td class="p-4 pl-6 font-bold text-[#1D1D1F] group-hover:text-[#780000]">
                         {{ $pReq->coach ? $pReq->coach->full_name : 'Deleted Coach' }}
                     </td>
 
                     <td class="p-4">
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $pReq->status_badge['class'] }}">
+                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $pReq->status_badge['class'] }}">
                             {{ $pReq->status_badge['label'] }}
                         </span>
                     </td>
 
-                    <td class="p-4 text-xs text-[#6E6E73]">
+                    <td class="p-4 text-sm text-[#6E6E73]">
                         {{ $pReq->requester->name }}
                     </td>
 
-                    <td class="p-4 text-xs text-[#6E6E73]">
+                    <td class="p-4 text-sm text-[#6E6E73]">
                         {{ $pReq->resolver ? $pReq->resolver->name : 'N/A' }}
                     </td>
 
-                    <td class="p-4 text-right pr-6 text-xs text-[#6E6E73] whitespace-nowrap">
+                    <td class="p-4 text-right pr-6 text-sm text-[#6E6E73] whitespace-nowrap">
                         {{ $pReq->resolved_at ? $pReq->resolved_at->format('M d, Y h:i A') : 'N/A' }}
                     </td>
                 </tr>
@@ -158,22 +159,22 @@
     <!-- ========================================================================= -->
     <!-- MODAL: CONFIRM DEACTIVATION (OWNER ONLY) -->
     <!-- ========================================================================= -->
-    <div x-show="openConfirmModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div x-show="openConfirmModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openConfirmModal = false">
             <h3 class="text-lg font-bold text-[#FF3B3C]">Confirm Coach Deactivation</h3>
-            <p class="text-xs text-[#6E6E73]">
+            <p class="text-sm text-[#6E6E73]">
                 Are you sure you want to deactivate <strong class="text-[#1D1D1F]" x-text="selectedRequest?.coach?.full_name"></strong>?
             </p>
 
-            <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-xs text-[#991B1B]">
+            <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA] text-sm text-[#991B1B]">
                 <strong>Conflict Check:</strong> If this coach has any upcoming 2D1N batch assignments, the system will block deactivation until those sessions are reassigned.
             </div>
 
             <form :action="'{{ url('/admin/coaches/deactivations') }}/' + selectedRequest?.id + '/confirm'" method="POST" class="pt-2">
                 @csrf
                 <div class="flex items-center justify-end gap-2">
-                    <button type="button" @click="openConfirmModal = false" class="btn-secondary px-4 py-2 text-xs">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-2 text-xs font-bold bg-[#FF3B3C] hover:bg-[#D32F2F]">
+                    <button type="button" @click="openConfirmModal = false" class="btn-secondary px-4 py-2 text-sm">Cancel</button>
+                    <button type="submit" class="btn-danger px-5 py-2 text-sm font-bold">
                         Confirm & Deactivate
                     </button>
                 </div>

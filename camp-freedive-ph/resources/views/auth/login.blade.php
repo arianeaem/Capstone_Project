@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login | Camp FreedivePH</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800,900" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -32,7 +33,7 @@
 
             @if(session('error') || (isset($errors) && ($errors->has('email') || $errors->has('password'))))
                 <div class="mb-6 p-4 rounded-xl bg-[#FEF2F2] flex items-center gap-3">
-                    <div class="text-xs font-semibold text-[#991B1B] leading-relaxed">
+                    <div class="text-sm font-semibold text-[#991B1B] leading-relaxed">
                         {{ session('error') ?? ($errors->first('password') ?: $errors->first('email')) }}
                     </div>
                 </div>
@@ -40,7 +41,7 @@
 
             @if(session('status') || session('success'))
                 <div class="mb-6 p-4 rounded-xl bg-[#ECFDF5] flex items-center gap-3">
-                    <div class="text-xs font-semibold text-[#065F46] leading-relaxed">
+                    <div class="text-sm font-semibold text-[#065F46] leading-relaxed">
                         {{ session('status') ?? session('success') }}
                     </div>
                 </div>
@@ -51,7 +52,7 @@
 
                 <!-- Email Input -->
                 <div class="space-y-1.5">
-                    <label for="email" class="block font-bold text-[#1D1D1F] text-xs uppercase tracking-wider">
+                    <label for="email" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
                         Email Address <span class="text-[#780000]">*</span>
                     </label>
                     <input type="email" 
@@ -67,10 +68,10 @@
                 <!-- Password Input -->
                 <div class="space-y-1.5" x-data="{ show: false }">
                     <div class="flex items-center justify-between">
-                        <label for="password" class="block font-bold text-[#1D1D1F] text-xs uppercase tracking-wider">
+                        <label for="password" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
                             Password <span class="text-[#780000]">*</span>
                         </label>
-                        <a href="{{ route('password.request') }}" class="text-xs font-semibold text-[#780000] hover:underline" data-no-spa>
+                        <a href="{{ route('password.request') }}" class="text-sm font-semibold text-[#780000] hover:underline" data-no-spa>
                             Forgot password?
                         </a>
                     </div>
@@ -94,7 +95,7 @@
                 <div class="flex items-center justify-between pt-1">
                     <label class="flex items-center gap-2.5 cursor-pointer">
                         <input type="checkbox" name="remember" class="w-4 h-4 rounded text-[#780000] focus:ring-0 border-[#D1D1D6]">
-                        <span class="text-xs text-[#6E6E73] font-medium">Remember my session</span>
+                        <span class="text-sm text-[#6E6E73] font-medium">Remember my session</span>
                     </label>
                 </div>
 

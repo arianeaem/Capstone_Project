@@ -21,6 +21,7 @@ use App\Http\Controllers\Coach\PortalController as CoachPortalController;
 use App\Http\Controllers\Coach\RequestController as CoachRequestController;
 use App\Http\Controllers\Coach\ScheduleController;
 use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\ManageBookingController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,11 @@ use Illuminate\Support\Facades\Route;
 // 1. PUBLIC CUSTOMER PORTAL
 // =========================================================================
 Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/terms-and-conditions', [LegalController::class, 'terms'])->name('legal.terms');
+Route::redirect('/terms', '/terms-and-conditions', 301);
+
+Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::redirect('/privacy', '/privacy-policy', 301);
 
 Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/api/weather/check', [BookingController::class, 'checkWeather'])->name('api.weather.check');
@@ -146,27 +152,44 @@ $registerBackofficeRoutes = function (string $portalRole) {
     Route::post('/coaches/{coach}/reassign-student', [CoachRosterController::class, 'reassignStudent'])->name('coaches.reassign_student');
 
     // Weather & Marine Safety Monitoring Module
-    Route::get('/weather', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'index'])->name('weather.index');
-    Route::post('/weather/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache'])->name('weather.sync_cache');
-    Route::get('/weather/{batch}', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'show'])->name('weather.show');
-    Route::post('/weather/{batch}/assess', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'assess'])->name('weather.assess');
-    Route::post('/weather/{batch}/override', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'override'])->name('weather.override');
-    Route::post('/weather/{batch}/cancel', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'cancel'])->name('weather.cancel');
+    Route::get('/safety-monitoring', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'index'])->name('weather.index');
+    Route::get('/weather', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'index']);
+    Route::post('/safety-monitoring/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache'])->name('weather.sync_cache');
+    Route::post('/weather/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache']);
+    Route::get('/safety-monitoring/{batch}', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'show'])->name('weather.show');
+    Route::get('/weather/{batch}', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'show']);
+    Route::post('/safety-monitoring/{batch}/assess', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'assess'])->name('weather.assess');
+    Route::post('/weather/{batch}/assess', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'assess']);
+    Route::post('/safety-monitoring/{batch}/override', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'override'])->name('weather.override');
+    Route::post('/weather/{batch}/override', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'override']);
+    Route::post('/safety-monitoring/{batch}/cancel', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'cancel'])->name('weather.cancel');
+    Route::post('/weather/{batch}/cancel', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'cancel']);
 
     // Dynamic Pricing Management Module
-    Route::get('/pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'index'])->name('pricing.index');
-    Route::get('/pricing/create', [\App\Http\Controllers\Admin\PricingRuleController::class, 'create'])->name('pricing.create');
-    Route::post('/pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'store'])->name('pricing.store');
-    Route::get('/pricing/{rule}/edit', [\App\Http\Controllers\Admin\PricingRuleController::class, 'edit'])->name('pricing.edit');
-    Route::put('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'update'])->name('pricing.update');
-    Route::delete('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'destroy'])->name('pricing.destroy');
-    Route::patch('/pricing/{rule}/toggle-status', [\App\Http\Controllers\Admin\PricingRuleController::class, 'toggleStatus'])->name('pricing.toggle_status');
-    Route::get('/pricing/{rule}/triggered', [\App\Http\Controllers\Admin\PricingRuleController::class, 'triggered'])->name('pricing.triggered');
+    Route::get('/dynamic-pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'index'])->name('pricing.index');
+    Route::get('/pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'index']);
+    Route::get('/dynamic-pricing/create', [\App\Http\Controllers\Admin\PricingRuleController::class, 'create'])->name('pricing.create');
+    Route::get('/pricing/create', [\App\Http\Controllers\Admin\PricingRuleController::class, 'create']);
+    Route::post('/dynamic-pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'store'])->name('pricing.store');
+    Route::post('/pricing', [\App\Http\Controllers\Admin\PricingRuleController::class, 'store']);
+    Route::get('/dynamic-pricing/{rule}/edit', [\App\Http\Controllers\Admin\PricingRuleController::class, 'edit'])->name('pricing.edit');
+    Route::get('/pricing/{rule}/edit', [\App\Http\Controllers\Admin\PricingRuleController::class, 'edit']);
+    Route::put('/dynamic-pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'update'])->name('pricing.update');
+    Route::put('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'update']);
+    Route::delete('/dynamic-pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'destroy'])->name('pricing.destroy');
+    Route::delete('/pricing/{rule}', [\App\Http\Controllers\Admin\PricingRuleController::class, 'destroy']);
+    Route::patch('/dynamic-pricing/{rule}/toggle-status', [\App\Http\Controllers\Admin\PricingRuleController::class, 'toggleStatus'])->name('pricing.toggle_status');
+    Route::patch('/pricing/{rule}/toggle-status', [\App\Http\Controllers\Admin\PricingRuleController::class, 'toggleStatus']);
+    Route::get('/dynamic-pricing/{rule}/triggered', [\App\Http\Controllers\Admin\PricingRuleController::class, 'triggered'])->name('pricing.triggered');
+    Route::get('/pricing/{rule}/triggered', [\App\Http\Controllers\Admin\PricingRuleController::class, 'triggered']);
 
     // Reports & Analytics Module
-    Route::get('/reports', [ReportsController::class, 'index'])->name('reports.index');
-    Route::get('/reports/export', [ReportsController::class, 'export'])->name('reports.export');
-    Route::get('/reports/print', [ReportsController::class, 'printSummary'])->name('reports.print');
+    Route::get('/reports-and-analytics', [ReportsController::class, 'index'])->name('reports.index');
+    Route::get('/reports', [ReportsController::class, 'index']);
+    Route::get('/reports-and-analytics/export', [ReportsController::class, 'export'])->name('reports.export');
+    Route::get('/reports/export', [ReportsController::class, 'export']);
+    Route::get('/reports-and-analytics/print-summary', [ReportsController::class, 'printSummary'])->name('reports.print');
+    Route::get('/reports/print', [ReportsController::class, 'printSummary']);
 
     // User Management
     Route::get('/users', [UserManagementController::class, 'index']);
@@ -217,16 +240,21 @@ Route::middleware(['auth', 'active', 'must_change_password', 'role:coach'])
         Route::get('/', [CoachPortalController::class, 'index'])->name('dashboard');
 
         // Page 2: Availability Calendar
-        Route::get('/availability', [AvailabilityController::class, 'index'])->name('availability.index');
+        Route::get('/availability-calendar', [AvailabilityController::class, 'index'])->name('availability.index');
+        Route::get('/availability', [AvailabilityController::class, 'index']);
         Route::post('/availability/toggle', [AvailabilityController::class, 'toggle'])->name('availability.toggle');
         Route::post('/availability/bulk', [AvailabilityController::class, 'bulkUpdate'])->name('availability.bulk');
         Route::post('/availability/release', [AvailabilityController::class, 'requestRelease'])->name('availability.release');
 
-        // Page 3: My Assigned Schedule (Upcoming & History)
-        Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+        // Page 3: My Schedule & History
+        Route::get('/my-schedule', [ScheduleController::class, 'index'])->name('schedule.index');
+        Route::get('/schedule', [ScheduleController::class, 'index']);
 
-        // Page 4: Open Requests Board
-        Route::get('/open-requests', [CoachRequestController::class, 'index'])->name('requests.index');
-        Route::post('/open-requests/{opening}/apply', [CoachRequestController::class, 'store'])->name('requests.store');
-        Route::delete('/open-requests/{coachRequest}/withdraw', [CoachRequestController::class, 'withdraw'])->name('requests.withdraw');
+        // Page 4: Open Slot Requests
+        Route::get('/open-slot-requests', [CoachRequestController::class, 'index'])->name('requests.index');
+        Route::get('/open-requests', [CoachRequestController::class, 'index']);
+        Route::post('/open-slot-requests/{opening}/apply', [CoachRequestController::class, 'store'])->name('requests.store');
+        Route::post('/open-requests/{opening}/apply', [CoachRequestController::class, 'store']);
+        Route::delete('/open-slot-requests/{coachRequest}/withdraw', [CoachRequestController::class, 'withdraw'])->name('requests.withdraw');
+        Route::delete('/open-requests/{coachRequest}/withdraw', [CoachRequestController::class, 'withdraw']);
     });

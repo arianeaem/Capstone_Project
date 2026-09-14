@@ -1276,7 +1276,7 @@ class DatabaseSeeder extends Seeder
         $pricingRules = [
             [
                 'name' => 'Amihan Peak Season Rate',
-                'description' => 'Seasonal dry-season markup during optimal diving months in Batangas (November – May).',
+                'description' => 'Seasonal dry-season markup during optimal diving months in Batangas (November to May).',
                 'rule_type' => 'seasonality',
                 'condition_operator' => null,
                 'condition_value' => 'peak',
@@ -1290,7 +1290,7 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'name' => 'Habagat Off-Peak Monsoon Incentive',
-                'description' => 'Special promotion to stimulate camp bookings and occupancy during off-peak rainy season (June – September).',
+                'description' => 'Special promotion to stimulate camp bookings and occupancy during off-peak rainy season (June to September).',
                 'rule_type' => 'seasonality',
                 'condition_operator' => null,
                 'condition_value' => 'off_peak',

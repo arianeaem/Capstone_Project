@@ -10,7 +10,7 @@
         .content { padding: 32px 24px; }
         .status-box { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 10px; padding: 16px; color: #991B1B; margin: 20px 0; }
         .btn { display: inline-block; background: #780000; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; }
-        .footer { background: #FAFAFC; padding: 20px; text-align: center; font-size: 12px; color: #8E8E93; border-top: 1px solid #E5E5EA; }
+        .footer { background: #F2F2F7; padding: 20px; text-align: center; font-size: 14px; color: #8E8E93; border-top: 1px solid #E5E5EA; }
     </style>
 </head>
 <body>
@@ -27,7 +27,7 @@
                 <strong>Status: Cancellation Pending Camp Review</strong><br>
                 Calculated Policy Refund: <strong>₱{{ number_format($cancellationRequest->calculated_refund_amount, 2) }}</strong>
                 @if($cancellationRequest->force_majeure_flag)
-                    <br><span style="font-size: 12px; color: #991B1B;">(Force Majeure / Marine Safety Advisory applied)</span>
+                    <br><span style="font-size: 14px; color: #991B1B;">(Force Majeure / Marine Safety Advisory applied)</span>
                 @endif
             </div>
 
@@ -36,7 +36,7 @@
             </p>
 
             @if($cancellationRequest->reason)
-            <div style="background: #FAFAFC; padding: 12px; border-radius: 8px; font-size: 13px; color: #6E6E73; margin: 16px 0;">
+            <div style="background: #F2F2F7; padding: 12px; border-radius: 8px; font-size: 14px; color: #6E6E73; margin: 16px 0;">
                 <strong>Reason:</strong> {{ $cancellationRequest->reason }}
             </div>
             @endif
@@ -46,7 +46,13 @@
             </div>
         </div>
         <div class="footer">
-            Camp FreedivePH<br>Mabini, Batangas
+            <p><strong>Camp FreedivePH</strong><br>The Shack Hideaway by Mayumi Resorts, Sitio Bagalangit Road, Barangay Bagalangit, Anilao, Mabini, Batangas, Philippines</p>
+            <p style="margin-top: 8px;">
+                <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">Facebook</a> &bull;
+                <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">Instagram</a> &bull;
+                <a href="mailto:campfreediveph@gmail.com" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">campfreediveph@gmail.com</a> &bull;
+                <a href="tel:+639278879894" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">+63 927 887 9894</a>
+            </p>
         </div>
     </div>
 </body>

@@ -18,7 +18,7 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden">
                 
                 <!-- Calendar Controls -->
-                <div class="p-4 sm:p-5 border-b border-[#E5E5EA] flex flex-wrap items-center justify-between gap-4 bg-[#FAFAFC]">
+                <div class="p-4 sm:p-5 border-b border-[#E5E5EA] flex flex-wrap items-center justify-between gap-4 bg-[#F2F2F7]">
                     <!-- Month Navigator -->
                     <div class="flex items-center gap-2">
                         <div class="flex items-center bg-white rounded-xl border border-[#E5E5EA] p-1">
@@ -26,7 +26,7 @@
                                class="p-2 rounded-lg hover:bg-[#F2F2F7] text-[#1D1D1F] transition-colors" title="Previous Month">
                                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
                             </a>
-                            <span class="px-4 text-xs sm:text-sm font-extrabold text-[#1D1D1F] min-w-[130px] sm:min-w-[150px] text-center">
+                            <span class="px-4 text-sm sm:text-sm font-extrabold text-[#1D1D1F] min-w-[130px] sm:min-w-[150px] text-center">
                                 {{ $currentMonth->format('F Y') }}
                             </span>
                             <a href="{{ route('coach.availability.index', ['year' => $nextMonth->year, 'month' => $nextMonth->month]) }}" 
@@ -35,7 +35,7 @@
                             </a>
                         </div>
                         <a href="{{ route('coach.availability.index') }}" 
-                           class="text-xs font-bold px-3 py-2 rounded-xl bg-white border border-[#E5E5EA] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all">
+                           class="text-sm font-bold px-3 py-2 rounded-xl bg-white border border-[#E5E5EA] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all">
                             Today
                         </a>
                     </div>
@@ -44,8 +44,8 @@
                     <button type="button" 
                             @click="toggleBulkMode()"
                             :class="bulkMode ? 'bg-[#780000] text-white border-[#780000]' : 'bg-white text-[#1D1D1F] border-[#E5E5EA] hover:bg-[#F2F2F7]'"
-                            class="px-4 py-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 cursor-pointer">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            class="px-4 py-2 rounded-xl border text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
+                        <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-4 h-4 object-contain inline-block shrink-0" :class="bulkMode ? 'brightness-0 invert' : ''">
                         <span x-text="bulkMode ? 'Exit Bulk Mode' : 'Bulk Edit Mode'"></span>
                     </button>
                 </div>
@@ -56,7 +56,7 @@
                      @touchmove="if (Math.abs($event.touches[0].clientX - touchStartX) > 10 || Math.abs($event.touches[0].clientY - touchStartY) > 10) { touchMoved = true; }">
                     <div class="min-w-[620px] sm:min-w-0">
                         <!-- Day of Week Header -->
-                        <div class="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#FAFAFC] text-center text-xs font-bold text-[#8E8E93] py-3">
+                        <div class="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F2F2F7] text-center text-sm font-bold text-[#8E8E93] py-3">
                             <span class="text-rose-600">Sun</span>
                             <span>Mon</span>
                             <span>Tue</span>
@@ -124,11 +124,11 @@
 
                                         <div class="flex items-center gap-1 shrink-0">
                                             @if($day['is_today'])
-                                                <span class="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 uppercase tracking-wider whitespace-nowrap shrink-0">Today</span>
+                                                <span class="text-sm sm:text-sm font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 uppercase tracking-wider whitespace-nowrap shrink-0">Today</span>
                                             @endif
 
                                             @if($hasRelease)
-                                                <span class="text-[9px] sm:text-[10px] font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 shadow-2xs whitespace-nowrap shrink-0" title="Release request pending">
+                                                <span class="text-sm sm:text-sm font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 shadow-2xs whitespace-nowrap shrink-0" title="Release request pending">
                                                     Pending
                                                 </span>
                                             @endif
@@ -136,7 +136,7 @@
                                             <!-- Bulk Mode Selection Indicator -->
                                             <template x-if="bulkMode && !{{ $isPast ? 'true' : 'false' }} && !{{ $isAssigned ? 'true' : 'false' }}">
                                                 <div class="w-4 h-4 rounded border border-current flex items-center justify-center pointer-events-none transition-colors"
-                                                     :class="isSelectedInBulk('{{ $dateStr }}') ? 'bg-amber-400 border-amber-400 text-black' : 'bg-white/30 text-transparent'">
+                                                     :class="isSelectedInBulk('{{ $dateStr }}') ? 'bg-amber-400 border-amber-400 text-black' : 'bg-transparent border-white/60 text-transparent'">
                                                     <svg x-show="isSelectedInBulk('{{ $dateStr }}')" class="w-3 h-3 text-black stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                 </div>
                                             </template>
@@ -147,10 +147,10 @@
                                     <div class="my-auto py-1">
                                         @if($isAssigned)
                                             <div class="space-y-0.5">
-                                                <div class="font-black text-xs sm:text-sm text-white tracking-wide leading-tight whitespace-nowrap truncate">
+                                                <div class="font-black text-sm sm:text-sm text-white tracking-wide leading-tight whitespace-nowrap truncate">
                                                     {{ $statusTitle }}
                                                 </div>
-                                                <div class="text-[10px] sm:text-[11px] text-white/90 truncate font-semibold leading-tight whitespace-nowrap">
+                                                <div class="text-sm sm:text-sm text-white/90 truncate font-semibold leading-tight whitespace-nowrap">
                                                     {{ $day['batch']?->batch_number ?? 'Dive Batch' }}
                                                     @if($day['students_count'] > 0)
                                                         ({{ $day['students_count'] }} pax)
@@ -158,22 +158,22 @@
                                                 </div>
                                             </div>
                                         @elseif($status === 'available')
-                                            <div class="font-black text-xs sm:text-sm text-white tracking-wide whitespace-nowrap">
+                                            <div class="font-black text-sm sm:text-sm text-white tracking-wide whitespace-nowrap">
                                                 Available
                                             </div>
                                         @endif
                                     </div>
 
                                     <!-- Bottom: Action Links & Hover Hints -->
-                                    <div class="text-[10px] text-right">
+                                    <div class="text-sm text-right">
                                         @if($isAssigned && !$isPast)
                                             <button type="button" 
                                                     @click.stop="openReleaseModal({{ json_encode($day) }})"
-                                                    class="text-[10px] font-bold text-white/90 hover:text-white underline transition-colors whitespace-nowrap">
+                                                    class="text-sm font-bold text-white/90 hover:text-white underline transition-colors whitespace-nowrap">
                                                 Release Request
                                             </button>
                                         @elseif(!$isPast && !$isOtherMonth)
-                                            <span class="text-[10px] font-medium transition-opacity whitespace-nowrap {{ $status === 'available' ? 'text-emerald-100 opacity-0 group-hover:opacity-100' : 'text-[#8E8E93] opacity-0 group-hover:opacity-100' }}">
+                                            <span class="text-sm font-medium transition-opacity whitespace-nowrap {{ $status === 'available' ? 'text-emerald-100 opacity-0 group-hover:opacity-100' : 'text-[#8E8E93] opacity-0 group-hover:opacity-100' }}">
                                                 {{ $status === 'available' ? 'Click to unselect' : 'Click to select' }}
                                             </span>
                                         @endif
@@ -182,7 +182,7 @@
                                     <!-- Toggling Loading Spinner Overlay -->
                                     <div x-show="isToggling && (togglingDate === '{{ $dateStr }}' || get2D1NPair(togglingDate) === '{{ $dateStr }}')"
                                          x-cloak
-                                         class="absolute inset-0 bg-black/30 rounded-lg backdrop-blur-2xs flex items-center justify-center z-10">
+                                         class="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center z-10">
                                         <svg class="animate-spin w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                                             <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle>
                                             <path d="M4 12a8 8 0 018-8" stroke="currentColor"></path>
@@ -204,14 +204,14 @@
             <!-- Calendar Overview -->
             <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5EA] space-y-3">
                 <h1 class="text-xl font-black text-[#1D1D1F]">My Availability Calendar</h1>
-                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                <p class="text-sm text-[#6E6E73] leading-relaxed">
                     Click any date or weekend to select or unselect your availability. Assigned dates are locked and require an emergency release request.
                 </p>
             </div>
 
             <!-- Status Legend -->
-            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5EA] space-y-4 text-xs">
-                <span class="font-bold text-[#8E8E93] uppercase tracking-wider text-[11px] block">Status Legend</span>
+            <div class="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E5EA] space-y-4 text-sm">
+                <span class="font-bold text-[#8E8E93] uppercase tracking-wider text-sm block">Status Legend</span>
                 
                 <div class="space-y-3">
                     <div class="flex items-center gap-2.5">
@@ -249,17 +249,17 @@
          class="fixed bottom-4 sm:bottom-6 inset-x-3 sm:inset-x-4 max-w-2xl mx-auto z-40 bg-[#1D1D1F] text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex items-center justify-between w-full sm:w-auto gap-3">
             <div>
-                <div class="font-bold text-xs sm:text-sm text-white flex items-center gap-1.5">
+                <div class="font-bold text-sm sm:text-sm text-white flex items-center gap-1.5">
                     <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
                     <span>Bulk Edit Mode Active</span>
                 </div>
-                <div class="text-[11px] sm:text-xs text-gray-300">
+                <div class="text-sm sm:text-sm text-gray-300">
                     <span x-text="selectedDates.length" class="font-black text-amber-300"></span> date(s) selected
                 </div>
             </div>
             <button type="button" 
                     @click="toggleSelectAllMonth()"
-                    class="text-[11px] font-bold text-[#00C3D0] hover:underline sm:hidden cursor-pointer">
+                    class="text-sm font-bold text-[#00C3D0] hover:underline sm:hidden cursor-pointer">
                 <span x-text="allSelectableDates.length > 0 && allSelectableDates.every(d => selectedDates.includes(d)) ? 'Deselect All' : 'Select All Month'"></span>
             </button>
         </div>
@@ -267,13 +267,13 @@
         <div class="flex items-center gap-2 w-full sm:w-auto">
             <button type="button" 
                     @click="toggleSelectAllMonth()"
-                    class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all cursor-pointer">
+                    class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white font-bold text-sm transition-all cursor-pointer border border-[#3A3A3C]">
                 <span x-text="allSelectableDates.length > 0 && allSelectableDates.every(d => selectedDates.includes(d)) ? 'Deselect All' : 'Select All Month'"></span>
             </button>
             <button type="button" 
                     @click="applyBulk('available')"
                     :disabled="selectedDates.length === 0 || bulkSubmitting"
-                    class="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    class="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                 <span x-show="!bulkSubmitting">Mark Available</span>
                 <span x-show="bulkSubmitting" class="flex items-center gap-1">
                     <svg class="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor"></path></svg>
@@ -283,12 +283,12 @@
             <button type="button" 
                     @click="applyBulk('remove')"
                     :disabled="selectedDates.length === 0 || bulkSubmitting"
-                    class="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-600 disabled:opacity-40 text-white font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    class="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-600 disabled:opacity-40 text-white font-bold text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer">
                 <span>Remove</span>
             </button>
             <button type="button" 
                     @click="clearBulkSelection()"
-                    class="px-2.5 sm:px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-all cursor-pointer">
+                    class="px-2.5 sm:px-3 py-2 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white font-bold text-sm transition-all cursor-pointer border border-[#3A3A3C]">
                 Clear
             </button>
         </div>
@@ -297,21 +297,21 @@
     <!-- Emergency Release Request Modal -->
     <div x-show="releaseModalOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#E5E5EA] space-y-6 relative" @click.away="releaseModalOpen = false">
             
             <div class="flex items-start justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <div class="text-xs font-bold uppercase tracking-wider text-rose-600">Emergency Staffing Request</div>
-                    <h3 class="text-lg font-black text-[#1D1D1F] mt-0.5">Request Assignment Release</h3>
+                    <h3 class="text-lg font-black text-[#1D1D1F]">Request Assignment Release</h3>
+                    <p class="text-sm font-semibold text-rose-600 mt-0.5">Emergency Staffing Request</p>
                 </div>
-                <button type="button" @click="releaseModalOpen = false" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                <button type="button" @click="releaseModalOpen = false" aria-label="Close release modal" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
             </div>
 
             <template x-if="selectedAssignedDay">
                 <div class="space-y-4">
                     <!-- Session Details -->
-                    <div class="p-4 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 text-sm shadow-2xs">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#1D1D1F]" x-text="selectedAssignedDay.batch?.batch_number || 'Dive Batch'"></span>
                             <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold" x-text="selectedAssignedDay.students_count + ' Student(s) Assigned'"></span>
@@ -322,7 +322,7 @@
 
                     <!-- Staffing Policy Notice -->
                     <template x-if="!selectedAssignedDay.can_request_release">
-                        <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 space-y-2">
+                        <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-900 space-y-2">
                             <div class="font-bold flex items-center gap-2">
                                 <svg class="w-5 h-5 text-rose-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                                 <span>48-Hour Cutoff Enforced</span>
@@ -344,22 +344,22 @@
                             <input type="hidden" name="dive_date" :value="selectedAssignedDay.date_str">
 
                             <div class="space-y-1.5">
-                                <label class="block text-xs font-bold text-[#1D1D1F]">
+                                <label class="block text-sm font-bold text-[#1D1D1F]">
                                     Reason for Emergency Release <span class="text-rose-500">*</span>
                                 </label>
                                 <textarea name="reason" 
                                           rows="4" 
                                           required 
                                           placeholder="Please explain the emergency, illness, or unavoidable circumstance requiring reassignment..."
-                                          class="w-full text-xs rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
-                                <span class="text-[11px] text-[#8E8E93]">Your request will be submitted to Camp Admin for review and student reassignment.</span>
+                                          class="w-full text-sm rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-[#780000] p-3"></textarea>
+                                <span class="text-sm text-[#8E8E93]">Your request will be submitted to Camp Admin for review and student reassignment.</span>
                             </div>
 
                             <div class="flex items-center justify-end gap-2 pt-2">
-                                <button type="button" @click="releaseModalOpen = false" class="px-4 py-2.5 rounded-xl border border-[#E5E5EA] text-xs font-bold text-[#6E6E73] hover:bg-[#F2F2F7]">
+                                <button type="button" @click="releaseModalOpen = false" class="btn-secondary px-4 py-2 text-sm">
                                     Cancel
                                 </button>
-                                <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-600 text-white text-xs font-bold hover:bg-rose-700">
+                                <button type="submit" class="btn-danger px-5 py-2 text-sm font-bold">
                                     Submit Release Request
                                 </button>
                             </div>

@@ -85,7 +85,7 @@ class Coach extends Model
         if ($this->isExpired()) {
             return [
                 'label' => 'Expired (' . $this->certification_expiry->format('M d, Y') . ')',
-                'class' => 'bg-red-50 text-red-700 border-red-200',
+                'class' => 'bg-red-50 text-red-700',
                 'state' => 'expired',
             ];
         }
@@ -94,14 +94,14 @@ class Coach extends Model
             $days = now()->startOfDay()->diffInDays($this->certification_expiry->startOfDay());
             return [
                 'label' => "Expiring in {$days}d (" . $this->certification_expiry->format('M d, Y') . ')',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
                 'state' => 'expiring_soon',
             ];
         }
 
         return [
             'label' => 'Valid until ' . $this->certification_expiry->format('M d, Y'),
-            'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            'class' => 'bg-emerald-50 text-emerald-700',
             'state' => 'valid',
         ];
     }
@@ -111,23 +111,23 @@ class Coach extends Model
         return match ($this->status) {
             'active' => [
                 'label' => 'Active',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'pending_deactivation' => [
                 'label' => 'Pending Deactivation',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'on_leave' => [
                 'label' => 'On Leave',
-                'class' => 'bg-blue-50 text-blue-700 border-blue-200',
+                'class' => 'bg-blue-50 text-blue-700',
             ],
             'inactive' => [
                 'label' => 'Inactive',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-300',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', $this->status)),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

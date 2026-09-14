@@ -89,8 +89,7 @@ class AdminBatchModuleTest extends TestCase
         $endDate = Carbon::now()->addDays(31)->format('Y-m-d');
 
         $response = $this->post('/admin/batches', [
-            'name' => 'Oct 10–11 Custom Batch',
-            'batch_code' => 'Batch 99',
+            'batch_number' => 'Batch 99',
             'start_date' => $startDate,
             'end_date' => $endDate,
             'risk_classification' => 'safe',
@@ -100,12 +99,12 @@ class AdminBatchModuleTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('batches', [
-            'name' => 'Oct 10–11 Custom Batch',
+            'name' => 'Batch 99',
             'batch_code' => 'Batch 99',
             'status' => 'confirmed',
         ]);
 
-        $this->assertEquals('Oct 10–11 Custom Batch', $booking->fresh()->batch->name);
+        $this->assertEquals('Batch 99', $booking->fresh()->batch->name);
     }
 
     public function test_unbatched_bookings_api_returns_correct_json(): void

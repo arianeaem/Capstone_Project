@@ -7,18 +7,18 @@
     
     <!-- Top Breadcrumb & Header -->
     <div class="flex items-center justify-between">
-        <a href="{{ route('admin.users.index') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+        <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             <span>Back to User Management</span>
         </a>
-        <span class="text-xs text-[#8E8E93]">Admin/Owner Managed Profile</span>
+        <span class="text-sm text-[#8E8E93]">Admin/Owner Managed Profile</span>
     </div>
 
     <!-- Edit User Profile Form -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-7 shadow-2xs space-y-5">
         <div class="border-b border-[#E5E5EA] pb-3">
             <h1 class="text-xl font-extrabold text-[#1D1D1F] tracking-tight">Edit Staff Profile</h1>
-            <p class="text-xs text-[#6E6E73] mt-0.5">
+            <p class="text-sm text-[#6E6E73] mt-0.5">
                 Update account info for <strong>{{ $user->name }}</strong> ({{ $user->role_badge['label'] }}).
             </p>
         </div>
@@ -29,7 +29,7 @@
 
             <!-- Name -->
             <div>
-                <label for="name" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
+                <label for="name" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                     First & Last Name <span class="text-[#780000]">*</span>
                 </label>
                 <input type="text" 
@@ -38,15 +38,15 @@
                        value="{{ old('name', $user->name) }}" 
                        required
                        placeholder="First & Last Name"
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-xs text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 @error('name')
-                    <p class="text-xs text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                    <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Email -->
             <div>
-                <label for="email" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
+                <label for="email" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                     Email Address <span class="text-[#780000]">*</span>
                 </label>
                 <input type="email" 
@@ -54,15 +54,15 @@
                        id="email" 
                        value="{{ old('email', $user->email) }}" 
                        required
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-xs text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 @error('email')
-                    <p class="text-xs text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                    <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Phone -->
             <div>
-                <label for="phone" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
+                <label for="phone" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                     Mobile / Phone Number
                 </label>
                 <input type="tel" 
@@ -70,19 +70,19 @@
                        id="phone" 
                        value="{{ old('phone', $user->phone) }}" 
                        placeholder="0917 123 4567"
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-xs text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 @error('phone')
-                    <p class="text-xs text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                    <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
             <!-- Role & Status -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="role" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
+                    <label for="role" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                         Assigned Role <span class="text-[#780000]">*</span>
                     </label>
-                    <select name="role" id="role" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                    <select name="role" id="role" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="coach" {{ old('role', $user->role) === 'coach' ? 'selected' : '' }}>Freediving Coach</option>
                         @if($currentUser->isOwner())
                             <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Camp Admin</option>
@@ -92,10 +92,10 @@
                 </div>
 
                 <div>
-                    <label for="status" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
+                    <label for="status" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                         Account Status <span class="text-[#780000]">*</span>
                     </label>
-                    <select name="status" id="status" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
+                    <select name="status" id="status" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="active" {{ old('status', $user->status) === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ old('status', $user->status) === 'inactive' ? 'selected' : '' }}>Inactive / Deactivated</option>
                     </select>
@@ -104,23 +104,23 @@
 
             <!-- Optional Password Reset by Admin/Owner -->
             <div class="pt-3 border-t border-[#E5E5EA]">
-                <label for="new_password" class="block font-bold text-[#1D1D1F] mb-1.5 text-xs">
+                <label for="new_password" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                     Assign New Temporary Password (Optional)
                 </label>
                 <input type="text" 
                        name="new_password" 
                        id="new_password" 
                        placeholder="Leave blank to keep existing password"
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-xs font-mono text-[#1D1D1F] bg-white">
-                <span class="text-xs text-[#6E6E73] mt-1 block">
+                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm font-mono text-[#1D1D1F] bg-white">
+                <span class="text-sm text-[#6E6E73] mt-1 block">
                     Setting a new password will force the user to change it upon their next login.
                 </span>
             </div>
 
             <!-- Submit Controls -->
             <div class="flex items-center justify-end gap-2 pt-3">
-                <a href="{{ route('admin.users.index') }}" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold">Cancel</a>
-                <button type="submit" class="btn-primary px-4 py-1.5 text-xs font-bold shadow-2xs">
+                <a href="{{ route('admin.users.index') }}" class="btn-secondary px-3.5 py-1.5 text-sm font-semibold">Cancel</a>
+                <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">
                     Save Profile Changes
                 </button>
             </div>
@@ -133,37 +133,37 @@
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
                 <h3 class="text-sm font-extrabold text-[#780000]">Danger Zone</h3>
-                <p class="text-xs text-[#6E6E73] mt-0.5">Permanently delete this staff account and all associated portal access.</p>
+                <p class="text-sm text-[#6E6E73] mt-0.5">Permanently delete this staff account and all associated portal access.</p>
             </div>
             <button type="button" 
                     @click="openDeleteConfirm = true" 
-                    class="btn-danger px-3.5 py-2 text-xs font-bold shrink-0 self-start sm:self-auto cursor-pointer">
+                    class="btn-danger px-3.5 py-2 text-sm font-bold shrink-0 self-start sm:self-auto cursor-pointer">
                 Delete Account
             </button>
         </div>
 
         <!-- Delete Modal inside Edit Page -->
-        <div x-show="openDeleteConfirm" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+        <div x-show="openDeleteConfirm" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openDeleteConfirm = false">
                 <div class="flex items-start justify-between">
                     <div class="flex items-center gap-3">
                         <div>
                             <h3 class="text-base font-extrabold text-[#780000]">Delete {{ $user->name }}</h3>
-                            <p class="text-xs text-[#6E6E73]">Irreversible permanent deletion.</p>
+                            <p class="text-sm text-[#6E6E73]">Irreversible permanent deletion.</p>
                         </div>
                     </div>
-                    <button type="button" @click="openDeleteConfirm = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                    <button type="button" @click="openDeleteConfirm = false" aria-label="Close delete modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
                 </div>
 
-                <p class="text-xs text-[#1D1D1F]">
+                <p class="text-sm text-[#1D1D1F]">
                     Are you sure you want to permanently delete the account for <strong>{{ $user->name }}</strong> (<span class="font-mono text-[#6E6E73]">{{ $user->email }}</span>)? This action cannot be undone.
                 </p>
 
-                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="pt-2 flex items-center justify-end gap-2">
+                <form action="{{ route('admin.users.destroy', $user) }}" method="POST" class="pt-2 flex items-center justify-end border-t border-[#F2F2F7] gap-2">
                     @csrf
                     @method('DELETE')
-                    <button type="button" @click="openDeleteConfirm = false" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold cursor-pointer">Cancel</button>
-                    <button type="submit" class="btn-danger px-4 py-1.5 text-xs font-bold shadow-2xs cursor-pointer">
+                    <button type="button" @click="openDeleteConfirm = false" class="btn-secondary px-3.5 py-1.5 text-sm font-semibold cursor-pointer">Cancel</button>
+                    <button type="submit" class="btn-danger px-4 py-1.5 text-sm font-bold shadow-2xs cursor-pointer">
                         Permanently Delete
                     </button>
                 </form>

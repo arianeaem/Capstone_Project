@@ -76,32 +76,32 @@ class BatchRiskAssessment extends Model
         return match ($this->overall_classification) {
             'Very Safe' => [
                 'label' => 'Very Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
                 'bg' => 'bg-emerald-500',
             ],
             'Safe' => [
                 'label' => 'Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
                 'bg' => 'bg-emerald-500',
             ],
             'Moderate' => [
                 'label' => 'Moderate',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
                 'bg' => 'bg-amber-500',
             ],
             'High Risk' => [
                 'label' => 'High Risk',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
                 'bg' => 'bg-rose-500',
             ],
             'Critical Risk' => [
                 'label' => 'Critical Risk',
-                'class' => 'bg-red-100 text-red-800 border-red-300',
+                'class' => 'bg-red-100 text-red-800',
                 'bg' => 'bg-red-600',
             ],
             default => [
                 'label' => $this->overall_classification ?: 'Not Assessed',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
                 'bg' => 'bg-gray-400',
             ],
         };

@@ -83,7 +83,7 @@ class UpdateForecastCommand extends Command
                 if ($batches->isNotEmpty()) {
                     foreach ($batches as $batch) {
                         $assessResult = $weatherService->assessBatch($batch, null, null);
-                        $this->line("  • Batch <fg=yellow>{$batch->batch_code}</>: Overall Risk = <fg=green>{$assessResult['overall_classification']}</>");
+                        $this->line("  - Batch <fg=yellow>{$batch->batch_code}</>: Overall Risk = <fg=green>{$assessResult['overall_classification']}</>");
                     }
                     $this->info("Successfully evaluated {$batches->count()} active batch(es).");
                 } else {

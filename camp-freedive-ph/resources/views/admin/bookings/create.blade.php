@@ -15,12 +15,13 @@
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Add Manual Reservation</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Create a reservation for walk-in guests or direct inquiries.
             </p>
         </div>
-        <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-4 py-2 text-xs sm:text-sm">
-            ← Back to List
+        <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-4 py-2 text-sm sm:text-sm flex items-center gap-1.5 font-medium">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <span>Back to List</span>
         </a>
     </div>
 
@@ -77,13 +78,13 @@
             </div>
 
             <!-- Weather Forecast Preview -->
-            <div x-show="forecast" x-cloak class="p-3.5 rounded-xl text-xs space-y-1 mt-2"
+            <div x-show="forecast" x-cloak class="p-3.5 rounded-xl text-sm space-y-1 mt-2"
                  :style="'background-color: ' + (forecast?.bg_color || '#F2F2F7') + '; color: ' + (forecast?.text_color || '#1D1D1F')">
                 <div class="flex items-center justify-between font-bold">
                     <span x-text="'Forecast: ' + (forecast?.title || '')"></span>
                     <span x-text="forecast?.is_bookable ? 'Safe Conditions' : 'Critical Storm Warning'"></span>
                 </div>
-                <p class="text-xs" x-text="forecast?.description"></p>
+                <p class="text-sm" x-text="forecast?.description"></p>
             </div>
         </div>
 
@@ -91,45 +92,45 @@
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <div class="flex items-center justify-between pb-2">
                 <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants</h3>
-                <span class="text-xs text-[#6E6E73]">Data Privacy Act (RA 10173) Protected</span>
+                <span class="text-sm text-[#6E6E73]">Data Privacy Act (RA 10173) Protected</span>
             </div>
 
             <div class="space-y-4">
                 <template x-for="(p, index) in participants" :key="index">
-                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-3">
+                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#780000]" x-text="'Participant #' + (index + 1)"></span>
                             <button type="button" 
                                     x-show="participants.length > 1" 
                                     @click="removeParticipant(index)"
-                                    class="text-xs text-[#FF3B3C] font-bold hover:underline">
+                                    class="text-sm text-[#FF3B3C] font-bold hover:underline">
                                 Remove
                             </button>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Age <span class="text-[#780000]">*</span></label>
-                                <input type="number" :name="'participants[' + index + '][age]'" x-model="p.age" required min="8" max="80" placeholder="Age" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age <span class="text-[#780000]">*</span></label>
+                                <input type="number" :name="'participants[' + index + '][age]'" x-model="p.age" required min="8" max="80" placeholder="Age" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Swimming Status</label>
-                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Status</label>
+                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                                     <option value="non_swimmer">Non-Swimmer</option>
                                     <option value="casual_swimmer">Casual / Beginner Swimmer</option>
                                     <option value="swimmer">Confident Swimmer</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Health Condition Notes (Free-text)</label>
-                                <input type="text" :name="'participants[' + index + '][health_condition]'" x-model="p.health_condition" placeholder="e.g. Asthma, allergies, ear issues, or None" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Health Condition Notes (Free-text)</label>
+                                <input type="text" :name="'participants[' + index + '][health_condition]'" x-model="p.health_condition" placeholder="e.g. Asthma, allergies, ear issues, or None" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
                     </div>
@@ -138,8 +139,8 @@
 
             <button type="button" 
                     @click="addParticipant()"
-                    class="w-full py-2.5 rounded-xl border border-dashed border-[#780000]/30 hover:border-[#780000] text-[#780000] font-bold text-xs bg-[#F8EAEA]/20 hover:bg-[#F8EAEA]/50 transition-colors flex items-center justify-center gap-1.5">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    class="w-full py-2.5 rounded-xl border border-dashed border-[#780000]/30 hover:border-[#780000] text-[#780000] font-bold text-sm bg-[#F8EAEA]/20 hover:bg-[#F8EAEA]/50 transition-colors flex items-center justify-center gap-1.5">
+                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                 <span>Add Another Participant</span>
             </button>
         </div>
@@ -150,23 +151,23 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Contact Name <span class="text-[#780000]">*</span></label>
-                    <input type="text" name="contact_name" required placeholder="Lead Contact" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Contact Name <span class="text-[#780000]">*</span></label>
+                    <input type="text" name="contact_name" required placeholder="Lead Contact" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Contact Email <span class="text-[#780000]">*</span></label>
-                    <input type="email" name="contact_email" required placeholder="email@example.com" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Contact Email <span class="text-[#780000]">*</span></label>
+                    <input type="email" name="contact_email" required placeholder="email@example.com" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Mobile Number <span class="text-[#780000]">*</span></label>
-                    <input type="tel" name="contact_phone" required placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Mobile Number <span class="text-[#780000]">*</span></label>
+                    <input type="tel" name="contact_phone" required placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
             </div>
 
             <!-- Transportation Choice -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Transportation Option</label>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Transportation Option</label>
                     <select name="pickup_option" x-model="pickupOption" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="carpool">Manila Carpool Van (₱1,200 / head roundtrip)</option>
                         <option value="own">Own Transportation (₱0)</option>
@@ -174,7 +175,7 @@
                 </div>
 
                 <div x-show="pickupOption === 'carpool'" x-cloak>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Carpool Pickup Location & Schedule</label>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Carpool Pickup Location & Schedule</label>
                     <select name="pickup_location" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         <template x-for="p in pickupPoints" :key="p.id">
                             <option :value="p.name" x-text="p.name"></option>
@@ -198,7 +199,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Payment Channel <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Payment Channel <span class="text-[#780000]">*</span></label>
                     <select name="payment_method" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="gcash">GCash (Direct Transfer)</option>
                         <option value="bpi_bank_transfer">BPI Bank Transfer</option>
@@ -206,7 +207,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Payment Stage <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Payment Stage <span class="text-[#780000]">*</span></label>
                     <select name="payment_stage" x-model="paymentStage" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="downpayment">Required Downpayment Only</option>
                         <option value="full">Full Settlement (100%)</option>
@@ -214,7 +215,7 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Payment Status <span class="text-[#780000]">*</span></label>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Payment Status <span class="text-[#780000]">*</span></label>
                     <select name="payment_status" required class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="completed">Payment Verified (Completed)</option>
                         <option value="pending">Pending Verification</option>
@@ -223,7 +224,7 @@
             </div>
 
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Admin / Coordinator Note</label>
+                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Admin / Coordinator Note</label>
                 <textarea name="admin_notes" rows="2" placeholder="e.g. Phone reservation confirmed via WhatsApp" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
             </div>
         </div>

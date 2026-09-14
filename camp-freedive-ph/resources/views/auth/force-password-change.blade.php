@@ -4,8 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>First-Time Password Setup | Camp FreedivePH</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700,800,900" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -34,13 +35,13 @@
             </div>
 
             @if(session('warning'))
-                <div class="mb-6 p-4 rounded-xl bg-amber-50 text-xs font-semibold text-amber-900 leading-relaxed">
+                <div class="mb-6 p-4 rounded-xl bg-amber-50 text-sm font-semibold text-amber-900 leading-relaxed">
                     {{ session('warning') }}
                 </div>
             @endif
 
             @if(session('error'))
-                <div class="mb-6 p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-xs font-semibold text-[#991B1B]">
+                <div class="mb-6 p-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-sm font-semibold text-[#991B1B]">
                     {{ session('error') }}
                 </div>
             @endif
@@ -50,7 +51,7 @@
 
                 <!-- Current Temporary Password -->
                 <div class="space-y-1.5" x-data="{ show: false }">
-                    <label for="current_password" class="block font-bold text-[#1D1D1F] text-xs uppercase tracking-wider">
+                    <label for="current_password" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
                         Current Temporary Password <span class="text-[#780000]">*</span>
                     </label>
                     <div class="relative">
@@ -69,13 +70,13 @@
                         </button>
                     </div>
                     @error('current_password')
-                        <p class="text-xs text-[#FF3B3C] font-semibold mt-1">{{ $message }}</p>
+                        <p class="text-sm text-[#FF3B3C] font-semibold mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- New Permanent Password -->
                 <div class="space-y-1.5" x-data="{ show: false }">
-                    <label for="password" class="block font-bold text-[#1D1D1F] text-xs uppercase tracking-wider">
+                    <label for="password" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
                         New Permanent Password <span class="text-[#780000]">*</span>
                     </label>
                     <div class="relative">
@@ -93,13 +94,13 @@
                         </button>
                     </div>
                     @error('password')
-                        <p class="text-xs text-[#FF3B3C] font-semibold mt-1">{{ $message }}</p>
+                        <p class="text-sm text-[#FF3B3C] font-semibold mt-1">{{ $message }}</p>
                     @enderror
                 </div>
 
                 <!-- Confirm New Password -->
                 <div class="space-y-1.5" x-data="{ show: false }">
-                    <label for="password_confirmation" class="block font-bold text-[#1D1D1F] text-xs uppercase tracking-wider">
+                    <label for="password_confirmation" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
                         Confirm New Permanent Password <span class="text-[#780000]">*</span>
                     </label>
                     <div class="relative">
@@ -127,7 +128,7 @@
             <div class="mt-8 pt-6 border-t border-[#E5E5EA] text-center">
                 <form action="{{ route('logout') }}" method="POST" data-no-spa data-native>
                     @csrf
-                    <button type="submit" class="text-xs text-[#6E6E73] hover:text-[#780000] font-semibold underline cursor-pointer">
+                    <button type="submit" class="text-sm text-[#6E6E73] hover:text-[#780000] font-semibold underline cursor-pointer">
                         Sign Out
                     </button>
                 </form>

@@ -106,19 +106,19 @@ class User extends Authenticatable
         return match ($this->role) {
             'owner' => [
                 'label' => 'Camp Owner',
-                'class' => 'bg-purple-100 text-purple-800 border-purple-200',
+                'class' => 'bg-purple-100 text-purple-800',
             ],
             'admin' => [
                 'label' => 'Camp Admin',
-                'class' => 'bg-blue-100 text-blue-800 border-blue-200',
+                'class' => 'bg-blue-100 text-blue-800',
             ],
             'coach' => [
                 'label' => 'Freediving Coach',
-                'class' => 'bg-emerald-100 text-emerald-800 border-emerald-200',
+                'class' => 'bg-emerald-100 text-emerald-800',
             ],
             default => [
                 'label' => ucfirst($this->role),
-                'class' => 'bg-gray-100 text-gray-800 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-800',
             ],
         };
     }

@@ -22,25 +22,25 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.payments.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1 font-medium">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                     <span>Back to Payments</span>
                 </a>
                 <span class="text-[#D1D1D6]">/</span>
-                <span class="text-xs font-bold text-[#780000]">Refund Queue</span>
+                <span class="text-sm font-bold text-[#780000]">Refund Queue</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Pending Refund Requests</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Review, forfeit, or approve customer refund claims based on the 14-day camp cancellation policy.
             </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
+            <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5">
                 <svg class="w-4 h-4 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                 <span>Reschedule/Cancel Requests</span>
             </a>
-            <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-3.5 py-2 text-xs sm:text-sm font-semibold">
+            <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold">
                 Payments Ledger
             </a>
         </div>
@@ -52,7 +52,7 @@
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
                 <span>Pending Refund Approvals</span>
                 @if(count($pendingRefunds) > 0)
-                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#780000] text-white">
+                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#780000] text-white">
                         {{ count($pendingRefunds) }} Action Required
                     </span>
                 @endif
@@ -79,59 +79,58 @@
                                 <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-sm text-[#780000] hover:underline">
                                     {{ $booking->booking_number }}
                                 </a>
-                                <span class="text-xs font-bold px-2 py-0.5 rounded-md bg-[#FAFAFC] border border-[#E5E5EA] text-[#3A3A3C] truncate">
+                                <span class="text-sm font-bold px-2 py-0.5 rounded-md bg-[#F2F2F7] border border-[#E5E5EA] text-[#3A3A3C] truncate">
                                     {{ $booking->formatted_class_type }}
                                 </span>
                             </div>
-                            <div class="text-xs text-[#8E8E93]">
+                            <div class="text-sm text-[#8E8E93]">
                                 Requested {{ $req->requested_at ? $req->requested_at->diffForHumans() : $req->created_at->diffForHumans() }}
                             </div>
                         </div>
 
-                        <span class="px-2 py-0.5 rounded-md text-xs font-bold uppercase tracking-wider bg-[#FAFAFC] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
+                        <span class="px-2 py-0.5 rounded-md text-sm font-bold uppercase tracking-wider bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
                             Pending
                         </span>
                     </div>
 
                     <!-- Guest and Trip Details -->
-                    <div class="mt-3 space-y-1 text-xs">
+                    <div class="mt-3 space-y-1 text-sm">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-sm text-[#1D1D1F]">{{ $booking->contact_name }}</span>
-                            <span class="text-xs text-[#6E6E73] font-medium">{{ $booking->participants->count() }} Student{{ $booking->participants->count() > 1 ? 's' : '' }}</span>
+                            <span class="text-sm text-[#6E6E73] font-medium">{{ $booking->participants->count() }} Student{{ $booking->participants->count() > 1 ? 's' : '' }}</span>
                         </div>
-                        <div class="text-xs text-[#6E6E73]">
-                            {{ $booking->contact_email }} • {{ $booking->contact_phone }}
+                        <div class="text-xs text-[#6E6E73] space-y-0.5">
+                            <div>{{ $booking->contact_email }}</div>
+                            <div>{{ $booking->contact_phone }}</div>
                         </div>
-                        <div class="text-xs text-[#6E6E73] pt-0.5">
+                        <div class="text-sm text-[#6E6E73] pt-0.5">
                             Dive Date: <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('M d, Y') }}</strong>
                         </div>
                     </div>
 
                     <!-- Refund Claim Details -->
-                    <div class="mt-3 p-3 rounded-lg bg-[#FAFAFC] border border-[#E5E5EA] space-y-2 text-xs">
+                    <div class="mt-3 p-3 rounded-lg bg-[#F2F2F7] border border-[#E5E5EA] space-y-2 text-sm">
                         <div class="flex items-baseline justify-between">
-                            <span class="text-xs text-[#6E6E73] font-medium">Refund Claim Amount:</span>
+                            <span class="text-sm text-[#6E6E73] font-medium">Refund Claim Amount:</span>
                             <div class="text-base font-extrabold text-[#1D1D1F]">
                                 ₱{{ number_format($claimAmount, 2) }}
                             </div>
                         </div>
 
-                        <div class="flex items-center justify-between text-xs text-[#6E6E73] pt-1.5 border-t border-[#E5E5EA]">
+                        <div class="flex items-center justify-between text-sm text-[#6E6E73] pt-1.5 border-t border-[#E5E5EA]">
                             <span>Method: <strong class="text-[#1D1D1F] uppercase">{{ $payment->payment_method ?? 'GCash' }}</strong></span>
                             <span>Type: <strong class="text-[#1D1D1F] capitalize">{{ $payment->payment_type ?? 'downpayment' }}</strong></span>
                         </div>
 
                         <div class="pt-1.5 border-t border-[#E5E5EA] space-y-1">
-                            <div class="flex items-center gap-1.5 font-bold text-xs {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
+                            <div class="flex items-center gap-1.5 font-bold text-sm {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
                                 @if($isEligible)
-                                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-600 shrink-0"></span>
                                     <span>Eligible for 100% Full Refund</span>
                                 @else
-                                    <span class="inline-block w-2 h-2 rounded-full bg-amber-600 shrink-0"></span>
                                     <span>Non-Refundable Policy Window</span>
                                 @endif
                             </div>
-                            <p class="text-xs text-[#6E6E73] leading-relaxed">
+                            <p class="text-sm text-[#6E6E73] leading-relaxed">
                                 @if($isEligible)
                                     Cancellation filed 14+ days before dive date. Qualified for online gateway reversal.
                                 @else
@@ -139,7 +138,7 @@
                                 @endif
                             </p>
                             @if($req->notes)
-                                <div class="text-xs text-[#6E6E73] italic pt-0.5">
+                                <div class="text-sm text-[#6E6E73] italic pt-0.5">
                                     Note: "{{ $req->notes }}"
                                 </div>
                             @endif
@@ -153,7 +152,7 @@
                         <!-- Reject Action -->
                         <button type="button" 
                                 @click="openRejectModal('{{ route('admin.payments.refunds.reject', $req) }}', '{{ $booking->booking_number }}', '₱{{ number_format($claimAmount, 2) }}')"
-                                class="btn-secondary py-2 px-3 text-xs font-semibold text-center shrink-0">
+                                class="btn-secondary py-2 px-3 text-sm font-semibold text-center shrink-0">
                             Reject
                         </button>
 
@@ -164,7 +163,7 @@
                                 <input type="hidden" name="forfeit_reason" value="cancellation_outside_policy_window">
                                 <button type="submit" 
                                         onclick="return confirm('Forfeit ₱{{ number_format($claimAmount, 2) }} deposit under camp cancellation policy for {{ $booking->booking_number }}?')"
-                                        class="btn-secondary w-full py-2 text-xs font-bold text-center">
+                                        class="btn-secondary w-full py-2 text-sm font-bold text-center">
                                     Forfeit Deposit (₱0)
                                 </button>
                             </form>
@@ -174,7 +173,7 @@
                                 @csrf
                                 <button type="submit" 
                                         onclick="return confirm('Approve & execute ₱{{ number_format($claimAmount, 2) }} refund via PayMongo for {{ $booking->booking_number }}?')"
-                                        class="btn-primary w-full py-2 text-xs font-bold shadow-2xs text-center">
+                                        class="btn-primary w-full py-2 text-sm font-bold shadow-2xs text-center">
                                     Approve & Execute (₱{{ number_format($claimAmount, 2) }})
                                 </button>
                             </form>
@@ -188,7 +187,7 @@
                             <input type="hidden" name="notes" value="Administrative policy override: 100% refund approved">
                             <button type="submit" 
                                     onclick="return confirm('Override policy and execute full refund of ₱{{ number_format($claimAmount, 2) }} via PayMongo for {{ $booking->booking_number }}?')"
-                                    class="btn-danger w-full py-1.5 text-xs font-bold text-center">
+                                    class="btn-danger w-full py-1.5 text-sm font-bold text-center">
                                 Override Policy: Execute Refund (₱{{ number_format($claimAmount, 2) }})
                             </button>
                         </form>
@@ -198,11 +197,11 @@
             </div>
             @empty
             <div class="col-span-full bg-white rounded-xl border border-[#E5E5EA] p-10 text-center space-y-3">
-                <div class="w-10 h-10 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000]/30 flex items-center justify-center mx-auto text-base font-bold">
-                    ✓
+                <div class="w-10 h-10 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000]/30 flex items-center justify-center mx-auto">
+                    <svg class="w-5 h-5 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
                 <h3 class="font-bold text-base text-[#1D1D1F]">No Pending Refund Requests</h3>
-                <p class="text-xs text-[#6E6E73] max-w-md mx-auto">
+                <p class="text-sm text-[#6E6E73] max-w-md mx-auto">
                     All customer cancellation refund claims have been reviewed and processed.
                 </p>
             </div>
@@ -215,14 +214,14 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="font-bold text-base text-[#1D1D1F]">Processed Refund History</h2>
-                <p class="text-xs text-[#6E6E73] mt-0.5">Audit ledger of approved, forfeited, and rejected refund transactions.</p>
+                <p class="text-sm text-[#6E6E73] mt-0.5">Audit ledger of approved, forfeited, and rejected refund transactions.</p>
             </div>
         </div>
 
         <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
             <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs">
-                    <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
                         <tr>
                             <th class="py-3 px-4 text-left">Booking #</th>
                             <th class="py-3 px-4 text-left">Lead Guest</th>
@@ -235,7 +234,7 @@
                     </thead>
                     <tbody class="divide-y divide-[#E5E5EA]">
                         @forelse($processedRefunds as $pr)
-                        <tr class="hover:bg-[#FAFAFC] transition-colors">
+                        <tr class="hover:bg-[#F2F2F7] transition-colors">
                             <td class="py-3 px-4 text-left">
                                 <a href="{{ route('admin.bookings.show', $pr->booking) }}" class="font-mono font-bold text-[#780000] hover:underline">
                                     {{ $pr->booking->booking_number }}
@@ -249,15 +248,15 @@
                             </td>
                             <td class="py-3 px-4 text-left">
                                 @if($pr->status === 'approved')
-                                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-emerald-50 text-emerald-700">
                                         Refunded
                                     </span>
                                 @elseif($pr->status === 'forfeited')
-                                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FAFAFC] text-[#1D1D1F] border border-[#E5E5EA]">
+                                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#F2F2F7] text-[#1D1D1F]">
                                         Forfeited
                                     </span>
                                 @else
-                                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-rose-50 text-rose-700">
                                         Rejected
                                     </span>
                                 @endif
@@ -268,13 +267,13 @@
                             <td class="py-3 px-4 text-[#6E6E73] whitespace-nowrap">
                                 {{ $pr->reviewed_at ? $pr->reviewed_at->format('M d, Y g:i A') : '-' }}
                             </td>
-                            <td class="py-3 px-4 font-mono text-xs text-[#6E6E73]">
+                            <td class="py-3 px-4 font-mono text-sm text-[#6E6E73]">
                                 {{ $pr->paymongo_refund_id ?? ($pr->status === 'forfeited' ? 'Forfeited to Camp' : 'N/A') }}
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="py-8 text-center text-xs text-[#8E8E93]">
+                            <td colspan="7" class="py-8 text-center text-sm text-[#8E8E93]">
                                 No processed refund records found.
                             </td>
                         </tr>
@@ -290,19 +289,19 @@
     <!-- Rejection Reason Modal -->
     <div x-show="rejectModalOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
         <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" 
              @click.outside="rejectModalOpen = false">
             <div class="flex items-center justify-between">
                 <h3 class="font-bold text-base text-[#1D1D1F]">
                     Reject Refund Request
                 </h3>
-                <button type="button" @click="rejectModalOpen = false" class="text-base font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+                <button type="button" @click="rejectModalOpen = false" aria-label="Close reject refund modal" class="text-base font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
             <form :action="rejectFormAction" method="POST" class="space-y-4">
                 @csrf
-                <p class="text-xs text-[#6E6E73]">
+                <p class="text-sm text-[#6E6E73]">
                     Please provide a reason for rejecting the refund request (<span class="font-bold text-[#1D1D1F]" x-text="rejectAmount"></span>) for Booking #<strong class="text-[#1D1D1F]" x-text="rejectBookingNumber"></strong>:
                 </p>
 
@@ -312,14 +311,14 @@
                               rows="3" 
                               required
                               placeholder="e.g. Request does not meet cancellation criteria or chargeback already settled..." 
-                              class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
+                              class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2.5 pt-2 border-t border-[#E5E5EA]">
-                    <button type="button" @click="rejectModalOpen = false" class="btn-secondary px-3.5 py-1.5 text-xs font-semibold">
+                    <button type="button" @click="rejectModalOpen = false" class="btn-secondary px-3.5 py-1.5 text-sm font-semibold">
                         Cancel
                     </button>
-                    <button type="submit" class="btn-danger px-4 py-1.5 text-xs font-bold shadow-2xs">
+                    <button type="submit" class="btn-danger px-4 py-1.5 text-sm font-bold shadow-2xs">
                         Confirm Rejection
                     </button>
                 </div>

@@ -10,7 +10,7 @@
         .content { padding: 32px 24px; }
         .status-box { background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 10px; padding: 16px; color: #92400E; margin: 20px 0; }
         .btn { display: inline-block; background: #780000; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 14px; }
-        .footer { background: #FAFAFC; padding: 20px; text-align: center; font-size: 12px; color: #8E8E93; border-top: 1px solid #E5E5EA; }
+        .footer { background: #F2F2F7; padding: 20px; text-align: center; font-size: 14px; color: #8E8E93; border-top: 1px solid #E5E5EA; }
     </style>
 </head>
 <body>
@@ -45,14 +45,20 @@
                 @endif
             </table>
 
-            <p style="font-size: 13px; color: #6E6E73;">You can track the status of your booking anytime using your Booking Number and PIN on the portal.</p>
+            <p style="font-size: 14px; color: #6E6E73;">You can track the status of your booking anytime using your Booking Number and PIN on the portal.</p>
             
             <div style="text-align: center; margin-top: 24px;">
                 <a href="{{ url('/manage-booking') }}" class="btn">View Booking Status</a>
             </div>
         </div>
         <div class="footer">
-            Camp FreedivePH<br>Mabini, Batangas
+            <p><strong>Camp FreedivePH</strong><br>The Shack Hideaway by Mayumi Resorts, Sitio Bagalangit Road, Barangay Bagalangit, Anilao, Mabini, Batangas, Philippines</p>
+            <p style="margin-top: 8px;">
+                <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">Facebook</a> &bull;
+                <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">Instagram</a> &bull;
+                <a href="mailto:campfreediveph@gmail.com" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">campfreediveph@gmail.com</a> &bull;
+                <a href="tel:+639278879894" style="color: #780000; font-weight: 600; text-decoration: underline; margin: 0 4px;">+63 927 887 9894</a>
+            </p>
         </div>
     </div>
 </body>

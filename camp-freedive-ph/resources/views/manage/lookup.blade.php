@@ -44,20 +44,26 @@
                        maxlength="8"
                        required
                        class="w-full px-4 py-3 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm font-mono tracking-widest text-[#1D1D1F] bg-white">
-                <span class="text-xs text-[#6E6E73] mt-1.5 block">
+                <span class="text-sm text-[#6E6E73] mt-1.5 block">
                     The 4-digit PIN was sent to the booking email.
                 </span>
             </div>
 
-            <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md mt-2">
+            <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold mt-2">
                 Find Booking
             </button>
         </form>
 
         <!-- Support Contact Information -->
-        <div class="mt-8 pt-6 border-t border-[#E5E5EA] text-center text-sm text-[#6E6E73]">
-            <p>Need help with your reservation? <br>
-            Message us on <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline">Facebook Messenger</a> or call <a href="tel:09278879894" class="text-[#780000] font-bold">0927 887 9894</a>.</p>
+        <div class="mt-8 pt-6 border-t border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1.5">
+            <p class="font-semibold text-[#1D1D1F]">Need help with your reservation?</p>
+            <p class="leading-relaxed">
+                You may contact us on 
+                <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000]">Facebook</a>, 
+                <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000]">Instagram</a>, 
+                email <a href="mailto:campfreediveph@gmail.com" class="text-[#780000] font-bold underline hover:text-[#5E0000]">campfreediveph@gmail.com</a>, 
+                or call <a href="tel:+639278879894" class="text-[#780000] font-bold whitespace-nowrap hover:underline">+63 927 887 9894</a>.
+            </p>
         </div>
     </div>
 </div>

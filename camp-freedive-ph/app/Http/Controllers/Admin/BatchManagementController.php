@@ -125,7 +125,8 @@ class BatchManagementController extends Controller
         $defaultStartDateStr = $defaultDate->format('Y-m-d');
         $defaultEndDateStr = $defaultEndDate->format('Y-m-d');
         $batchCount = Batch::count();
-        $defaultBatchNumber = 'Batch ' . ($batchCount + 1);
+        $priorCount = Batch::whereDate('start_date', '<=', $defaultDate)->count();
+        $defaultBatchNumber = 'Batch ' . ($priorCount + 1);
 
         $unbatchedBookings = $this->batchService->getUnbatchedBookingsForDate($defaultDate);
 
@@ -178,7 +179,8 @@ class BatchManagementController extends Controller
         $dateStr = $request->input('date', Carbon::today()->format('Y-m-d'));
         $date = Carbon::parse($dateStr);
         $bookings = $this->batchService->getUnbatchedBookingsForDate($date);
-        $batchCount = Batch::count();
+        $priorCount = Batch::whereDate('start_date', '<=', $date)->count();
+        $suggestedNum = $priorCount + 1;
         $mlRec = $this->forecastService->getStaffingRecommendationForDate($date);
 
         $existingForDate = Batch::whereDate('start_date', $date)->get()->map(function ($b) {
@@ -195,9 +197,10 @@ class BatchManagementController extends Controller
 
         return response()->json([
             'date' => $date->format('Y-m-d'),
-            'suggested_batch_number' => 'Batch ' . ($batchCount + 1),
-            'suggested_name' => 'Batch ' . ($batchCount + 1),
-            'suggested_code' => 'Batch ' . ($batchCount + 1),
+            'suggested_batch_number' => 'Batch ' . $suggestedNum,
+            'suggested_batch_number_only' => (string) $suggestedNum,
+            'suggested_name' => 'Batch ' . $suggestedNum,
+            'suggested_code' => 'Batch ' . $suggestedNum,
             'count' => $bookings->count(),
             'existing_batches' => $existingForDate,
             'ml_recommendation' => $mlRec,
@@ -232,10 +235,17 @@ class BatchManagementController extends Controller
             'booking_ids.*' => 'exists:bookings,id',
         ]);
 
-        if (!empty($validated['batch_number'])) {
-            $validated['batch_code'] = $validated['batch_number'];
-            $validated['name'] = $validated['batch_number'];
+        $batchRaw = $validated['batch_number'] ?? $request->input('batch_number_digits') ?? '';
+        if (preg_match('/(\d+)/', (string) $batchRaw, $m)) {
+            $batchIdentifier = 'Batch ' . $m[1];
+        } else {
+            $priorCount = Batch::whereDate('start_date', '<=', Carbon::parse($validated['start_date']))->count();
+            $batchIdentifier = 'Batch ' . ($priorCount + 1);
         }
+
+        $validated['batch_number'] = $batchIdentifier;
+        $validated['batch_code'] = $batchIdentifier;
+        $validated['name'] = $batchIdentifier;
 
         // Check if an existing batch already exists for the same start date to prevent duplicate date batches
         $existingBatch = Batch::whereDate('start_date', $validated['start_date'])->first();

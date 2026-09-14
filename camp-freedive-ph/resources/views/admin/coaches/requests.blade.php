@@ -9,20 +9,20 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.coaches.index') }}" class="text-xs font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                <a href="{{ route('admin.coaches.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                     <span>Coach Roster</span>
                 </a>
                 <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000] text-xs">Coach Requests Queue</span>
+                <span class="font-bold text-[#780000] text-sm">Coach Requests Queue</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Review Coach Requests</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
+            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Review slot applications submitted by coaches for upcoming weekend batches.
             </p>
         </div>
 
-        <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-4 py-2 text-xs sm:text-sm font-bold shadow-2xs">
+        <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs">
             Matching Queue
         </a>
     </div>
@@ -39,20 +39,20 @@
         @endphp
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4" x-data="{ selectedRequests: [] }">
             
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="font-mono font-extrabold text-base text-[#780000]">{{ $batch->batch_code }}</span>
-                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
+                        <span class="px-2.5 py-1 rounded-md text-sm font-bold bg-amber-50 text-amber-900 border border-amber-200">
                             {{ $groupRequests->count() }} {{ Str::plural('Applicant', $groupRequests->count()) }}
                         </span>
-                        <span class="px-2.5 py-1 rounded-md text-xs font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                        <span class="px-2.5 py-1 rounded-md text-sm font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                             {{ $alreadyApproved }} Approved (Recommended: {{ $coachesNeeded }})
                         </span>
                     </div>
-                    <div class="space-y-1 text-xs text-[#6E6E73] mt-2">
+                    <div class="space-y-1 text-sm text-[#6E6E73] mt-2">
                         <div>
-                            <span class="font-bold text-[#1D1D1F]">{{ $batch->start_date->format('F d, Y (l)') }} – {{ $batch->end_date->format('F d, Y (l)') }}</span>
+                            <span class="font-bold text-[#1D1D1F]">{{ $batch->start_date->format('F d, Y (l)') }} to {{ $batch->end_date->format('F d, Y (l)') }}</span>
                         </div>
                         <div>
                             <span>Students Booked: <strong class="text-[#1D1D1F]">{{ $headcount }}</strong> {{ Str::plural('Student', $headcount) }}</span>
@@ -71,7 +71,7 @@
                     </template>
                     <button type="submit" 
                             onclick="return confirm('Approve the selected ' + selectedRequests.length + ' coach applicant(s) for ' + '{{ $batch->batch_code }}' + '?')"
-                            class="btn-primary px-4 py-2 text-xs font-bold shadow-2xs flex items-center gap-1.5">
+                            class="btn-primary px-4 py-2 text-sm font-bold shadow-2xs flex items-center gap-1.5">
                         <span>Approve Selected (<span x-text="selectedRequests.length"></span>)</span>
                     </button>
                 </form>
@@ -80,7 +80,7 @@
             <!-- Applied Coaches List with Multi-Select -->
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 @foreach($groupRequests as $req)
-                <label class="bg-[#FAFAFC] p-4 rounded-xl flex flex-col justify-between gap-2.5 shadow-2xs hover:bg-white hover:border-[#D1D1D6] border border-[#E5E5EA] transition-all cursor-pointer select-none"
+                <label class="bg-[#F2F2F7] p-4 rounded-xl flex flex-col justify-between gap-2.5 shadow-2xs hover:bg-white hover:border-[#D1D1D6] border border-[#E5E5EA] transition-all cursor-pointer select-none"
                        :class="selectedRequests.includes({{ $req->id }}) ? 'border-[#780000] bg-white ring-1 ring-[#780000]/30' : ''">
                     <div class="space-y-2.5">
                         <div class="flex items-center gap-3">
@@ -89,18 +89,18 @@
                                    x-model="selectedRequests" 
                                    class="rounded text-[#780000] focus:ring-[#780000] w-4 h-4 cursor-pointer shrink-0">
 
-                            <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-xs flex items-center justify-center shrink-0">
+                            <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-sm flex items-center justify-center shrink-0">
                                 {{ strtoupper(substr($req->coach->name, 0, 1)) }}
                             </div>
 
                             <div class="min-w-0 flex-1">
-                                <strong class="font-bold text-xs text-[#1D1D1F] block truncate">{{ $req->coach->name }}</strong>
-                                <span class="text-[11px] text-[#8E8E93] block">Applied {{ $req->created_at->format('M d, Y g:i A') }}</span>
+                                <strong class="font-bold text-sm text-[#1D1D1F] block truncate">{{ $req->coach->name }}</strong>
+                                <span class="text-sm text-[#8E8E93] block">Applied {{ $req->created_at->format('M d, Y g:i A') }}</span>
                             </div>
                         </div>
 
                         @if($req->notes)
-                            <p class="text-xs text-[#3A3A3C] italic bg-white p-2.5 rounded-lg border border-[#E5E5EA] leading-relaxed">
+                            <p class="text-sm text-[#3A3A3C] italic bg-white p-2.5 rounded-lg border border-[#E5E5EA] leading-relaxed">
                                 "{{ $req->notes }}"
                             </p>
                         @endif
@@ -111,7 +111,7 @@
 
         </div>
         @empty
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-8 text-center text-xs text-[#6E6E73] shadow-2xs">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-8 text-center text-sm text-[#6E6E73] shadow-2xs">
             No pending coach requests at this time.
         </div>
         @endforelse
@@ -124,16 +124,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             @foreach($reviewedRequests as $rev)
-            <div class="bg-[#FAFAFC] p-3.5 rounded-xl flex items-center justify-between gap-3 text-xs shadow-2xs">
+            <div class="bg-[#F2F2F7] p-3.5 rounded-xl flex items-center justify-between gap-3 text-sm shadow-2xs">
                 <div class="min-w-0 flex-1">
                     <strong class="text-[#1D1D1F] block truncate">{{ $rev->coach->name }}</strong>
-                    <span class="text-[#6E6E73] text-[11px] block">{{ $rev->batch->batch_code }}</span>
-                    <span class="text-[10px] text-[#8E8E93] block mt-0.5">
+                    <span class="text-[#6E6E73] text-sm block">{{ $rev->batch->batch_code }}</span>
+                    <span class="text-sm text-[#8E8E93] block mt-0.5">
                         Reviewed by {{ $rev->reviewer ? $rev->reviewer->name : 'System' }} on {{ $rev->reviewed_at ? $rev->reviewed_at->format('M d, Y') : 'N/A' }}
                     </span>
                 </div>
 
-                <span class="px-2 py-0.5 rounded-md text-[11px] font-bold border shrink-0 {{ $rev->status_badge['class'] }}">
+                <span class="px-2 py-0.5 rounded-md text-sm font-bold shrink-0 {{ $rev->status_badge['class'] }}">
                     {{ $rev->status_badge['label'] }}
                 </span>
             </div>

@@ -19,8 +19,9 @@
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
         <div>
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.bookings.show', $booking) }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F]">
-                    ← Back to Booking #{{ $booking->booking_number }}
+                <a href="{{ route('admin.bookings.show', $booking) }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span>Back to Booking #{{ $booking->booking_number }}</span>
                 </a>
             </div>
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Edit Booking & Participant Details</h1>
@@ -71,19 +72,19 @@
                                 </option>
                             @endforeach
                         </select>
-                        <span class="text-xs text-[#6E6E73] block mt-1">Manila Carpool Service (₱1,200/person roundtrip)</span>
+                        <span class="text-sm text-[#6E6E73] block mt-1">Manila Carpool Service (₱1,200/person roundtrip)</span>
                     </div>
                 @else
-                    <div class="p-3.5 bg-[#FAFAFC] rounded-xl border border-[#E5E5EA] text-xs space-y-1">
+                    <div class="p-3.5 bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] text-sm space-y-1">
                         <span class="text-[#6E6E73] block">Transportation Mode:</span>
                         <strong class="text-[#1D1D1F] text-sm block">Own Transportation (Direct to Anilao Resort)</strong>
-                        <span class="text-[11px] text-[#8E8E93] block">Transportation mode is fixed to preserve original downpayment breakdown.</span>
+                        <span class="text-sm text-[#8E8E93] block">Transportation mode is fixed to preserve original downpayment breakdown.</span>
                     </div>
                 @endif
             </div>
 
             <!-- Boat Dive Status (Read-Only) -->
-            <div class="pt-1 text-xs text-[#6E6E73] flex items-center gap-2">
+            <div class="pt-1 text-sm text-[#6E6E73] flex items-center gap-2">
                 <span>Sanctuary Boat Dive Add-on:</span>
                 <strong class="text-[#1D1D1F]">{{ $booking->boat_dive ? 'Yes (+₱600/person included)' : 'No (Shore Sanctuary Dives Only)' }}</strong>
             </div>
@@ -94,44 +95,44 @@
             <div class="flex items-center justify-between pb-2">
                 <div>
                     <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants ({{ $booking->participants->count() }} pax)</h3>
-                    <p class="text-xs text-[#6E6E73]">Update participant medical and roster information for this reservation.</p>
+                    <p class="text-sm text-[#6E6E73]">Update participant medical and roster information for this reservation.</p>
                 </div>
-                <span class="text-xs text-[#6E6E73] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded">Fixed Participant Count</span>
+                <span class="text-sm text-[#6E6E73] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded">Fixed Participant Count</span>
             </div>
 
             <div class="space-y-4">
                 <template x-for="(p, index) in participants" :key="index">
-                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#FAFAFC] space-y-3">
+                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-3">
                         <input type="hidden" :name="'participants[' + index + '][id]'" :value="p.id">
 
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#780000]" x-text="'Participant #' + (index + 1)"></span>
-                            <span class="text-xs font-mono text-[#8E8E93]" x-text="'ID: ' + (p.id || 'Existing')"></span>
+                            <span class="text-sm font-mono text-[#8E8E93]" x-text="'ID: ' + (p.id || 'Existing')"></span>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Age <span class="text-[#780000]">*</span></label>
-                                <input type="number" :name="'participants[' + index + '][age]'" x-model="p.age" required min="8" max="85" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age <span class="text-[#780000]">*</span></label>
+                                <input type="number" :name="'participants[' + index + '][age]'" x-model="p.age" required min="8" max="85" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Swimming Status</label>
-                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Status</label>
+                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                                     <option value="non_swimmer">Non-Swimmer</option>
                                     <option value="casual_swimmer">Casual / Beginner Swimmer</option>
                                     <option value="swimmer">Confident Swimmer</option>
                                 </select>
                             </div>
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Health Condition Notes</label>
-                                <input type="text" :name="'participants[' + index + '][health_condition]'" x-model="p.health_condition" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Health Condition Notes</label>
+                                <input type="text" :name="'participants[' + index + '][health_condition]'" x-model="p.health_condition" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
                     </div>
@@ -145,16 +146,16 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Contact Name <span class="text-[#780000]">*</span></label>
-                    <input type="text" name="contact_name" value="{{ old('contact_name', $booking->contact_name) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Contact Name <span class="text-[#780000]">*</span></label>
+                    <input type="text" name="contact_name" value="{{ old('contact_name', $booking->contact_name) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Email <span class="text-[#780000]">*</span></label>
-                    <input type="email" name="contact_email" value="{{ old('contact_email', $booking->contact_email) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Email <span class="text-[#780000]">*</span></label>
+                    <input type="email" name="contact_email" value="{{ old('contact_email', $booking->contact_email) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-xs mb-2">Mobile Phone <span class="text-[#780000]">*</span></label>
-                    <input type="tel" name="contact_phone" value="{{ old('contact_phone', $booking->contact_phone) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Mobile Phone <span class="text-[#780000]">*</span></label>
+                    <input type="tel" name="contact_phone" value="{{ old('contact_phone', $booking->contact_phone) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
             </div>
         </div>
@@ -163,15 +164,15 @@
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-3">
             <div class="flex items-center justify-between pb-2">
                 <h3 class="text-base font-bold text-[#1D1D1F]">4. System Audit Log Note</h3>
-                <span class="text-xs text-[#780000] font-bold">Mandatory</span>
+                <span class="text-sm text-[#780000] font-bold">Mandatory</span>
             </div>
 
             <div>
-                <label class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">
                     Reason for Modifying Booking & Participant Details <span class="text-[#780000]">*</span>
                 </label>
                 <textarea name="edit_reason" rows="2" required placeholder="e.g. Corrected spelling of participant name per customer WhatsApp request" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white"></textarea>
-                <span class="text-xs text-[#6E6E73] block mt-1">
+                <span class="text-sm text-[#6E6E73] block mt-1">
                     This note and the exact changes will be recorded immutably in the system audit logs alongside your account username and IP address.
                 </span>
             </div>

@@ -332,14 +332,10 @@ class Batch extends Model
 
     public function getBatchNumberAttribute(): string
     {
-        if (!empty($this->batch_code)) {
-            if (preg_match('/^batch\s*#?\s*(\d+)/i', $this->batch_code, $matches)) {
-                return 'Batch ' . $matches[1];
-            }
-            $cleaned = preg_replace('/^BATCH[-#\s]*/i', '', $this->batch_code);
-            return is_numeric($cleaned) ? 'Batch ' . $cleaned : $this->batch_code;
+        if (!empty($this->batch_code) && preg_match('/(\d+)/', $this->batch_code, $matches)) {
+            return 'Batch ' . $matches[1];
         }
-        if (!empty($this->name) && preg_match('/^Batch\s*(\d+)/i', $this->name, $matches)) {
+        if (!empty($this->name) && preg_match('/(\d+)/', $this->name, $matches)) {
             return 'Batch ' . $matches[1];
         }
         return 'Batch ' . $this->id;
@@ -351,23 +347,23 @@ class Batch extends Model
         return match ($st) {
             'confirmed', 'open' => [
                 'label' => 'Confirmed',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'completed' => [
                 'label' => 'Completed',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-300',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
             'rescheduled' => [
                 'label' => 'Rescheduled',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'cancelled_by_camp', 'cancelled' => [
                 'label' => 'Cancelled by Camp',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', $st)),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }
@@ -378,27 +374,27 @@ class Batch extends Model
         return match ($key) {
             'very_safe' => [
                 'label' => 'Very Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'safe' => [
                 'label' => 'Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'moderate' => [
                 'label' => 'Moderate',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'high_risk' => [
                 'label' => 'High Risk',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
             ],
             'critical_risk' => [
                 'label' => 'Critical',
-                'class' => 'bg-red-100 text-red-800 border-red-300',
+                'class' => 'bg-red-100 text-red-800',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', $this->risk_classification ?: 'Safe')),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

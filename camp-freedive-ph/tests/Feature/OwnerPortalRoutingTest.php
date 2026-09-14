@@ -107,15 +107,15 @@ class OwnerPortalRoutingTest extends TestCase
         $owner = User::where('email', 'owner@campfreedive.ph')->first();
         Auth::login($owner);
 
-        $this->assertStringContainsString('/owner/pricing', route('admin.pricing.index'));
-        $this->assertStringContainsString('/owner/pricing', route('owner.pricing.index'));
+        $this->assertStringContainsString('/owner/dynamic-pricing', route('admin.pricing.index'));
+        $this->assertStringContainsString('/owner/dynamic-pricing', route('owner.pricing.index'));
         $this->assertStringContainsString('/owner', route('admin.dashboard'));
 
         $admin = User::where('email', 'admin@campfreedive.ph')->first();
         Auth::login($admin);
 
-        $this->assertStringContainsString('/admin/pricing', route('admin.pricing.index'));
-        $this->assertStringContainsString('/admin/pricing', route('owner.pricing.index'));
+        $this->assertStringContainsString('/admin/dynamic-pricing', route('admin.pricing.index'));
+        $this->assertStringContainsString('/admin/dynamic-pricing', route('owner.pricing.index'));
         $this->assertStringContainsString('/admin', route('admin.dashboard'));
     }
 }

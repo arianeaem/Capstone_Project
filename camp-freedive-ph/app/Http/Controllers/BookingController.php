@@ -313,6 +313,7 @@ class BookingController extends Controller
                 'booking_number' => $booking->booking_number,
                 'pin' => $booking->pin,
                 'booking_id' => $booking->id,
+                'downpayment_paid' => $downpaymentAmount,
                 'downpayment_due' => $downpaymentAmount,
                 'balance_due' => $balanceAmount,
                 'manage_url' => route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]),

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#FAFAFC]">
+<html lang="en" class="h-full bg-[#F2F2F7]">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
     <title>@yield('title', 'Staff Portal | Camp FreedivePH')</title>
 
-    <!-- Fonts -->
+    <!-- Fonts: Outfit (Display/Headings) & Plus Jakarta Sans (Body/UI) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
@@ -17,7 +17,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="h-full text-[#1D1D1F] antialiased text-sm overflow-x-hidden min-w-[320px] bg-[#FAFAFC]"
+<body class="h-full text-[#1D1D1F] antialiased text-sm overflow-x-hidden min-w-[320px] bg-[#F2F2F7]"
       x-data="{ 
           sidebarCollapsed: localStorage.getItem('sidebar_collapsed') === 'true',
           mobileMenuOpen: false,
@@ -224,7 +224,7 @@
         </aside>
 
         <!-- Mobile Drawer -->
-        <div x-show="mobileMenuOpen" x-cloak class="md:hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm" @click="mobileMenuOpen = false"></div>
+        <div x-show="mobileMenuOpen" x-cloak class="md:hidden fixed inset-0 z-50 bg-black/50" @click="mobileMenuOpen = false"></div>
 
         <div x-show="mobileMenuOpen" 
              x-cloak 
@@ -243,7 +243,7 @@
                     <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH" class="w-8 h-8 rounded-full object-contain bg-white shadow-2xs border border-[#E5E5EA] shrink-0">
                     <span class="font-extrabold text-sm text-[#1D1D1F] tracking-tight">Camp Freedive<span class="text-[#780000]">PH</span></span>
                 </a>
-                <button type="button" @click="mobileMenuOpen = false" class="w-8 h-8 flex items-center justify-center text-[#8E8E93] hover:text-[#1D1D1F] rounded-lg hover:bg-[#F2F2F7] transition-colors cursor-pointer">
+                <button type="button" @click="mobileMenuOpen = false" class="w-8 h-8 flex items-center justify-center text-[#8E8E93] hover:text-[#1D1D1F] rounded-lg hover:bg-[#F2F2F7] transition-colors cursor-pointer" aria-label="Close navigation menu">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -331,14 +331,16 @@
                     <button type="button" 
                             @click="toggleSidebar()" 
                             class="hidden md:flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] transition-all cursor-pointer"
-                            :title="sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'">
+                            :title="sidebarCollapsed ? 'Expand Sidebar' : 'Collapse Sidebar'"
+                            :aria-label="sidebarCollapsed ? 'Expand desktop sidebar' : 'Collapse desktop sidebar'">
                         <img src="{{ asset('icons/icons8-sidebar-60.png') }}" class="w-5 h-5 shrink-0 opacity-80 hover:opacity-100 transition-opacity" alt="Toggle Sidebar">
                     </button>
 
                     <!-- Mobile Drawer Toggle -->
                     <button type="button" 
                             @click="mobileMenuOpen = !mobileMenuOpen"
-                            class="md:hidden flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] cursor-pointer">
+                            class="md:hidden flex items-center justify-center w-8 h-8 rounded-md hover:bg-[#F2F2F7] cursor-pointer"
+                            aria-label="Toggle navigation menu">
                         <img src="{{ asset('icons/icons8-sidebar-60.png') }}" class="w-5 h-5 shrink-0 opacity-80 hover:opacity-100 transition-opacity" alt="Open Menu">
                     </button>
 
@@ -346,7 +348,7 @@
                     <div class="h-4 w-px bg-[#D1D1D6]"></div>
 
                     <!-- Breadcrumbs -->
-                    <div id="header-breadcrumbs" class="flex items-center gap-1.5 text-xs sm:text-sm">
+                    <div id="header-breadcrumbs" class="flex items-center gap-1.5 text-sm">
                         @if(View::hasSection('breadcrumb'))
                             @yield('breadcrumb')
                         @else
@@ -360,10 +362,11 @@
                     <button type="button" 
                             @click="profileMenuOpen = !profileMenuOpen" 
                             @click.outside="profileMenuOpen = false"
-                            class="flex items-center gap-2 cursor-pointer focus:outline-none group">
+                            class="flex items-center gap-2 cursor-pointer focus:outline-none group"
+                            aria-label="User account settings and menu">
                         
                         <!-- User Avatar -->
-                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-xs shrink-0 group-hover:ring-[#780000]/30 transition-all">
+                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-sm shrink-0 group-hover:ring-[#780000]/30 transition-all">
                             {{ $userInitials }}
                         </div>
                     </button>
@@ -385,9 +388,9 @@
                                 {{ $userInitials }}
                             </div>
                             <div class="min-w-0 flex-1">
-                                <div class="font-bold text-xs text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                                <div class="text-[11px] text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
-                                <span class="inline-block mt-1 px-2 py-0.2 rounded-md text-[10px] font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                                <div class="font-bold text-sm text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                                <div class="text-sm text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
+                                <span class="inline-block mt-1 px-2.5 py-0.5 rounded-md text-sm font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
                                     {{ auth()->user()->role_label ?? ucfirst(auth()->user()->role) }}
                                 </span>
                             </div>
@@ -397,7 +400,7 @@
                         <div>
                             <form action="{{ route('logout') }}" method="POST" data-no-spa data-native>
                                 @csrf
-                                <button type="submit" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[#1D1D1F] hover:bg-rose-50 font-bold text-xs transition-colors cursor-pointer">
+                                <button type="submit" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[#1D1D1F] hover:bg-rose-50 font-bold text-sm transition-colors cursor-pointer">
                                     <img src="{{ asset('icons/icons8-logout-60.png') }}" class="w-4 h-4 shrink-0" alt="Sign Out">
                                     <span>Log Out</span>
                                 </button>
@@ -411,32 +414,32 @@
             <!-- Global Flash Messages -->
             <div id="flash-messages-container" class="px-4 sm:px-8 pt-4">
                 @if(session('success'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] flex items-center justify-between text-xs sm:text-sm font-medium">
+                    <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] flex items-center justify-between text-sm font-medium">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#34C759]"></span>
                             <span>{{ session('success') }}</span>
                         </div>
-                        <button type="button" @click="$el.parentElement.remove()" class="text-xs font-bold text-[#065F46]/60 hover:text-[#065F46]">✕</button>
+                        <button type="button" @click="$el.parentElement.remove()" class="text-sm font-bold text-[#065F46]/60 hover:text-[#065F46]" aria-label="Dismiss success notification">✕</button>
                     </div>
                 @endif
 
                 @if(session('error'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] flex items-center justify-between text-xs sm:text-sm font-medium">
+                    <div class="p-4 mb-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] flex items-center justify-between text-sm font-medium">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#FF3B3C]"></span>
                             <span>{{ session('error') }}</span>
                         </div>
-                        <button type="button" @click="$el.parentElement.remove()" class="text-xs font-bold text-[#991B1B]/60 hover:text-[#991B1B]">✕</button>
+                        <button type="button" @click="$el.parentElement.remove()" class="text-sm font-bold text-[#991B1B]/60 hover:text-[#991B1B]" aria-label="Dismiss error notification">✕</button>
                     </div>
                 @endif
 
                 @if(session('info'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#1E40AF] flex items-center justify-between text-xs sm:text-sm font-medium">
+                    <div class="p-4 mb-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#1E40AF] flex items-center justify-between text-sm font-medium">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#0088FF]"></span>
                             <span>{{ session('info') }}</span>
                         </div>
-                        <button type="button" @click="$el.parentElement.remove()" class="text-xs font-bold text-[#1E40AF]/60 hover:text-[#1E40AF]">✕</button>
+                        <button type="button" @click="$el.parentElement.remove()" class="text-sm font-bold text-[#1E40AF]/60 hover:text-[#1E40AF]" aria-label="Dismiss notice">✕</button>
                     </div>
                 @endif
             </div>
