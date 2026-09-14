@@ -61,19 +61,6 @@
                     </div>
                 </div>
 
-                <!-- AI Model Recommended Staffing Pill -->
-                <template x-if="staffingRec && staffingRec.pill_text">
-                    <div class="p-3.5 rounded-xl bg-gradient-to-r from-[#F0FDF4] to-emerald-50/50 border border-emerald-200 text-emerald-950 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
-                        <div class="flex items-center gap-2">
-                            <span class="inline-flex items-center justify-center w-5 h-5 rounded-md bg-emerald-600 text-white shrink-0">
-                                <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                            </span>
-                            <span class="font-extrabold text-sm sm:text-sm text-emerald-900" x-text="staffingRec.pill_text"></span>
-                        </div>
-                        <span class="px-2 py-0.5 rounded text-sm font-black uppercase tracking-wider bg-emerald-200/80 text-emerald-900 self-start sm:self-auto" x-text="staffingRec.demand_level + ' Demand'"></span>
-                    </div>
-                </template>
-
                 <!-- Duplicate Batch Date Warning Alert & Direct Redirect -->
                 <template x-if="duplicateBatches.length > 0">
                     <div class="p-4 rounded-xl bg-[#FFFBEB] border border-amber-200 text-[#92400E] space-y-3">
@@ -127,7 +114,6 @@
                                class="w-full px-3.5 py-2.5 font-mono text-sm font-bold text-[#1D1D1F] bg-transparent border-0 focus:ring-0 focus:outline-none">
                         <input type="hidden" name="batch_number" :value="'Batch ' + (batchNumberOnly || '')">
                     </div>
-                    <span class="text-sm text-[#6E6E73] mt-1.5 block">Unique batch identifier is always formatted as <strong>Batch [Number]</strong> in chronological order.</span>
                 </div>
 
             </div>

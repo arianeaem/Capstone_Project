@@ -35,7 +35,7 @@ use Illuminate\Support\Facades\Schema;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Fixed Carpool Pickup Points strictly matching the booking wizard process.
+     * Fixed Carpool Pickup Points strictly matching the booking form process.
      */
     public const PICKUP_MONUMENTO = 'Monumento Hypermarket - 2:30 AM';
     public const PICKUP_TIENDESITAS = 'Shell Tiendesitas - 3:00 AM';
@@ -565,7 +565,7 @@ class DatabaseSeeder extends Seeder
 
         // =========================================================================
         // 4. SEED AUTHENTIC CUSTOMER BOOKINGS & PARTICIPANTS
-        // Strictly using the 5 exact fixed pickup points from the booking wizard!
+        // Strictly using the 5 exact fixed pickup points from the booking form!
         // =========================================================================
 
         // -------------------------------------------------------------------------

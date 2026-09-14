@@ -27,10 +27,9 @@
 
     @if($booking->status === 'pending_downpayment')
     <!-- Downpayment Required Alert -->
-    <div class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div class="mb-6 p-4 sm:p-5 rounded-xl bg-amber-100 text-amber-900 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-1">
             <div class="flex items-center gap-2 font-bold text-sm sm:text-base text-amber-900">
-                <svg class="w-5 h-5 text-amber-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 <span>Downpayment Required</span>
             </div>
             <p class="text-sm text-amber-800 leading-relaxed">
@@ -48,7 +47,7 @@
 
     <!-- Booking Overview -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 mb-6 sm:mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6">
             <div>
                 <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                     <h1 class="text-xl sm:text-3xl font-extrabold text-[#1D1D1F] font-mono tracking-wide">
@@ -118,36 +117,33 @@
             <!-- Dynamic Pricing and Rate Breakdown -->
             @if($booking->priceAdjustments && $booking->priceAdjustments->count() > 0)
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-6 space-y-3">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-base font-bold text-[#1D1D1F]">Price Breakdown & Applied Rules</h3>
-                    <span class="text-sm font-semibold px-2.5 py-0.5 rounded-full bg-[#F8EAEA] text-[#780000]">
-                        Dynamic Pricing Applied
-                    </span>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h3 class="text-sm sm:text-base font-bold text-[#1D1D1F]">Price Breakdown &amp; Applied Rules</h3>
                 </div>
 
-                <div class="space-y-2 text-sm">
-                    <div class="flex justify-between items-center text-[#6E6E73]">
-                        <span>Base Class Rate:</span>
-                        <span class="font-bold text-[#1D1D1F]">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} / person</span>
+                <div class="space-y-2 text-xs sm:text-sm">
+                    <div class="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 sm:gap-2 text-[#6E6E73]">
+                        <span class="shrink-0">Base Class Rate:</span>
+                        <span class="font-bold text-[#1D1D1F] whitespace-nowrap">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} <span class="font-normal text-[#8E8E93]">/ person</span></span>
                     </div>
 
-                    <div class="space-y-1.5 py-2 border-y border-dashed border-[#E5E5EA]">
+                    <div class="space-y-2 py-2.5 border-y border-dashed border-[#E5E5EA]">
                         @foreach($booking->priceAdjustments as $adj)
-                        <div class="flex justify-between items-center">
-                            <div class="flex items-center gap-2">
+                        <div class="flex flex-wrap sm:flex-nowrap justify-between items-start sm:items-center gap-1 sm:gap-3">
+                            <div class="flex flex-wrap items-center gap-1.5 min-w-0">
                                 <span class="font-medium text-[#1D1D1F]">{{ $adj->rule_name }}</span>
-                                <span class="text-sm text-[#6E6E73]">({{ $adj->condition_summary }})</span>
+                                <span class="text-[#6E6E73] text-xs">({{ $adj->condition_summary }})</span>
                             </div>
-                            <span class="font-bold {{ $adj->adjustment_amount >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
-                                {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }} / person
+                            <span class="font-bold shrink-0 whitespace-nowrap {{ $adj->adjustment_amount >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
+                                {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }} <span class="font-normal text-xs text-[#8E8E93]">/ person</span>
                             </span>
                         </div>
                         @endforeach
                     </div>
 
-                    <div class="flex justify-between items-center text-sm font-extrabold text-[#1D1D1F] pt-1">
-                        <span>Final Adjusted Rate:</span>
-                        <span>₱{{ number_format($booking->participants->first()->price_per_person ?? $booking->priceAdjustments->first()->adjusted_price, 2) }} / person</span>
+                    <div class="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 sm:gap-2 font-extrabold text-[#1D1D1F] pt-1">
+                        <span class="shrink-0">Final Adjusted Rate:</span>
+                        <span class="text-sm sm:text-base font-extrabold text-[#780000] whitespace-nowrap">₱{{ number_format($booking->participants->first()->price_per_person ?? $booking->priceAdjustments->first()->adjusted_price, 2) }} <span class="font-normal text-xs text-[#8E8E93]">/ person</span></span>
                     </div>
                 </div>
             </div>
@@ -247,7 +243,7 @@
 
                 @if($booking->status === 'pending_downpayment')
                 <!-- Unpaid Downpayment Notice -->
-                <div class="p-4 rounded-xl bg-amber-50 text-amber-900 space-y-3 shadow-2xs">
+                <div class="p-4 rounded-xl bg-amber-100 text-amber-900 space-y-3 shadow-2xs">
                     <div class="font-bold text-sm text-amber-900">
                         Downpayment Required
                     </div>
@@ -316,25 +312,25 @@
             </div>
 
             <!-- Coordinator Contact -->
-            <div class="p-5 sm:p-6 rounded-xl bg-[#F2F2F7] text-sm text-[#6E6E73] space-y-3 shadow-2xs border border-[#E5E5EA]">
-                <h4 class="font-bold text-[#1D1D1F] text-sm">Need Special Assistance?</h4>
-                <p class="text-sm text-[#6E6E73]">You may contact us through any of our support channels:</p>
-                <div class="space-y-2 text-sm text-[#1D1D1F] pt-1">
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#6E6E73] font-medium w-20">Facebook:</span>
+            <div class="p-5 sm:p-6 rounded-xl bg-white text-sm text-[#6E6E73] space-y-3 shadow-2xs border border-[#E5E5EA]">
+                <h4 class="font-bold text-[#1D1D1F] text-sm sm:text-base">Need Special Assistance?</h4>
+                <p class="text-xs sm:text-sm text-[#6E6E73]">You may contact us through any of our support channels:</p>
+                <div class="space-y-2.5 text-xs sm:text-sm text-[#1D1D1F] pt-1">
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[#6E6E73] font-medium shrink-0">Facebook:</span>
                         <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold hover:underline">@Campfreediveph</a>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#6E6E73] font-medium w-20">Instagram:</span>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[#6E6E73] font-medium shrink-0">Instagram:</span>
                         <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold hover:underline">@campfreediveph</a>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#6E6E73] font-medium w-20">Email:</span>
-                        <a href="mailto:campfreediveph@gmail.com" class="text-[#780000] font-bold hover:underline break-all">campfreediveph@gmail.com</a>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[#6E6E73] font-medium shrink-0">Email:</span>
+                        <a href="mailto:campfreediveph@gmail.com" class="text-[#780000] font-bold hover:underline">campfreediveph@gmail.com</a>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[#6E6E73] font-medium w-20">Phone:</span>
-                        <a href="tel:+639278879894" class="text-[#780000] font-bold hover:underline">+63 927 887 9894</a>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-[#6E6E73] font-medium shrink-0">Phone:</span>
+                        <a href="tel:+639278879894" class="text-[#780000] font-bold hover:underline whitespace-nowrap">+63 927 887 9894</a>
                     </div>
                 </div>
             </div>

@@ -21,7 +21,7 @@ class BookingFlowTest extends TestCase
         $response->assertSee('Manage Booking');
     }
 
-    public function test_booking_wizard_page_loads(): void
+    public function test_booking_page_loads(): void
     {
         $response = $this->get('/book?class=discovery');
         $response->assertStatus(200);

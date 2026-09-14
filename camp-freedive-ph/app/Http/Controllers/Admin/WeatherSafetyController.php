@@ -110,7 +110,8 @@ class WeatherSafetyController extends Controller
                         'operational_status_label' => $d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
                         'day1' => $d1ML,
                         'day2' => $d2ML,
-                        'hard_gate_triggered' => ($d1ML['hard_gate_triggered'] ?? false) || ($d2ML['hard_gate_triggered'] ?? false),
+                        'safety_threshold_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
+                        'hard_gate_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
                     ];
                 }
             }
@@ -300,7 +301,8 @@ class WeatherSafetyController extends Controller
                 'day1' => $day1MLAssessment,
                 'day2' => $day2MLAssessment,
                 'is_authoritative_go' => ($day1MLAssessment['is_authoritative_go'] ?? false) && ($day2MLAssessment['is_authoritative_go'] ?? false),
-                'hard_gate_triggered' => ($day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['hard_gate_triggered'] ?? false),
+                'safety_threshold_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),
+                'hard_gate_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),
             ];
         }
 

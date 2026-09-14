@@ -11,7 +11,7 @@ Artisan::command('inspire', function () {
 /**
  * 24-Hour Continuous Weather & Marine Forecast Cache Sync
  * Runs every 15 minutes (96 times a day) to maintain continuous whole-day predictions in local cache
- * providing sub-millisecond (<1ms) response times for all users, booking wizards, and batch risk engines.
+ * providing sub-millisecond (<1ms) response times for all users, booking requests, and batch risk engines.
  */
 Schedule::command('forecast:update --assess-batches')
     ->everyFifteenMinutes()

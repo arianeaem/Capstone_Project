@@ -53,12 +53,15 @@ class MLSafetyServiceIntegrationTest extends TestCase
                 'displayed_risk_name' => $currentTier,
                 'overall_operational_status' => 'PROVISIONAL_TREND_OUTLOOK',
                 'is_authoritative_go' => ($currentTier === 'Very Safe' || $currentTier === 'Safe'),
+                'overall_safety_threshold_triggered' => ($currentTier === 'Critical Risk'),
                 'overall_hard_gate_triggered' => ($currentTier === 'Critical Risk'),
                 'worst_hour' => [
                     'hour' => 10,
                     'final_tier_name' => $currentTier,
                     'primary_hazard' => 'Test Hazard',
                     'advisory_message' => 'Test Advisory',
+                    'safety_threshold_triggered' => ($currentTier === 'Critical Risk'),
+                    'hard_gate_triggered' => ($currentTier === 'Critical Risk'),
                 ],
             ], 200);
         });
@@ -126,6 +129,7 @@ class MLSafetyServiceIntegrationTest extends TestCase
                 'displayed_risk_name' => 'Safe',
                 'overall_operational_status' => 'PROVISIONAL_TREND_OUTLOOK',
                 'is_authoritative_go' => false,
+                'overall_safety_threshold_triggered' => false,
                 'overall_hard_gate_triggered' => false,
                 'worst_hour' => [
                     'hour' => 11,
@@ -175,6 +179,7 @@ class MLSafetyServiceIntegrationTest extends TestCase
                 'displayed_risk_name' => 'Very Safe',
                 'overall_operational_status' => 'PROVISIONAL_TREND_OUTLOOK',
                 'is_authoritative_go' => false,
+                'overall_safety_threshold_triggered' => false,
                 'overall_hard_gate_triggered' => false,
                 'worst_hour' => [
                     'hour' => 10,

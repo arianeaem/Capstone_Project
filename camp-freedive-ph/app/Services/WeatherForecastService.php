@@ -205,7 +205,8 @@ class WeatherForecastService
                     'day1' => $day1ML,
                     'day2' => $day2ML,
                     'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
-                    'hard_gate_triggered' => ($day1ML['hard_gate_triggered'] ?? false) || ($day2ML['hard_gate_triggered'] ?? false),
+                    'safety_threshold_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
+                    'hard_gate_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
                 ];
             }
 
@@ -495,7 +496,8 @@ class WeatherForecastService
                     'day1' => $day1ML,
                     'day2' => $day2ML,
                     'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
-                    'hard_gate_triggered' => ($day1ML['hard_gate_triggered'] ?? false) || ($day2ML['hard_gate_triggered'] ?? false),
+                    'safety_threshold_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
+                    'hard_gate_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
                 ];
             }
 
@@ -575,7 +577,8 @@ class WeatherForecastService
                 'day1' => $day1ML,
                 'day2' => $day2ML,
                 'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
-                'hard_gate_triggered' => ($day1ML['hard_gate_triggered'] ?? false) || ($day2ML['hard_gate_triggered'] ?? false),
+                'safety_threshold_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
+                'hard_gate_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
             ];
         }
 

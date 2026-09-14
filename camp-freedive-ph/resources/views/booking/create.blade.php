@@ -7,7 +7,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 text-sm" 
-     x-data="bookingWizard({
+     x-data="bookingForm({
          initialClass: '{{ $selectedClass }}',
          pickupPoints: {{ json_encode($pickupPoints) }},
          csrfToken: '{{ csrf_token() }}',
@@ -15,18 +15,18 @@
          pricingQuoteUrl: '{{ route('api.pricing.quote') }}',
          storeBookingUrl: '{{ route('booking.store') }}'
      })"
-     x-init="initWizard()">
+     x-init="initBooking()">
 
     <!-- Booking Header -->
-    <div class="flex items-center justify-between pb-5 mb-6 sm:mb-8 border-b border-[#E5E5EA]">
-        <a href="{{ route('landing') }}" class="flex items-center gap-2.5 group">
-            <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-contain bg-white">
-            <div>
-                <span class="font-extrabold text-base sm:text-lg tracking-tight text-[#1D1D1F] block leading-none">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                <span class="text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>
+    <div class="flex items-center justify-between pb-4 sm:pb-5 mb-5 sm:mb-8 border-b border-[#E5E5EA] gap-2">
+        <a href="{{ route('landing') }}" class="flex items-center gap-2 sm:gap-2.5 group min-w-0">
+            <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-contain bg-white shrink-0">
+            <div class="min-w-0">
+                <span class="font-extrabold text-sm sm:text-lg tracking-tight text-[#1D1D1F] block leading-none truncate">Camp Freedive<span class="text-[#780000]">PH</span></span>
+                <span class="text-[11px] sm:text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5 truncate">Mabini, Batangas</span>
             </div>
         </a>
-        <a href="{{ route('landing') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] flex items-center gap-1.5 transition-colors">
+        <a href="{{ route('landing') }}" class="text-xs sm:text-sm font-semibold text-[#6E6E73] hover:text-[#780000] flex items-center gap-1 transition-colors shrink-0">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             <span>Exit to Home</span>
         </a>
@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <!-- Wizard Form Container -->
+    <!-- Booking Form Container -->
     <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-8 lg:p-10 relative text-sm">
 
         <!-- Step 1: Select Class -->
@@ -300,24 +300,24 @@
                 <div class="lg:col-span-7 space-y-5">
 
                     <!-- Selected Dates Overview -->
-                    <div class="rounded-2xl border border-[#E5E5EA] bg-white p-4 sm:p-5 transition-all shadow-2xs">
+                    <div class="rounded-2xl border border-[#E5E5EA] bg-white p-3.5 sm:p-5 transition-all shadow-2xs">
                         <div class="grid grid-cols-2 divide-x divide-[#E5E5EA]">
                             
                             <!-- Depart (Day 1) -->
-                            <div class="pr-3 sm:pr-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-extrabold uppercase tracking-wider text-[#6E6E73]">Depart</span>
-                                    <span class="text-sm font-bold px-2 py-0.5 rounded bg-[#F8EAEA] text-[#780000]">Day 1</span>
+                            <div class="pr-2.5 sm:pr-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 sm:gap-2">
+                                    <span class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#6E6E73]">Depart</span>
+                                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#F8EAEA] text-[#780000] whitespace-nowrap">Day 1</span>
                                 </div>
                                 <div class="mt-1.5">
                                     <template x-if="form.start_date">
                                         <div>
-                                            <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.start_date)"></div>
-                                            <div class="text-sm font-semibold text-[#780000] mt-0.5" x-text="formatDateDayOfWeek(form.start_date)"></div>
+                                            <div class="text-sm sm:text-lg md:text-xl font-black text-[#1D1D1F] tracking-tight truncate" x-text="formatDateDisplay(form.start_date)"></div>
+                                            <div class="text-xs sm:text-sm font-semibold text-[#780000] mt-0.5 truncate" x-text="formatDateDayOfWeek(form.start_date)"></div>
                                         </div>
                                     </template>
                                     <template x-if="!form.start_date">
-                                        <div class="text-sm sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
                                             Select start date below
                                         </div>
                                     </template>
@@ -325,20 +325,20 @@
                             </div>
 
                             <!-- Return (Day 2) -->
-                            <div class="pl-3 sm:pl-4">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm font-extrabold uppercase tracking-wider text-[#6E6E73]">Return</span>
-                                    <span class="text-sm font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#00C3D0]">Day 2</span>
+                            <div class="pl-2.5 sm:pl-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between items-start gap-1 sm:gap-2">
+                                    <span class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#6E6E73]">Return</span>
+                                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#EBF7F8] text-[#00C3D0] whitespace-nowrap">Day 2</span>
                                 </div>
                                 <div class="mt-1.5">
                                     <template x-if="form.end_date">
                                         <div>
-                                            <div class="text-base sm:text-xl font-black text-[#1D1D1F] tracking-tight" x-text="formatDateDisplay(form.end_date)"></div>
-                                            <div class="text-sm font-semibold text-[#00C3D0] mt-0.5" x-text="formatDateDayOfWeek(form.end_date)"></div>
+                                            <div class="text-sm sm:text-lg md:text-xl font-black text-[#1D1D1F] tracking-tight truncate" x-text="formatDateDisplay(form.end_date)"></div>
+                                            <div class="text-xs sm:text-sm font-semibold text-[#00C3D0] mt-0.5 truncate" x-text="formatDateDayOfWeek(form.end_date)"></div>
                                         </div>
                                     </template>
                                     <template x-if="!form.end_date">
-                                        <div class="text-sm sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
                                             Next day return
                                         </div>
                                     </template>
@@ -349,14 +349,14 @@
                     </div>
 
                     <!-- Interactive Dual-Month Calendar -->
-                    <div class="bg-white rounded-2xl p-5 sm:p-7 space-y-6">
+                    <div class="bg-white rounded-2xl p-4 sm:p-7 space-y-6 shadow-2xs border border-[#E5E5EA]">
                         
-                        <!-- Months Container -->
+                        <!-- Months Container (Single month on mobile with arrows, dual months on desktop) -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
                             
                             <!-- First Month -->
                             <div class="space-y-4">
-                                <!-- Header for Month 1 with Prev Arrow -->
+                                <!-- Header for Month 1 with Prev/Next Arrows -->
                                 <div class="flex items-center justify-between h-9">
                                     <button type="button" 
                                             @click="prevMonth()" 
@@ -383,7 +383,7 @@
                                 </div>
                                 
                                 <!-- Weekday Headers -->
-                                <div class="grid grid-cols-7 text-center text-sm font-semibold text-[#6E6E73] py-1">
+                                <div class="grid grid-cols-7 text-center text-xs sm:text-sm font-semibold text-[#6E6E73] py-1">
                                     <span class="text-[#780000] font-bold">Sun</span>
                                     <span>Mon</span>
                                     <span>Tue</span>
@@ -394,9 +394,9 @@
                                 </div>
 
                                 <!-- Month Calendar Days -->
-                                <div class="grid grid-cols-7 gap-y-2 text-center text-sm sm:text-sm">
+                                <div class="grid grid-cols-7 gap-y-1.5 sm:gap-y-2 text-center text-xs sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month1Year, month1Month)" :key="'m1-' + idx">
-                                        <div class="h-9 flex items-center justify-center relative">
+                                        <div class="h-8 sm:h-9 flex items-center justify-center relative">
                                             <template x-if="dObj.isBlank">
                                                 <span class="w-full h-full"></span>
                                             </template>
@@ -406,7 +406,7 @@
                                                         :disabled="dObj.isDisabled"
                                                         :aria-label="dObj.dateStr + (dObj.isDisabled ? ' (Unavailable)' : '')"
                                                         :aria-pressed="dObj.dateStr === form.start_date"
-                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-sm sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                                        class="w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
@@ -422,11 +422,11 @@
                                 </div>
                             </div>
 
-                            <!-- Second Month -->
-                            <div class="space-y-4">
+                            <!-- Second Month (Visible on md+ screens for dual-calendar experience) -->
+                            <div class="space-y-4 hidden md:block">
                                 <!-- Header for Month 2 with Next Arrow -->
                                 <div class="flex items-center justify-between h-9">
-                                    <div class="w-8 hidden md:block shrink-0"></div>
+                                    <div class="w-8 shrink-0"></div>
 
                                     <div class="font-extrabold text-sm sm:text-base text-[#1D1D1F] text-center flex-1">
                                         <span x-text="getMonthName(month2Month) + ' ' + month2Year"></span>
@@ -434,7 +434,7 @@
 
                                     <button type="button" 
                                             @click="nextMonth()" 
-                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] hidden md:flex shrink-0"
+                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] shrink-0"
                                             title="Next Month"
                                             aria-label="Next Month">
                                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
@@ -442,7 +442,7 @@
                                 </div>
                                 
                                 <!-- Weekday Headers -->
-                                <div class="grid grid-cols-7 text-center text-sm font-semibold text-[#6E6E73] py-1">
+                                <div class="grid grid-cols-7 text-center text-xs sm:text-sm font-semibold text-[#6E6E73] py-1">
                                     <span class="text-[#780000] font-bold">Sun</span>
                                     <span>Mon</span>
                                     <span>Tue</span>
@@ -453,9 +453,9 @@
                                 </div>
 
                                 <!-- Month Calendar Days -->
-                                <div class="grid grid-cols-7 gap-y-2 text-center text-sm sm:text-sm">
+                                <div class="grid grid-cols-7 gap-y-1.5 sm:gap-y-2 text-center text-xs sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month2Year, month2Month)" :key="'m2-' + idx">
-                                        <div class="h-9 flex items-center justify-center relative">
+                                        <div class="h-8 sm:h-9 flex items-center justify-center relative">
                                             <template x-if="dObj.isBlank">
                                                 <span class="w-full h-full"></span>
                                             </template>
@@ -465,7 +465,7 @@
                                                         :disabled="dObj.isDisabled"
                                                         :aria-label="dObj.dateStr + (dObj.isDisabled ? ' (Unavailable)' : '')"
                                                         :aria-pressed="dObj.dateStr === form.start_date"
-                                                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-sm sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                                        class="w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
@@ -489,18 +489,18 @@
 
                 <!-- Dive Safety Evaluation -->
                 <div class="lg:col-span-5 space-y-4 lg:sticky lg:top-8">
-                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-6 shadow-2xs space-y-4">
                         
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-black text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
+                        <div class="flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-1.5 sm:gap-2">
+                                <h3 class="font-black text-sm sm:text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
                                 
                                 <!-- About Forecast Icon with Tooltip -->
                                 <div class="relative group inline-flex items-center">
-                                    <button type="button" aria-label="About Forecast" class="p-1.5 rounded-xl text-[#6E6E73] hover:text-[#1D1D1F] transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
-                                        <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-5 h-5 shrink-0 object-contain" alt="About Forecast">
+                                    <button type="button" aria-label="About Forecast" class="p-1 rounded-lg text-[#6E6E73] hover:text-[#1D1D1F] transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
+                                        <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0 object-contain" alt="About Forecast">
                                     </button>
-                                    <div class="absolute left-0 top-full mt-2 w-72 p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
+                                    <div class="absolute left-0 top-full mt-2 w-64 sm:w-72 max-w-[calc(100vw-3rem)] p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
                                         <div class="font-bold flex items-center gap-1.5 text-[#00C3D0]">
                                             <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain brightness-0 invert" alt="Weather Note">
                                             <span>Weather & Sea Conditions Note</span>
@@ -513,7 +513,7 @@
                             </div>
                             
                             <template x-if="weatherLoading">
-                                <span class="text-sm text-[#00C3D0] font-bold flex items-center gap-1">
+                                <span class="text-xs sm:text-sm text-[#00C3D0] font-bold flex items-center gap-1 shrink-0">
                                     <svg class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                                     Checking...
                                 </span>
@@ -523,7 +523,7 @@
                         <!-- Forecast Loading State -->
                         <div x-show="weatherLoading" x-cloak class="space-y-4 py-2">
                             <div class="space-y-2">
-                                <div class="flex items-center justify-between text-sm">
+                                <div class="flex items-center justify-between text-xs sm:text-sm">
                                     <span class="font-semibold text-[#1D1D1F]">Checking weather & marine conditions...</span>
                                     <span class="font-mono font-bold text-[#00C3D0]" x-text="weatherProgress + '%'"></span>
                                 </div>
@@ -535,18 +535,18 @@
 
                             <!-- Weather Assessment Loading State -->
                             <div class="space-y-2.5 pt-1 animate-pulse">
-                                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2">
+                                <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] space-y-2">
                                     <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
                                     <div class="h-3 w-40 bg-[#E5E5EA] rounded"></div>
                                 </div>
-                                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2">
+                                <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] space-y-2">
                                     <div class="h-3.5 w-24 bg-[#E5E5EA] rounded"></div>
                                     <div class="h-3 w-40 bg-[#E5E5EA] rounded"></div>
                                 </div>
                             </div>
 
                             <!-- Rotating Tip -->
-                            <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center gap-2.5 text-sm text-[#6E6E73]">
+                            <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center gap-2.5 text-xs sm:text-sm text-[#6E6E73]">
                                 <div class="flex-1 min-w-0">
                                     <span class="font-bold text-[#1D1D1F]" x-text="currentTip.title + ': '"></span>
                                     <span x-text="currentTip.text"></span>
@@ -557,61 +557,55 @@
                         <!-- Weather Assessment Results -->
                         <template x-if="forecast && !weatherLoading && !forecast.is_benchmark">
                             <div class="space-y-4">
-                                <!-- Overall Assessment (5 Lines Indicator, No Background Color) -->
+                                <!-- Overall Assessment (5 Lines Indicator) -->
                                 <div class="space-y-2 pb-1">
-                                    <div class="flex items-center justify-between flex-wrap gap-2">
-                                        <div class="flex items-center gap-3">
-                                            <span class="text-lg sm:text-xl font-black uppercase tracking-wide"
+                                    <div class="flex flex-wrap items-center justify-between gap-2">
+                                        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+                                            <span class="text-base sm:text-xl font-black uppercase tracking-wide"
                                                   :class="getSafetyTextClass(forecast.overall_classification)"
                                                   x-text="forecast.overall_classification"></span>
 
                                             <!-- 5 Lines Indicator -->
-                                            <div class="flex items-center gap-1.5">
+                                            <div class="flex items-center gap-1 sm:gap-1.5">
                                                 <template x-for="i in 5" :key="i">
-                                                    <div class="h-1.5 w-5 sm:w-7 rounded-full transition-all duration-300"
+                                                    <div class="h-1.5 w-4 sm:w-7 rounded-full transition-all duration-300"
                                                          :class="i <= getSafetyScore(forecast.overall_classification) ? getSafetyBarClass(forecast.overall_classification) : 'bg-[#E5E5EA]'"></div>
                                                 </template>
                                             </div>
                                         </div>
                                     </div>
-                                    <p class="text-sm text-[#6E6E73] leading-relaxed" x-text="forecast.description"></p>
+                                    <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed" x-text="forecast.description"></p>
                                 </div>
 
                                 <!-- Day 1 & Day 2 Breakdown -->
                                 <template x-if="forecast.day1 && forecast.day2">
                                     <div class="space-y-3 pt-2">
                                         <!-- Day 1 -->
-                                        <div class="relative pl-4 py-0.5 space-y-1 text-sm">
-                                            <div class="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full transition-colors duration-200"
+                                        <div class="relative pl-3.5 sm:pl-4 py-0.5 space-y-1 text-xs sm:text-sm">
+                                            <div class="absolute left-0 top-0.5 bottom-0.5 w-1 sm:w-1.5 rounded-full transition-colors duration-200"
                                                  :class="getSafetyBarClass(forecast.day1.classification)"></div>
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#1D1D1F] text-sm uppercase tracking-wider">Day 1</span>
-                                                <span class="font-extrabold text-xs uppercase tracking-wider"
-                                                      :class="getSafetyTextClass(forecast.day1.classification)"
-                                                      x-text="forecast.day1.classification"></span>
+                                                <span class="font-extrabold text-[#1D1D1F] text-xs sm:text-sm uppercase tracking-wider">Day 1</span>
                                             </div>
-                                            <div class="text-[#6E6E73] text-sm flex items-center justify-between">
+                                            <div class="text-[#6E6E73] text-xs sm:text-sm flex flex-wrap items-center justify-between gap-1">
                                                 <span class="font-bold text-[#1D1D1F]" x-text="forecast.day1.date"></span>
-                                                <span>Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day1.worst_hour"></strong></span>
+                                                <span class="shrink-0">Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day1.worst_hour"></strong></span>
                                             </div>
-                                            <p class="text-sm text-[#6E6E73] pt-0.5" x-text="forecast.day1.recommended_action"></p>
+                                            <p class="text-xs sm:text-sm text-[#6E6E73] pt-0.5 leading-relaxed" x-text="forecast.day1.recommended_action"></p>
                                         </div>
 
                                         <!-- Day 2 -->
-                                        <div class="relative pl-4 py-0.5 space-y-1 text-sm">
-                                            <div class="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full transition-colors duration-200"
+                                        <div class="relative pl-3.5 sm:pl-4 py-0.5 space-y-1 text-xs sm:text-sm">
+                                            <div class="absolute left-0 top-0.5 bottom-0.5 w-1 sm:w-1.5 rounded-full transition-colors duration-200"
                                                  :class="getSafetyBarClass(forecast.day2.classification)"></div>
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#1D1D1F] text-sm uppercase tracking-wider">Day 2</span>
-                                                <span class="font-extrabold text-xs uppercase tracking-wider"
-                                                      :class="getSafetyTextClass(forecast.day2.classification)"
-                                                      x-text="forecast.day2.classification"></span>
+                                                <span class="font-extrabold text-[#1D1D1F] text-xs sm:text-sm uppercase tracking-wider">Day 2</span>
                                             </div>
-                                            <div class="text-[#6E6E73] text-sm flex items-center justify-between">
+                                            <div class="text-[#6E6E73] text-xs sm:text-sm flex flex-wrap items-center justify-between gap-1">
                                                 <span class="font-bold text-[#1D1D1F]" x-text="forecast.day2.date"></span>
-                                                <span>Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day2.worst_hour"></strong></span>
+                                                <span class="shrink-0">Worst Hour: <strong class="text-[#1D1D1F]" x-text="forecast.day2.worst_hour"></strong></span>
                                             </div>
-                                            <p class="text-sm text-[#6E6E73] pt-0.5" x-text="forecast.day2.recommended_action"></p>
+                                            <p class="text-xs sm:text-sm text-[#6E6E73] pt-0.5 leading-relaxed" x-text="forecast.day2.recommended_action"></p>
                                         </div>
                                     </div>
                                 </template>
@@ -622,7 +616,7 @@
                         <!-- Empty State: Dates Selected but Evaluation Not Available -->
                         <template x-if="form.start_date && !weatherLoading && (!forecast || forecast.is_benchmark)">
                             <div class="py-1 text-left">
-                                <p class="text-sm text-[#6E6E73] leading-relaxed">
+                                <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
                                     Evaluation for this dates are not available but you can still proceed. The camp will just update you.
                                 </p>
                             </div>
@@ -631,7 +625,7 @@
                         <!-- Empty State: No Date Selected Yet -->
                         <template x-if="!form.start_date && !weatherLoading">
                             <div class="py-1 text-left">
-                                <p class="text-sm text-[#8E8E93] italic leading-relaxed">
+                                <p class="text-xs sm:text-sm text-[#8E8E93] italic leading-relaxed">
                                     Select dates on the calendar to view safety evaluation.
                                 </p>
                             </div>
@@ -654,25 +648,25 @@
 
                     <!-- Section 1: Participants -->
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between pb-2">
-                            <h4 class="text-lg font-bold text-[#1D1D1F]">1. Participants</h4>
+                        <div class="flex items-center justify-between pb-1 gap-2 flex-wrap sm:flex-nowrap">
+                            <h4 class="text-base sm:text-lg font-bold text-[#1D1D1F]">1. Participants</h4>
                             <button type="button" 
                                     @click="addParticipant()" 
-                                    class="px-3.5 py-1.5 rounded-xl border border-[#780000] text-[#780000] font-bold text-sm bg-[#F8EAEA]/30 hover:bg-[#F8EAEA] transition-colors flex items-center gap-1.5 shadow-2xs">
-                                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                                    class="px-3 py-1.5 rounded-xl border border-[#780000] text-[#780000] font-bold text-xs sm:text-sm bg-[#F8EAEA]/30 hover:bg-[#F8EAEA] transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0">
+                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                                 <span>Add Participant</span>
                             </button>
                         </div>
                         
                         <div class="space-y-4">
                             <template x-for="(participant, index) in form.participants" :key="index">
-                                <div class="p-4 sm:p-5 rounded-xl bg-[#F2F2F7] relative space-y-4 shadow-2xs">
+                                <div class="p-3.5 sm:p-5 rounded-xl bg-[#F2F2F7] relative space-y-3.5 sm:space-y-4 shadow-2xs">
                                     <div class="flex items-center justify-between">
                                         <span class="font-bold text-[#780000] text-sm" x-text="'Participant #' + (index + 1)"></span>
                                         <button type="button" 
                                                 x-show="form.participants.length > 1" 
                                                 @click="removeParticipant(index)"
-                                                class="text-sm font-semibold text-[#FF3B3C] hover:underline cursor-pointer">
+                                                class="text-xs sm:text-sm font-semibold text-[#FF3B3C] hover:underline cursor-pointer">
                                             Remove
                                         </button>
                                     </div>
@@ -680,27 +674,27 @@
                                     <!-- Participant Name -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First Name <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">First Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
                                                    x-model="participant.first_name" 
                                                    @input="participant.first_name = participant.first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = (participant.first_name + ' ' + (participant.last_name || '')).trim()"
                                                    placeholder="e.g. Maria" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateName(participant.first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.first_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                            <span x-show="touchedStep3 && !validateName(participant.first_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                                 Please enter a valid first name (letters only, min 2 chars).
                                             </span>
                                         </div>
 
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Last Name <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
                                                    x-model="participant.last_name" 
                                                    @input="participant.last_name = participant.last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = ((participant.first_name || '') + ' ' + participant.last_name).trim()"
                                                    placeholder="e.g. Santos" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateName(participant.last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.last_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                            <span x-show="touchedStep3 && !validateName(participant.last_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                                 Please enter a valid last name (letters only, min 2 chars).
                                             </span>
                                         </div>
@@ -709,7 +703,7 @@
                                     <!-- Age & Swimming Ability -->
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                         <div>
-                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age (8-85 yrs) <span class="text-[#780000]">*</span></label>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Age (8-85 yrs) <span class="text-[#780000]">*</span></label>
                                             <input type="number" 
                                                    x-model="participant.age" 
                                                    min="8" 
@@ -719,13 +713,13 @@
                                                    placeholder="e.g. 24" 
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateAge(participant.age) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateAge(participant.age)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                            <span x-show="touchedStep3 && !validateAge(participant.age)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                                 Age must be between 8 and 85 years old.
                                             </span>
                                         </div>
 
                                         <div x-show="form.class_type === 'discovery'">
-                                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Ability</label>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Swimming Ability</label>
                                             <select x-model="participant.swimmer_status" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                                                 <option value="non_swimmer">Non-Swimmer</option>
                                                 <option value="casual_swimmer">Casual / Beginner Swimmer</option>
@@ -735,7 +729,7 @@
                                     </div>
 
                                     <div>
-                                        <label class="block font-bold text-[#1D1D1F] text-sm mb-2">
+                                        <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">
                                             Health Condition / Medical Notes
                                         </label>
                                         <input type="text" 
@@ -749,50 +743,50 @@
                     </div>
 
                     <!-- Contact Details -->
-                    <div class="space-y-4 pt-2">
-                        <h4  class="text-lg font-bold text-[#1D1D1F] pb-2">2. Contact Information</h4>
+                    <div class="space-y-4 pt-1">
+                        <h4 class="text-base sm:text-lg font-bold text-[#1D1D1F] pb-1">2. Contact Information</h4>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Lead First Name <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead First Name <span class="text-[#780000]">*</span></label>
                                 <input type="text" 
                                        x-model="form.contact_first_name" 
                                        @input="form.contact_first_name = form.contact_first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = (form.contact_first_name + ' ' + (form.contact_last_name || '')).trim()"
                                        placeholder="Juan" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                     Please enter a valid first name (min 2 chars).
                                 </span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Lead Last Name <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead Last Name <span class="text-[#780000]">*</span></label>
                                 <input type="text" 
                                        x-model="form.contact_last_name" 
                                        @input="form.contact_last_name = form.contact_last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = ((form.contact_first_name || '') + ' ' + form.contact_last_name).trim()"
                                        placeholder="Dela Cruz" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                     Please enter a valid last name (min 2 chars).
                                 </span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Email Address <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Email Address <span class="text-[#780000]">*</span></label>
                                 <input type="email" 
                                        x-model="form.contact_email" 
                                        placeholder="juan@example.com" 
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validateEmail(form.contact_email) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateEmail(form.contact_email)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validateEmail(form.contact_email)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                     Please enter a valid email address with @ (e.g. name@example.com).
                                 </span>
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Mobile Number (PH) <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Mobile Number (PH) <span class="text-[#780000]">*</span></label>
                                 <input type="tel" 
                                        x-model="form.contact_phone" 
                                        @input="form.contact_phone = form.contact_phone.replace(/[^0-9+\s-]/g, '')"
@@ -800,24 +794,24 @@
                                        maxlength="16"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                        :class="touchedStep3 && !validatePhone(form.contact_phone) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                     Valid 11-digit PH mobile number required (e.g. 09171234567 or +639171234567).
                                 </span>
                             </div>
 
                             <div class="sm:col-span-2">
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Facebook Profile Link (Optional)</label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Facebook Profile Link (Optional)</label>
                                 <input type="text" x-model="form.contact_facebook" placeholder="facebook.com/juandelacruz" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
                     </div>
 
                     <!-- Transportation and Add-ons -->
-                    <div class="space-y-4 pt-2">
-                        <h4 class="text-lg font-bold text-[#1D1D1F] pb-2">3. Transportation & Add-ons</h4>
+                    <div class="space-y-4 pt-1">
+                        <h4 class="text-base sm:text-lg font-bold text-[#1D1D1F] pb-1">3. Transportation & Add-ons</h4>
                         
                         <div class="space-y-3">
-                            <label class="block font-bold text-[#1D1D1F] text-sm">Transportation Option:</label>
+                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm">Transportation Option:</label>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-label="Transportation Option">
                                 <label tabindex="0"
                                        role="radio"
@@ -829,11 +823,11 @@
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
-                                             <span class="font-extrabold text-sm sm:text-sm text-[#1D1D1F]">Manila Carpool Van</span>
+                                             <span class="font-extrabold text-sm text-[#1D1D1F]">Manila Carpool Van</span>
                                             <span x-show="form.pickup_option === 'carpool'" class="w-2.5 h-2.5 rounded-full bg-[#780000]"></span>
                                         </div>
-                                        <span class="font-bold text-[#780000] text-sm block">₱1,200 / person</span>
-                                        <span class="text-sm text-[#780000] font-semibold block">(DP: ₱3,000 / head)</span>
+                                        <span class="font-bold text-[#780000] text-xs sm:text-sm block">₱1,200 / person</span>
+                                        <span class="text-xs sm:text-sm text-[#780000] font-semibold block">(DP: ₱3,000 / head)</span>
                                     </div>
                                 </label>
 
@@ -847,18 +841,18 @@
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
-                                            <span class="font-extrabold text-sm sm:text-sm text-[#1D1D1F]">Own Vehicle / Commute</span>
+                                            <span class="font-extrabold text-sm text-[#1D1D1F]">Own Vehicle / Commute</span>
                                             <span x-show="form.pickup_option === 'own'" class="w-2.5 h-2.5 rounded-full bg-[#780000]"></span>
                                         </div>
-                                        <span class="font-bold text-[#1D1D1F] text-sm block">₱0 (Self-arranged)</span>
-                                        <span class="text-sm text-[#6E6E73] font-semibold block">(DP: ₱2,000 / head)</span>
+                                        <span class="font-bold text-[#1D1D1F] text-xs sm:text-sm block">₱0 (Self-arranged)</span>
+                                        <span class="text-xs sm:text-sm text-[#6E6E73] font-semibold block">(DP: ₱2,000 / head)</span>
                                     </div>
                                 </label>
                             </div>
 
                             <!-- Pickup Hub Selection with Times -->
                             <div x-show="form.pickup_option === 'carpool'" x-cloak class="pt-1">
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Carpool Pickup Hub & Schedule: <span class="text-[#780000]">*</span></label>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Carpool Pickup Hub & Schedule: <span class="text-[#780000]">*</span></label>
                                 <select x-model="form.pickup_location" 
                                         class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#780000]"
                                         :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
@@ -867,7 +861,7 @@
                                         <option :value="p.name" x-text="p.name"></option>
                                     </template>
                                 </select>
-                                <span x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-sm text-[#FF3B3C] font-semibold mt-1 block">
+                                <span x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
                                     Please select your preferred Carpool Pickup Hub to continue.
                                 </span>
                             </div>
@@ -882,32 +876,32 @@
                                    @keydown.space.prevent="form.boat_dive = !form.boat_dive"
                                    class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0]"
                                    :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white'">
-                                <div class="flex items-start gap-2.5">
-                                    <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#00C3D0] focus:ring-[#00C3D0] mt-0.5">
-                                    <div>
-                                        <span class="font-bold text-sm sm:text-sm text-[#1D1D1F] block">Boat Dive (Optional)</span>
-                                        <span class="text-sm text-[#6E6E73] block">Boat ride to deeper marine sanctuaries.</span>
+                                <div class="flex items-start gap-2.5 min-w-0">
+                                    <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#00C3D0] focus:ring-[#00C3D0] mt-0.5 shrink-0 cursor-pointer">
+                                    <div class="min-w-0">
+                                        <span class="font-bold text-sm text-[#1D1D1F] block">Boat Dive (Optional)</span>
+                                        <span class="text-xs sm:text-sm text-[#6E6E73] block leading-snug">Boat ride to deeper marine sanctuaries.</span>
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <span class="font-extrabold text-[#00C3D0] text-sm sm:text-sm">+₱600</span>
-                                    <span class="text-sm text-[#6E6E73] block">/ person</span>
+                                    <span class="font-extrabold text-[#00C3D0] text-xs sm:text-sm">+₱600</span>
+                                    <span class="text-[11px] sm:text-xs text-[#6E6E73] block">/ person</span>
                                 </div>
                             </label>
                         </div>
                     </div>
 
                     <!-- Accuracy & Prerequisite Verification -->
-                    <div class="pt-2">
-                        <div class="p-3.5 sm:p-4 rounded-xl bg-[#D4A5A5] border border-[#C69090]">
+                    <div class="pt-1">
+                        <div class="p-3.5 sm:p-4 rounded-xl bg-[#F8EAEA] border border-[#F1D5D5]">
                             <label tabindex="0"
                                    role="checkbox"
                                    :aria-checked="form.confirmation_ack"
                                    @keydown.enter.prevent="form.confirmation_ack = !form.confirmation_ack"
                                    @keydown.space.prevent="form.confirmation_ack = !form.confirmation_ack"
                                    class="flex items-start gap-2.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] rounded-lg">
-                                <input type="checkbox" x-model="form.confirmation_ack" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
-                                <span class="font-bold text-[#780000] text-sm leading-relaxed">
+                                <input type="checkbox" x-model="form.confirmation_ack" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0 cursor-pointer">
+                                <span class="font-bold text-[#780000] text-xs sm:text-sm leading-relaxed">
                                     <span x-show="form.class_type === 'fundive' || form.class_type === 'refinement'">
                                         I confirm that I have completed Discovery Class and that all information provided is accurate. <span class="text-red-500">*</span>
                                     </span>
@@ -926,71 +920,71 @@
                     
                     <!-- Itemized Price Calculation Summary -->
                     <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden shadow-2xs">
-                        <div class="bg-[#F2F2F7] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between">
-                            <span class="font-bold text-[#1D1D1F] text-sm">Booking Summary</span>
-                            <span class="text-sm font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize" x-text="form.class_type"></span>
+                        <div class="bg-[#F2F2F7] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between gap-2">
+                            <span class="font-bold text-[#1D1D1F] text-sm sm:text-base">Booking Summary</span>
+                            <span class="text-xs sm:text-sm font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize shrink-0" x-text="form.class_type"></span>
                         </div>
 
-                        <div class="p-4 space-y-3 text-sm">
-                            <div class="flex justify-between items-center text-[#6E6E73]">
-                                <span>Base Class Rate (<span class="capitalize" x-text="form.class_type"></span> × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber((pricingQuote ? pricingQuote.base_price_per_pax : calculateBasePriceUnit()) * form.participants.length)"></span>
+                        <div class="p-3.5 sm:p-5 space-y-3 text-xs sm:text-sm">
+                            <div class="flex justify-between items-center gap-2 text-[#6E6E73]">
+                                <span class="min-w-0">Base Class Rate (<span class="capitalize" x-text="form.class_type"></span> × <span x-text="form.participants.length"></span>)</span>
+                                <span class="font-bold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber((pricingQuote ? pricingQuote.base_price_per_pax : calculateBasePriceUnit()) * form.participants.length)"></span>
                             </div>
 
                             <!-- Dynamic Pricing Adjustments -->
                             <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
-                                <div class="space-y-1.5 py-2 border-y border-dashed border-[#E5E5EA]">
-                                    <div class="text-sm uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
+                                <div class="space-y-2 py-2.5 border-y border-dashed border-[#E5E5EA]">
+                                    <div class="text-[11px] sm:text-xs uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
                                     <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
-                                        <div class="flex justify-between items-center text-sm">
-                                            <div class="flex items-center gap-1.5">
-                                                <span class="text-[#1D1D1F]" x-text="adj.rule_name"></span>
-                                                <span class="text-sm px-1.5 py-0.5 rounded font-bold" :class="adj.delta_per_pax >= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" x-text="adj.formatted_adjustment"></span>
+                                        <div class="flex justify-between items-start gap-2 text-xs sm:text-sm">
+                                            <div class="min-w-0 space-y-0.5">
+                                                <div class="font-medium text-[#1D1D1F] leading-snug" x-text="adj.rule_name"></div>
+                                                <span class="inline-block text-[11px] px-1.5 py-0.5 rounded font-bold" :class="adj.delta_per_pax >= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" x-text="adj.formatted_adjustment + ' / pax'"></span>
                                             </div>
-                                            <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                                            <span class="font-bold shrink-0 text-right" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
                                         </div>
                                     </template>
                                 </div>
                             </template>
 
-                            <div class="flex justify-between items-center text-[#1D1D1F] font-semibold">
+                            <div class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Adjusted Class Subtotal</span>
-                                <span class="font-extrabold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
                             </div>
 
-                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center text-[#6E6E73]">
+                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center gap-2 text-[#6E6E73]">
                                 <span>Transportation (Carpool × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
+                                <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
                             </div>
 
-                            <div x-show="form.boat_dive" class="flex justify-between items-center text-[#6E6E73]">
+                            <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#6E6E73]">
                                 <span>Boat Dive (₱600 × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(600 * form.participants.length)"></span>
+                                <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(600 * form.participants.length)"></span>
                             </div>
 
-                            <div class="flex justify-between items-center text-[#6E6E73]">
+                            <div class="flex justify-between items-center gap-2 text-[#6E6E73]">
                                 <span>Mabini LGU Pass & Env. Fee</span>
-                                <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(350 * form.participants.length)"></span>
+                                <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(350 * form.participants.length)"></span>
                             </div>
 
-                            <div class="pt-2 border-t border-[#E5E5EA] flex justify-between items-center font-extrabold text-sm text-[#1D1D1F]">
-                                <span>Total Amount</span>
-                                <span class="text-base font-black text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal())"></span>
+                            <div class="pt-2.5 border-t border-[#E5E5EA] flex justify-between items-center gap-2 font-extrabold text-[#1D1D1F]">
+                                <span class="text-xs sm:text-sm">Total Amount</span>
+                                <span class="text-base sm:text-lg font-black text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateTotal())"></span>
                             </div>
 
                             <!-- Downpayment Box -->
-                            <div class="p-3 rounded-xl bg-[#D1FAE5] flex justify-between items-center">
-                                <div>
-                                    <span class="font-extrabold text-[#065F46] block text-sm">Downpayment Due Now</span>
-                                    <span class="text-sm text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '3,000' : '2,000') + ' php / head)'"></span>
+                            <div class="p-3 sm:p-3.5 rounded-xl bg-[#D1FAE5] flex justify-between items-center gap-2">
+                                <div class="min-w-0">
+                                    <span class="font-extrabold text-[#065F46] block text-xs sm:text-sm leading-tight">Downpayment Due Now</span>
+                                    <span class="text-[11px] sm:text-xs text-[#065F46]/80 font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '3,000' : '2,000') + ' php / head)'"></span>
                                 </div>
-                                <span class="text-base sm:text-lg font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
+                                <span class="text-base sm:text-lg font-black text-[#065F46] shrink-0 text-right" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
                             </div>
 
                             <!-- Balance Box -->
-                            <div class="p-2.5 rounded-xl bg-[#FFFBEB] flex justify-between items-center text-[#92400E]">
-                                <span class="font-semibold text-sm">Remaining Balance at Camp</span>
-                                <span class="font-bold text-sm" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                            <div class="p-2.5 sm:p-3 rounded-xl bg-[#FDE68A] flex justify-between items-center gap-2 text-[#92400E]">
+                                <span class="font-semibold text-xs sm:text-sm">Remaining Balance at Camp</span>
+                                <span class="font-bold text-xs sm:text-sm shrink-0 text-right" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
                             </div>
                         </div>
                     </div>
@@ -1002,9 +996,9 @@
         <!-- Step 4: Downpayment -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
-            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-8 space-y-6 shadow-2xs">
+            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-8 shadow-2xs">
                 <!-- Top Navigation & Header -->
-                <div class="flex items-center justify-between border-b border-[#F2F2F7] pb-4">
+                <div class="flex items-center justify-between">
                     <button type="button" 
                             @click="prevStep()" 
                             class="text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors cursor-pointer">
@@ -1030,7 +1024,7 @@
 
                     <div class="space-y-2.5 text-sm text-[#6E6E73]">
                         <!-- Tier 1: > 14 Days -->
-                        <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-1">
+                        <div class="rounded-xl space-y-1">
                             <div class="flex items-center justify-between gap-2 flex-wrap">
                                 <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given > 14 Days</strong>
                                 <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
@@ -1043,7 +1037,7 @@
                         </div>
 
                         <!-- Tier 2: 7 to 14 Days -->
-                        <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-1">
+                        <div class="rounded-xl space-y-1">
                             <div class="flex items-center justify-between gap-2 flex-wrap">
                                 <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given 7 to 14 Days</strong>
                                 <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
@@ -1056,9 +1050,9 @@
                         </div>
 
                         <!-- Tier 3: < 7 Days (Locked) -->
-                        <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-1">
+                        <div class="rounded-xl space-y-1">
                             <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days (Locked Window)</strong>
+                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days</strong>
                                 <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">
                                     Non-Refundable
                                 </span>
@@ -1078,7 +1072,7 @@
                         </h3>
                     </div>
 
-                    <div class="p-4 sm:p-5 rounded-2xl space-y-3">
+                    <div class="rounded-2xl space-y-3">
                         <div class="flex justify-between items-center text-sm text-[#6E6E73]">
                             <span>Package</span>
                             <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type + ' (' + form.participants.length + ' pax)'"></strong>
@@ -1108,7 +1102,7 @@
                 </div>
 
                 <!-- 3. Supported Hosted Payment Channels -->
-                <div class="space-y-2.5 pt-2 border-t border-[#F2F2F7]">
+                <div class="space-y-2.5 pt-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">
                         Accepted on PayMongo Hosted Checkout:
                     </span>
@@ -1135,8 +1129,8 @@
 
                 <!-- 4. Explicit Consent & Hosted Checkout Action Button -->
                 <div class="space-y-4 pt-2">
-                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] border transition-all"
-                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#E5E5EA]'">
+                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] transition-all"
+                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border border-[#FF3B3C] bg-red-50/20' : ''">
                         <label class="flex items-start gap-2.5 cursor-pointer select-none">
                             <input type="checkbox" 
                                    x-model="form.hasAgreedToTerms" 
@@ -1145,7 +1139,7 @@
                                 I have read and agree to the 
                                 <a href="{{ route('legal.terms') }}" target="_blank" class="text-[#780000] font-bold underline hover:text-[#500000]">Terms &amp; Conditions</a>, 
                                 <a href="{{ route('legal.privacy') }}" target="_blank" class="text-[#780000] font-bold underline hover:text-[#500000]">Privacy Policy</a>, 
-                                and 14-Day Cancellation Policy. <span class="text-[#780000]">*</span>
+                                and Cancellation Policy. <span class="text-[#780000]">*</span>
                             </span>
                         </label>
                         <span x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#FF3B3C] font-semibold mt-1.5 block">
@@ -1166,9 +1160,8 @@
                         </span>
                     </button>
 
-                    <div class="flex items-center justify-center gap-1.5 text-xs text-[#6E6E73]">
-                        <svg class="w-3.5 h-3.5 text-[#34C759]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                        <span>256-Bit SSL Encrypted Hosted Checkout by PayMongo</span>
+                    <div class="text-center text-xs text-[#6E6E73] leading-relaxed">
+                        <span>Your payment is safely processed by PayMongo using bank-grade encryption. We never see or store your card or wallet details.</span>
                     </div>
                 </div>
 
@@ -1281,11 +1274,11 @@
         </div>
 
         <!-- Step Navigation Controls -->
-        <div x-show="currentStep < 4" class="mt-8 pt-6 flex items-center justify-between">
+        <div x-show="currentStep < 4" class="mt-8 pt-6 flex items-center justify-between gap-2.5 sm:gap-4">
             <button type="button" 
                     @click="prevStep()" 
                     x-show="currentStep > 1"
-                    class="btn-secondary px-4 sm:px-5 py-2.5 text-sm flex items-center gap-1.5">
+                    class="btn-secondary px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0 cursor-pointer">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 <span>Back</span>
             </button>
@@ -1293,7 +1286,7 @@
 
             <button type="button" 
                     @click="nextStep()" 
-                    class="btn-primary px-5 sm:px-8 py-2.5 text-sm cursor-pointer active:scale-[0.99] transition-all">
+                    class="btn-primary px-4 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all text-center leading-snug flex-1 sm:flex-initial shadow-sm">
                 <span x-text="currentStep === 3 ? 'Proceed to Downpayment (₱' + formatNumber(calculateDownpayment()) + ')' : 'Continue'"></span>
             </button>
         </div>
@@ -1304,7 +1297,7 @@
 
 @push('scripts')
 <script>
-function bookingWizard(config) {
+function bookingForm(config) {
     return {
         currentStep: 1,
         stepTitles: [
@@ -1468,7 +1461,7 @@ contact_phone: '',
             this.onStartDateChange();
         },
 
-        initWizard() {
+        initBooking() {
             this.loadDraft();
 
             // Auto-save form inputs whenever they change
@@ -1855,7 +1848,7 @@ contact_phone: '',
                 }
             } else if (this.currentStep === 2) {
                 if (!this.form.start_date) {
-                    this.errorMessage = "Please select your preferred 2D1N trip start date to continue.";
+                    this.errorMessage = "Please select your preferred trip start date to continue.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
@@ -2052,5 +2045,6 @@ contact_phone: '',
         }
     };
 }
+window.bookingWizard = bookingForm;
 </script>
 @endpush

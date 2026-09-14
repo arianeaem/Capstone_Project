@@ -526,7 +526,7 @@
 
                 <div class="md:text-right">
                     <span class="text-sm uppercase font-bold text-[#6E6E73] block">Mandatory Safety Limits</span>
-                    @if($batchMLAssessment && ($batchMLAssessment['hard_gate_triggered'] ?? false))
+                    @if($batchMLAssessment && ($batchMLAssessment['safety_threshold_triggered'] ?? $batchMLAssessment['hard_gate_triggered'] ?? false))
                         <span class="text-sm font-bold text-[#991B1B] bg-[#FEF2F2] px-3 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5 mt-1">
                             <span>Safety Limit Exceeded</span>
                         </span>

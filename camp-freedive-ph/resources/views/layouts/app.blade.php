@@ -22,27 +22,74 @@
 
     @unless(View::hasSection('hide_header'))
     <!-- Navigation Bar -->
-    <header class="sticky top-0 z-40 bg-white border-b border-[#E5E5EA]">
-        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-2">
+    <header class="sticky top-0 z-40 bg-white border-b border-[#E5E5EA]" x-data="{ mobileMenuOpen: false }">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between gap-3">
             <!-- Brand Logo -->
             <a href="{{ route('landing') }}" class="flex items-center gap-2.5 sm:gap-3 group shrink-0">
-                <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-contain bg-white">
+                <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-9 h-9 sm:w-12 sm:h-12 rounded-full object-contain bg-white shrink-0">
                 <div class="block">
                     <span class="font-extrabold text-base sm:text-xl tracking-tight text-[#1D1D1F] block leading-none">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                    <span class="text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>
+                    <span class="text-xs sm:text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5">Mabini, Batangas</span>
                 </div>
             </a>
 
-            <!-- Navigation Actions -->
-            <div class="flex items-center gap-3 sm:gap-5">
+            <!-- Desktop Navigation Actions -->
+            <div class="hidden sm:flex items-center gap-4 sm:gap-6">
                 <a href="{{ route('manage.index') }}" class="text-sm sm:text-base font-semibold text-[#1D1D1F] hover:text-[#780000] transition-colors whitespace-nowrap">
                     Manage Booking
                 </a>
-
-                <a href="{{ route('booking.create') }}" class="btn-primary px-4 sm:px-6 py-2.5 text-sm sm:text-base font-bold whitespace-nowrap">
+                <a href="{{ route('booking.create') }}" class="btn-primary px-5 py-2.5 text-sm sm:text-base font-bold shadow-2xs hover:shadow transition-all whitespace-nowrap">
                     Book Now
                 </a>
             </div>
+
+            <!-- Mobile Menu Toggle Button -->
+            <div class="flex sm:hidden items-center">
+                <button type="button" 
+                        @click="mobileMenuOpen = !mobileMenuOpen"
+                        :aria-expanded="mobileMenuOpen"
+                        aria-label="Toggle navigation menu"
+                        class="w-10 h-10 rounded-xl flex items-center justify-center text-[#1D1D1F] hover:bg-[#F2F2F7] active:bg-[#E5E5EA] transition-colors focus:outline-none cursor-pointer">
+                    <svg x-show="!mobileMenuOpen" class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                    <svg x-show="mobileMenuOpen" x-cloak class="w-6 h-6 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Dropdown -->
+        <div x-show="mobileMenuOpen"
+             x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 -translate-y-2"
+             @click.away="mobileMenuOpen = false"
+             @keydown.escape.window="mobileMenuOpen = false"
+             class="sm:hidden border-t border-[#E5E5EA] bg-white px-4 py-4 space-y-3 shadow-lg">
+            
+            <nav class="space-y-2">
+                <a href="{{ route('manage.index') }}" 
+                   @click="mobileMenuOpen = false"
+                   class="flex items-center justify-between px-4 py-3 rounded-xl font-semibold text-sm text-[#1D1D1F] hover:bg-[#F2F2F7] active:bg-[#E5E5EA] transition-colors">
+                    <span>Manage Booking</span>
+                    <svg class="w-4 h-4 text-[#8E8E93]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg>
+                </a>
+
+                <a href="{{ route('booking.create') }}" 
+                   @click="mobileMenuOpen = false"
+                   class="btn-primary w-full py-3 text-center text-sm font-bold block shadow-sm">
+                    Book Now
+                </a>
+            </nav>
         </div>
     </header>
     @endunless

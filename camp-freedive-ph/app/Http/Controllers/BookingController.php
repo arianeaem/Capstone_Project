@@ -27,7 +27,7 @@ class BookingController extends Controller
     ) {}
 
     /**
-     * Show the multi-step public customer booking wizard.
+     * Show the public customer booking process.
      */
     public function create(Request $request): View
     {
@@ -69,7 +69,7 @@ class BookingController extends Controller
             ],
         ];
 
-        return view('booking.wizard', compact('selectedClass', 'pickupPoints'));
+        return view('booking.create', compact('selectedClass', 'pickupPoints'));
     }
 
     /**

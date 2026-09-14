@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Auth\LoginController;
 
-echo "=== VERIFYING LOGIN & WIZARD UPDATES ===\n\n";
+echo "=== VERIFYING LOGIN & BOOKING FORM UPDATES ===\n\n";
 
 $loginController = app(LoginController::class);
 
