@@ -79,154 +79,219 @@
 
         <!-- Step 1: Select Class -->
         <div x-show="currentStep === 1" x-cloak class="space-y-6">
-            <div class="border-b border-[#E5E5EA] pb-4">
-                <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Freediving Class</h2>
-                <p class="text-sm text-[#6E6E73] mt-1">Select the course or dive experience you want to join. Beginners and non-swimmers are welcome!</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+                
+                <!-- Left Side: Packages & Fundive Experience Level -->
+                <div class="lg:col-span-8 space-y-4 sm:space-y-5">
+                    
+                    <!-- 3 Square Packages Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" role="radiogroup" aria-label="Freediving Class Packages">
+                        
+                        <!-- 1. Discovery Square -->
+                        <div @click="form.class_type = 'discovery'" 
+                             @keydown.enter.prevent="form.class_type = 'discovery'"
+                             @keydown.space.prevent="form.class_type = 'discovery'"
+                             tabindex="0"
+                             role="radio"
+                             :aria-checked="form.class_type === 'discovery'"
+                             aria-label="Discovery beginner class, 4,250 php per person"
+                             class="p-4 sm:p-5 rounded-2xl bg-white cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] focus:outline-none">
+                            
+                            <div class="w-full flex flex-col items-center">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
+                                     :class="form.class_type === 'discovery' ? 'bg-[#780000]/20 ring-2 ring-[#780000]' : 'bg-[#780000]/10'">
+                                    <img src="{{ asset('icons/icons8-water-60.png') }}" class="w-10 h-10 object-contain" alt="Discovery Icon">
+                                </div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Discovery</h3>
+                                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] mt-1 mb-2">
+                                    BEGINNER CLASS
+                                </span>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    Solo joiners and non-swimmers welcome. Theory, pool and 2 open water dives.
+                                </p>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
+                                <span class="text-lg sm:text-xl font-black text-[#780000]">4,250 php</span>
+                                <span class="text-xs text-[#6E6E73]">/ person</span>
+                            </div>
+                        </div>
+
+                        <!-- 2. Fundive Square -->
+                        <div @click="form.class_type = 'fundive'" 
+                             @keydown.enter.prevent="form.class_type = 'fundive'"
+                             @keydown.space.prevent="form.class_type = 'fundive'"
+                             tabindex="0"
+                             role="radio"
+                             :aria-checked="form.class_type === 'fundive'"
+                             aria-label="Fundive class, prerequisite discovery class"
+                             class="p-4 sm:p-5 rounded-2xl bg-white cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] focus:outline-none">
+                            
+                            <div class="w-full flex flex-col items-center">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
+                                     :class="form.class_type === 'fundive' ? 'bg-[#780000]/20 ring-2 ring-[#780000]' : 'bg-[#780000]/10'">
+                                    <img src="{{ asset('icons/icons8-snorkel-60.png') }}" class="w-10 h-10 object-contain" alt="Fundive Icon">
+                                </div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Fundive</h3>
+                                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] mt-1 mb-2">
+                                    PREREQUISITE: DISCOVERY CLASS
+                                </span>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    Explore open water sanctuaries with coach guidance, 2D1N stay and photo coverage.
+                                </p>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
+                                <span class="text-lg sm:text-xl font-black text-[#780000]" x-text="form.is_certified_diver ? '2,500 php' : '3,300 php'"></span>
+                                <span class="text-xs text-[#6E6E73]" x-text="form.is_certified_diver ? 'Certified Diver / person' : 'Non-Certified Diver / person'"></span>
+                            </div>
+                        </div>
+
+                        <!-- 3. Refinement Square -->
+                        <div @click="form.class_type = 'refinement'" 
+                             @keydown.enter.prevent="form.class_type = 'refinement'"
+                             @keydown.space.prevent="form.class_type = 'refinement'"
+                             tabindex="0"
+                             role="radio"
+                             :aria-checked="form.class_type === 'refinement'"
+                             aria-label="Skill refinement practice dive, 4,100 php per person"
+                             class="p-4 sm:p-5 rounded-2xl bg-white cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] focus:outline-none">
+                            
+                            <div class="w-full flex flex-col items-center">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
+                                     :class="form.class_type === 'refinement' ? 'bg-[#780000]/20 ring-2 ring-[#780000]' : 'bg-[#780000]/10'">
+                                    <img src="{{ asset('icons/icons8-flippers-60.png') }}" class="w-10 h-10 object-contain" alt="Refinement Icon">
+                                </div>
+                                <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Refinement</h3>
+                                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] mt-1 mb-2">
+                                    PRACTICE DIVE
+                                </span>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    Practice dive with 2 open water sessions, pool access, coach fee and full meals.
+                                </p>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
+                                <span class="text-lg sm:text-xl font-black text-[#780000]">4,100 php</span>
+                                <span class="text-xs text-[#6E6E73]">/ person</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fundive Diver Certification Selection (Visible when Fundive is selected) -->
+                    <div x-show="form.class_type === 'fundive'" x-transition x-cloak class="p-4 sm:p-5 bg-amber-100 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div>
+                                <h4 class="font-extrabold text-[#92400E] text-sm sm:text-base flex items-center gap-1.5">
+                                    <span>Fundive Experience & Certification Level</span>
+                                </h4>
+                                <p class="text-xs sm:text-sm text-[#78350F] mt-0.5">
+                                    Select whether you hold an official freediving certification or require full safety coach guidance.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                            <!-- Non-Certified -->
+                            <label @click="form.is_certified_diver = false"
+                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white"
+                                   :class="!form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-transparent'">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="is_certified" :value="false" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
+                                    <div>
+                                        <span class="font-bold text-[#1D1D1F] block text-sm">Non-Certified Diver</span>
+                                        <span class="text-xs text-[#6E6E73] block">Includes dedicated safety coach</span>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">3,300 php</strong>
+                                    <span class="text-xs text-[#6E6E73] block">/ person</span>
+                                </div>
+                            </label>
+
+                            <!-- Certified Diver -->
+                            <label @click="form.is_certified_diver = true"
+                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white"
+                                   :class="form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-transparent'">
+                                <div class="flex items-center gap-3">
+                                    <input type="radio" name="is_certified" :value="true" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
+                                    <div>
+                                        <span class="font-bold text-[#1D1D1F] block text-sm">Certified Diver</span>
+                                        <span class="text-xs text-[#6E6E73] block">Licensed (no coach fee needed)</span>
+                                    </div>
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">2,500 php</strong>
+                                    <span class="text-xs text-[#6E6E73] block">/ person</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right Side: Inclusions & Exclusions -->
+                <div class="lg:col-span-4 space-y-6" x-show="form.class_type" x-transition x-cloak>
+                    <!-- Inclusions -->
+                    <div class="space-y-2.5">
+                        <h4 class="font-extrabold text-sm uppercase tracking-wider text-[#1D1D1F]">Inclusions</h4>
+                        
+                        <!-- Discovery Inclusions -->
+                        <ul x-show="form.class_type === 'discovery'" class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
+                            <li>2 open water dives (2-3 hrs per session)</li>
+                            <li>1 pool session (10 ft deep pool access)</li>
+                            <li>2D1N shared AC room accommodation</li>
+                            <li>Lesson fee and coach fee</li>
+                            <li>Safety buoy set up</li>
+                            <li>3 full board meals</li>
+                            <li>Photos and videos</li>
+                            <li>Gears (mask, snorkel, fins, weight belt)</li>
+                        </ul>
+
+                        <!-- Fundive Inclusions -->
+                        <ul x-show="form.class_type === 'fundive'" class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
+                            <li>2 open water dives (2-3 hrs per session)</li>
+                            <li>1 pool session (10 ft deep pool access)</li>
+                            <li>2D1N shared AC room accommodation</li>
+                            <li x-text="form.is_certified_diver ? 'Safety buoy setup and dive buddy briefing' : 'Safety coach fee included'"></li>
+                            <li>Safety buoy set up</li>
+                            <li>3 full board meals</li>
+                            <li>Photos and videos</li>
+                            <li>Gears (mask, snorkel, fins, weight belt)</li>
+                        </ul>
+
+                        <!-- Refinement Inclusions -->
+                        <ul x-show="form.class_type === 'refinement'" class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
+                            <li>2 open water dives (2-3 hrs per session)</li>
+                            <li>1 pool session (10 ft deep pool access)</li>
+                            <li>2D1N shared AC room accommodation</li>
+                            <li>Coach fee (skills drills and form correction)</li>
+                            <li>Safety buoy set up</li>
+                            <li>3 full board meals</li>
+                            <li>Photos and videos</li>
+                            <li>Gears (mask, snorkel, fins, weight belt)</li>
+                        </ul>
+                    </div>
+
+                    <!-- Exclusions -->
+                    <div class="space-y-2.5">
+                        <h4 class="font-extrabold text-sm uppercase tracking-wider text-[#1D1D1F]">Exclusions</h4>
+                        
+                        <ul class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
+                            <li>Transportation (We arrange convenient carpool van transfers)</li>
+                            <li>Boat dive (Optional sanctuary boat trip +₱600/person)</li>
+                            <li>Mabini LGU municipal environmental fee and dive pass</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:gap-6" role="radiogroup" aria-label="Freediving Class Packages">
-                <!-- Discovery Package Option -->
-                <div @click="form.class_type = 'discovery'" 
-                     @keydown.enter.prevent="form.class_type = 'discovery'"
-                     @keydown.space.prevent="form.class_type = 'discovery'"
-                     tabindex="0"
-                     role="radio"
-                     :aria-checked="form.class_type === 'discovery'"
-                     aria-label="Discovery beginner class, 4,250 php per person"
-                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
-                     :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#F8EAEA]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
-                    <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
-                             :class="form.class_type === 'discovery' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
-                            <span x-show="form.class_type === 'discovery'" class="w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-[#1D1D1F]">Discovery</h3>
-                            <span class="font-bold text-[#780000] block text-xs uppercase tracking-wider mt-0.5 mb-1">Beginner Class</span>
-                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">Open to solo joiners and non-swimmers. Includes theory, pool session, and 2 open water dive sessions.</p>
-                        </div>
-                    </div>
-                    <div class="text-left sm:text-right shrink-0 pl-8 sm:pl-0">
-                        <span class="text-xl sm:text-2xl font-extrabold text-[#780000]">4,250 php</span>
-                        <span class="text-sm sm:text-sm text-[#6E6E73] block">/ person</span>
-                    </div>
-                </div>
-
-                <!-- Fun Dive Package Option -->
-                <div @click="form.class_type = 'fundive'" 
-                     @keydown.enter.prevent="form.class_type = 'fundive'"
-                     @keydown.space.prevent="form.class_type = 'fundive'"
-                     tabindex="0"
-                     role="radio"
-                     :aria-checked="form.class_type === 'fundive'"
-                     aria-label="Fundive class, prerequisite discovery class"
-                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
-                     :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#F8EAEA]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
-                    <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
-                             :class="form.class_type === 'fundive' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
-                            <span x-show="form.class_type === 'fundive'" class="w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-[#1D1D1F]">Fundive</h3>
-                            <span class="font-bold text-[#00838F] block text-xs uppercase tracking-wider mt-0.5 mb-1">Prerequisite: Discovery Class</span>
-                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">2 open water dives, pool session, 2D1N accommodation, safety coach fee, photos and videos.</p>
-                        </div>
-                    </div>
-                    <div class="text-left sm:text-right shrink-0 pl-8 sm:pl-0">
-                        <span class="text-xl sm:text-2xl font-extrabold text-[#780000]" x-text="form.is_certified_diver ? '2,500 php' : '3,300 php'"></span>
-                        <span class="text-sm sm:text-sm text-[#6E6E73] block" x-text="form.is_certified_diver ? 'Certified Diver' : 'Non-Certified Diver'"></span>
-                    </div>
-                </div>
-
-                <!-- Skill Refinement Package Option -->
-                <div @click="form.class_type = 'refinement'" 
-                     @keydown.enter.prevent="form.class_type = 'refinement'"
-                     @keydown.space.prevent="form.class_type = 'refinement'"
-                     tabindex="0"
-                     role="radio"
-                     :aria-checked="form.class_type === 'refinement'"
-                     aria-label="Skill refinement practice dive, 4,100 php per person"
-                     class="p-4 sm:p-6 rounded-xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
-                     :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#F8EAEA]' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
-                    <div class="flex items-start gap-3 sm:gap-4">
-                        <div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border flex items-center justify-center shrink-0 mt-0.5"
-                             :class="form.class_type === 'refinement' ? 'border-[#780000] bg-[#780000]' : 'border-[#D1D1D6]'">
-                            <span x-show="form.class_type === 'refinement'" class="w-2 h-2 rounded-full bg-white"></span>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-[#1D1D1F]">Refinement</h3>
-                            <span class="font-bold text-[#2C2C2E] block text-xs uppercase tracking-wider mt-0.5 mb-1">Practice Dive</span>
-                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">Practice dive with 2 open water sessions, pool access, coach fee, 3 meals, and photo/video coverage.</p>
-                        </div>
-                    </div>
-                    <div class="text-left sm:text-right shrink-0 pl-8 sm:pl-0">
-                        <span class="text-xl sm:text-2xl font-extrabold text-[#780000]">4,100 php</span>
-                        <span class="text-sm sm:text-sm text-[#6E6E73] block">/ person</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Fundive Inline Prerequisite & Certification Logic -->
-            <div x-show="form.class_type === 'fundive'" x-cloak class="p-4 sm:p-5 bg-[#FFFBEB] border border-[#FDE68A] rounded-xl space-y-4 text-sm">
-                <div>
-                    <h4 class="font-bold text-[#92400E]">Fundive Prerequisite: Discovery Class</h4>
-                    <p class="text-sm text-[#78350F] mt-0.5">Please indicate if you hold a certified freediver license or finished Discovery Class.</p>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#FDE68A] cursor-pointer">
-                        <input type="radio" name="is_certified" :value="false" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
-                        <span class="font-semibold text-[#1D1D1F]">Non-Certified (3,300 php)</span>
-                    </label>
-                    <label class="flex items-center gap-3 p-3 bg-white rounded-xl border border-[#FDE68A] cursor-pointer">
-                        <input type="radio" name="is_certified" :value="true" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
-                        <span class="font-semibold text-[#1D1D1F]">Certified Diver (2,500 php)</span>
-                    </label>
-                </div>
-
-                <div class="pt-2">
-                    <label class="flex items-start gap-3 cursor-pointer">
-                        <input type="checkbox" x-model="form.discovery_completed_ack" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5">
-                        <span class="font-semibold text-[#78350F]">
-                            I confirm that I have completed Discovery Class or hold a certified freediving license.
-                        </span>
-                    </label>
-                </div>
-            </div>
         </div>
 
         <!-- Step 2: Select Dates -->
         <div x-show="currentStep === 2" x-cloak class="space-y-6">
-            
-            <!-- Step Header -->
-            <div class="border-b border-[#E5E5EA] pb-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">Choose Your Dive Dates</h2>
-                        <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">Select your preferred 2D1N trip start date on the calendar. All freediving camps run for 2 consecutive days.</p>
-                    </div>
-
-                    <!-- Information Icon with Hover Notice -->
-                    <div class="relative group inline-flex items-center self-start sm:self-center">
-                        <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F2F7] hover:bg-[#E5E5EA] text-sm font-semibold text-[#1D1D1F] cursor-pointer transition-colors">
-                            <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain" alt="About Forecast">
-                            <span>About Forecast</span>
-                        </div>
-
-                        <!-- Interactive Date Help Tooltip -->
-                        <div class="absolute right-0 sm:right-auto sm:left-0 top-full mt-2 w-80 p-3.5 bg-[#1D1D1F] text-white text-sm rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
-                            <div class="font-bold flex items-center gap-1.5 text-[#00C3D0]">
-                                <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-3.5 h-3.5 shrink-0 object-contain brightness-0 invert" alt="Weather Note">
-                                <span>Weather & Sea Conditions Note</span>
-                            </div>
-                            <p class="text-sm text-gray-200">
-                                Safety ratings shown are automated predictions based on coastal forecast models. Actual water conditions can change naturally, and our safety team continuously checks the water before every dive.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Dates and Safety Evaluation Layout -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -428,8 +493,23 @@
                         
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-[#00C3D0] animate-pulse"></span>
                                 <h3 class="font-black text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
+                                
+                                <!-- About Forecast Icon with Tooltip -->
+                                <div class="relative group inline-flex items-center">
+                                    <button type="button" aria-label="About Forecast" class="p-1.5 rounded-xl text-[#6E6E73] hover:text-[#1D1D1F] transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
+                                        <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-5 h-5 shrink-0 object-contain" alt="About Forecast">
+                                    </button>
+                                    <div class="absolute left-0 top-full mt-2 w-72 p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
+                                        <div class="font-bold flex items-center gap-1.5 text-[#00C3D0]">
+                                            <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain brightness-0 invert" alt="Weather Note">
+                                            <span>Weather & Sea Conditions Note</span>
+                                        </div>
+                                        <p class="text-xs text-gray-200">
+                                            Safety ratings shown are automated predictions based on coastal forecast models. Actual water conditions can change naturally, and our safety team continuously checks the water before every dive.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
                             
                             <template x-if="weatherLoading">
@@ -477,30 +557,37 @@
                         <!-- Weather Assessment Results -->
                         <template x-if="forecast && !weatherLoading && !forecast.is_benchmark">
                             <div class="space-y-4">
-                                <!-- Overall Banner -->
-                                <div class="rounded-xl p-4 border transition-all space-y-2 shadow-2xs"
-                                     :style="'background-color: ' + forecast.bg_color + '; border-color: ' + forecast.border_color + '; color: ' + forecast.text_color">
-                                    <div class="flex items-center justify-between gap-2">
-                                        <h4 class="font-extrabold text-sm sm:text-base" x-text="forecast.title"></h4>
-                                        <span class="text-sm font-black uppercase px-2 py-0.5 rounded-full bg-white text-black border border-black/10" x-text="forecast.classification"></span>
+                                <!-- Overall Assessment (5 Lines Indicator, No Background Color) -->
+                                <div class="space-y-2 pb-1">
+                                    <div class="flex items-center justify-between flex-wrap gap-2">
+                                        <div class="flex items-center gap-3">
+                                            <span class="text-lg sm:text-xl font-black uppercase tracking-wide"
+                                                  :class="getSafetyTextClass(forecast.overall_classification)"
+                                                  x-text="forecast.overall_classification"></span>
+
+                                            <!-- 5 Lines Indicator -->
+                                            <div class="flex items-center gap-1.5">
+                                                <template x-for="i in 5" :key="i">
+                                                    <div class="h-1.5 w-5 sm:w-7 rounded-full transition-all duration-300"
+                                                         :class="i <= getSafetyScore(forecast.overall_classification) ? getSafetyBarClass(forecast.overall_classification) : 'bg-[#E5E5EA]'"></div>
+                                                </template>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <p class="text-sm leading-relaxed opacity-90" x-text="forecast.description"></p>
+                                    <p class="text-sm text-[#6E6E73] leading-relaxed" x-text="forecast.description"></p>
                                 </div>
 
                                 <!-- Day 1 & Day 2 Breakdown -->
                                 <template x-if="forecast.day1 && forecast.day2">
-                                    <div class="space-y-2.5">
+                                    <div class="space-y-3 pt-2">
                                         <!-- Day 1 -->
-                                        <div class="p-3 rounded-xl space-y-1 text-sm">
+                                        <div class="relative pl-4 py-0.5 space-y-1 text-sm">
+                                            <div class="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full transition-colors duration-200"
+                                                 :class="getSafetyBarClass(forecast.day1.classification)"></div>
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#780000] text-sm uppercase tracking-wider">Day 1</span>
-                                                <span class="font-bold px-2 py-0.5 rounded-full text-sm"
-                                                      :class="{
-                                                          'bg-emerald-100 text-emerald-800': forecast.day1.classification === 'Very Safe' || forecast.day1.classification === 'Safe',
-                                                          'bg-amber-100 text-amber-800': forecast.day1.classification === 'Moderate',
-                                                          'bg-rose-100 text-rose-800': forecast.day1.classification === 'High Risk',
-                                                          'bg-red-100 text-red-800': forecast.day1.classification === 'Critical Risk'
-                                                      }"
+                                                <span class="font-extrabold text-[#1D1D1F] text-sm uppercase tracking-wider">Day 1</span>
+                                                <span class="font-extrabold text-xs uppercase tracking-wider"
+                                                      :class="getSafetyTextClass(forecast.day1.classification)"
                                                       x-text="forecast.day1.classification"></span>
                                             </div>
                                             <div class="text-[#6E6E73] text-sm flex items-center justify-between">
@@ -511,16 +598,13 @@
                                         </div>
 
                                         <!-- Day 2 -->
-                                        <div class="p-3 rounded-xl space-y-1 text-sm">
+                                        <div class="relative pl-4 py-0.5 space-y-1 text-sm">
+                                            <div class="absolute left-0 top-0.5 bottom-0.5 w-1.5 rounded-full transition-colors duration-200"
+                                                 :class="getSafetyBarClass(forecast.day2.classification)"></div>
                                             <div class="flex items-center justify-between">
-                                                <span class="font-extrabold text-[#00C3D0] text-sm uppercase tracking-wider">Day 2</span>
-                                                <span class="font-bold px-2 py-0.5 rounded-full text-sm"
-                                                      :class="{
-                                                          'bg-emerald-100 text-emerald-800': forecast.day2.classification === 'Very Safe' || forecast.day2.classification === 'Safe',
-                                                          'bg-amber-100 text-amber-800': forecast.day2.classification === 'Moderate',
-                                                          'bg-rose-100 text-rose-800': forecast.day2.classification === 'High Risk',
-                                                          'bg-red-100 text-red-800': forecast.day2.classification === 'Critical Risk'
-                                                      }"
+                                                <span class="font-extrabold text-[#1D1D1F] text-sm uppercase tracking-wider">Day 2</span>
+                                                <span class="font-extrabold text-xs uppercase tracking-wider"
+                                                      :class="getSafetyTextClass(forecast.day2.classification)"
                                                       x-text="forecast.day2.classification"></span>
                                             </div>
                                             <div class="text-[#6E6E73] text-sm flex items-center justify-between">
@@ -532,6 +616,24 @@
                                     </div>
                                 </template>
 
+                            </div>
+                        </template>
+
+                        <!-- Empty State: Dates Selected but Evaluation Not Available -->
+                        <template x-if="form.start_date && !weatherLoading && (!forecast || forecast.is_benchmark)">
+                            <div class="py-1 text-left">
+                                <p class="text-sm text-[#6E6E73] leading-relaxed">
+                                    Evaluation for this dates are not available but you can still proceed. The camp will just update you.
+                                </p>
+                            </div>
+                        </template>
+
+                        <!-- Empty State: No Date Selected Yet -->
+                        <template x-if="!form.start_date && !weatherLoading">
+                            <div class="py-1 text-left">
+                                <p class="text-sm text-[#8E8E93] italic leading-relaxed">
+                                    Select dates on the calendar to view safety evaluation.
+                                </p>
                             </div>
                         </template>
 
@@ -795,9 +897,9 @@
                         </div>
                     </div>
 
-                    <!-- Accuracy Verification -->
+                    <!-- Accuracy & Prerequisite Verification -->
                     <div class="pt-2">
-                        <div class="p-3.5 rounded-xl bg-[#F8EAEA] border border-[#780000]/30">
+                        <div class="p-3.5 sm:p-4 rounded-xl bg-[#D4A5A5] border border-[#C69090]">
                             <label tabindex="0"
                                    role="checkbox"
                                    :aria-checked="form.confirmation_ack"
@@ -806,7 +908,12 @@
                                    class="flex items-start gap-2.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] rounded-lg">
                                 <input type="checkbox" x-model="form.confirmation_ack" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
                                 <span class="font-bold text-[#780000] text-sm leading-relaxed">
-                                    I confirm that all information provided is accurate. <span class="text-red-500">*</span>
+                                    <span x-show="form.class_type === 'fundive' || form.class_type === 'refinement'">
+                                        I confirm that I have completed Discovery Class and that all information provided is accurate. <span class="text-red-500">*</span>
+                                    </span>
+                                    <span x-show="form.class_type === 'discovery'">
+                                        I confirm that all information provided is accurate. <span class="text-red-500">*</span>
+                                    </span>
                                 </span>
                             </label>
                         </div>
@@ -872,7 +979,7 @@
                             </div>
 
                             <!-- Downpayment Box -->
-                            <div class="p-3 rounded-xl bg-[#ECFDF5] flex justify-between items-center">
+                            <div class="p-3 rounded-xl bg-[#D1FAE5] flex justify-between items-center">
                                 <div>
                                     <span class="font-extrabold text-[#065F46] block text-sm">Downpayment Due Now</span>
                                     <span class="text-sm text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '3,000' : '2,000') + ' php / head)'"></span>
@@ -1652,6 +1759,65 @@ contact_phone: '',
             return (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         },
 
+        getSafetyScore(classification) {
+            switch (classification) {
+                case 'Very Safe': return 5;
+                case 'Safe': return 4;
+                case 'Moderate': return 3;
+                case 'High Risk': return 2;
+                case 'Critical Risk': return 1;
+                default: return 4;
+            }
+        },
+
+        getSafetyBarClass(classification) {
+            switch (classification) {
+                case 'Very Safe':
+                case 'Safe':
+                    return 'bg-[#10B981]';
+                case 'Moderate':
+                    return 'bg-[#F59E0B]';
+                case 'High Risk':
+                    return 'bg-[#F43F5E]';
+                case 'Critical Risk':
+                    return 'bg-[#EF4444]';
+                default:
+                    return 'bg-[#10B981]';
+            }
+        },
+
+        getSafetyBorderClass(classification) {
+            switch (classification) {
+                case 'Very Safe':
+                case 'Safe':
+                    return 'border-[#10B981]';
+                case 'Moderate':
+                    return 'border-[#F59E0B]';
+                case 'High Risk':
+                    return 'border-[#F43F5E]';
+                case 'Critical Risk':
+                    return 'border-[#EF4444]';
+                default:
+                    return 'border-[#10B981]';
+            }
+        },
+
+        getSafetyTextClass(classification) {
+            switch (classification) {
+                case 'Very Safe':
+                case 'Safe':
+                    return 'text-[#10B981]';
+                case 'Moderate':
+                    return 'text-[#F59E0B]';
+                case 'High Risk':
+                    return 'text-[#F43F5E]';
+                case 'Critical Risk':
+                    return 'text-[#EF4444]';
+                default:
+                    return 'text-[#10B981]';
+            }
+        },
+
         touchedStep3: false,
         touchedStep4: false,
 
@@ -1684,11 +1850,6 @@ contact_phone: '',
             if (this.currentStep === 1) {
                 if (!this.form.class_type) {
                     this.errorMessage = "Please select a freediving class to proceed.";
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                    return;
-                }
-                if (this.form.class_type === 'fundive' && !this.form.discovery_completed_ack && !this.form.is_certified_diver) {
-                    this.errorMessage = "Fundive requires self-declaration of prior Discovery Class completion or diver certification.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
@@ -1769,9 +1930,14 @@ contact_phone: '',
                     return;
                 }
                 if (!this.form.confirmation_ack) {
-                    this.errorMessage = "Please check the confirmation box acknowledging that all provided details are accurate.";
+                    this.errorMessage = (this.form.class_type === 'fundive' || this.form.class_type === 'refinement')
+                        ? "Please check the confirmation box acknowledging that you have completed Discovery Class and that all provided information is accurate."
+                        : "Please check the confirmation box acknowledging that all provided details are accurate.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
+                }
+                if (this.form.class_type === 'fundive' || this.form.class_type === 'refinement') {
+                    this.form.discovery_completed_ack = true;
                 }
                 this.startPaymentTimer();
             }

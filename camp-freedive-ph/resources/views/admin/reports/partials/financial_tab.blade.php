@@ -209,7 +209,7 @@
             </div>
 
             <!-- Dynamic Pricing Lift -->
-            <div class="p-3.5 rounded-xl bg-[#F8EAEA] space-y-2">
+            <div class="p-3.5 rounded-xl bg-[#D4A5A5] space-y-2">
                 <div class="flex items-center justify-between">
                     <span class="font-bold text-sm text-[#780000]">Dynamic Pricing Net Lift</span>
                     <span class="text-sm font-bold text-[#780000]">{{ $fin['dynamic_pricing']['adjustments_count'] ?? 0 }} rules</span>

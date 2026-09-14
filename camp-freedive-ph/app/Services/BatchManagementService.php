@@ -38,6 +38,16 @@ class BatchManagementService
         $nextBatchNum = $priorCount + 1;
         $batchIdentifier = "Batch {$nextBatchNum}";
 
+        if (Batch::where('batch_code', $batchIdentifier)->exists()) {
+            $maxNum = 0;
+            foreach (Batch::pluck('batch_code') as $code) {
+                if (preg_match('/(\d+)/', (string) $code, $m)) {
+                    $maxNum = max($maxNum, (int)$m[1]);
+                }
+            }
+            $batchIdentifier = 'Batch ' . ($maxNum + 1);
+        }
+
         $creatorId = $creator?->id ?? \Illuminate\Support\Facades\Auth::id() ?? null;
 
         $batch = Batch::create([
@@ -81,18 +91,23 @@ class BatchManagementService
             // Auto-generate or sanitize unified batch identifier to always be 'Batch [Number]'
             $batchNumberInput = trim($data['batch_number'] ?? $data['name'] ?? $data['batch_code'] ?? '');
             if (preg_match('/(\d+)/', $batchNumberInput, $matches)) {
-                $batchIdentifier = 'Batch ' . $matches[1];
+                $batchIdentifier = 'Batch ' . (int)$matches[1];
             } else {
                 $priorCount = Batch::whereDate('start_date', '<=', $startDate)->count();
                 $batchIdentifier = 'Batch ' . ($priorCount + 1);
             }
 
-            // Guarantee unique batch_code even if pre-filled duplicate was submitted
+            // Guarantee unique batch_code even if duplicate number exists
             $batchCode = $batchIdentifier;
-            $counter = 1;
-            while (Batch::where('batch_code', $batchCode)->exists()) {
-                $batchCode = $batchIdentifier . '-' . $counter;
-                $counter++;
+            if (Batch::where('batch_code', $batchCode)->exists()) {
+                $maxNum = 0;
+                foreach (Batch::pluck('batch_code') as $code) {
+                    if (preg_match('/(\d+)/', (string) $code, $m)) {
+                        $maxNum = max($maxNum, (int)$m[1]);
+                    }
+                }
+                $batchCode = 'Batch ' . ($maxNum + 1);
+                $batchIdentifier = $batchCode;
             }
 
             $batch = Batch::create([

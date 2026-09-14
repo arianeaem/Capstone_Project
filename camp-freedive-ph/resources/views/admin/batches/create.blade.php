@@ -263,12 +263,16 @@
 
 </div>
 
+@php
+    $initBatchNumberOnly = (string) preg_replace('/^Batch\s*/i', '', (string) old('batch_number', $defaultBatchNumber));
+@endphp
+
 <script>
 function batchCreateForm() {
     return {
         startDate: @json(old('start_date', $defaultStartDateStr)),
         endDate: @json(old('end_date', $defaultEndDateStr)),
-        batchNumberOnly: @json(preg_replace('/^Batch\s*/i', '', old('batch_number', $defaultBatchNumber))),
+        batchNumberOnly: @json($initBatchNumberOnly),
         unbatchedBookings: @json($initialBookings),
         selectedBookingIds: @json($selectedIds),
         existingBatches: @json($existingBatches ?? []),
