@@ -60,9 +60,11 @@ class WeatherSafetyMLService
     ];
 
     public const OPERATIONAL_STATUS_LABELS = [
-        'TACTICAL_CLEARANCE' => 'Tactical Clearance (H ≤ 1h)',
-        'PROVISIONAL_TREND_OUTLOOK' => 'Provisional Trend Outlook (6h-24h)',
-        'EXTENDED_TREND_OUTLOOK' => 'Extended Trend Outlook (H ≥ 48h)',
+        'TACTICAL_CLEARANCE' => 'Live Departure Clearance (1 hour before departure)',
+        'PROVISIONAL_TREND_OUTLOOK' => '24-Hour Planning Forecast (Final clearance evaluated 1 hour before departure)',
+        'EXTENDED_TREND_OUTLOOK' => 'Extended Planning Outlook (Advance Planning)',
+        'CONCLUDED' => 'Concluded Session',
+        'BEYOND_HORIZON' => 'Beyond 16-Day Forecast Horizon',
     ];
 
     /**

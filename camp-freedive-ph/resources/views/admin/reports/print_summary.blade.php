@@ -10,7 +10,7 @@
     @vite(['resources/css/app.css'])
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }

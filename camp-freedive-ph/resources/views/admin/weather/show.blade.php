@@ -497,13 +497,8 @@
                 'Critical Risk' => ['pill' => 'bg-red-700 text-white', 'dot' => 'bg-red-300', 'border' => 'border-red-300'],
                 default => ['pill' => 'bg-gray-600 text-white', 'dot' => 'bg-gray-300', 'border' => 'border-gray-200'],
             };
-            $opStatus = $batchMLAssessment['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK';
-            $opBadgeClass = match($opStatus) {
-                'TACTICAL_CLEARANCE' => 'bg-emerald-50 text-emerald-700',
-                'PROVISIONAL_TREND_OUTLOOK' => 'bg-blue-50 text-blue-700',
-                'EXTENDED_TREND_OUTLOOK' => 'bg-purple-50 text-purple-700',
-                default => 'bg-gray-50 text-gray-700',
-            };
+            $horizon = \App\Services\WeatherForecastService::getOperationalHorizon($batch);
+            $opLabel = $batchMLAssessment['operational_status_label'] ?? $horizon['label'];
         @endphp
 
         <div class="bg-white rounded-xl border {{ $mlConfig['border'] }} p-6 sm:p-7 space-y-5">
@@ -518,8 +513,8 @@
                             <span>{{ $mlRec }}</span>
                         </span>
                         
-                        <span class="text-sm font-bold px-3 py-1 rounded-lg {{ $opBadgeClass }}">
-                            {{ $batchMLAssessment['operational_status_label'] ?? 'Provisional Trend Outlook (6h-24h)' }}
+                        <span class="text-xs sm:text-sm font-medium text-[#48484A]">
+                            {{ $opLabel }}
                         </span>
                     </div>
                 </div>
@@ -539,90 +534,6 @@
                 </div>
             </div>
 
-            <!-- Dual-Engine Architecture Section -->
-            <div class="pt-4 border-t border-[#E5E5EA]">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Rule-Based Assessment -->
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-extrabold uppercase text-[#6E6E73]">Rule-Based Marine Safety</span>
-                            <span class="px-2.5 py-0.5 rounded-full text-sm font-black uppercase {{ $overallConfig['pill'] }}">
-                                {{ $overallClassification }}
-                            </span>
-                        </div>
-                        <p class="text-sm text-[#6E6E73]">
-                            9-variable marine parameters with standard Coast Guard safety limits.
-                        </p>
-                    </div>
-
-                    <!-- Predictive Model Assessment -->
-                    <div class="p-4 rounded-xl {{ $batchMLAssessment ? 'bg-[#F0FDF4] border border-[#BBF7D0]' : 'bg-[#F2F2F7] border border-[#E5E5EA]' }} space-y-1.5">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-extrabold uppercase {{ $batchMLAssessment ? 'text-[#166534]' : 'text-[#6E6E73]' }}">Predictive Risk Model</span>
-                            <span class="px-2.5 py-0.5 rounded-full text-sm font-black uppercase {{ $mlConfig['pill'] }}">
-                                {{ $mlRec }}
-                            </span>
-                        </div>
-                        <p class="text-sm {{ $batchMLAssessment ? 'text-[#15803D]' : 'text-[#6E6E73]' }}">
-                            12-variable hydrodynamic forecasts & machine learning risk classifier.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- 12-Variable ONNX Forecasters Hydrodynamic Matrix -->
-        @php
-            $mlList = $day1MLAssessment['hourly_assessments'] ?? [];
-            $avgHs = !empty($mlList) ? collect($mlList)->avg('predicted_hs') : ($day1Continuous24h['daily']['avg_wave_height'] ?? 0.70);
-            $avgTp = !empty($mlList) ? collect($mlList)->avg('predicted_tp') : ($day1Continuous24h['daily']['avg_wave_period'] ?? 6.1);
-            $avgSwell = !empty($mlList) ? collect($mlList)->avg('predicted_swell_height') : ($day1Continuous24h['daily']['avg_swell_height'] ?? 0.60);
-            $avgWindWave = !empty($mlList) ? collect($mlList)->avg('predicted_wind_wave_height') : ($day1Continuous24h['daily']['avg_wind_wave_height'] ?? 0.35);
-            $avgWindSpeed = !empty($mlList) ? collect($mlList)->avg('predicted_wind_speed') : ($day1Continuous24h['daily']['avg_wind_speed'] ?? 12.0);
-            $maxGust = !empty($mlList) ? collect($mlList)->max('predicted_wind_gust') : ($day1Continuous24h['daily']['max_wind_gust'] ?? 18.0);
-            $avgCurrent = !empty($mlList) ? collect($mlList)->avg('predicted_current_speed') : ($day1Continuous24h['daily']['avg_ocean_current'] ?? 0.30);
-        @endphp
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4 shadow-2xs">
-            <h3 class="text-base font-extrabold text-[#1D1D1F]">12-Variable Marine Risk Model Readings</h3>
-            <p class="text-sm text-[#6E6E73]">
-                Atmospheric boundary layer pressure, drag coefficients, and current velocity predictions for Mabini, Batangas.
-            </p>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-sm">
-                <!-- Wave Dynamics -->
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <span class="text-[#6E6E73] font-bold uppercase text-sm block">Wave Dynamics Forecasters</span>
-                    <div class="space-y-1 text-[#1D1D1F]">
-                        <div class="flex justify-between"><span>Significant Wave Height ($H_s$):</span> <strong class="font-mono">{{ number_format($avgHs, 2) }} m</strong></div>
-                        <div class="flex justify-between"><span>Peak Wave Period ($T_p$):</span> <strong class="font-mono">{{ number_format($avgTp, 1) }} s</strong></div>
-                        <div class="flex justify-between"><span>Swell Wave Height:</span> <strong class="font-mono">{{ number_format($avgSwell, 2) }} m</strong></div>
-                        <div class="flex justify-between"><span>Wind Wave Component:</span> <strong class="font-mono">{{ number_format($avgWindWave, 2) }} m</strong></div>
-                    </div>
-                </div>
-
-                <!-- Wind & Pressure -->
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <span class="text-[#6E6E73] font-bold uppercase text-sm block">Wind & Atmospheric Forecasters</span>
-                    <div class="space-y-1 text-[#1D1D1F]">
-                        <div class="flex justify-between"><span>10m Sustained Wind Speed:</span> <strong class="font-mono">{{ round($avgWindSpeed) }} km/h</strong></div>
-                        <div class="flex justify-between"><span>Instantaneous Wind Gusts:</span> <strong class="font-mono">{{ round($maxGust) }} km/h</strong></div>
-                        <div class="flex justify-between"><span>Pressure Tendency ($\Delta P_{3h}$):</span> <strong class="font-mono">-0.4 hPa</strong></div>
-                        <div class="flex justify-between"><span>Mean Sea Level Pressure:</span> <strong class="font-mono">{{ number_format($day1Continuous24h['daily']['avg_slp'] ?? 1010.5, 0) }} hPa</strong></div>
-                    </div>
-                </div>
-
-                <!-- Hydrodynamic Currents & XGBoost -->
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <span class="text-[#6E6E73] font-bold uppercase text-sm block">Currents & XGBoost Classifier</span>
-                    <div class="space-y-1 text-[#1D1D1F]">
-                        <div class="flex justify-between"><span>Ocean Current Velocity:</span> <strong class="font-mono">{{ number_format($avgCurrent, 2) }} m/s</strong></div>
-                        <div class="flex justify-between"><span>Current Drift Vector ($U, V$):</span> <strong class="font-mono">+0.22, -0.15 m/s</strong></div>
-                        <div class="flex justify-between"><span>Classifier Output Tier:</span> <strong class="font-mono uppercase text-[#780000]">{{ $mlRec }}</strong></div>
-                        <div class="flex justify-between"><span>Model Sessions:</span> <strong class="font-mono text-emerald-700">12 ONNX Sessions</strong></div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <!-- Day 1 & Day 2 ML Condition Panels -->
@@ -856,83 +767,6 @@
                 @endif
             </div>
 
-        </div>
-
-        <!-- Philippine Coast Guard Safety Limits Audit -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-            <h3 class="text-base font-extrabold text-[#1D1D1F]">Anilao Marine Safety Ceilings & Limits</h3>
-            <p class="text-sm text-[#6E6E73]">
-                Official Philippine Coast Guard safety boundaries. Any breach triggers immediate Critical Risk and cancellation protection.
-            </p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Sustained Wind Speed</span>
-                    <strong class="text-base font-black text-[#1D1D1F]">&ge; 42.0 km/h</strong>
-                    <span class="text-sm text-[#8E8E93] block">PCG Banca / Small Craft Limit</span>
-                </div>
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Squall Wind Gusts</span>
-                    <strong class="text-base font-black text-[#1D1D1F]">&ge; 48.0 km/h</strong>
-                    <span class="text-sm text-[#8E8E93] block">Instantaneous squall threshold</span>
-                </div>
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Significant Wave Height ($H_s$)</span>
-                    <strong class="text-base font-black text-[#1D1D1F]">&ge; 1.80 m</strong>
-                    <span class="text-sm text-[#8E8E93] block">30-min rolling mean limit</span>
-                </div>
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1">
-                    <span class="text-[#6E6E73] font-bold block uppercase text-sm">Ocean Current Velocity</span>
-                    <strong class="text-base font-black text-[#1D1D1F]">&ge; 0.80 m/s</strong>
-                    <span class="text-sm text-[#8E8E93] block">Line drift hazard threshold</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Marine Data Sources & Model Attribution -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-            <div class="flex items-center justify-between pb-3">
-                <div>
-                    <h3 class="text-base font-extrabold text-[#1D1D1F]">Meteorological Data Sources & Attribution</h3>
-                    <p class="text-sm text-[#6E6E73]">Multi-agency numerical weather predictions and marine assimilation feeds for Anilao / Mabini.</p>
-                </div>
-                <span class="px-2.5 py-1 rounded-md text-sm font-black uppercase bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
-                    Open-Meteo High-Resolution Ensemble
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 text-sm">
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <strong class="font-bold text-[#1D1D1F]">ECMWF IFS / AIFS</strong>
-                        <span class="text-sm px-1.5 py-0.2 rounded bg-blue-100 text-blue-800 font-extrabold uppercase">Europe</span>
-                    </div>
-                    <p class="text-sm text-[#6E6E73]">0.25° European Centre global atmospheric model. Gold standard for wind shear & pressure fields.</p>
-                </div>
-
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <strong class="font-bold text-[#1D1D1F]">NOAA GFS & WaveWatch III</strong>
-                        <span class="text-sm px-1.5 py-0.2 rounded bg-indigo-100 text-indigo-800 font-extrabold uppercase">USA</span>
-                    </div>
-                    <p class="text-sm text-[#6E6E73]">Global Forecast System 13km atmospheric model + global ocean wave dynamics and swell spectra.</p>
-                </div>
-
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <strong class="font-bold text-[#1D1D1F]">Copernicus Marine (CMEMS)</strong>
-                        <span class="text-sm px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 font-extrabold uppercase">Mercator Ocean</span>
-                    </div>
-                    <p class="text-sm text-[#6E6E73]">0.083° global ocean current analysis ($U/V$ drift vectors), sea surface temperature, and tides.</p>
-                </div>
-
-                <div class="p-3.5 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-1.5">
-                    <div class="flex items-center justify-between">
-                        <strong class="font-bold text-[#1D1D1F]">PAGASA & JMA Himawari-9</strong>
-                        <span class="text-sm px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 font-extrabold uppercase">PH / Japan</span>
-                    </div>
-                    <p class="text-sm text-[#6E6E73]">Tropical Cyclone Wind Signals (TCWS), gale warnings, and geostationary satellite nowcasting.</p>
-                </div>
-            </div>
         </div>
 
     </div>

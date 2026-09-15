@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Reschedule Request Update - Camp FreedivePH</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1D1D1F; background-color: #F2F2F7; margin: 0; padding: 24px; }
+        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; line-height: 1.6; color: #1D1D1F; background-color: #F2F2F7; margin: 0; padding: 24px; }
         .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #E5E5EA; }
         .header { background: #470000; color: #ffffff; padding: 28px 24px; text-align: center; }
         .content { padding: 32px 24px; }

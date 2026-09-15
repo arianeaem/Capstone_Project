@@ -81,6 +81,7 @@ class SPARouter {
     bindEvents() {
         // Intercept all link clicks
         document.addEventListener('click', (e) => {
+            if (e.defaultPrevented) return;
             const link = e.target.closest('a');
             if (!link) return;
 
@@ -92,6 +93,7 @@ class SPARouter {
 
         // Intercept standard GET and POST forms
         document.addEventListener('submit', (e) => {
+            if (e.defaultPrevented) return;
             const form = e.target;
             if (!form || !this.shouldInterceptForm(form)) return;
 

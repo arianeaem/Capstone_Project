@@ -125,6 +125,90 @@ class WeatherForecastService
     }
 
     /**
+     * Determine Operational Horizon Status based on Batch or Dive Date.
+     *
+     * States:
+     * - CONCLUDED: Dive operations finished or past.
+     * - TACTICAL_CLEARANCE: Day 0 / H <= 1h (Live Departure Clearance).
+     * - PROVISIONAL_TREND_OUTLOOK: 1h < H <= 24h (24-Hour Planning Forecast).
+     * - EXTENDED_TREND_OUTLOOK: H > 24h (Extended Planning Outlook).
+     * - BEYOND_HORIZON: > 16 days out.
+     */
+    public static function getOperationalHorizon(Batch|Carbon $dateOrBatch): array
+    {
+        $now = Carbon::now(self::TIMEZONE);
+
+        if ($dateOrBatch instanceof Batch) {
+            $isPastOrConcluded = in_array($dateOrBatch->status, ['completed', 'cancelled', 'cancelled_by_camp']) ||
+                                 in_array($dateOrBatch->lifecycle_status, ['completed', 'cancelled', 'cancelled_by_camp']) ||
+                                 ($dateOrBatch->end_date && $dateOrBatch->end_date->copy()->endOfDay()->isPast()) ||
+                                 ($dateOrBatch->start_date->copy()->endOfDay()->isPast() && !$dateOrBatch->end_date);
+
+            if ($isPastOrConcluded) {
+                return [
+                    'status' => 'CONCLUDED',
+                    'label' => 'Concluded Session',
+                    'description' => 'Dive operations have concluded for this batch.',
+                ];
+            }
+
+            $startDate = $dateOrBatch->start_date->copy()->startOfDay();
+            $leadTimeHours = max(0, $now->diffInHours($dateOrBatch->start_date->copy()->setTime(9, 30), false));
+        } else {
+            $startDate = $dateOrBatch->copy()->startOfDay();
+            $leadTimeHours = max(0, $now->diffInHours($dateOrBatch->copy()->setTime(9, 30), false));
+
+            if ($dateOrBatch->copy()->endOfDay()->isPast()) {
+                return [
+                    'status' => 'CONCLUDED',
+                    'label' => 'Concluded Session',
+                    'description' => 'Dive date is in the past.',
+                ];
+            }
+        }
+
+        $daysOut = $now->startOfDay()->diffInDays($startDate, false);
+
+        if ($daysOut < 0) {
+            return [
+                'status' => 'CONCLUDED',
+                'label' => 'Concluded Session',
+                'description' => 'Dive date is in the past.',
+            ];
+        }
+
+        if ($startDate->isToday() || $leadTimeHours <= 1) {
+            return [
+                'status' => 'TACTICAL_CLEARANCE',
+                'label' => 'Live Departure Clearance (1 hour before departure)',
+                'description' => 'Real-time dockside clearance for immediate departure.',
+            ];
+        }
+
+        if ($leadTimeHours <= 24 || $daysOut <= 1) {
+            return [
+                'status' => 'PROVISIONAL_TREND_OUTLOOK',
+                'label' => '24-Hour Planning Forecast (Final clearance evaluated 1 hour before departure)',
+                'description' => '24-hour advance planning outlook. Final go/no-go cleared 1h before departure.',
+            ];
+        }
+
+        if ($daysOut <= self::MAX_FORECAST_DAYS) {
+            return [
+                'status' => 'EXTENDED_TREND_OUTLOOK',
+                'label' => 'Extended Planning Outlook (Advance Planning)',
+                'description' => 'Medium to long-range forecast for advance scheduling.',
+            ];
+        }
+
+        return [
+            'status' => 'BEYOND_HORIZON',
+            'label' => 'Beyond 16-Day Forecast Horizon',
+            'description' => 'Forecast models unlock 16 days before dive date.',
+        ];
+    }
+
+    /**
      * Run full risk assessment for a 2D1N Batch across all 4 fixed windows:
      * - Day 1 AM (09:30-12:00) & PM (15:30-17:30)
      * - Day 2 AM (09:30-12:00) & PM (15:30-17:30)
@@ -218,12 +302,13 @@ class WeatherForecastService
                 $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
                 $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
 
+                $horizonInfo = self::getOperationalHorizon($batch);
                 $batchML = [
                     'overall_recommendation' => $worseMLRec,
                     'ml_recommendation' => $worseMLRec,
                     'ml_classification' => $worseMLRec,
-                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
-                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? $horizonInfo['status'],
+                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? $horizonInfo['label'],
                     'day1' => $day1ML,
                     'day2' => $day2ML,
                     'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
@@ -509,12 +594,13 @@ class WeatherForecastService
                 $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
                 $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
 
+                $horizonInfo = self::getOperationalHorizon($startDate);
                 $tripML = [
                     'overall_recommendation' => $worseMLRec,
                     'ml_recommendation' => $worseMLRec,
                     'ml_classification' => $worseMLRec,
-                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
-                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? $horizonInfo['status'],
+                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? $horizonInfo['label'],
                     'day1' => $day1ML,
                     'day2' => $day2ML,
                     'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
@@ -590,12 +676,13 @@ class WeatherForecastService
             $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
             $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
 
+            $horizonInfo = self::getOperationalHorizon($startDate);
             $tripML = [
                 'overall_recommendation' => $worseMLRec,
                 'ml_recommendation' => $worseMLRec,
                 'ml_classification' => $worseMLRec,
-                'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
-                'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? $horizonInfo['status'],
+                'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? $horizonInfo['label'],
                 'day1' => $day1ML,
                 'day2' => $day2ML,
                 'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),

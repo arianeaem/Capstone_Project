@@ -7,6 +7,8 @@
     openCancelModal: false, 
     openRescheduleModal: false,
     openMoveModal: false,
+    openCompleteModal: false,
+    openReactivateModal: false,
     selectedBookingId: null,
     selectedBookingNumber: ''
 }">
@@ -32,16 +34,13 @@
             <!-- Confirmed / Active State Options -->
             @if(in_array($batch->status, ['confirmed', 'open']))
                 
-                <!-- Complete Action -->
-                <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" onsubmit="return confirm('Mark this batch as Completed? This will conclude the 2D1N dive schedule and mark active connected bookings as completed.');">
-                    @csrf
-                    <input type="hidden" name="status" value="completed">
-                    <input type="hidden" name="note" value="2D1N dive schedule concluded successfully.">
-                    <button type="submit" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                        <span>Mark as Completed</span>
-                    </button>
-                </form>
+                <!-- Complete Action Trigger -->
+                <button type="button" 
+                        @click="openCompleteModal = true"
+                        class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Mark as Completed</span>
+                </button>
 
                 <!-- Reschedule Action Trigger -->
                 <button type="button" 
@@ -59,15 +58,13 @@
 
             @else
                 
-                <!-- Reopen / Reconfirm Option -->
-                <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" onsubmit="return confirm('Reactivate this batch as Confirmed?');">
-                    @csrf
-                    <input type="hidden" name="status" value="confirmed">
-                    <input type="hidden" name="note" value="Reactivated batch to Confirmed status.">
-                    <button type="submit" class="btn-secondary px-4 py-2 text-sm sm:text-sm font-bold">
-                        Reactivate Batch
-                    </button>
-                </form>
+                <!-- Reopen / Reconfirm Option Trigger -->
+                <button type="button"
+                        @click="openReactivateModal = true"
+                        class="btn-secondary px-4 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                    <span>Reactivate Batch</span>
+                </button>
 
             @endif
 
@@ -509,6 +506,64 @@
                     <button type="button" @click="openMoveModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
                     <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">
                         Confirm Move
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Complete Batch Modal -->
+    <div x-show="openCompleteModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCompleteModal = false">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h3 class="text-lg font-bold text-[#1D1D1F]">Mark Batch as Completed</h3>
+                    <p class="text-xs text-[#6E6E73]">{{ $batch->batch_number }} &bull; {{ $batch->start_date->format('M d') }} - {{ $batch->end_date->format('M d, Y') }}</p>
+                </div>
+            </div>
+
+            <p class="text-sm text-[#6E6E73]">
+                Marking this batch as <strong class="text-[#1D1D1F]">Completed</strong> will conclude the 2D1N dive schedule and transition active connected bookings to completed status.
+            </p>
+
+            <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" class="space-y-3 text-sm">
+                @csrf
+                <input type="hidden" name="status" value="completed">
+                <input type="hidden" name="note" value="2D1N dive schedule concluded successfully.">
+
+                <div class="flex items-center justify-end gap-2 pt-3">
+                    <button type="button" @click="openCompleteModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">
+                        Confirm & Complete
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reactivate Batch Modal -->
+    <div x-show="openReactivateModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openReactivateModal = false">
+            <div class="flex items-center gap-3">
+                <div>
+                    <h3 class="text-lg font-bold text-[#1D1D1F]">Reactivate Batch</h3>
+                    <p class="text-xs text-[#6E6E73]">{{ $batch->batch_number }} &bull; {{ $batch->start_date->format('M d') }} - {{ $batch->end_date->format('M d, Y') }}</p>
+                </div>
+            </div>
+
+            <p class="text-sm text-[#6E6E73]">
+                Are you sure you want to reactivate <strong class="text-[#1D1D1F]">{{ $batch->batch_number }}</strong> ({{ $batch->start_date->format('M d') }} - {{ $batch->end_date->format('M d, Y') }}) to <strong class="text-emerald-700 font-bold">Confirmed</strong> status? This will reopen the batch for schedule and roster operations.
+            </p>
+
+            <form action="{{ route('admin.batches.update_status', $batch) }}" method="POST" class="space-y-3 text-sm">
+                @csrf
+                <input type="hidden" name="status" value="confirmed">
+                <input type="hidden" name="note" value="Reactivated batch to Confirmed status.">
+
+                <div class="flex items-center justify-end gap-2 pt-3">
+                    <button type="button" @click="openReactivateModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">
+                        Confirm Reactivation
                     </button>
                 </div>
             </form>

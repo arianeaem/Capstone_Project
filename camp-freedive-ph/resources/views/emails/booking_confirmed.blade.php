@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <title>Booking Confirmed - Camp FreedivePH</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1D1D1F; background-color: #F2F2F7; margin: 0; padding: 20px; font-size: 14px; }
+        body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; line-height: 1.6; color: #1D1D1F; background-color: #F2F2F7; margin: 0; padding: 20px; font-size: 14px; }
         .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border: 1px solid #E5E5EA; }
         .header { background: #780000; color: #ffffff; padding: 32px 24px; text-align: center; }
         .header h1 { margin: 0 0 8px 0; font-size: 24px; font-weight: 700; }

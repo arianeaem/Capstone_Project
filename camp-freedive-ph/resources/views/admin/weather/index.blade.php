@@ -327,31 +327,23 @@
                                 'Critical Risk' => 'bg-red-700 text-white',
                                 default => 'bg-gray-600 text-white',
                             };
-                            $opStatus = $ml['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK';
-                            $opLabel = $ml['operational_status_label'] ?? 'Provisional Trend Outlook (6h-24h)';
-                            $opBadgeClass = match($opStatus) {
-                                'TACTICAL_CLEARANCE' => 'bg-emerald-50 text-emerald-700',
-                                'PROVISIONAL_TREND_OUTLOOK' => 'bg-blue-50 text-blue-700',
-                                'EXTENDED_TREND_OUTLOOK' => 'bg-purple-50 text-purple-700',
-                                default => 'bg-gray-50 text-gray-700',
-                            };
+                            $horizon = \App\Services\WeatherForecastService::getOperationalHorizon($b);
+                            $opLabel = $ml['operational_status_label'] ?? $horizon['label'];
                         @endphp
                         <tr onclick="window.location='{{ route('admin.weather.show', ['batch' => $b, 'profile' => 'ml_model']) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors group">
                             <td class="py-3 px-3 font-extrabold text-[#1D1D1F] group-hover:text-[#780000]">
                                 {{ $b->batch_number }}
                             </td>
-                            <td class="py-3 px-3 text-[#6E6E73] font-medium">
+                            <td class="py-3 px-3 text-[#6E6E73] font-medium whitespace-nowrap">
                                 {{ $b->start_date->format('M d') }} to {{ $b->end_date->format('M d, Y') }}
                             </td>
-                            <td class="py-3 px-3">
-                                <span class="px-2.5 py-0.5 rounded-full text-sm font-black uppercase {{ $mlBadgeClass }}">
+                            <td class="py-3 px-3 whitespace-nowrap">
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-black uppercase {{ $mlBadgeClass }}">
                                     {{ $mlRec }}
                                 </span>
                             </td>
-                            <td class="py-3 px-3">
-                                <span class="px-2.5 py-0.5 rounded-md text-sm font-bold inline-block {{ $opBadgeClass }}">
-                                    {{ $opLabel }}
-                                </span>
+                            <td class="py-3 px-3 text-xs sm:text-sm text-[#3A3A3C] font-medium">
+                                {{ $opLabel }}
                             </td>
                             <td class="py-3 px-3 font-medium text-[#6E6E73]">
                                 {{ $ml['day1']['overall_recommendation'] ?? 'Safe' }}

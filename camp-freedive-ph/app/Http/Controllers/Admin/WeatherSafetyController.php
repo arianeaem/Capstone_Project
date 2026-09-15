@@ -118,11 +118,12 @@ class WeatherSafetyController extends Controller
                     $rec2 = $d2ML['overall_recommendation'] ?? 'Safe';
                     $wRank = max(WeatherForecastService::RISK_RANK[$rec1] ?? 1, WeatherForecastService::RISK_RANK[$rec2] ?? 1);
                     $wRec = array_search($wRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
+                    $horizonInfo = WeatherForecastService::getOperationalHorizon($b);
                     $batchMLAssessments[$b->id] = [
                         'batch' => $b,
                         'overall_recommendation' => $wRec,
-                        'operational_status' => $d1ML['operational_status'] ?? $d2ML['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
-                        'operational_status_label' => $d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? 'Provisional Trend Outlook',
+                        'operational_status' => $d1ML['operational_status'] ?? $d2ML['operational_status'] ?? $horizonInfo['status'],
+                        'operational_status_label' => $d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? $horizonInfo['label'],
                         'day1' => $d1ML,
                         'day2' => $d2ML,
                         'safety_threshold_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
@@ -307,12 +308,13 @@ class WeatherSafetyController extends Controller
             $worseMLRank = max(WeatherForecastService::RISK_RANK[$mlRec1] ?? 1, WeatherForecastService::RISK_RANK[$mlRec2] ?? 1);
             $worseMLRec = array_search($worseMLRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
 
+            $horizonInfo = WeatherForecastService::getOperationalHorizon($batch);
             $batchMLAssessment = [
                 'overall_recommendation' => $worseMLRec,
                 'ml_recommendation' => $worseMLRec,
                 'ml_classification' => $worseMLRec,
-                'operational_status' => $day1MLAssessment['operational_status'] ?? $day2MLAssessment['operational_status'] ?? 'PROVISIONAL_TREND_OUTLOOK',
-                'operational_status_label' => $day1MLAssessment['operational_status_label'] ?? $day2MLAssessment['operational_status_label'] ?? 'Provisional Trend Outlook',
+                'operational_status' => $day1MLAssessment['operational_status'] ?? $day2MLAssessment['operational_status'] ?? $horizonInfo['status'],
+                'operational_status_label' => $day1MLAssessment['operational_status_label'] ?? $day2MLAssessment['operational_status_label'] ?? $horizonInfo['label'],
                 'day1' => $day1MLAssessment,
                 'day2' => $day2MLAssessment,
                 'is_authoritative_go' => ($day1MLAssessment['is_authoritative_go'] ?? false) && ($day2MLAssessment['is_authoritative_go'] ?? false),

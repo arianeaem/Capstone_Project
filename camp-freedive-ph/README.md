@@ -6,7 +6,7 @@ A web application and maritime safety intelligence platform designed for Camp Fr
 
 ## Overview
 
-The platform coordinates 2D1N weekend freediving operations, dynamic pricing, coach staffing, and automated weather safety evaluations. It integrates with a dedicated Python Machine Learning microservice for marine weather risk assessments, with an automated fallback to native PHP heuristics.
+The platform coordinates weekend freediving operations, dynamic pricing, coach staffing, and automated weather safety evaluations. It integrates with a dedicated Python Machine Learning microservice for marine weather risk assessments, with an automated fallback to native PHP heuristics.
 
 ---
 

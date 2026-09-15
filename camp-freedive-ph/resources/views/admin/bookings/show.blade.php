@@ -171,7 +171,7 @@
                         <strong class="text-[#1D1D1F]">₱{{ number_format($booking->environmental_fee, 2) }}</strong>
                     </div>
 
-                    <div class="pt-3 border-t border-[#E5E5EA] flex justify-between items-center text-sm sm:text-base">
+                    <div class="pt-3 flex justify-between items-center text-sm sm:text-base">
                         <strong class="text-[#1D1D1F]">Total Amount:</strong>
                         <strong class="text-[#780000] text-base sm:text-lg font-extrabold">₱{{ number_format($booking->total_amount, 2) }}</strong>
                     </div>

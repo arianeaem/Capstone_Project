@@ -6,13 +6,13 @@
 <div class="max-w-4xl mx-auto space-y-6 text-sm" x-data="batchCreateForm()">
     
     <!-- Top Breadcrumb & Header -->
-    <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-4">
+    <div class="flex items-center justify-between pb-4">
         <div>
             <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 <span>Back to Batches</span>
             </a>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Create 2D1N Batch Schedule</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Create Batch Schedule</h1>
             <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Set up a new weekend trip schedule for guest bookings and coach assignments.
             </p>
@@ -26,7 +26,7 @@
 
             <!-- Batch Dates and Identification -->
             <div class="space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">1. 2D1N Dive Dates & Batch Identifier</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Dive Dates & Batch Identifier</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -63,7 +63,7 @@
 
                 <!-- Duplicate Batch Date Warning Alert & Direct Redirect -->
                 <template x-if="duplicateBatches.length > 0">
-                    <div class="p-4 rounded-xl bg-[#FFFBEB] border border-amber-200 text-[#92400E] space-y-3">
+                    <div class="p-4 rounded-xl bg-[#FFFBEB] text-[#92400E] space-y-3">
                         <div class="flex items-center justify-between gap-3">
                             <div class="flex items-center gap-2 font-extrabold text-sm text-[#B45309]">
                                 <span>Batch Already Exists for this Date Range!</span>
@@ -120,7 +120,7 @@
 
             <!-- Auto-Grouping Confirmed Unbatched Bookings -->
             <div class="space-y-4 pt-2">
-                <div class="flex items-center justify-between border-b border-[#D1D1D6] pb-2">
+                <div class="flex items-center justify-between pb-2">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">2. Group Confirmed Bookings for this Date</h3>
                         <p class="text-sm text-[#6E6E73] mt-0.5">
@@ -212,7 +212,7 @@
 
             <!-- Operational Notes & Overrides -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#D1D1D6] pb-2">3. Operational Notes & Overrides</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Operational Notes & Overrides</h3>
 
                 <div>
                     <label for="capacity_note" class="block font-bold text-[#1D1D1F] text-sm mb-2">
@@ -238,7 +238,7 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#D1D1D6]">
+            <div class="flex items-center justify-end gap-3 pt-4">
                 <a href="{{ route('admin.batches.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
                 <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold">
                     Create & Confirm Batch
