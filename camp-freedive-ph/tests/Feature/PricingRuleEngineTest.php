@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Booking;
 use App\Models\BookingParticipant;
+use App\Models\DemandForecast;
 use App\Models\PricingRule;
 use App\Models\User;
 use App\Services\PricingRuleEngine;
@@ -88,7 +89,7 @@ class PricingRuleEngineTest extends TestCase
         PricingRule::create([
             'name' => 'Rule B',
             'rule_type' => 'demand',
-            'condition_value' => 'low', // Default occupancy is low
+            'condition_value' => 'high',
             'applies_to' => 'all',
             'adjustment_type' => 'increase',
             'adjustment_method' => 'percentage',
@@ -255,5 +256,55 @@ class PricingRuleEngineTest extends TestCase
 
         // Subtotal = 4,675 * 2 = 9,350
         $this->assertEquals(9350.00, (float)$booking->subtotal);
+    }
+
+    public function test_pricing_engine_uses_ml_demand_forecast_for_future_unbooked_batches(): void
+    {
+        $engine = app(PricingRuleEngine::class);
+        $futureDate = '2026-11-20';
+
+        // 1. Without ML forecast or bookings, demand is low
+        $this->assertEquals('low', $engine->getDemandForDate($futureDate));
+
+        // 2. Persist a Prophet/XGBoost ML forecast predicting High demand (38 pax)
+        DemandForecast::create([
+            'forecast_date' => $futureDate,
+            'days_ahead' => 65,
+            'predicted_participants' => 38,
+            'predicted_revenue_php' => 182400.00,
+            'demand_level' => 'High',
+            'season_period' => 'Peak',
+            'instructors_needed' => 10,
+            'synced_at' => now(),
+        ]);
+
+        \Illuminate\Support\Facades\Cache::forget('ml_demand_forecast');
+
+        // 3. Engine now evaluates demand as 'high' predictive yield
+        $this->assertEquals('high', $engine->getDemandForDate($futureDate));
+        $this->assertEquals('peak', $engine->getSeasonForDate($futureDate));
+
+        // 4. Create an active high demand pricing rule
+        $rule = PricingRule::create([
+            'name' => 'High Demand Yield Surcharge',
+            'rule_type' => 'demand',
+            'condition_value' => 'high',
+            'applies_to' => 'all',
+            'adjustment_type' => 'increase',
+            'adjustment_method' => 'percentage',
+            'adjustment_value' => 15.00,
+            'priority' => 1,
+            'status' => 'active',
+        ]);
+
+        $quote = $engine->evaluate('discovery', $futureDate, false, 1);
+
+        $this->assertEquals('high', $quote['demand']);
+        $this->assertEquals('ml_predictive', $quote['forecast_source']);
+        $this->assertEquals(38, $quote['predicted_participants']);
+        $this->assertEquals(4250.00, $quote['base_price_per_pax']);
+        $this->assertEquals(637.50, $quote['delta_per_pax']); // +15% of 4250
+        $this->assertEquals(4887.50, $quote['adjusted_price_per_pax']);
+        $this->assertCount(1, $quote['adjustments']);
     }
 }

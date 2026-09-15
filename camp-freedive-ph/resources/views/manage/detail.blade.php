@@ -16,11 +16,11 @@
 
     <!-- Back Navigation -->
     <div class="flex items-center justify-between mb-6">
-        <a href="{{ route('manage.index') }}" class="text-sm sm:text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5">
+        <a href="{{ route('manage.index') }}" class="min-h-[44px] -ml-2 px-2.5 py-2 rounded-xl text-sm font-semibold text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] inline-flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
             <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             <span>Switch to another booking</span>
         </a>
-        <div class="text-sm sm:text-sm text-[#8E8E93]">
+        <div class="text-sm sm:text-sm text-[#636366]">
             Booking Created: {{ $booking->created_at->format('M d, Y') }}
         </div>
     </div>
@@ -32,13 +32,13 @@
             <div class="flex items-center gap-2 font-bold text-sm sm:text-base text-amber-900">
                 <span>Downpayment Required</span>
             </div>
-            <p class="text-sm text-amber-800 leading-relaxed">
+            <p class="text-sm text-[#78350F] leading-relaxed">
                 Your reservation has not gone through the system yet because the required reservation downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is unpaid. Please complete your payment via PayMongo to confirm your slots.
             </p>
         </div>
         <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST" class="shrink-0">
             @csrf
-            <button type="submit" class="btn-primary w-full sm:w-auto px-5 py-2.5 text-sm font-bold">
+            <button type="submit" class="btn-primary min-h-[44px] w-full sm:w-auto px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2">
                 Pay Downpayment
             </button>
         </form>
@@ -61,9 +61,19 @@
             </div>
 
             <!-- Security PIN -->
-            <div class="bg-[#F8EAEA] border border-[#F1D5D5] rounded-xl p-3 sm:p-3.5 sm:text-right shrink-0">
-                <span class="text-sm font-bold text-[#780000] block">Security PIN</span>
-                <span class="text-base sm:text-lg font-mono font-extrabold text-[#780000] tracking-widest">{{ $booking->pin }}</span>
+            <div class="bg-[#F8EAEA] rounded-xl p-3 sm:p-3.5 flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
+                <div>
+                    <span class="text-xs font-bold text-[#780000] block">Security PIN</span>
+                    <span class="text-base sm:text-lg font-mono font-extrabold text-[#780000] tracking-widest">{{ $booking->pin }}</span>
+                </div>
+                <button type="button" 
+                        @click="navigator.clipboard.writeText('{{ $booking->pin }}'); copiedPin = true; setTimeout(() => copiedPin = false, 2000)"
+                        aria-label="Copy Security PIN"
+                        class="min-h-[34px] px-2.5 py-1.5 rounded-lg bg-white/90 hover:bg-white text-xs font-bold text-[#780000] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copiedPin">
+                    <svg x-show="copiedPin" x-cloak class="w-4.5 h-4.5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span x-text="copiedPin ? 'Copied' : 'Copy'"></span>
+                </button>
             </div>
         </div>
 
@@ -99,7 +109,7 @@
                 <span class="text-sm text-[#6E6E73] block mb-1">Payment Status:</span>
                 @if($booking->status === 'pending_downpayment')
                     <strong class="text-sm text-amber-700 block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Unpaid</strong>
-                    <span class="text-sm text-rose-600 font-bold">Unconfirmed Reservation</span>
+                    <span class="text-sm text-[#D70015] font-bold">Unconfirmed Reservation</span>
                 @else
                     <strong class="text-sm text-[#34C759] block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Paid</strong>
                     <span class="text-sm text-[#780000] font-bold">₱{{ number_format($booking->balance_amount, 2) }} balance due at camp</span>
@@ -124,10 +134,10 @@
                 <div class="space-y-2 text-xs sm:text-sm">
                     <div class="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 sm:gap-2 text-[#6E6E73]">
                         <span class="shrink-0">Base Class Rate:</span>
-                        <span class="font-bold text-[#1D1D1F] whitespace-nowrap">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} <span class="font-normal text-[#8E8E93]">/ person</span></span>
+                        <span class="font-bold text-[#1D1D1F] whitespace-nowrap">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} <span class="font-normal text-[#636366]">/ person</span></span>
                     </div>
 
-                    <div class="space-y-2 py-2.5 border-y border-dashed border-[#E5E5EA]">
+                    <div class="space-y-2 py-2.5 border-y border-[#E5E5EA]/60">
                         @foreach($booking->priceAdjustments as $adj)
                         <div class="flex flex-wrap sm:flex-nowrap justify-between items-start sm:items-center gap-1 sm:gap-3">
                             <div class="flex flex-wrap items-center gap-1.5 min-w-0">
@@ -135,7 +145,7 @@
                                 <span class="text-[#6E6E73] text-xs">({{ $adj->condition_summary }})</span>
                             </div>
                             <span class="font-bold shrink-0 whitespace-nowrap {{ $adj->adjustment_amount >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
-                                {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }} <span class="font-normal text-xs text-[#8E8E93]">/ person</span>
+                                {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }} <span class="font-normal text-xs text-[#636366]">/ person</span>
                             </span>
                         </div>
                         @endforeach
@@ -143,7 +153,7 @@
 
                     <div class="flex flex-wrap sm:flex-nowrap justify-between items-center gap-1 sm:gap-2 font-extrabold text-[#1D1D1F] pt-1">
                         <span class="shrink-0">Final Adjusted Rate:</span>
-                        <span class="text-sm sm:text-base font-extrabold text-[#780000] whitespace-nowrap">₱{{ number_format($booking->participants->first()->price_per_person ?? $booking->priceAdjustments->first()->adjusted_price, 2) }} <span class="font-normal text-xs text-[#8E8E93]">/ person</span></span>
+                        <span class="text-sm sm:text-base font-extrabold text-[#780000] whitespace-nowrap">₱{{ number_format($booking->participants->first()->price_per_person ?? $booking->priceAdjustments->first()->adjusted_price, 2) }} <span class="font-normal text-xs text-[#636366]">/ person</span></span>
                     </div>
                 </div>
             </div>
@@ -247,12 +257,12 @@
                     <div class="font-bold text-sm text-amber-900">
                         Downpayment Required
                     </div>
-                    <p class="text-sm text-amber-800 leading-relaxed">
+                    <p class="text-sm text-[#78350F] leading-relaxed">
                         Self-service rescheduling and cancellations are enabled once your required downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is paid.
                     </p>
                     <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn-primary w-full py-2.5 text-sm font-bold cursor-pointer">
+                        <button type="submit" class="btn-primary min-h-[44px] w-full py-2.5 px-4 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2">
                             Pay ₱{{ number_format($booking->downpayment_amount, 2) }}
                         </button>
                     </form>
@@ -271,7 +281,7 @@
                     @if($policy['reschedule_allowed'])
                         <button type="button" 
                                 @click="openRescheduleModal = true" 
-                                class="btn-secondary w-full py-2.5 text-sm font-bold mt-1">
+                                class="btn-secondary min-h-[44px] w-full py-2.5 px-4 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 mt-1">
                             Reschedule Booking Date
                         </button>
                     @endif
@@ -290,7 +300,7 @@
                     @if($policy['cancel_allowed'] || $booking->status === 'confirmed')
                         <button type="button" 
                                 @click="openCancelModal = true" 
-                                class="btn-secondary w-full py-2.5 text-sm font-bold mt-1">
+                                class="btn-secondary min-h-[44px] w-full py-2.5 px-4 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 mt-1">
                             Request Cancellation
                         </button>
                     @endif
@@ -318,19 +328,25 @@
                 <div class="space-y-2.5 text-xs sm:text-sm text-[#1D1D1F] pt-1">
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-[#6E6E73] font-medium shrink-0">Facebook:</span>
-                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold hover:underline">@Campfreediveph</a>
+                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" aria-label="Facebook (opens in a new tab)" class="text-[#780000] font-bold hover:underline inline-flex items-center gap-1.5">
+                            <span>@Campfreediveph</span>
+                            <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                        </a>
                     </div>
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-[#6E6E73] font-medium shrink-0">Instagram:</span>
-                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold hover:underline">@campfreediveph</a>
+                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" aria-label="Instagram (opens in a new tab)" class="text-[#780000] font-bold hover:underline inline-flex items-center gap-1.5">
+                            <span>@campfreediveph</span>
+                            <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                        </a>
                     </div>
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-[#6E6E73] font-medium shrink-0">Email:</span>
-                        <a href="mailto:campfreediveph@gmail.com" class="text-[#780000] font-bold hover:underline">campfreediveph@gmail.com</a>
+                        <a href="mailto:campfreediveph@gmail.com" aria-label="Email Camp FreedivePH" class="text-[#780000] font-bold hover:underline">campfreediveph@gmail.com</a>
                     </div>
                     <div class="flex items-center justify-between gap-2">
                         <span class="text-[#6E6E73] font-medium shrink-0">Phone:</span>
-                        <a href="tel:+639278879894" class="text-[#780000] font-bold hover:underline whitespace-nowrap">+63 927 887 9894</a>
+                        <a href="tel:+639278879894" aria-label="Call Camp FreedivePH" class="text-[#780000] font-bold hover:underline whitespace-nowrap">+63 927 887 9894</a>
                     </div>
                 </div>
             </div>
@@ -339,14 +355,27 @@
     </div>
 
     <!-- Reschedule Modal -->
-    <div x-show="openRescheduleModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
+    <div x-show="openRescheduleModal" 
+         x-cloak 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="reschedule-modal-title" 
+         @keydown.escape.window="openRescheduleModal = false" 
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-[#1D1D1F]">Reschedules</h3>
+                    <h3 id="reschedule-modal-title" class="text-lg font-bold text-[#1D1D1F]">Reschedule Dive Dates</h3>
                     <p class="text-sm text-[#6E6E73]">Pick a new 2D1N date pair.</p>
                 </div>
-                <button type="button" @click="openRescheduleModal = false" aria-label="Close reschedule modal" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
+                <button type="button" 
+                        @click="openRescheduleModal = false" 
+                        aria-label="Close reschedule modal" 
+                        class="w-11 h-11 min-h-[44px] min-w-[44px] -mr-2 rounded-full flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <form action="{{ route('manage.reschedule', $booking->booking_number) }}" method="POST" class="space-y-4 text-sm">
@@ -355,14 +384,14 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-2">New Start Date <span class="text-[#780000]">*</span></label>
+                        <label class="block font-bold text-[#1D1D1F] mb-2">New Start Date <span class="text-[#D70015]">*</span></label>
                         <input type="date" 
                                name="requested_start_date" 
                                x-model="rescheduleStartDate" 
                                @change="onRescheduleDateChange()"
                                min="{{ date('Y-m-d', strtotime('+3 days')) }}"
                                required
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm font-medium text-[#1D1D1F] bg-white">
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none text-sm font-medium text-[#1D1D1F] bg-white transition-colors">
                     </div>
                     <div>
                         <label class="block font-bold text-[#6E6E73] mb-1">New End Date (Auto)</label>
@@ -375,8 +404,14 @@
                     </div>
                 </div>
 
+                <!-- Weather Loading State -->
+                <div x-show="weatherLoading" x-cloak class="p-3.5 rounded-xl bg-[#F2F2F7] text-xs sm:text-sm text-[#1D1D1F] flex items-center gap-2">
+                    <svg class="animate-spin h-4 w-4 text-[#00C3D0] shrink-0" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                    <span class="font-medium text-[#1D1D1F]">Checking sea safety &amp; weather conditions for selected dates...</span>
+                </div>
+
                 <!-- Weather Forecast Check -->
-                <div x-show="rescheduleForecast" x-cloak class="p-3.5 rounded-xl text-sm space-y-1"
+                <div x-show="rescheduleForecast && !weatherLoading" x-cloak class="p-3.5 rounded-xl text-sm space-y-1"
                      :style="'background-color: ' + (rescheduleForecast?.bg_color || '#F2F2F7') + '; color: ' + (rescheduleForecast?.text_color || '#1D1D1F')">
                     <div class="font-bold flex items-center justify-between">
                         <span x-text="'Safety: ' + (rescheduleForecast?.title || '')"></span>
@@ -387,18 +422,18 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Reason for Rescheduling (Optional)</label>
-                    <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
                 </div>
 
-                <div class="p-3.5 bg-[#FFFBEB] rounded-xl text-sm text-[#92400E] border border-[#FDE68A]">
+                <div class="p-3.5 bg-[#FFFBEB] rounded-xl text-sm text-[#92400E]">
                     <strong>Note:</strong> On submission, your request status is set to <strong>Pending Approval</strong>. The camp will review coach availability and notify you via email.
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-3">
-                    <button type="button" @click="openRescheduleModal = false" class="btn-secondary px-4 py-2 text-sm">Cancel</button>
+                    <button type="button" @click="openRescheduleModal = false" class="btn-secondary min-h-[44px] px-4 py-2.5 text-sm font-semibold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">Cancel</button>
                     <button type="submit" 
-                            :disabled="rescheduleForecast && !rescheduleForecast.is_bookable" 
-                            class="btn-primary px-5 py-2 text-sm font-bold">
+                            :disabled="weatherLoading || (rescheduleForecast && !rescheduleForecast.is_bookable)" 
+                            class="btn-primary min-h-[44px] px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                         Submit Reschedule Request
                     </button>
                 </div>
@@ -407,14 +442,27 @@
     </div>
 
     <!-- Cancellation Modal -->
-    <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
+    <div x-show="openCancelModal" 
+         x-cloak 
+         role="dialog" 
+         aria-modal="true" 
+         aria-labelledby="cancel-modal-title" 
+         @keydown.escape.window="openCancelModal = false" 
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-[#1D1D1F]">Request Booking Cancellation</h3>
+                    <h3 id="cancel-modal-title" class="text-lg font-bold text-[#1D1D1F]">Request Booking Cancellation</h3>
                     <p class="text-sm text-[#6E6E73]">Review your refund calculation according to camp policy.</p>
                 </div>
-                <button type="button" @click="openCancelModal = false" aria-label="Close cancellation modal" class="text-[#8E8E93] hover:text-[#1D1D1F] font-bold text-lg">✕</button>
+                <button type="button" 
+                        @click="openCancelModal = false" 
+                        aria-label="Close cancellation modal" 
+                        class="w-11 h-11 min-h-[44px] min-w-[44px] -mr-2 rounded-full flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <form action="{{ route('manage.cancel', $booking->booking_number) }}" method="POST" class="space-y-4 text-sm">
@@ -440,22 +488,31 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] text-sm mb-1.5">Reason for Cancellation</label>
-                    <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
                 </div>
 
                 <!-- Cancellation Confirmation Checkbox -->
                 <div class="pt-1">
-                    <label class="flex items-start gap-2.5 cursor-pointer">
-                        <input type="checkbox" name="confirm_cancel_ack" required class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5">
-                        <span class="text-sm text-[#1D1D1F]">
-                            I confirm that I want to cancel this booking and understand the refund amount will be reviewed by the camp.
+                    <label tabindex="0"
+                           role="checkbox"
+                           aria-checked="false"
+                           @keydown.space.prevent="$refs.cancelCheck.click()" 
+                           @keydown.enter.prevent="$refs.cancelCheck.click()" 
+                           class="flex items-start gap-2.5 cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 select-none">
+                        <input type="checkbox" 
+                               x-ref="cancelCheck" 
+                               name="confirm_cancel_ack" 
+                               required 
+                               class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
+                        <span class="text-sm text-[#1D1D1F] leading-relaxed">
+                            I confirm that I want to cancel this booking and understand the refund amount will be reviewed by the camp. <span class="text-[#D70015]">*</span>
                         </span>
                     </label>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-4 py-2 text-sm">Keep My Booking</button>
-                    <button type="submit" class="btn-danger px-5 py-2 text-sm font-bold">
+                    <button type="button" @click="openCancelModal = false" class="btn-secondary min-h-[44px] px-4 py-2.5 text-sm font-semibold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">Keep My Booking</button>
+                    <button type="submit" class="btn-danger min-h-[44px] px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D70015] focus-visible:ring-offset-2">
                         Confirm Cancellation Request
                     </button>
                 </div>
@@ -475,6 +532,8 @@ function manageBooking(config) {
         rescheduleStartDate: '',
         rescheduleEndDate: '',
         rescheduleForecast: null,
+        weatherLoading: false,
+        copiedPin: false,
 
         onRescheduleDateChange() {
             if (!this.rescheduleStartDate) return;
@@ -482,6 +541,9 @@ function manageBooking(config) {
             const end = new Date(start);
             end.setDate(start.getDate() + 1);
             this.rescheduleEndDate = end.toISOString().split('T')[0];
+
+            this.weatherLoading = true;
+            this.rescheduleForecast = null;
 
             fetch(config.checkWeatherUrl, {
                 method: 'POST',
@@ -497,6 +559,12 @@ function manageBooking(config) {
             .then(res => res.json())
             .then(data => {
                 this.rescheduleForecast = data;
+            })
+            .catch(err => {
+                console.error('Weather check failed:', err);
+            })
+            .finally(() => {
+                this.weatherLoading = false;
             });
         }
     };

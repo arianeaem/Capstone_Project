@@ -180,12 +180,12 @@ def check_overrides(
     tsunami_warning: bool = False,
 ) -> bool:
     """
-    Returns True if ANY override condition is active, per PRD:
-    - TCWS Signal #3 or higher
-    - Gale Warning
-    - Thunderstorm/Lightning Advisory
-    - Typhoon within predefined safety distance
-    - Tsunami Warning
+    Returns True if ANY official maritime warning is active:
+    - TCWS Signal #3 or higher (PAGASA Tropical Cyclone Wind Signal)
+    - Coast Guard Gale Warning (PCG Sea Travel Advisory)
+    - Severe Thunderstorm/Lightning Advisory
+    - Typhoon within critical safety perimeter
+    - Tsunami Warning (PHIVOLCS Advisory)
     """
     return (
         tcws_signal >= 3
@@ -220,7 +220,7 @@ def assess_weather_risk(scores: dict, overrides: dict = None) -> dict:
 
     if check_overrides(**overrides):
         return {
-            "weighted_score_pct": None,  # score is ignored per PRD when override triggers
+            "weighted_score_pct": None,  # Numerical score bypassed when official emergency warning triggers
             "classification": "Critical Risk",
             "recommended_action": MEANING_MAP["Critical Risk"],
             "override_triggered": True,

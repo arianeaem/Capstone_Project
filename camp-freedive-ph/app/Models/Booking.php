@@ -9,6 +9,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Booking Model representing a guest or group freediving reservation.
+ *
+ * Domain & Financial Context:
+ * - Requires a flat ₱3,000 per participant downpayment upon reservation to guarantee slot allocation.
+ * - Supports self-service tracking, rescheduling, and cancellation requests via a unique booking number
+ *   and 4-digit PIN authentication.
+ * - Manages financial aggregates including base course fees, optional carpool transport, optional boat dive
+ *   sessions, and Mabini LGU environmental fees.
+ *
+ * @property int $id
+ * @property string $booking_number e.g. BK-2026-XXXX
+ * @property string $pin 4-digit security PIN for guest portal access
+ * @property string $class_type discovery, fundive, refinement
+ * @property bool $is_certified_diver
+ * @property Carbon $start_date
+ * @property Carbon $end_date
+ * @property float $subtotal
+ * @property float $total_amount
+ * @property float $downpayment_amount
+ * @property float $balance_amount Outstanding balance payable at camp
+ * @property string $status confirmed, completed, rescheduled, reschedule_requested, cancellation_requested, cancelled_by_camp, cancelled_by_guest, no_show
+ */
 class Booking extends Model
 {
     use HasFactory;

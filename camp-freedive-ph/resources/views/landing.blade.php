@@ -16,7 +16,7 @@
                 <!-- Main Heading -->
                 <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-[1.15] mb-5">
                     Sharing the love for ocean through freediving in <br class="hidden sm:inline" />
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#63a5c4] via-[#164B60] to-[#2e80a3]">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#67E8F9] to-[#38BDF8]">
                         Mabini, Batangas.
                     </span>
                 </h1>
@@ -28,11 +28,13 @@
 
                 <!-- Call to Action Buttons -->
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-                    <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] active:bg-[#009da7] text-[#1D1D1F] text-center transition-all hover:-translate-y-px active:translate-y-0 shadow-sm hover:shadow flex items-center justify-center">
-                        <span>Book Slot Now</span>
+                    <a href="{{ route('booking.create') }}" 
+                       class="w-full sm:w-auto min-h-[44px] px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00C3D0] hover:bg-[#00B2BE] active:bg-[#009DA7] text-[#1D1D1F] text-center transition-all shadow-xs hover:shadow active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#780000] flex items-center justify-center">
+                        Book a Camp
                     </a>
 
-                    <a href="{{ route('manage.index') }}" class="text-white hover:text-[#00c3d0] font-bold text-sm sm:text-base transition-colors px-3 py-3.5 hover:underline underline-offset-4">
+                    <a href="{{ route('manage.index') }}" 
+                       class="w-full sm:w-auto min-h-[44px] px-4 py-3.5 text-white hover:text-[#67E8F9] active:text-[#38BDF8] font-bold text-sm sm:text-base transition-colors hover:underline underline-offset-4 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white flex items-center justify-center text-center">
                         Manage Booking
                     </a>
                 </div>
@@ -52,7 +54,7 @@
     </section>
 
     <!-- Content Sections -->
-    <div class="space-y-14 sm:space-y-24 mt-12 sm:mt-18">
+    <div class="space-y-16 sm:space-y-24 mt-12 sm:mt-20">
 
     <!-- Class Packages Section -->
     <section id="packages" class="w-full bg-[#F2F2F7] py-16 sm:py-24">
@@ -84,28 +86,28 @@
                                         <div>
                                             <span class="text-sm font-semibold text-[#6E6E73] block">Certified freedivers:</span>
                                             <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
-                                                2,500 <span class="text-base font-bold text-[#780000]">php</span>
+                                                ₱2,500
                                             </div>
-                                            <span class="text-sm text-[#8E8E93] italic block mt-0.5">(safety coach not included)</span>
+                                            <span class="text-sm text-[#636366] italic block mt-0.5">(safety coach not included)</span>
                                         </div>
                                         <div class="pt-2 border-t border-[#F1D5D5]/80">
                                             <span class="text-sm font-semibold text-[#6E6E73] block">Non certified freedivers:</span>
                                             <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
-                                                3,300 <span class="text-base font-bold text-[#780000]">php</span>
+                                                ₱3,300
                                             </div>
                                         </div>
                                     </div>
                                 @elseif($c['id'] === 'discovery')
                                     <div>
                                         <div class="text-4xl sm:text-5xl font-black text-[#1D1D1F] tracking-tight">
-                                            4,250 <span class="text-xl font-bold text-[#780000]">php</span>
+                                            ₱4,250
                                         </div>
                                         <span class="text-sm text-[#6E6E73] font-medium block mt-1">per person</span>
                                     </div>
                                 @else
                                     <div>
                                         <div class="text-4xl sm:text-5xl font-black text-[#1D1D1F] tracking-tight">
-                                            4,100 <span class="text-xl font-bold text-[#780000]">php</span>
+                                            ₱4,100
                                         </div>
                                         <span class="text-sm text-[#6E6E73] font-medium block mt-1">per person</span>
                                     </div>
@@ -121,7 +123,7 @@
                         <!-- Top CTA Button -->
                         <div class="pt-2">
                             <a href="{{ route('booking.create', ['class' => $c['id']]) }}" 
-                                class="btn-primary w-full py-3.5 px-6 rounded-xl font-extrabold text-sm sm:text-base text-center block">
+                               class="w-full min-h-[44px] py-3.5 px-6 rounded-xl font-extrabold text-sm sm:text-base text-center flex items-center justify-center bg-[#00C3D0] hover:bg-[#00B2BE] active:bg-[#009DA7] text-[#1D1D1F] shadow-xs hover:shadow active:scale-[0.98] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0] focus-visible:ring-offset-2">
                                 Book Class
                             </a>
                         </div>
@@ -138,7 +140,9 @@
                                 <ul class="space-y-2.5 text-sm sm:text-base text-[#1D1D1F]">
                                     @foreach($c['inclusions'] as $inc)
                                     <li class="flex items-start gap-3">
-                                        <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                        <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
                                         <span class="leading-snug">{{ $inc }}</span>
                                     </li>
                                     @endforeach
@@ -150,10 +154,12 @@
                                 <h4 class="text-sm font-extrabold uppercase tracking-wider text-[#6E6E73] mb-3">
                                     Exclusions
                                 </h4>
-                                <ul class="space-y-2 text-sm sm:text-base text-[#6E6E73]">
+                                <ul class="space-y-2 text-sm sm:text-base text-[#636366]">
                                     @foreach($c['exclusions'] as $exc)
                                     <li class="flex items-start gap-3">
-                                        <span class="text-[#8E8E93] shrink-0 font-bold leading-none mt-1">-</span>
+                                        <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
                                         <span class="leading-snug">{{ $exc }}</span>
                                     </li>
                                     @endforeach
@@ -169,7 +175,7 @@
     </section>
 
     <!-- Logistics, Add-ons & Fees -->
-    <section id="addons" class="max-w-7xl mx-auto px-8 sm:px-16 lg:px-32 text-sm">
+    <section id="addons" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-sm">
         <div class="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
             <h2 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Carpool, Add-ons & Reservation Policies</h2>
             <p class="text-sm sm:text-base text-[#6E6E73] mt-2">Transparent pricing and clear logistics for your 2D1N Batangas freedive experience.</p>
@@ -183,7 +189,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Manila Carpool Service</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
+                    <p class="text-sm sm:text-base text-[#1D1D1F] leading-relaxed">
                         ₱1,200/person for roundtrip van transportation to Mabini, Batangas. Pickup points: Monumento, Shell Tiendesitas, Market! Market! BGC, Starmall Alabang, and Sto. Tomas SLEX Exit.
                     </p>
                 </div>
@@ -195,7 +201,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Reservation Downpayment</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
+                    <p class="text-sm sm:text-base text-[#1D1D1F] leading-relaxed">
                         A per-head downpayment is required to secure your slot: ₱3,000/person with carpool or ₱2,000/person with own transportation.
                     </p>
                 </div>
@@ -207,7 +213,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Boat Dive (Optional)</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
+                    <p class="text-sm sm:text-base text-[#1D1D1F] leading-relaxed">
                         ₱600/person for an optional boat excursion to deeper marine sanctuaries in Anilao for extended reef exploration and marine life observation.
                     </p>
                 </div>
@@ -219,7 +225,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h4 class="font-extrabold text-[#1D1D1F] text-base sm:text-lg">Mabini LGU Marine Fees</h4>
                     </div>
-                    <p class="text-md sm:text-sm text-[#1D1D1F] leading-relaxed">
+                    <p class="text-sm sm:text-base text-[#1D1D1F] leading-relaxed">
                         Mandatory LGU fees support marine sanctuary preservation and coastal management. ₱50 one-time Municipal Environmental Fee and ₱300 for Mabini LGU Dive Pass for 2 days.
                     </p>
                 </div>
@@ -239,15 +245,18 @@
             <!-- Things to Bring FAQ Item -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
                 <button 
+                    type="button"
                     @click="openFaq = (openFaq === 'bring' ? null : 'bring')"
-                    class="w-full px-5 sm:px-6 py-4 sm:py-5 text-left font-bold text-sm sm:text-base text-[#1D1D1F] flex items-center justify-between gap-4 hover:bg-[#F2F2F7] transition-colors"
+                    :aria-expanded="openFaq === 'bring'"
+                    aria-controls="faq-panel-bring"
+                    class="w-full px-5 sm:px-6 py-4 sm:py-5 text-left font-bold text-sm sm:text-base text-[#1D1D1F] flex items-center justify-between gap-4 hover:bg-[#F2F2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] transition-colors"
                 >
                     <span class="flex items-center gap-2">
                         <span>What are the things to bring for the 2D1N freediving camp?</span>
                     </span>
-                    <svg class="w-5 h-5 text-[#6E6E73] transition-transform duration-200 shrink-0" :class="{ 'rotate-180 text-[#780000]': openFaq === 'bring' }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg class="w-5 h-5 text-[#6E6E73] transition-transform duration-200 shrink-0" :class="{ 'rotate-180 text-[#780000]': openFaq === 'bring' }" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
-                <div x-show="openFaq === 'bring'" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-sm text-[#6E6E73] leading-relaxed border-t border-[#E5E5EA] pt-4 space-y-2">
+                <div id="faq-panel-bring" x-show="openFaq === 'bring'" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-sm text-[#6E6E73] leading-relaxed border-t border-[#E5E5EA] pt-4 space-y-2">
                     <p>Please bring the following for your weekend stay:</p>
                     <ul class="list-disc list-inside space-y-1 text-[#1D1D1F] pl-2">
                         <li><strong>Swimming clothes:</strong> Any swimwear, rashguard, or leggings you are comfortable wearing in the water.</li>
@@ -264,13 +273,16 @@
             @foreach($faqs as $index => $faq)
             <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
                 <button 
+                    type="button"
                     @click="openFaq = (openFaq === {{ $index }} ? null : {{ $index }})"
-                    class="w-full px-5 sm:px-6 py-4 sm:py-5 text-left font-bold text-sm sm:text-base text-[#1D1D1F] flex items-center justify-between gap-4 hover:bg-[#F2F2F7] transition-colors"
+                    :aria-expanded="openFaq === {{ $index }}"
+                    :aria-controls="'faq-panel-' + {{ $index }}"
+                    class="w-full px-5 sm:px-6 py-4 sm:py-5 text-left font-bold text-sm sm:text-base text-[#1D1D1F] flex items-center justify-between gap-4 hover:bg-[#F2F2F7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] transition-colors"
                 >
                     <span>{{ $faq['q'] }}</span>
-                    <svg class="w-5 h-5 text-[#6E6E73] transition-transform duration-200 shrink-0" :class="{ 'rotate-180 text-[#780000]': openFaq === {{ $index }} }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg class="w-5 h-5 text-[#6E6E73] transition-transform duration-200 shrink-0" :class="{ 'rotate-180 text-[#780000]': openFaq === {{ $index }} }" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
-                <div x-show="openFaq === {{ $index }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-sm text-[#6E6E73] leading-relaxed border-t border-[#E5E5EA] pt-4">
+                <div :id="'faq-panel-' + {{ $index }}" x-show="openFaq === {{ $index }}" x-collapse x-cloak class="px-5 sm:px-6 pb-5 text-sm text-[#6E6E73] leading-relaxed border-t border-[#E5E5EA] pt-4">
                     {{ $faq['a'] }}
                 </div>
             </div>
@@ -286,11 +298,13 @@
                 Join our 2D1N freedive camp. Discovery beginner classes, fundives, and refinement practice dives are open for booking.
             </p>
             <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
-                <a href="{{ route('booking.create') }}" class="w-full sm:w-auto px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] active:bg-[#009da7] text-[#1D1D1F] text-center transition-all hover:-translate-y-px active:translate-y-0 shadow-sm hover:shadow flex items-center justify-center">
-                    Book Your Freediving Adventure
+                <a href="{{ route('booking.create') }}" 
+                   class="w-full sm:w-auto min-h-[44px] px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-sm sm:text-base font-extrabold bg-[#00C3D0] hover:bg-[#00B2BE] active:bg-[#009DA7] text-[#1D1D1F] text-center transition-all shadow-xs hover:shadow active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#780000] flex items-center justify-center">
+                    Book a Camp
                 </a>
-                <a href="{{ route('manage.index') }}" class="w-full sm:w-auto px-6 py-3.5 sm:py-4 rounded-xl bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] active:bg-[#E5E5EA] font-semibold text-sm transition-all hover:-translate-y-px active:translate-y-0 shadow-sm hover:shadow text-center">
-                    Find My Booking
+                <a href="{{ route('manage.index') }}" 
+                   class="w-full sm:w-auto min-h-[44px] px-6 py-3.5 sm:py-4 rounded-xl bg-white text-[#1D1D1F] hover:bg-[#F2F2F7] active:bg-[#E5E5EA] font-bold text-sm sm:text-base transition-all active:scale-[0.98] shadow-xs hover:shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white flex items-center justify-center text-center">
+                    Manage Booking
                 </a>
             </div>
         </div>

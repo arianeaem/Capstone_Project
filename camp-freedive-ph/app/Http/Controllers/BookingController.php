@@ -10,6 +10,7 @@ use App\Models\Payment;
 use App\Models\PaymentStatusLog;
 use App\Services\AuditLogger;
 use App\Services\PricingRuleEngine;
+use App\Services\SlotReservationService;
 use App\Services\WeatherSafetyService;
 use Carbon\Carbon;
 use Exception;
@@ -27,6 +28,8 @@ use Illuminate\View\View;
  * - Real-time Weather Feeds: Integrates live Open-Meteo forecasts and ML safety clearance.
  * - Capacity Bounds: Enforces a strict 45-pax cap per weekend trip across all batches
  *   to ensure adherence to Coast Guard banca vessel limits and a 1:4 instructor-to-student safety ratio.
+ * - Distributed Slot Locking: Manages temporary 15-minute slot reservations in cache during checkout step 4
+ *   to eliminate race-condition overbooking under concurrent traffic.
  * - Payment Guarantees: Reserves slots in `pending_downpayment` status and releases them if
  *   unpaid within the slot-hold grace period.
  */
@@ -34,10 +37,9 @@ class BookingController extends Controller
 {
     public function __construct(
         protected WeatherSafetyService $weatherSafetyService,
-        protected PricingRuleEngine $pricingRuleEngine
+        protected PricingRuleEngine $pricingRuleEngine,
+        protected SlotReservationService $slotReservationService
     ) {}
-
-    // TODO: Implement temporary Redis slot locking during checkout step 4 to prevent race-condition overbooking.
 
     /**
      * Display the customer-facing booking form.
@@ -190,191 +192,207 @@ class BookingController extends Controller
         $endDate = Carbon::parse($validated['end_date'])->format('Y-m-d');
         $isCertified = !empty($validated['is_certified_diver']);
 
-        // Business Logic - Capacity Enforcement:
-        // Capped at 45 pax per weekend trip to comply with Philippine Coast Guard banca passenger
-        // limits and maintain an instructor-to-diver ratio of 1:4.
-        // We deliberately exclude 'pending_downpayment' and cancelled bookings so uncompleted checkout
-        // attempts or abandoned browser sessions never permanently lock out paying guests.
-        $existingPaxOnDate = BookingParticipant::whereHas('booking', function ($q) use ($startDate) {
-            $q->whereDate('start_date', $startDate)
-              ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']);
-        })->count();
-
-        if (($existingPaxOnDate + $paxCount) > 45) {
-            $slotsLeft = max(0, 45 - $existingPaxOnDate);
-            return response()->json([
-                'success' => false,
-                'message' => "Capacity limit reached for {$startDate}. Only {$slotsLeft} slot(s) remaining for this weekend trip. Please select another date or reduce group size.",
-            ], 422);
-        }
-
-        // Pricing Logic:
-        // Evaluates dynamic pricing rules (early-bird discounts, certified diver deductions, group discounts).
-        $quote = $this->pricingRuleEngine->evaluate(
-            $validated['class_type'],
-            $startDate,
-            $isCertified,
-            $paxCount
-        );
-
-        $classPrice = $quote['adjusted_price_per_pax'];
-        $subtotal = $quote['subtotal'];
-
-        // Regulatory & Logistics Fees:
-        // ₱300 LGU Tourism Pass + ₱50 Mabini Marine Sanctuary Ecological Fee per participant.
-        // Carpool (₱1,000/head roundtrip) and Boat Dive (₱800/head private banca) are optional add-ons.
-        $lguFee = 300.00 * $paxCount;
-        $envFee = 50.00 * $paxCount;
-        $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1000.00 * $paxCount) : 0.00;
-        $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? (800.00 * $paxCount) : 0.00;
-
-        $totalAmount = $subtotal + $lguFee + $envFee + $carpoolFee + $boatDiveFee;
-        
-        // Deposit Policy:
-        // ₱3,000/head covers upfront instructor scheduling and resort room holds.
-        // The remaining balance is collected at camp on Day 1 upon physical check-in.
-        $downpaymentAmount = min($totalAmount, 3000.00 * $paxCount);
-        $balanceAmount = max(0, $totalAmount - $downpaymentAmount);
-
-        // Auto-assign batch roster for this weekend dates
-        $batch = app(\App\Services\BatchManagementService::class)->findOrCreateBatchForDates($startDate, $endDate);
-
-        // Security Credentials:
-        // 4-digit PIN enables self-service booking portal lookup without requiring traditional password registration.
-        $bookingNumber = 'CFP-' . date('Y') . '-' . strtoupper(Str::random(5));
-        $pin = str_pad((string) mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
-
-        // Atomic Transaction:
-        // Guarantees booking, participant rows, dynamic pricing audits, and payment records
-        // are committed in sync; rolls back completely if PayMongo session initialization fails.
-        DB::beginTransaction();
         try {
-            $booking = Booking::create([
-                'booking_number' => $bookingNumber,
-                'pin' => $pin,
-                'batch_id' => $batch->id,
-                'class_type' => $validated['class_type'],
-                'is_certified_diver' => $isCertified,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'pickup_option' => $validated['pickup_option'],
-                'pickup_location' => $validated['pickup_location'] ?? null,
-                'carpool_fee' => $carpoolFee,
-                'boat_dive' => !empty($validated['boat_dive']) && $validated['boat_dive'],
-                'boat_dive_fee' => $boatDiveFee,
-                'lgu_fee' => $lguFee,
-                'environmental_fee' => $envFee,
-                'subtotal' => $subtotal,
-                'total_amount' => $totalAmount,
-                'downpayment_amount' => $downpaymentAmount,
-                'balance_amount' => $balanceAmount,
-                'contact_name' => $contactName ?: 'Guest',
-                'contact_email' => $validated['contact_email'],
-                'contact_phone' => $validated['contact_phone'],
-                'contact_facebook' => $validated['contact_facebook'] ?? null,
-                'status' => 'pending_downpayment',
-            ]);
-
-            // Save individual participant health questionnaires and medical disclosures
-            foreach ($validated['participants'] as $pData) {
-                $pName = !empty($pData['name'])
-                    ? $pData['name']
-                    : trim(($pData['first_name'] ?? '') . ' ' . ($pData['last_name'] ?? ''));
-
-                $booking->participants()->create([
-                    'name' => $pName ?: 'Participant',
-                    'age' => (int) $pData['age'],
-                    'health_condition' => $pData['health_condition'] ?? 'None',
-                    'swimmer_status' => $pData['swimmer_status'] ?? 'beginner',
-                    'price_per_person' => $classPrice,
-                ]);
-            }
-
-            // Pricing Audit Trail:
-            // Persists exact snapshot of active rule adjustments applied at checkout time
-            // to preserve pricing integrity against future admin rule modifications.
-            foreach ($quote['adjustments'] as $adj) {
-                $booking->priceAdjustments()->create([
-                    'pricing_rule_id' => $adj['rule_id'],
-                    'rule_name' => $adj['rule_name'],
-                    'rule_type' => $adj['rule_type'],
-                    'condition_summary' => $adj['condition_summary'],
-                    'base_price' => $quote['base_price_per_pax'],
-                    'adjustment_amount' => $adj['delta_per_pax'],
-                    'adjusted_price' => $quote['adjusted_price_per_pax'],
-                ]);
-            }
-
-            // Payment Session Lifecycle:
-            // Expires in 24 hours to automatically purge uncompleted reservations.
-            $paymentMethod = $validated['payment_method'] ?? 'paymongo';
-            $transactionId = 'PAY-' . strtoupper(Str::random(10));
-
-            $payment = Payment::create([
-                'booking_id' => $booking->id,
-                'payment_method' => 'paymongo',
-                'transaction_id' => $transactionId,
-                'amount' => $downpaymentAmount,
-                'fee_amount' => 0.00,
-                'net_amount' => $downpaymentAmount,
-                'payment_type' => 'downpayment',
-                'status' => 'pending',
-                'expires_at' => now()->addHours(24),
-            ]);
-
-            // Hosted PayMongo Gateway v2: Generates direct GCash, Maya, Card, or GrabPay checkout session
-            $payMongoGateway = app(\App\Services\Gateways\PayMongoGateway::class);
-            $checkoutResult = $payMongoGateway->createCheckoutSession($booking, $downpaymentAmount);
-
-            if (!$checkoutResult['success']) {
-                $errMsg = is_array($checkoutResult['error'] ?? null)
-                    ? ($checkoutResult['error']['errors'][0]['detail'] ?? 'PayMongo session creation failed.')
-                    : ($checkoutResult['error'] ?? 'Unable to connect to PayMongo.');
-                throw new Exception("PayMongo Error: " . $errMsg);
-            }
-
-            $payment->update([
-                'paymongo_resource_id' => $checkoutResult['checkout_id'],
-            ]);
-
-            BookingStatusLog::create([
-                'booking_id' => $booking->id,
-                'old_status' => 'initiated',
-                'new_status' => 'pending_downpayment',
-                'changed_by' => null,
-                'note' => "Reservation created. Awaiting downpayment of ₱" . number_format($downpaymentAmount, 2) . " via PayMongo Hosted Checkout.",
-                'created_at' => now(),
-            ]);
-
-            AuditLogger::log(
-                'BOOKING_CREATED',
-                "New booking #{$booking->booking_number} created for {$booking->contact_name} ({$paxCount} pax, {$booking->class_type}). Awaiting PayMongo checkout.",
-                null,
-                $booking->contact_name,
+            return $this->slotReservationService->withLock($startDate, function () use (
+                $validated,
+                $contactName,
+                $paxCount,
+                $startDate,
+                $endDate,
+                $isCertified,
                 $request
-            );
+            ) {
+                // Business Logic - Distributed Capacity Enforcement:
+                // Capped at 45 pax per weekend trip to comply with Philippine Coast Guard banca passenger
+                // limits and maintain an instructor-to-diver ratio of 1:4.
+                // Accounts for both confirmed bookings in the database AND active 15-minute checkout holds.
+                $availableSlots = $this->slotReservationService->getAvailableSlots($startDate);
 
-            DB::commit();
+                if ($paxCount > $availableSlots) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Capacity limit reached for {$startDate}. Only {$availableSlots} slot(s) remaining for this weekend trip. Please select another date or reduce group size.",
+                    ], 422);
+                }
 
-            return response()->json([
-                'success' => true,
-                'is_paymongo_redirect' => true,
-                'checkout_url' => $checkoutResult['checkout_url'],
-                'checkout_id' => $checkoutResult['checkout_id'],
-                'booking_number' => $booking->booking_number,
-                'pin' => $booking->pin,
-                'booking_id' => $booking->id,
-                'downpayment_paid' => $downpaymentAmount,
-                'downpayment_due' => $downpaymentAmount,
-                'balance_due' => $balanceAmount,
-                'manage_url' => route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]),
-            ]);
-        } catch (Exception $e) {
-            DB::rollBack();
+                // Pricing Logic:
+                // Evaluates dynamic pricing rules (early-bird discounts, certified diver deductions, group discounts).
+                $quote = $this->pricingRuleEngine->evaluate(
+                    $validated['class_type'],
+                    $startDate,
+                    $isCertified,
+                    $paxCount
+                );
+
+                $classPrice = $quote['adjusted_price_per_pax'];
+                $subtotal = $quote['subtotal'];
+
+                // Regulatory & Logistics Fees:
+                // ₱300 LGU Tourism Pass + ₱50 Mabini Marine Sanctuary Ecological Fee per participant.
+                // Carpool (₱1,000/head roundtrip) and Boat Dive (₱800/head private banca) are optional add-ons.
+                $lguFee = 300.00 * $paxCount;
+                $envFee = 50.00 * $paxCount;
+                $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1000.00 * $paxCount) : 0.00;
+                $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? (800.00 * $paxCount) : 0.00;
+
+                $totalAmount = $subtotal + $lguFee + $envFee + $carpoolFee + $boatDiveFee;
+                
+                // Deposit Policy:
+                // ₱3,000/head covers upfront instructor scheduling and resort room holds.
+                // The remaining balance is collected at camp on Day 1 upon physical check-in.
+                $downpaymentAmount = min($totalAmount, 3000.00 * $paxCount);
+                $balanceAmount = max(0, $totalAmount - $downpaymentAmount);
+
+                // Auto-assign batch roster for this weekend dates
+                $batch = app(\App\Services\BatchManagementService::class)->findOrCreateBatchForDates($startDate, $endDate);
+
+                // Security Credentials:
+                // 4-digit PIN enables self-service booking portal lookup without requiring traditional password registration.
+                $bookingNumber = 'CFP-' . date('Y') . '-' . strtoupper(Str::random(5));
+                $pin = str_pad((string) mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
+
+                // Atomic Transaction:
+                // Guarantees booking, participant rows, dynamic pricing audits, and payment records
+                // are committed in sync; rolls back completely if PayMongo session initialization fails.
+                DB::beginTransaction();
+                try {
+                    $booking = Booking::create([
+                        'booking_number' => $bookingNumber,
+                        'pin' => $pin,
+                        'batch_id' => $batch->id,
+                        'class_type' => $validated['class_type'],
+                        'is_certified_diver' => $isCertified,
+                        'start_date' => $startDate,
+                        'end_date' => $endDate,
+                        'pickup_option' => $validated['pickup_option'],
+                        'pickup_location' => $validated['pickup_location'] ?? null,
+                        'carpool_fee' => $carpoolFee,
+                        'boat_dive' => !empty($validated['boat_dive']) && $validated['boat_dive'],
+                        'boat_dive_fee' => $boatDiveFee,
+                        'lgu_fee' => $lguFee,
+                        'environmental_fee' => $envFee,
+                        'subtotal' => $subtotal,
+                        'total_amount' => $totalAmount,
+                        'downpayment_amount' => $downpaymentAmount,
+                        'balance_amount' => $balanceAmount,
+                        'contact_name' => $contactName ?: 'Guest',
+                        'contact_email' => $validated['contact_email'],
+                        'contact_phone' => $validated['contact_phone'],
+                        'contact_facebook' => $validated['contact_facebook'] ?? null,
+                        'status' => 'pending_downpayment',
+                    ]);
+
+                    // Save individual participant health questionnaires and medical disclosures
+                    foreach ($validated['participants'] as $pData) {
+                        $pName = !empty($pData['name'])
+                            ? $pData['name']
+                            : trim(($pData['first_name'] ?? '') . ' ' . ($pData['last_name'] ?? ''));
+
+                        $booking->participants()->create([
+                            'name' => $pName ?: 'Participant',
+                            'age' => (int) $pData['age'],
+                            'health_condition' => $pData['health_condition'] ?? 'None',
+                            'swimmer_status' => $pData['swimmer_status'] ?? 'beginner',
+                            'price_per_person' => $classPrice,
+                        ]);
+                    }
+
+                    // Pricing Audit Trail:
+                    // Persists exact snapshot of active rule adjustments applied at checkout time
+                    // to preserve pricing integrity against future admin rule modifications.
+                    foreach ($quote['adjustments'] as $adj) {
+                        $booking->priceAdjustments()->create([
+                            'pricing_rule_id' => $adj['rule_id'],
+                            'rule_name' => $adj['rule_name'],
+                            'rule_type' => $adj['rule_type'],
+                            'condition_summary' => $adj['condition_summary'],
+                            'base_price' => $quote['base_price_per_pax'],
+                            'adjustment_amount' => $adj['delta_per_pax'],
+                            'adjusted_price' => $quote['adjusted_price_per_pax'],
+                        ]);
+                    }
+
+                    // Payment Session Lifecycle:
+                    // Expires in 24 hours to automatically purge uncompleted reservations.
+                    $paymentMethod = $validated['payment_method'] ?? 'paymongo';
+                    $transactionId = 'PAY-' . strtoupper(Str::random(10));
+
+                    $payment = Payment::create([
+                        'booking_id' => $booking->id,
+                        'payment_method' => 'paymongo',
+                        'transaction_id' => $transactionId,
+                        'amount' => $downpaymentAmount,
+                        'fee_amount' => 0.00,
+                        'net_amount' => $downpaymentAmount,
+                        'payment_type' => 'downpayment',
+                        'status' => 'pending',
+                        'expires_at' => now()->addHours(24),
+                    ]);
+
+                    // Register temporary 15-minute slot hold in cache during active checkout
+                    $this->slotReservationService->acquireHold($startDate, $bookingNumber, $paxCount, SlotReservationService::DEFAULT_HOLD_TTL_SECONDS);
+
+                    // Hosted PayMongo Gateway v2: Generates direct GCash, Maya, Card, or GrabPay checkout session
+                    $payMongoGateway = app(\App\Services\Gateways\PayMongoGateway::class);
+                    $checkoutResult = $payMongoGateway->createCheckoutSession($booking, $downpaymentAmount);
+
+                    if (!$checkoutResult['success']) {
+                        $errMsg = is_array($checkoutResult['error'] ?? null)
+                            ? ($checkoutResult['error']['errors'][0]['detail'] ?? 'PayMongo session creation failed.')
+                            : ($checkoutResult['error'] ?? 'Unable to connect to PayMongo.');
+                        throw new Exception("PayMongo Error: " . $errMsg);
+                    }
+
+                    $payment->update([
+                        'paymongo_resource_id' => $checkoutResult['checkout_id'],
+                    ]);
+
+                    BookingStatusLog::create([
+                        'booking_id' => $booking->id,
+                        'old_status' => 'initiated',
+                        'new_status' => 'pending_downpayment',
+                        'changed_by' => null,
+                        'note' => "Reservation created. Awaiting downpayment of ₱" . number_format($downpaymentAmount, 2) . " via PayMongo Hosted Checkout.",
+                        'created_at' => now(),
+                    ]);
+
+                    AuditLogger::log(
+                        'BOOKING_CREATED',
+                        "New booking #{$booking->booking_number} created for {$booking->contact_name} ({$paxCount} pax, {$booking->class_type}). Awaiting PayMongo checkout.",
+                        null,
+                        $booking->contact_name,
+                        $request
+                    );
+
+                    DB::commit();
+
+                    return response()->json([
+                        'success' => true,
+                        'is_paymongo_redirect' => true,
+                        'checkout_url' => $checkoutResult['checkout_url'],
+                        'checkout_id' => $checkoutResult['checkout_id'],
+                        'booking_number' => $booking->booking_number,
+                        'pin' => $booking->pin,
+                        'booking_id' => $booking->id,
+                        'downpayment_paid' => $downpaymentAmount,
+                        'downpayment_due' => $downpaymentAmount,
+                        'balance_due' => $balanceAmount,
+                        'manage_url' => route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]),
+                    ]);
+                } catch (Exception $e) {
+                    DB::rollBack();
+                    $this->slotReservationService->releaseHold($startDate, $bookingNumber);
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'An error occurred while setting up your PayMongo payment: ' . $e->getMessage(),
+                    ], 500);
+                }
+            });
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while setting up your PayMongo payment: ' . $e->getMessage(),
-            ], 500);
+                'message' => 'The booking system is currently processing high-volume simultaneous checkouts. Please retry in a few moments.',
+            ], 429);
         }
     }
 }

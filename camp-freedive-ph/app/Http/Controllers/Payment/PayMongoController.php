@@ -11,6 +11,7 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -23,7 +24,7 @@ use Illuminate\Support\Facades\Log;
  * 2. Dual-Verification Protocol:
  *    - Synchronous Return (Success Route): Reconciles payment status immediately upon browser redirect.
  *    - Asynchronous Webhook (Webhook Route): Verifies cryptographic HMAC signatures (`Paymongo-Signature`)
- *      to ensure payments are captured even if the customer accidentally closes their mobile browser.
+ *      with Redis/Cache-backed 24-hour idempotency deduplication to safely discard duplicate retry payloads.
  * 3. Automated State Machine: Updates booking status from `pending_downpayment` -> `confirmed`,
  *    records transaction fee audits, and dispatches customer confirmation emails.
  */
@@ -31,8 +32,6 @@ class PayMongoController extends Controller
 {
     protected PayMongoGateway $gateway;
     protected AuditLogger $auditLogger;
-
-    // TODO: Implement an Redis-backed webhook idempotency deduplication table to discard duplicate PayMongo retry payloads.
 
     public function __construct(PayMongoGateway $gateway, AuditLogger $auditLogger)
     {
@@ -172,6 +171,8 @@ class PayMongoController extends Controller
                         'status' => 'confirmed',
                     ]);
 
+                    app(\App\Services\SlotReservationService::class)->releaseHold($booking->start_date, $booking->booking_number);
+
                     \App\Models\BookingStatusLog::create([
                         'booking_id' => $booking->id,
                         'old_status' => 'pending_downpayment',
@@ -264,7 +265,22 @@ class PayMongoController extends Controller
         $eventType = $processed['event_type'];
         $eventData = $processed['data'];
 
-        Log::info("PayMongo Webhook Event Received: {$eventType}", ['event' => $eventType]);
+        // Webhook Idempotency Deduplication:
+        // PayMongo operates on an at-least-once delivery model, which may retry sending the exact same payload.
+        // Cache::add() is atomic and returns true ONLY if the event has not been processed within the 24-hour TTL window.
+        $eventId = $processed['raw']['data']['id'] ?? ($eventData['id'] ?? null);
+        $dedupKey = $eventId ? "paymongo_webhook_evt:{$eventId}" : 'paymongo_webhook_payload:' . hash('sha256', $payload);
+
+        if (!Cache::add($dedupKey, true, now()->addHours(24))) {
+            Log::info("PayMongo Webhook: Duplicate event delivery discarded (Key: {$dedupKey}, Event: {$eventType})");
+            return response()->json([
+                'received' => true,
+                'event' => $eventType,
+                'status' => 'duplicate_ignored',
+            ], 200);
+        }
+
+        Log::info("PayMongo Webhook Event Received: {$eventType}", ['event' => $eventType, 'event_id' => $eventId]);
 
         try {
             switch ($eventType) {
@@ -352,6 +368,7 @@ class PayMongoController extends Controller
 
             if ($booking->status !== 'confirmed') {
                 $booking->update(['status' => 'confirmed']);
+                app(\App\Services\SlotReservationService::class)->releaseHold($booking->start_date, $booking->booking_number);
             }
 
             AuditLogger::log(

@@ -44,6 +44,41 @@ class DemandForecastService
     }
 
     /**
+     * Get specific forecast prediction for a single dive date.
+     */
+    public function getForecastForDate(string|Carbon $date): ?array
+    {
+        $targetDate = Carbon::parse($date)->format('Y-m-d');
+        $allData = $this->getForecastData();
+        $forecasts = $allData['forecasts'] ?? [];
+
+        foreach ($forecasts as $f) {
+            if (($f['forecast_date'] ?? null) === $targetDate) {
+                return $f;
+            }
+        }
+
+        // Direct DB fallback if not found in cache list
+        $record = DemandForecast::whereDate('forecast_date', $targetDate)
+            ->latest('synced_at')
+            ->first();
+
+        if ($record) {
+            return [
+                'forecast_date' => $record->forecast_date?->format('Y-m-d'),
+                'days_ahead' => $record->days_ahead,
+                'predicted_participants' => (float) $record->predicted_participants,
+                'predicted_revenue_php' => (float) $record->predicted_revenue_php,
+                'demand_level' => $record->demand_level ?: 'Medium',
+                'season_period' => $record->season_period ?: 'Off-Peak',
+                'instructors_needed' => (int) $record->instructors_needed,
+            ];
+        }
+
+        return null;
+    }
+
+    /**
      * Call external ML service GET /forecast/demand.
      */
     public function fetchFromExternalService(): ?array

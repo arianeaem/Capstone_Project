@@ -205,4 +205,166 @@ class MLSafetyServiceIntegrationTest extends TestCase
             'day2',
         ]);
     }
+
+    public function test_circuit_breaker_trips_to_open_after_3_consecutive_failures(): void
+    {
+        $this->mlService->resetCircuit();
+
+        Http::fake([
+            '*/assess-booking' => Http::response('Server Down', 500),
+        ]);
+
+        $boundaryWeather = [
+            [
+                'timestamp' => '2026-09-15T08:00:00+08:00',
+                'wind_speed' => 12.0,
+                'wind_gust' => 15.0,
+                'wind_dir' => 245.0,
+                'slp' => 1012.0,
+                'rain_rate_mm_hr' => 0.0,
+            ],
+        ];
+
+        // 1st failure
+        $this->mlService->assessBookingSession('2026-09-15', '08:00', '12:00', $boundaryWeather);
+        $status1 = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_CLOSED, $status1['state']);
+        $this->assertEquals(1, $status1['consecutive_failures']);
+
+        // 2nd failure
+        $this->mlService->assessBookingSession('2026-09-15', '08:00', '12:00', $boundaryWeather);
+        $status2 = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_CLOSED, $status2['state']);
+        $this->assertEquals(2, $status2['consecutive_failures']);
+
+        // 3rd failure -> Circuit should TRIP to OPEN
+        $this->mlService->assessBookingSession('2026-09-15', '08:00', '12:00', $boundaryWeather);
+        $status3 = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_OPEN, $status3['state']);
+        $this->assertEquals(3, $status3['consecutive_failures']);
+        $this->assertFalse($status3['is_available']);
+        $this->assertNotNull($status3['tripped_at']);
+    }
+
+    public function test_circuit_breaker_fails_fast_when_open_without_making_http_calls(): void
+    {
+        $this->mlService->resetCircuit();
+
+        // Force trip circuit to OPEN
+        $this->mlService->recordFailure('Test 1');
+        $this->mlService->recordFailure('Test 2');
+        $this->mlService->recordFailure('Test 3');
+
+        $status = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_OPEN, $status['state']);
+
+        // Set Http::fake with a handler that would fail if called
+        $called = false;
+        Http::fake([
+            '*/assess-booking' => function () use (&$called) {
+                $called = true;
+                return Http::response('Should not be called', 500);
+            },
+        ]);
+
+        $boundaryWeather = [
+            [
+                'timestamp' => '2026-09-15T08:00:00+08:00',
+                'wind_speed' => 12.0,
+                'wind_gust' => 15.0,
+                'wind_dir' => 245.0,
+                'slp' => 1012.0,
+                'rain_rate_mm_hr' => 0.0,
+            ],
+        ];
+
+        // Should return null immediately without making any HTTP request
+        $startTime = microtime(true);
+        $result = $this->mlService->assessBookingSession('2026-09-15', '08:00', '12:00', $boundaryWeather);
+        $durationMs = (microtime(true) - $startTime) * 1000;
+
+        $this->assertNull($result);
+        $this->assertFalse($called, 'HTTP request was sent despite circuit being OPEN!');
+        $this->assertLessThan(50, $durationMs, 'Fail-fast took longer than 50ms');
+    }
+
+    public function test_circuit_breaker_recovers_to_closed_on_successful_trial_probe(): void
+    {
+        $this->mlService->resetCircuit();
+
+        // Trip the circuit to OPEN
+        $this->mlService->recordFailure('Test 1');
+        $this->mlService->recordFailure('Test 2');
+        $this->mlService->recordFailure('Test 3');
+
+        // Simulate 35 seconds elapsed since tripping
+        \Illuminate\Support\Facades\Cache::put(
+            WeatherSafetyMLService::CACHE_KEY_TRIPPED_AT,
+            now()->subSeconds(35)->timestamp,
+            now()->addMinutes(10)
+        );
+
+        // Circuit should now transition to HALF_OPEN to allow a trial probe
+        $this->assertTrue($this->mlService->isCircuitAvailable());
+        $status = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_HALF_OPEN, $status['state']);
+
+        // Mock successful 200 response from microservice
+        Http::fake([
+            '*/assess-booking' => Http::response([
+                'planned_date' => '2026-09-15',
+                'dive_start' => '08:00',
+                'dive_end' => '12:00',
+                'overall_recommendation' => 'Very Safe',
+                'displayed_risk_name' => 'Very Safe',
+                'overall_operational_status' => 'PROVISIONAL_TREND_OUTLOOK',
+                'is_authoritative_go' => true,
+                'worst_hour' => [
+                    'hour' => 9,
+                    'final_tier_name' => 'Very Safe',
+                ],
+            ], 200),
+        ]);
+
+        $boundaryWeather = [
+            [
+                'timestamp' => '2026-09-15T08:00:00+08:00',
+                'wind_speed' => 12.0,
+                'wind_gust' => 15.0,
+                'wind_dir' => 245.0,
+                'slp' => 1012.0,
+                'rain_rate_mm_hr' => 0.0,
+            ],
+        ];
+
+        $result = $this->mlService->assessBookingSession('2026-09-15', '08:00', '12:00', $boundaryWeather);
+
+        $this->assertNotNull($result);
+        $this->assertEquals('Very Safe', $result['overall_recommendation']);
+
+        // Circuit breaker should now be fully recovered and CLOSED
+        $recoveredStatus = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_CLOSED, $recoveredStatus['state']);
+        $this->assertEquals(0, $recoveredStatus['consecutive_failures']);
+        $this->assertTrue($recoveredStatus['is_available']);
+    }
+
+    public function test_circuit_breaker_can_be_manually_reset(): void
+    {
+        // Trip circuit
+        $this->mlService->recordFailure('Err 1');
+        $this->mlService->recordFailure('Err 2');
+        $this->mlService->recordFailure('Err 3');
+
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_OPEN, $this->mlService->getCircuitStatus()['state']);
+
+        // Reset circuit
+        $this->mlService->resetCircuit();
+
+        $resetStatus = $this->mlService->getCircuitStatus();
+        $this->assertEquals(WeatherSafetyMLService::CIRCUIT_STATE_CLOSED, $resetStatus['state']);
+        $this->assertEquals(0, $resetStatus['consecutive_failures']);
+        $this->assertTrue($resetStatus['is_available']);
+    }
 }
+

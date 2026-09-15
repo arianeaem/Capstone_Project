@@ -400,8 +400,8 @@
                         <div>
                             <form action="{{ route('logout') }}" method="POST" data-no-spa data-native>
                                 @csrf
-                                <button type="submit" class="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-[#1D1D1F] hover:bg-rose-50 font-bold text-sm transition-colors cursor-pointer">
-                                    <img src="{{ asset('icons/icons8-logout-60.png') }}" class="w-4 h-4 shrink-0" alt="Sign Out">
+                                <button type="submit" class="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[#1D1D1F] hover:bg-rose-50 font-bold text-sm transition-colors cursor-pointer">
+                                    <img src="{{ asset('icons/icons8-logout-60.png') }}" class="w-5 h-5 shrink-0 object-contain" alt="Sign Out">
                                     <span>Log Out</span>
                                 </button>
                             </form>

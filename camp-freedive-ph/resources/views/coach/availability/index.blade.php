@@ -45,7 +45,7 @@
                             @click="toggleBulkMode()"
                             :class="bulkMode ? 'bg-[#780000] text-white border-[#780000]' : 'bg-white text-[#1D1D1F] border-[#E5E5EA] hover:bg-[#F2F2F7]'"
                             class="px-4 py-2 rounded-xl border text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
-                        <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-4 h-4 object-contain inline-block shrink-0" :class="bulkMode ? 'brightness-0 invert' : ''">
+                        <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-5 h-5 object-contain inline-block shrink-0" :class="bulkMode ? 'brightness-0 invert' : ''">
                         <span x-text="bulkMode ? 'Exit Bulk Mode' : 'Bulk Edit Mode'"></span>
                     </button>
                 </div>

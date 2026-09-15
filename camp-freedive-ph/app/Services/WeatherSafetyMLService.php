@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -16,17 +17,31 @@ use Illuminate\Support\Facades\Log;
  * 1. Native PHP Heuristic Engine (WeatherForecastService): Evaluates 9 marine variables against Coast Guard safety rules.
  * 2. Predictive ONNX Microservice (WeatherSafetyMLService): Runs 12 multi-horizon regressor and classifier models
  *    predicting wave dynamics, wind speeds, and ocean currents up to 16 days ahead.
+ * 3. Redis-Backed Circuit Breaker: Fails fast (<0.1ms) when the microservice is temporarily down, preventing
+ *    HTTP connection timeouts from stalling PHP worker threads.
  *
  * Fault Tolerance:
  * If the ML microservice is unreachable, times out, or returns a 5xx error, the client catches the exception,
- * logs an info notice, and gracefully returns `null`. The calling controllers automatically fall back to the
- * native PHP heuristic engine ensuring zero downtime for customers booking sessions.
+ * trips the circuit breaker after 3 consecutive failures, and gracefully returns `null`. The calling controllers
+ * automatically fall back to the native PHP heuristic engine ensuring zero downtime for customers booking sessions.
  */
 class WeatherSafetyMLService
 {
     protected string $baseUrl;
     protected int $timeout;
     protected bool $enabled;
+
+    // Circuit Breaker State Constants
+    public const CIRCUIT_STATE_CLOSED = 'CLOSED';
+    public const CIRCUIT_STATE_OPEN = 'OPEN';
+    public const CIRCUIT_STATE_HALF_OPEN = 'HALF_OPEN';
+
+    // Circuit Breaker Operational Thresholds
+    public const FAILURE_THRESHOLD = 3; // 3 consecutive failures trip the circuit
+    public const COOLDOWN_SECONDS = 30; // 30 seconds cooldown before trial probe
+    public const CACHE_KEY_STATE = 'ml_circuit_breaker:state';
+    public const CACHE_KEY_FAILURES = 'ml_circuit_breaker:failures';
+    public const CACHE_KEY_TRIPPED_AT = 'ml_circuit_breaker:tripped_at';
 
     public const RISK_TIERS = [
         0 => 'Very Safe',
@@ -73,7 +88,105 @@ class WeatherSafetyMLService
         return $this->enabled && !empty($this->baseUrl);
     }
 
-    // TODO: Implement a circuit breaker pattern (e.g., via Redis) to prevent HTTP connection spam when the microservice is temporarily down.
+    /**
+     * Determine whether the circuit breaker permits outbound requests.
+     *
+     * State Machine:
+     * - CLOSED: Requests pass through normally.
+     * - OPEN: Requests fail fast (<0.1ms) unless cooldown has expired.
+     * - HALF_OPEN: One trial probe request is permitted to test microservice recovery.
+     */
+    public function isCircuitAvailable(): bool
+    {
+        $state = (string) Cache::get(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_CLOSED);
+
+        if ($state === self::CIRCUIT_STATE_CLOSED) {
+            return true;
+        }
+
+        if ($state === self::CIRCUIT_STATE_OPEN) {
+            $trippedAt = (int) Cache::get(self::CACHE_KEY_TRIPPED_AT, 0);
+            $elapsedSeconds = now()->timestamp - $trippedAt;
+
+            if ($elapsedSeconds >= self::COOLDOWN_SECONDS) {
+                // Cooldown elapsed -> Transition to HALF_OPEN to probe microservice recovery
+                Cache::put(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_HALF_OPEN, now()->addMinutes(5));
+                Log::info('[WeatherSafetyMLService] Circuit breaker transitioning from OPEN to HALF_OPEN (probing recovery).');
+                return true;
+            }
+
+            // Circuit remains open -> Fail-fast immediately
+            return false;
+        }
+
+        if ($state === self::CIRCUIT_STATE_HALF_OPEN) {
+            return true;
+        }
+
+        return true;
+    }
+
+    /**
+     * Record a successful request, resetting failures and closing the circuit.
+     */
+    public function recordSuccess(): void
+    {
+        $previousState = (string) Cache::get(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_CLOSED);
+        if ($previousState !== self::CIRCUIT_STATE_CLOSED) {
+            Log::info('[WeatherSafetyMLService] Circuit breaker recovered: state reset to CLOSED.');
+        }
+
+        Cache::put(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_CLOSED, now()->addDays(1));
+        Cache::put(self::CACHE_KEY_FAILURES, 0, now()->addDays(1));
+        Cache::forget(self::CACHE_KEY_TRIPPED_AT);
+    }
+
+    /**
+     * Record a request failure (timeout or 5xx), incrementing counters and tripping circuit if threshold reached.
+     */
+    public function recordFailure(?string $reason = null): void
+    {
+        $state = (string) Cache::get(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_CLOSED);
+        $failures = (int) Cache::get(self::CACHE_KEY_FAILURES, 0) + 1;
+        Cache::put(self::CACHE_KEY_FAILURES, $failures, now()->addMinutes(10));
+
+        if ($state === self::CIRCUIT_STATE_HALF_OPEN || $failures >= self::FAILURE_THRESHOLD) {
+            Cache::put(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_OPEN, now()->addMinutes(10));
+            Cache::put(self::CACHE_KEY_TRIPPED_AT, now()->timestamp, now()->addMinutes(10));
+
+            Log::warning("[WeatherSafetyMLService] Circuit breaker TRIPPED to OPEN state. Consecutive failures: {$failures}. Reason: {$reason}. Failing fast for " . self::COOLDOWN_SECONDS . "s.");
+        }
+    }
+
+    /**
+     * Retrieve the current circuit breaker status for health monitoring and diagnostics.
+     */
+    public function getCircuitStatus(): array
+    {
+        $state = (string) Cache::get(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_CLOSED);
+        $failures = (int) Cache::get(self::CACHE_KEY_FAILURES, 0);
+        $trippedAt = (int) Cache::get(self::CACHE_KEY_TRIPPED_AT, 0);
+
+        return [
+            'state' => $state,
+            'is_available' => $this->isCircuitAvailable(),
+            'consecutive_failures' => $failures,
+            'failure_threshold' => self::FAILURE_THRESHOLD,
+            'cooldown_seconds' => self::COOLDOWN_SECONDS,
+            'tripped_at' => $trippedAt > 0 ? Carbon::createFromTimestamp($trippedAt, WeatherForecastService::TIMEZONE)->toIso8601String() : null,
+            'seconds_remaining' => ($state === self::CIRCUIT_STATE_OPEN && $trippedAt > 0) ? max(0, self::COOLDOWN_SECONDS - (now()->timestamp - $trippedAt)) : 0,
+        ];
+    }
+
+    /**
+     * Manually reset the circuit breaker state to CLOSED.
+     */
+    public function resetCircuit(): void
+    {
+        Cache::put(self::CACHE_KEY_STATE, self::CIRCUIT_STATE_CLOSED, now()->addDays(1));
+        Cache::put(self::CACHE_KEY_FAILURES, 0, now()->addDays(1));
+        Cache::forget(self::CACHE_KEY_TRIPPED_AT);
+    }
 
     /**
      * Assess a dive booking session through the 12 ONNX ML inference pipeline.
@@ -93,6 +206,12 @@ class WeatherSafetyMLService
         ?array $pagasa = null
     ): ?array {
         if (!$this->isEnabled()) {
+            return null;
+        }
+
+        // Fail fast in <0.1ms if the circuit breaker is currently OPEN
+        if (!$this->isCircuitAvailable()) {
+            Log::debug("[WeatherSafetyMLService] Circuit is OPEN, skipping HTTP call to {$this->baseUrl} for {$date} (fail-fast active)");
             return null;
         }
 
@@ -122,6 +241,7 @@ class WeatherSafetyMLService
                 ->post("{$this->baseUrl}/assess-booking", $payload);
 
             if (!$response->successful()) {
+                $this->recordFailure("HTTP {$response->status()}");
                 Log::warning('[WeatherSafetyMLService] ML assessment endpoint returned non-200', [
                     'status' => $response->status(),
                     'body' => $response->body(),
@@ -130,9 +250,11 @@ class WeatherSafetyMLService
                 return null;
             }
 
+            $this->recordSuccess();
             $data = $response->json();
             return $this->standardizeResponse($data);
         } catch (Exception $e) {
+            $this->recordFailure($e->getMessage());
             Log::info('[WeatherSafetyMLService] ML Safety microservice unreachable, continuing with native heuristic engine', [
                 'error' => $e->getMessage(),
                 'date' => $date,

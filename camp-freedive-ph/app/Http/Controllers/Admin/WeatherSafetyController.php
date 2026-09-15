@@ -23,15 +23,13 @@ use Illuminate\View\View;
  * 3. Administrative Manual Overrides: Allows authorized operators to enforce storm signals (TCWS 1-5),
  *    gale warnings, or local squall alerts, escalating batches to Critical Risk.
  * 4. Automated Cancellation & Refund Trigger: Integrates one-click batch cancellation, triggering 100% force
- *    majeure refund entitlements and automated customer cancellation emails.
+ *    majeure refund entitlements and background-queued customer cancellation emails.
  */
 class WeatherSafetyController extends Controller
 {
     public function __construct(
         protected WeatherForecastService $forecastService
     ) {}
-
-    // TODO: Transition customer cancellation email dispatch to background queue workers for high-volume batches.
 
     /**
      * Page 1: Weather & Safety Monitoring Batch Roster.

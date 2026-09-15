@@ -33,8 +33,8 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
-            <a href="{{ route('admin.bookings.edit', $booking) }}" class="btn-secondary px-3.5 sm:px-4 py-2 text-sm font-semibold flex items-center justify-center gap-1.5 flex-1 sm:flex-initial">
-                <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-4 h-4 object-contain inline-block shrink-0">
+            <a href="{{ route('admin.bookings.edit', $booking) }}" class="btn-secondary px-3.5 sm:px-4 py-2 text-sm font-semibold flex items-center justify-center gap-2 flex-1 sm:flex-initial">
+                <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-5 h-5 object-contain inline-block shrink-0">
                 <span>Edit Details</span>
             </a>
 

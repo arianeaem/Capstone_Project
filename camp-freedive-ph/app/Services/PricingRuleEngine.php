@@ -10,20 +10,20 @@ use Carbon\Carbon;
  * Dynamic Yield Management & Pricing Rule Engine.
  *
  * Business Model & Economic Rationale:
- * 1. Multi-Factor Dynamic Pricing: Evaluates seasonal trends, occupancy velocity, and booking lead times
- *    to optimize freediving camp capacity utilization across the year.
- * 2. Strict ±30% Price Clamping Cap (ADJUSTMENT_PERCENTAGE_CAP):
+ * 1. Multi-Factor Dynamic Pricing: Evaluates seasonal trends, occupancy velocity, ML demand forecasts,
+ *    and booking lead times to optimize freediving camp capacity utilization across the year.
+ * 2. Predictive Yield Management: Connects with Prophet/XGBoost seasonal demand forecasts to project
+ *    batch fill rates and optimize early-bird discounts and capacity revenue ahead of time.
+ * 3. Strict ±30% Price Clamping Cap (ADJUSTMENT_PERCENTAGE_CAP):
  *    Protects customer trust and transparent pricing by strictly bounding cumulative discounts/surcharges
  *    between -30% and +30% of the base class tier price.
- * 3. Batangas Micro-Climate Seasonality:
+ * 4. Batangas Micro-Climate Seasonality:
  *    - Peak (Nov - Apr): Amihan northeast monsoon delivers dry, calm conditions and peak tourism demand.
  *    - Shoulder (May, Oct): Monsoon transitional months with moderate occupancy.
  *    - Off-Peak (Jun - Sep): Habagat southwest monsoon brings wet weather; discounts incentivize advance bookings.
  */
 class PricingRuleEngine
 {
-    // TODO: Connect pricing rule evaluation with Prophet/XGBoost seasonal demand forecasts to dynamically adjust lead-time pricing tiers.
-
     /**
      * Percentage cap to clamp stacked adjustments (+/- 30% of base price).
      */
@@ -39,6 +39,12 @@ class PricingRuleEngine
         'refinement' => 4100.00,
     ];
 
+    public function __construct(
+        protected ?DemandForecastService $demandForecastService = null
+    ) {
+        $this->demandForecastService ??= app(DemandForecastService::class);
+    }
+
     /**
      * Resolve base price for given class and diver certification.
      */
@@ -52,13 +58,25 @@ class PricingRuleEngine
     }
 
     /**
-     * Determine calendar season for a date in Batangas:
+     * Determine calendar season for a date in Batangas, factoring in ML micro-climate forecasts:
      * - Peak: November to April (Months 11, 12, 1, 2, 3, 4)
      * - Shoulder: May and October (Months 5, 10)
      * - Off-Peak: June to September (Months 6, 7, 8, 9)
      */
     public function getSeasonForDate(string|Carbon $date): string
     {
+        // 1. Check if ML demand forecast identifies a specific micro-climate season period
+        if ($this->demandForecastService) {
+            $forecast = $this->demandForecastService->getForecastForDate($date);
+            if (!empty($forecast['season_period'])) {
+                $period = strtolower(str_replace(['-', ' '], '_', $forecast['season_period']));
+                if (in_array($period, ['peak', 'shoulder', 'off_peak'], true)) {
+                    return $period;
+                }
+            }
+        }
+
+        // 2. Fallback to Batangas monsoon calendar
         $d = Carbon::parse($date);
         $month = (int) $d->format('n');
 
@@ -74,27 +92,55 @@ class PricingRuleEngine
     }
 
     /**
-     * Calculate live demand level for a date based on booking occupancy:
-     * - High: > 60% capacity (> 27 pax of 45)
-     * - Medium: 25% - 60% capacity (11 to 27 pax)
-     * - Low: < 25% capacity (< 11 pax)
+     * Calculate live dynamic demand level for a date combining:
+     * 1. Current physical bookings in DB
+     * 2. Forward-looking Prophet/XGBoost seasonal demand forecasts
+     *
+     * Classification:
+     * - High: > 60% capacity (> 27 pax of 45) or ML predicted high volume
+     * - Medium: 25% - 60% capacity (11 to 27 pax) or ML predicted medium volume
+     * - Low: < 25% capacity (< 11 pax) and ML predicted low volume
      */
     public function getDemandForDate(string|Carbon $date): string
     {
         $dateStr = Carbon::parse($date)->format('Y-m-d');
 
+        // Current actual confirmed headcount in DB
         $bookedCount = BookingParticipant::whereHas('booking', function ($q) use ($dateStr) {
             $q->whereDate('start_date', $dateStr)
               ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']);
         })->count();
 
-        $occupancyRate = $bookedCount / 45.0;
+        $actualOccupancyRate = $bookedCount / 45.0;
 
-        if ($occupancyRate >= 0.60) {
+        // If actual bookings already reached high capacity, honor that immediately
+        if ($actualOccupancyRate >= 0.60) {
             return 'high';
         }
 
-        if ($occupancyRate >= 0.25) {
+        // Check forward-looking ML Prophet/XGBoost demand forecast
+        if ($this->demandForecastService) {
+            $forecast = $this->demandForecastService->getForecastForDate($date);
+            if ($forecast) {
+                $mlDemand = strtolower($forecast['demand_level'] ?? '');
+                $predictedPax = (float) ($forecast['predicted_participants'] ?? 0);
+                $predictedOccupancyRate = $predictedPax / 45.0;
+
+                $effectiveOccupancy = max($actualOccupancyRate, $predictedOccupancyRate);
+
+                if ($effectiveOccupancy >= 0.60 || $mlDemand === 'high') {
+                    return 'high';
+                }
+
+                if ($effectiveOccupancy >= 0.25 || $mlDemand === 'medium') {
+                    return 'medium';
+                }
+
+                return 'low';
+            }
+        }
+
+        if ($actualOccupancyRate >= 0.25) {
             return 'medium';
         }
 
@@ -195,6 +241,8 @@ class PricingRuleEngine
 
         $adjustedPricePerPax = max(500.00, round($basePrice + $clampedDelta, 2));
 
+        $forecastData = $this->demandForecastService?->getForecastForDate($diveDate);
+
         return [
             'class_type' => $classType,
             'is_certified' => $isCertified,
@@ -203,6 +251,8 @@ class PricingRuleEngine
             'season_label' => ucfirst(str_replace('_', '-', $season)) . ' Season',
             'demand' => $demand,
             'demand_label' => ucfirst($demand) . ' Demand',
+            'forecast_source' => $forecastData ? 'ml_predictive' : 'historical_headcount',
+            'predicted_participants' => $forecastData['predicted_participants'] ?? null,
             'lead_time_days' => $leadTimeDays,
             'base_price_per_pax' => $basePrice,
             'adjusted_price_per_pax' => $adjustedPricePerPax,

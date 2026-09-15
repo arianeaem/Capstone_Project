@@ -16,6 +16,19 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
+/**
+ * Customer Self-Service Booking Management Controller.
+ *
+ * Business Workflow & Security Policies:
+ * 1. Frictionless PIN Authentication: Allows guests to access vouchers, reschedule requests, and cancellation forms
+ *    using their unique Booking Reference Code (CFP-YYYY-XXXXX) and 4-digit PIN without account registration.
+ * 2. Automated Policy Enforcement:
+ *    - Voluntary Reschedules: Permitted up to 72 hours prior to scheduled departure.
+ *    - Force Majeure Weather Cancellations: Automatically grants 100% refund entitlement if coastal storm warnings
+ *      or Critical Risk conditions are active on the dive date.
+ *    - Voluntary Guest Cancellations: Calculates tiered refund deductions based on booking lead time.
+ * 3. Proactive Safety Re-Verification: Validates marine weather safety for newly requested dates during reschedule attempts.
+ */
 class ManageBookingController extends Controller
 {
     public function __construct(
@@ -23,8 +36,13 @@ class ManageBookingController extends Controller
         protected WeatherSafetyService $weatherService
     ) {}
 
+    // TODO: Implement SMS OTP two-factor authentication for sensitive booking cancellations.
+
     /**
-     * Show the booking lookup form.
+     * Show the public booking lookup portal.
+     *
+     * @param Request $request Optional query params for pre-filling booking code and PIN.
+     * @return View Renders the lookup portal.
      */
     public function index(Request $request): View
     {
@@ -35,7 +53,10 @@ class ManageBookingController extends Controller
     }
 
     /**
-     * Look up a booking by number + PIN.
+     * Authenticates booking credentials and establishes guest session.
+     *
+     * @param Request $request Contains `booking_number` and `pin`.
+     * @return RedirectResponse Redirects to self-service dashboard on success.
      */
     public function search(Request $request): RedirectResponse
     {
@@ -67,6 +88,10 @@ class ManageBookingController extends Controller
 
     /**
      * Show the booking details and self-service management dashboard.
+     *
+     * @param Request $request Guest request holding auth session credentials.
+     * @param string $booking_number Unique booking code (CFP-YYYY-XXXXX).
+     * @return View|RedirectResponse Renders voucher, participant details, and policy actions.
      */
     public function show(Request $request, string $booking_number): View|RedirectResponse
     {
@@ -81,7 +106,7 @@ class ManageBookingController extends Controller
                 ->with('error', 'Booking not found - please check your details.');
         }
 
-        // Live evaluation of the policy engine
+        // Live evaluation of the cancellation/reschedule policy engine
         $policy = $this->policyEngine->evaluate($booking);
 
         // Marine forecast for current booking date
@@ -91,7 +116,16 @@ class ManageBookingController extends Controller
     }
 
     /**
-     * Submit a request to reschedule the dive date.
+     * Submit a customer request to reschedule the dive date.
+     *
+     * Business Logic:
+     * 1. Validates that downpayment was settled (unpaid bookings cannot hold replacement dates).
+     * 2. Checks policy cutoff window (minimum 72h lead time required for voluntary changes).
+     * 3. Proactively evaluates marine weather on the target replacement date to prevent moving into a storm.
+     *
+     * @param Request $request Holds `pin`, `requested_start_date`, `requested_end_date`, and `reason`.
+     * @param string $booking_number Target booking identifier.
+     * @return RedirectResponse Redirects back with status feedback.
      */
     public function reschedule(Request $request, string $booking_number): RedirectResponse
     {
@@ -115,7 +149,8 @@ class ManageBookingController extends Controller
             return back()->with('error', 'Rescheduling is not allowed: ' . $policy['reschedule_message']);
         }
 
-        // Check weather for requested date
+        // Proactive Marine Safety Verification on Replacement Date:
+        // Protects guests from inadvertently rescheduling into an approaching cyclone or gale warning.
         $forecast = $this->weatherService->getForecast($validated['requested_start_date'], $validated['requested_end_date']);
         if (!$forecast['is_bookable']) {
             return back()->with('error', 'The requested new date has a Critical Storm Warning. Please pick an alternative safe date.');
@@ -146,7 +181,17 @@ class ManageBookingController extends Controller
     }
 
     /**
-     * Submit a request to cancel the booking.
+     * Submit a customer request to cancel the reservation.
+     *
+     * Business Logic:
+     * Computes refund eligibility via BookingPolicyEngine:
+     * - Weather / Force Majeure: 100% full refund entitlement.
+     * - Voluntary Notice (>7 days): Partial downpayment refund minus non-refundable processing costs.
+     * - Last-minute Notice (<7 days): Non-refundable deposit retention.
+     *
+     * @param Request $request Holds `pin`, `confirm_cancel_ack`, and `reason`.
+     * @param string $booking_number Target booking identifier.
+     * @return RedirectResponse Redirects back with status feedback.
      */
     public function cancel(Request $request, string $booking_number): RedirectResponse
     {

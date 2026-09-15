@@ -177,4 +177,65 @@ class PayMongoIntegrationTest extends TestCase
             'paymongo_payment_id' => 'pay_test_webhook_paid_777',
         ]);
     }
+
+    public function test_paymongo_webhook_deduplicates_repeated_retry_events(): void
+    {
+        $batch = $this->createTestBatch();
+        $booking = $this->createTestBooking($batch, [
+            'booking_number' => 'CF-2026-DEDUP',
+            'status' => 'pending_downpayment',
+            'downpayment_amount' => 3000.00,
+        ]);
+
+        $payload = [
+            'data' => [
+                'id' => 'evt_dedup_unique_999',
+                'type' => 'event',
+                'attributes' => [
+                    'type' => 'checkout_session.payment.paid',
+                    'data' => [
+                        'id' => 'cs_dedup_session_888',
+                        'type' => 'checkout_session',
+                        'attributes' => [
+                            'amount' => 300000,
+                            'fee' => 7500,
+                            'payment_method_type' => 'gcash',
+                            'metadata' => [
+                                'booking_id' => $booking->id,
+                                'booking_number' => $booking->booking_number,
+                            ],
+                            'payments' => [
+                                [
+                                    'id' => 'pay_dedup_001',
+                                    'attributes' => [
+                                        'status' => 'paid',
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
+
+        // First delivery: processes successfully
+        $firstResponse = $this->postJson(route('paymongo.webhook.api'), $payload);
+        $firstResponse->assertStatus(200);
+        $firstResponse->assertJson(['received' => true]);
+
+        $this->assertEquals('confirmed', $booking->fresh()->status);
+        $paymentCount = Payment::where('booking_id', $booking->id)->count();
+        $this->assertEquals(1, $paymentCount);
+
+        // Second delivery (duplicate retry with same event ID): gracefully discarded
+        $secondResponse = $this->postJson(route('paymongo.webhook.api'), $payload);
+        $secondResponse->assertStatus(200);
+        $secondResponse->assertJson([
+            'received' => true,
+            'status' => 'duplicate_ignored',
+        ]);
+
+        // Assert payment count was not duplicated
+        $this->assertEquals(1, Payment::where('booking_id', $booking->id)->count());
+    }
 }

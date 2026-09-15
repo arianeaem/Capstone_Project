@@ -7,6 +7,26 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Batch Risk Assessment Model representing an evaluation of marine weather conditions for a batch day.
+ *
+ * Domain & Safety Assessment Context:
+ * - Stores aggregated multi-variable safety evaluations for Day 1 (Saturday) and Day 2 (Sunday).
+ * - Records overall classification ('Very Safe', 'Safe', 'Moderate', 'High Risk', 'Critical Risk').
+ * - Links to granular AM/PM hourly evaluations for tactical dive planning.
+ *
+ * @property int $id
+ * @property int $batch_id
+ * @property int $day_number 1 (Saturday) or 2 (Sunday)
+ * @property Carbon $dive_date
+ * @property float $lead_time_hours Forecasting horizon lead time
+ * @property string $overall_classification Very Safe, Safe, Moderate, High Risk, Critical Risk
+ * @property float $weighted_score_pct 0 to 100 risk score
+ * @property string $recommended_action Operational safety advisory for staff
+ * @property string $worst_window AM or PM
+ * @property Carbon $worst_hour Peak risk hour
+ * @property bool $override_triggered Whether manual staff override was logged
+ */
 class BatchRiskAssessment extends Model
 {
     use HasFactory;

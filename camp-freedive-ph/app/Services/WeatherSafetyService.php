@@ -4,15 +4,37 @@ namespace App\Services;
 
 use Carbon\Carbon;
 
+/**
+ * Weather Safety Evaluation & Risk Classification Service.
+ *
+ * Domain & Marine Safety Context:
+ * Provides unified safety assessments for freediving sessions in Mabini / Anilao, Batangas.
+ * Translates multi-variable meteorological forecasts (wave height, wind speed, gusts,
+ * barometric pressure drops, and current speed) into actionable 5-tier safety states:
+ * - Very Safe & Safe: Normal operations, calm seas, optimal equalizing conditions.
+ * - Moderate: Diveable with caution; sheltered coves selected.
+ * - High Risk: Heavy chop; backup safety divers assigned.
+ * - Critical Risk: Operations suspended; automatic reschedule/refund triggers activated.
+ *
+ * Forecast Horizon Limits:
+ * - 0 to 16 Days: High-resolution Open-Meteo marine and atmospheric models.
+ * - > 16 Days: Historical Batangas climate benchmarks (Amihan vs Habagat seasonal profiles).
+ */
 class WeatherSafetyService
 {
+    /**
+     * @param WeatherForecastService $forecastService Underlying Open-Meteo multi-parameter forecast provider
+     */
     public function __construct(
         protected WeatherForecastService $forecastService
     ) {}
 
     /**
-     * Evaluate dive safety conditions for a given 2D1N date range in Mabini, Batangas.
-     * Integrates live Open-Meteo marine & weather assessment models for dates within 16 days.
+     * Evaluates dive safety conditions for a 2D1N weekend date range in Mabini, Batangas.
+     *
+     * @param string|Carbon $startDate Weekend start date (Saturday)
+     * @param string|Carbon $endDate Weekend end date (Sunday)
+     * @return array Multi-attribute safety assessment including UI theme tokens, risk badges, and hourly breakdowns
      */
     public function getForecast(string|Carbon $startDate, string|Carbon $endDate): array
     {

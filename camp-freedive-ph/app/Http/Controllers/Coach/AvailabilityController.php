@@ -407,7 +407,7 @@ class AvailabilityController extends Controller
         $batch = Batch::findOrFail($request->input('batch_id'));
         $diveDate = Carbon::parse($request->input('dive_date'))->startOfDay();
 
-        // 48-Hour Cutoff Enforcement (§5.3 / PRD Q3 - 06:30 AM Base Call)
+        // 48-Hour Staffing Cutoff Enforcement: Emergency coach release locked out within 48h of 06:30 AM departure
         $diveStart = $diveDate->copy()->setTime(6, 30);
         $hoursUntilDive = Carbon::now()->diffInHours($diveStart, false);
 

@@ -10,6 +10,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
+/**
+ * Batch Model representing a discrete 2D1N Freediving Camp weekend.
+ *
+ * Business & Capacity Context:
+ * - Batches run on fixed weekend cycles (Saturday to Sunday) in Mabini, Batangas.
+ * - Maximum capacity is strictly capped at 45 participants per batch based on outrigger banca
+ *   licensing and Philippine Coast Guard safety rules.
+ * - Minimum coach staffing follows a 1:4 coach-to-diver ratio (45 divers = up to 12 coaches).
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $batch_code
+ * @property Carbon $start_date Saturday start date
+ * @property Carbon $end_date Sunday end date
+ * @property string $lifecycle_status open, closing_soon, sold_out, completed, archived
+ * @property string $risk_classification very_safe, safe, moderate, high_risk, critical_risk
+ * @property int $max_capacity Batch capacity ceiling (default 45)
+ * @property string $status confirmed, open, completed, rescheduled, cancelled_by_camp
+ */
 class Batch extends Model
 {
     use HasFactory;

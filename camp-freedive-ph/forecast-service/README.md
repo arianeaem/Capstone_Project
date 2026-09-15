@@ -58,8 +58,7 @@ FORECAST_SERVICE_URL=http://127.0.0.1:8001
 ```
 
 `ForecastService.php` calls `POST {FORECAST_SERVICE_URL}/assess-booking` once
-per window (AM, PM) - twice per day, four times per full batch assessment -
-per the PRD's Section 13.
+per window (AM: 07:00-11:00, PM: 13:00-17:00) - twice per day, four times per full 2D1N batch assessment.
 
 ## Deploying
 

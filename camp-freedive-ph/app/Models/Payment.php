@@ -8,6 +8,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Payment Model representing a monetary transaction for a dive booking.
+ *
+ * Financial Lifecycle Context:
+ * - Records downpayment receipts (₱3,000/head) and final balance settlements.
+ * - Stores PayMongo external references (`paymongo_payment_id`, `paymongo_refund_id`).
+ * - Supports partial refunds, full refunds, and no-show forfeitures according to the cancellation policy.
+ *
+ * @property int $id
+ * @property int $booking_id
+ * @property string $payment_method gcash, maya, card, bpi_bank_transfer, cash
+ * @property string $transaction_id
+ * @property string $paymongo_payment_id
+ * @property float $amount Total gross amount in PHP
+ * @property float $fee_amount Gateway processing fee
+ * @property float $net_amount Net proceeds received
+ * @property string $payment_type downpayment, balance_settlement, full
+ * @property string $status completed, paid, refund_requested, refunded, partially_refunded, forfeited, failed
+ */
 class Payment extends Model
 {
     use HasFactory;

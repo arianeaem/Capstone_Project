@@ -253,8 +253,8 @@
                                     
                                     <!-- Edit Rule -->
                                     <a href="{{ route('admin.pricing.edit', $rule) }}" 
-                                       class="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
-                                        <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-3.5 h-3.5 object-contain inline-block shrink-0">
+                                       class="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
+                                        <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
                                         <span>Edit Rule</span>
                                     </a>
 

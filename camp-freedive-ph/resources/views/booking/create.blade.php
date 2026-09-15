@@ -41,14 +41,14 @@
             <div class="text-right shrink-0">
                 <span class="text-sm text-[#6E6E73] font-semibold">Step</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000]">
-                    <span x-text="currentStep"></span> <span class="text-sm text-[#8E8E93] font-normal">/ 5</span>
+                    <span x-text="currentStep"></span> <span class="text-sm text-[#636366] font-normal">/ 5</span>
                 </div>
             </div>
         </div>
 
         <!-- Stepper Progress Bar -->
         <div class="w-full bg-[#E5E5EA] h-2.5 rounded-full overflow-hidden">
-            <div class="bg-gradient-to-r from-[#780000] to-[#00C3D0] h-full transition-all duration-300 rounded-full"
+            <div class="bg-[#780000] h-full transition-all duration-300 rounded-full"
                  :style="'width: ' + ((currentStep / 5) * 100) + '%'"></div>
         </div>
     </div>
@@ -95,8 +95,9 @@
                              tabindex="0"
                              role="radio"
                              :aria-checked="form.class_type === 'discovery'"
-                             aria-label="Discovery beginner class, 4,250 php per person"
-                             class="p-4 sm:p-5 rounded-2xl bg-white cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] focus:outline-none">
+                             aria-label="Discovery beginner class, ₱4,250 per person"
+                             class="p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
+                             :class="form.class_type === 'discovery' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                             
                             <div class="w-full flex flex-col items-center">
                                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
@@ -113,7 +114,7 @@
                             </div>
 
                             <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
-                                <span class="text-lg sm:text-xl font-black text-[#780000]">4,250 php</span>
+                                <span class="text-lg sm:text-xl font-black text-[#780000]">₱4,250</span>
                                 <span class="text-xs text-[#6E6E73]">/ person</span>
                             </div>
                         </div>
@@ -126,7 +127,8 @@
                              role="radio"
                              :aria-checked="form.class_type === 'fundive'"
                              aria-label="Fundive class, prerequisite discovery class"
-                             class="p-4 sm:p-5 rounded-2xl bg-white cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] focus:outline-none">
+                             class="p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
+                             :class="form.class_type === 'fundive' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                             
                             <div class="w-full flex flex-col items-center">
                                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
@@ -143,7 +145,7 @@
                             </div>
 
                             <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
-                                <span class="text-lg sm:text-xl font-black text-[#780000]" x-text="form.is_certified_diver ? '2,500 php' : '3,300 php'"></span>
+                                <span class="text-lg sm:text-xl font-black text-[#780000]" x-text="form.is_certified_diver ? '₱2,500' : '₱3,300'"></span>
                                 <span class="text-xs text-[#6E6E73]" x-text="form.is_certified_diver ? 'Certified Diver / person' : 'Non-Certified Diver / person'"></span>
                             </div>
                         </div>
@@ -155,8 +157,9 @@
                              tabindex="0"
                              role="radio"
                              :aria-checked="form.class_type === 'refinement'"
-                             aria-label="Skill refinement practice dive, 4,100 php per person"
-                             class="p-4 sm:p-5 rounded-2xl bg-white cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] focus:outline-none">
+                             aria-label="Skill refinement practice dive, ₱4,100 per person"
+                             class="p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
+                             :class="form.class_type === 'refinement' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                             
                             <div class="w-full flex flex-col items-center">
                                 <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
@@ -173,7 +176,7 @@
                             </div>
 
                             <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
-                                <span class="text-lg sm:text-xl font-black text-[#780000]">4,100 php</span>
+                                <span class="text-lg sm:text-xl font-black text-[#780000]">₱4,100</span>
                                 <span class="text-xs text-[#6E6E73]">/ person</span>
                             </div>
                         </div>
@@ -192,11 +195,16 @@
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1" role="radiogroup" aria-label="Fundive Experience & Certification Level">
                             <!-- Non-Certified -->
                             <label @click="form.is_certified_diver = false"
-                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white"
-                                   :class="!form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-transparent'">
+                                   @keydown.enter.prevent="form.is_certified_diver = false"
+                                   @keydown.space.prevent="form.is_certified_diver = false"
+                                   tabindex="0"
+                                   role="radio"
+                                   :aria-checked="!form.is_certified_diver"
+                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
+                                   :class="!form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                                 <div class="flex items-center gap-3">
                                     <input type="radio" name="is_certified" :value="false" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
                                     <div>
@@ -205,15 +213,20 @@
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">3,300 php</strong>
+                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">₱3,300</strong>
                                     <span class="text-xs text-[#6E6E73] block">/ person</span>
                                 </div>
                             </label>
 
                             <!-- Certified Diver -->
                             <label @click="form.is_certified_diver = true"
-                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white"
-                                   :class="form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-transparent'">
+                                   @keydown.enter.prevent="form.is_certified_diver = true"
+                                   @keydown.space.prevent="form.is_certified_diver = true"
+                                   tabindex="0"
+                                   role="radio"
+                                   :aria-checked="form.is_certified_diver"
+                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
+                                   :class="form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
                                 <div class="flex items-center gap-3">
                                     <input type="radio" name="is_certified" :value="true" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
                                     <div>
@@ -222,7 +235,7 @@
                                     </div>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">2,500 php</strong>
+                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">₱2,500</strong>
                                     <span class="text-xs text-[#6E6E73] block">/ person</span>
                                 </div>
                             </label>
@@ -317,7 +330,7 @@
                                         </div>
                                     </template>
                                     <template x-if="!form.start_date">
-                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                        <div class="text-xs sm:text-sm font-medium text-[#636366] italic py-1">
                                             Select start date below
                                         </div>
                                     </template>
@@ -338,7 +351,7 @@
                                         </div>
                                     </template>
                                     <template x-if="!form.end_date">
-                                        <div class="text-xs sm:text-sm font-medium text-[#8E8E93] italic py-1">
+                                        <div class="text-xs sm:text-sm font-medium text-[#636366] italic py-1">
                                             Next day return
                                         </div>
                                     </template>
@@ -357,14 +370,14 @@
                             <!-- First Month -->
                             <div class="space-y-4">
                                 <!-- Header for Month 1 with Prev/Next Arrows -->
-                                <div class="flex items-center justify-between h-9">
+                                <div class="flex items-center justify-between h-11">
                                     <button type="button" 
                                             @click="prevMonth()" 
                                             :disabled="!canGoPrev()"
-                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] disabled:opacity-20 disabled:cursor-not-allowed transition-all text-[#1D1D1F] shrink-0"
+                                            class="w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] active:bg-[#E5E5EA] disabled:opacity-20 disabled:cursor-not-allowed transition-all text-[#1D1D1F] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                             title="Previous Month"
                                             aria-label="Previous Month">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
+                                        <svg class="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m15 18-6-6 6-6"/></svg>
                                     </button>
 
                                     <div class="font-extrabold text-sm sm:text-base text-[#1D1D1F] text-center flex-1">
@@ -372,13 +385,13 @@
                                     </div>
 
                                     <!-- Month Navigation Controls -->
-                                    <div class="w-8 hidden md:block shrink-0"></div>
+                                    <div class="w-11 hidden md:block shrink-0"></div>
                                     <button type="button" 
                                             @click="nextMonth()" 
-                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] md:hidden shrink-0"
+                                            class="w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] active:bg-[#E5E5EA] transition-all text-[#1D1D1F] md:hidden shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                             title="Next Month"
                                             aria-label="Next Month">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                        <svg class="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
                                     </button>
                                 </div>
                                 
@@ -394,9 +407,9 @@
                                 </div>
 
                                 <!-- Month Calendar Days -->
-                                <div class="grid grid-cols-7 gap-y-1.5 sm:gap-y-2 text-center text-xs sm:text-sm">
+                                <div class="grid grid-cols-7 gap-y-1 sm:gap-y-2 text-center text-xs sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month1Year, month1Month)" :key="'m1-' + idx">
-                                        <div class="h-8 sm:h-9 flex items-center justify-center relative">
+                                        <div class="h-10 sm:h-11 flex items-center justify-center relative">
                                             <template x-if="dObj.isBlank">
                                                 <span class="w-full h-full"></span>
                                             </template>
@@ -406,11 +419,11 @@
                                                         :disabled="dObj.isDisabled"
                                                         :aria-label="dObj.dateStr + (dObj.isDisabled ? ' (Unavailable)' : '')"
                                                         :aria-pressed="dObj.dateStr === form.start_date"
-                                                        class="w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
-                                                            'text-gray-300 cursor-not-allowed': dObj.isDisabled,
+                                                            'text-[#AEAEB2] cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
                                                             'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
                                                         }"
@@ -425,8 +438,8 @@
                             <!-- Second Month (Visible on md+ screens for dual-calendar experience) -->
                             <div class="space-y-4 hidden md:block">
                                 <!-- Header for Month 2 with Next Arrow -->
-                                <div class="flex items-center justify-between h-9">
-                                    <div class="w-8 shrink-0"></div>
+                                <div class="flex items-center justify-between h-11">
+                                    <div class="w-11 shrink-0"></div>
 
                                     <div class="font-extrabold text-sm sm:text-base text-[#1D1D1F] text-center flex-1">
                                         <span x-text="getMonthName(month2Month) + ' ' + month2Year"></span>
@@ -434,10 +447,10 @@
 
                                     <button type="button" 
                                             @click="nextMonth()" 
-                                            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] transition-all text-[#1D1D1F] shrink-0"
+                                            class="w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] active:bg-[#E5E5EA] transition-all text-[#1D1D1F] shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                             title="Next Month"
                                             aria-label="Next Month">
-                                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+                                        <svg class="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
                                     </button>
                                 </div>
                                 
@@ -453,9 +466,9 @@
                                 </div>
 
                                 <!-- Month Calendar Days -->
-                                <div class="grid grid-cols-7 gap-y-1.5 sm:gap-y-2 text-center text-xs sm:text-sm">
+                                <div class="grid grid-cols-7 gap-y-1 sm:gap-y-2 text-center text-xs sm:text-sm">
                                     <template x-for="(dObj, idx) in getMonthDays(month2Year, month2Month)" :key="'m2-' + idx">
-                                        <div class="h-8 sm:h-9 flex items-center justify-center relative">
+                                        <div class="h-10 sm:h-11 flex items-center justify-center relative">
                                             <template x-if="dObj.isBlank">
                                                 <span class="w-full h-full"></span>
                                             </template>
@@ -465,11 +478,11 @@
                                                         :disabled="dObj.isDisabled"
                                                         :aria-label="dObj.dateStr + (dObj.isDisabled ? ' (Unavailable)' : '')"
                                                         :aria-pressed="dObj.dateStr === form.start_date"
-                                                        class="w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-medium text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                                        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
                                                             'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
-                                                            'text-gray-300 cursor-not-allowed': dObj.isDisabled,
+                                                            'text-[#AEAEB2] cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
                                                             'text-[#780000] font-semibold': dObj.isSunday && !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date
                                                         }"
@@ -625,7 +638,7 @@
                         <!-- Empty State: No Date Selected Yet -->
                         <template x-if="!form.start_date && !weatherLoading">
                             <div class="py-1 text-left">
-                                <p class="text-xs sm:text-sm text-[#8E8E93] italic leading-relaxed">
+                                <p class="text-xs sm:text-sm text-[#636366] italic leading-relaxed">
                                     Select dates on the calendar to view safety evaluation.
                                 </p>
                             </div>
@@ -666,7 +679,7 @@
                                         <button type="button" 
                                                 x-show="form.participants.length > 1" 
                                                 @click="removeParticipant(index)"
-                                                class="text-xs sm:text-sm font-semibold text-[#FF3B3C] hover:underline cursor-pointer">
+                                                class="text-xs sm:text-sm font-semibold text-[#D70015] hover:underline cursor-pointer">
                                             Remove
                                         </button>
                                     </div>
@@ -679,9 +692,12 @@
                                                    x-model="participant.first_name" 
                                                    @input="participant.first_name = participant.first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = (participant.first_name + ' ' + (participant.last_name || '')).trim()"
                                                    placeholder="e.g. Maria" 
+                                                   autocomplete="given-name"
+                                                   :aria-invalid="touchedStep3 && !validateName(participant.first_name)"
+                                                   :aria-describedby="'err-participant-fn-' + index"
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                                   :class="touchedStep3 && !validateName(participant.first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.first_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                                   :class="touchedStep3 && !validateName(participant.first_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                            <span :id="'err-participant-fn-' + index" x-show="touchedStep3 && !validateName(participant.first_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                                 Please enter a valid first name (letters only, min 2 chars).
                                             </span>
                                         </div>
@@ -692,9 +708,12 @@
                                                    x-model="participant.last_name" 
                                                    @input="participant.last_name = participant.last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = ((participant.first_name || '') + ' ' + participant.last_name).trim()"
                                                    placeholder="e.g. Santos" 
+                                                   autocomplete="family-name"
+                                                   :aria-invalid="touchedStep3 && !validateName(participant.last_name)"
+                                                   :aria-describedby="'err-participant-ln-' + index"
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                                   :class="touchedStep3 && !validateName(participant.last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateName(participant.last_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                                   :class="touchedStep3 && !validateName(participant.last_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                            <span :id="'err-participant-ln-' + index" x-show="touchedStep3 && !validateName(participant.last_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                                 Please enter a valid last name (letters only, min 2 chars).
                                             </span>
                                         </div>
@@ -709,11 +728,14 @@
                                                    min="8" 
                                                    max="85" 
                                                    maxlength="2"
+                                                   inputmode="numeric"
                                                    @input="if(participant.age && participant.age.toString().length > 2) participant.age = parseInt(participant.age.toString().slice(0, 2), 10)"
                                                    placeholder="e.g. 24" 
+                                                   :aria-invalid="touchedStep3 && !validateAge(participant.age)"
+                                                   :aria-describedby="'err-participant-age-' + index"
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                                   :class="touchedStep3 && !validateAge(participant.age) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                            <span x-show="touchedStep3 && !validateAge(participant.age)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                                   :class="touchedStep3 && !validateAge(participant.age) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                            <span :id="'err-participant-age-' + index" x-show="touchedStep3 && !validateAge(participant.age)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                                 Age must be between 8 and 85 years old.
                                             </span>
                                         </div>
@@ -753,9 +775,12 @@
                                        x-model="form.contact_first_name" 
                                        @input="form.contact_first_name = form.contact_first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = (form.contact_first_name + ' ' + (form.contact_last_name || '')).trim()"
                                        placeholder="Juan" 
+                                       autocomplete="given-name"
+                                       :aria-invalid="touchedStep3 && !validateName(form.contact_first_name)"
+                                       aria-describedby="err-lead-fn"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                       :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                <span id="err-lead-fn" x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                     Please enter a valid first name (min 2 chars).
                                 </span>
                             </div>
@@ -766,9 +791,12 @@
                                        x-model="form.contact_last_name" 
                                        @input="form.contact_last_name = form.contact_last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = ((form.contact_first_name || '') + ' ' + form.contact_last_name).trim()"
                                        placeholder="Dela Cruz" 
+                                       autocomplete="family-name"
+                                       :aria-invalid="touchedStep3 && !validateName(form.contact_last_name)"
+                                       aria-describedby="err-lead-ln"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                       :class="touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                <span id="err-lead-ln" x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                     Please enter a valid last name (min 2 chars).
                                 </span>
                             </div>
@@ -778,9 +806,13 @@
                                 <input type="email" 
                                        x-model="form.contact_email" 
                                        placeholder="juan@example.com" 
+                                       autocomplete="email"
+                                       inputmode="email"
+                                       :aria-invalid="touchedStep3 && !validateEmail(form.contact_email)"
+                                       aria-describedby="err-lead-email"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validateEmail(form.contact_email) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validateEmail(form.contact_email)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                       :class="touchedStep3 && !validateEmail(form.contact_email) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                <span id="err-lead-email" x-show="touchedStep3 && !validateEmail(form.contact_email)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                     Please enter a valid email address with @ (e.g. name@example.com).
                                 </span>
                             </div>
@@ -791,10 +823,14 @@
                                        x-model="form.contact_phone" 
                                        @input="form.contact_phone = form.contact_phone.replace(/[^0-9+\s-]/g, '')"
                                        placeholder="0917 123 4567" 
+                                       autocomplete="tel"
+                                       inputmode="tel"
                                        maxlength="16"
+                                       :aria-invalid="touchedStep3 && !validatePhone(form.contact_phone)"
+                                       aria-describedby="err-lead-phone"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validatePhone(form.contact_phone) ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                       :class="touchedStep3 && !validatePhone(form.contact_phone) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                <span id="err-lead-phone" x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                     Valid 11-digit PH mobile number required (e.g. 09171234567 or +639171234567).
                                 </span>
                             </div>
@@ -818,7 +854,7 @@
                                        :aria-checked="form.pickup_option === 'carpool'"
                                        @keydown.enter.prevent="form.pickup_option = 'carpool'"
                                        @keydown.space.prevent="form.pickup_option = 'carpool'"
-                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
                                        :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
@@ -836,7 +872,7 @@
                                        :aria-checked="form.pickup_option === 'own'"
                                        @keydown.enter.prevent="form.pickup_option = 'own'"
                                        @keydown.space.prevent="form.pickup_option = 'own'"
-                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
                                        :class="form.pickup_option === 'own' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
@@ -854,14 +890,16 @@
                             <div x-show="form.pickup_option === 'carpool'" x-cloak class="pt-1">
                                 <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Carpool Pickup Hub & Schedule: <span class="text-[#780000]">*</span></label>
                                 <select x-model="form.pickup_location" 
+                                        :aria-invalid="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location"
+                                        aria-describedby="err-carpool-hub"
                                         class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#780000]"
-                                        :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#FF3B3C] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                        :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                     <option value="" disabled selected>-- Select Carpool Pickup Hub & Schedule --</option>
                                     <template x-for="p in pickupPoints" :key="p.id">
                                         <option :value="p.name" x-text="p.name"></option>
                                     </template>
                                 </select>
-                                <span x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-xs text-[#FF3B3C] font-semibold mt-1 block">
+                                <span id="err-carpool-hub" x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                     Please select your preferred Carpool Pickup Hub to continue.
                                 </span>
                             </div>
@@ -874,8 +912,8 @@
                                    :aria-checked="form.boat_dive"
                                    @keydown.enter.prevent="form.boat_dive = !form.boat_dive"
                                    @keydown.space.prevent="form.boat_dive = !form.boat_dive"
-                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0]"
-                                   :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white'">
+                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0] focus-visible:ring-offset-2"
+                                   :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                 <div class="flex items-start gap-2.5 min-w-0">
                                     <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#00C3D0] focus:ring-[#00C3D0] mt-0.5 shrink-0 cursor-pointer">
                                     <div class="min-w-0">
@@ -899,14 +937,14 @@
                                    :aria-checked="form.confirmation_ack"
                                    @keydown.enter.prevent="form.confirmation_ack = !form.confirmation_ack"
                                    @keydown.space.prevent="form.confirmation_ack = !form.confirmation_ack"
-                                   class="flex items-start gap-2.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] rounded-lg">
+                                   class="flex items-start gap-2.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 rounded-lg">
                                 <input type="checkbox" x-model="form.confirmation_ack" class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0 cursor-pointer">
                                 <span class="font-bold text-[#780000] text-xs sm:text-sm leading-relaxed">
                                     <span x-show="form.class_type === 'fundive' || form.class_type === 'refinement'">
-                                        I confirm that I have completed Discovery Class and that all information provided is accurate. <span class="text-red-500">*</span>
+                                        I confirm that I have completed Discovery Class and that all information provided is accurate. <span class="text-[#D70015]">*</span>
                                     </span>
                                     <span x-show="form.class_type === 'discovery'">
-                                        I confirm that all information provided is accurate. <span class="text-red-500">*</span>
+                                        I confirm that all information provided is accurate. <span class="text-[#D70015]">*</span>
                                     </span>
                                 </span>
                             </label>
@@ -976,15 +1014,15 @@
                             <div class="p-3 sm:p-3.5 rounded-xl bg-[#D1FAE5] flex justify-between items-center gap-2">
                                 <div class="min-w-0">
                                     <span class="font-extrabold text-[#065F46] block text-xs sm:text-sm leading-tight">Downpayment Due Now</span>
-                                    <span class="text-[11px] sm:text-xs text-[#065F46]/80 font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '3,000' : '2,000') + ' php / head)'"></span>
+                                    <span class="text-[11px] sm:text-xs text-[#065F46]/80 font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head)'"></span>
                                 </div>
                                 <span class="text-base sm:text-lg font-black text-[#065F46] shrink-0 text-right" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
                             </div>
 
                             <!-- Balance Box -->
-                            <div class="p-2.5 sm:p-3 rounded-xl bg-[#FDE68A] flex justify-between items-center gap-2 text-[#92400E]">
-                                <span class="font-semibold text-xs sm:text-sm">Remaining Balance at Camp</span>
-                                <span class="font-bold text-xs sm:text-sm shrink-0 text-right" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                            <div class="p-2.5 sm:p-3 rounded-xl bg-[#F2F2F7] flex justify-between items-center gap-2 text-[#1D1D1F]">
+                                <span class="font-medium text-xs sm:text-sm text-[#6E6E73]">Remaining Balance (at Camp)</span>
+                                <span class="font-bold text-xs sm:text-sm shrink-0 text-right text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
                             </div>
                         </div>
                     </div>
@@ -996,83 +1034,33 @@
         <!-- Step 4: Downpayment -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
-            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-8 shadow-2xs">
+            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-8 shadow-2xs space-y-6">
                 <!-- Top Navigation & Header -->
-                <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between gap-3">
                     <button type="button" 
                             @click="prevStep()" 
-                            class="text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 transition-colors cursor-pointer">
-                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            class="min-h-[44px] -ml-2 px-2.5 py-2 rounded-xl text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] inline-flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                         <span>Back to Booking Details</span>
                     </button>
-                    <div class="text-right">
-                        <span class="text-xs font-bold uppercase tracking-wider text-[#FF3B3C] block">Slot Hold Timer</span>
-                        <span class="text-sm sm:text-base font-mono font-black text-[#FF3B3C]" x-text="timerDisplay"></span>
+                    <div class="text-right shrink-0" role="timer" aria-label="Slot hold countdown timer">
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#D70015] block">Slot Hold Timer</span>
+                        <span class="text-sm sm:text-base font-mono font-black text-[#D70015]" x-text="timerDisplay" aria-live="off"></span>
                     </div>
                 </div>
 
-                <!-- 1. Cancellation and Reschedule Policy (First on Step 4) -->
-                <div class="space-y-3">
+                <!-- 1. Downpayment Breakdown & Summary Card (Primary Information First) -->
+                <div class="space-y-3 pt-1">
                     <div>
-                        <h3 class="text-base font-extrabold text-[#1D1D1F]">
-                            Cancellation & Reschedule Policy
+                        <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">
+                            Reservation Breakdown
                         </h3>
                         <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
-                            Please review our reservation policies before completing your downpayment.
+                            Review your trip summary and required downpayment to secure your slots.
                         </p>
                     </div>
 
-                    <div class="space-y-2.5 text-sm text-[#6E6E73]">
-                        <!-- Tier 1: > 14 Days -->
-                        <div class="rounded-xl space-y-1">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given > 14 Days</strong>
-                                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                                    100% Refund or 1 Free Reschedule
-                                </span>
-                            </div>
-                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
-                                Eligible for full downpayment refund or one free date transfer to any future open schedule.
-                            </p>
-                        </div>
-
-                        <!-- Tier 2: 7 to 14 Days -->
-                        <div class="rounded-xl space-y-1">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given 7 to 14 Days</strong>
-                                <span class="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md">
-                                    1 Free Date Reschedule
-                                </span>
-                            </div>
-                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
-                                Free date reschedule to another available schedule. Downpayment is non-refundable.
-                            </p>
-                        </div>
-
-                        <!-- Tier 3: < 7 Days (Locked) -->
-                        <div class="rounded-xl space-y-1">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days</strong>
-                                <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-md">
-                                    Non-Refundable
-                                </span>
-                            </div>
-                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
-                                Slots and resort/boat allocations are finalized. Cannot be refunded or rescheduled.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Downpayment Breakdown & Summary Card -->
-                <div class="space-y-3 pt-2 border-t border-[#F2F2F7]">
-                    <div>
-                        <h3 class="text-base font-extrabold text-[#1D1D1F]">
-                            Reservation Breakdown
-                        </h3>
-                    </div>
-
-                    <div class="rounded-2xl space-y-3">
+                    <div class="rounded-2xl bg-[#F2F2F7] p-4 sm:p-5 space-y-3">
                         <div class="flex justify-between items-center text-sm text-[#6E6E73]">
                             <span>Package</span>
                             <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type + ' (' + form.participants.length + ' pax)'"></strong>
@@ -1091,7 +1079,7 @@
                         </div>
 
                         <!-- Downpayment Highlight -->
-                        <div class="pt-3 border-t border-[#E5E5EA] flex justify-between items-center">
+                        <div class="pt-3 border-t border-[#E5E5EA]/60 flex justify-between items-center gap-2">
                             <div>
                                 <span class="font-bold text-[#065F46] text-sm block">Downpayment Due Now:</span>
                                 <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
@@ -1101,48 +1089,114 @@
                     </div>
                 </div>
 
+                <!-- 2. Cancellation and Reschedule Policy (Secondary Policy Context) -->
+                <div class="space-y-3 pt-2 border-t border-[#F2F2F7]">
+                    <div>
+                        <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">
+                            Cancellation & Reschedule Policy
+                        </h3>
+                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
+                            Transparent booking policies for date transfers and cancellations.
+                        </p>
+                    </div>
+
+                    <div class="space-y-2 text-xs sm:text-sm text-[#6E6E73]">
+                        <!-- Tier 1: > 14 Days -->
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7]/60 space-y-0.5">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given > 14 Days</strong>
+                                <span class="text-[11px] sm:text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md">
+                                    100% Refund or 1 Free Reschedule
+                                </span>
+                            </div>
+                            <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                Eligible for full downpayment refund or one free date transfer to any future open schedule.
+                            </p>
+                        </div>
+
+                        <!-- Tier 2: 7 to 14 Days -->
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7]/60 space-y-0.5">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given 7 to 14 Days</strong>
+                                <span class="text-[11px] sm:text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md">
+                                    1 Free Date Reschedule
+                                </span>
+                            </div>
+                            <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                Free date reschedule to another available schedule. Downpayment is non-refundable.
+                            </p>
+                        </div>
+
+                        <!-- Tier 3: < 7 Days (Locked) -->
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7]/60 space-y-0.5">
+                            <div class="flex items-center justify-between gap-2 flex-wrap">
+                                <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days</strong>
+                                <span class="text-[11px] sm:text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-md">
+                                    Non-Refundable
+                                </span>
+                            </div>
+                            <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                Slots and resort/boat allocations are finalized. Cannot be refunded or rescheduled.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 3. Supported Hosted Payment Channels -->
-                <div class="space-y-2.5 pt-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">
+                <div class="space-y-2.5 pt-2 border-t border-[#F2F2F7]">
+                    <span class="text-xs font-bold uppercase tracking-wider text-[#636366] block">
                         Accepted on PayMongo Hosted Checkout:
                     </span>
 
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5">
+                    <div class="grid grid-cols-3 gap-2 text-center" role="group" aria-label="Supported Payment Channels">
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5 select-none">
                             <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">QR Ph</span>
-                            <span class="text-xs text-[#8E8E93] block">All PH Banks</span>
+                            <span class="text-[11px] text-[#636366] block">All PH Banks</span>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5">
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5 select-none">
                             <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">GCash</span>
-                            <span class="text-xs text-[#8E8E93] block">E-Wallet</span>
+                            <span class="text-[11px] text-[#636366] block">E-Wallet</span>
                         </div>
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5">
+                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5 select-none">
                             <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">Maya & Cards</span>
-                            <span class="text-xs text-[#8E8E93] block">Visa / Master</span>
+                            <span class="text-[11px] text-[#636366] block">Visa / Master</span>
                         </div>
                     </div>
 
-                    <p class="text-xs text-[#6E6E73] text-center pt-1">
+                    <p class="text-xs text-[#6E6E73] text-center pt-0.5">
                         You will be redirected to PayMongo's secure hosted checkout page to complete your payment.
                     </p>
                 </div>
 
                 <!-- 4. Explicit Consent & Hosted Checkout Action Button -->
-                <div class="space-y-4 pt-2">
+                <div class="space-y-4 pt-2 border-t border-[#F2F2F7]">
                     <div class="p-3.5 rounded-xl bg-[#F2F2F7] transition-all"
-                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border border-[#FF3B3C] bg-red-50/20' : ''">
-                        <label class="flex items-start gap-2.5 cursor-pointer select-none">
+                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border border-[#D70015] bg-red-50/20' : ''">
+                        <label tabindex="0"
+                               role="checkbox"
+                               :aria-checked="form.hasAgreedToTerms"
+                               :aria-invalid="touchedStep4 && !form.hasAgreedToTerms"
+                               aria-describedby="err-terms-agreement"
+                               @keydown.enter.prevent="form.hasAgreedToTerms = !form.hasAgreedToTerms"
+                               @keydown.space.prevent="form.hasAgreedToTerms = !form.hasAgreedToTerms"
+                               class="flex items-start gap-2.5 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 rounded-lg">
                             <input type="checkbox" 
                                    x-model="form.hasAgreedToTerms" 
                                    class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
                             <span class="text-xs sm:text-sm text-[#1D1D1F] leading-relaxed">
                                 I have read and agree to the 
-                                <a href="{{ route('legal.terms') }}" target="_blank" class="text-[#780000] font-bold underline hover:text-[#500000]">Terms &amp; Conditions</a>, 
-                                <a href="{{ route('legal.privacy') }}" target="_blank" class="text-[#780000] font-bold underline hover:text-[#500000]">Privacy Policy</a>, 
-                                and Cancellation Policy. <span class="text-[#780000]">*</span>
+                                <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener noreferrer" @click.stop aria-label="Terms and Conditions (opens in a new tab)" class="text-[#780000] font-bold underline hover:text-[#500000] inline-flex items-center gap-1">
+                                    <span>Terms &amp; Conditions</span>
+                                    <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                                </a>, 
+                                <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener noreferrer" @click.stop aria-label="Privacy Policy (opens in a new tab)" class="text-[#780000] font-bold underline hover:text-[#500000] inline-flex items-center gap-1">
+                                    <span>Privacy Policy</span>
+                                    <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                                </a>, 
+                                and Cancellation Policy. <span class="text-[#D70015]">*</span>
                             </span>
                         </label>
-                        <span x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#FF3B3C] font-semibold mt-1.5 block">
+                        <span id="err-terms-agreement" x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#D70015] font-semibold mt-1.5 block">
                             Please check the box above to accept the terms before proceeding to payment.
                         </span>
                     </div>
@@ -1150,8 +1204,9 @@
                     <button type="button" 
                             @click="if (!form.hasAgreedToTerms) { touchedStep4 = true; errorMessage = 'Please read and agree to the Terms & Conditions and Privacy Policy to proceed.'; window.scrollTo({ top: 0, behavior: 'smooth' }); return; } processPayment(false, true)" 
                             :disabled="submittingPayment || !form.hasAgreedToTerms"
-                            class="btn-primary w-full py-3.5 px-6 text-base font-bold shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                            class="btn-primary w-full py-3.5 px-6 text-base font-extrabold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
                         <span x-show="!submittingPayment" class="flex items-center gap-2">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                             <span>Proceed to PayMongo Hosted Checkout</span>
                         </span>
                         <span x-show="submittingPayment" class="flex items-center gap-2">
@@ -1160,8 +1215,8 @@
                         </span>
                     </button>
 
-                    <div class="text-center text-xs text-[#6E6E73] leading-relaxed">
-                        <span>Your payment is safely processed by PayMongo using bank-grade encryption. We never see or store your card or wallet details.</span>
+                    <div class="text-center text-xs text-[#6E6E73] leading-relaxed flex items-center justify-center gap-1.5 pt-1">
+                        <span>Encrypted &amp; securely processed by PayMongo. We never store card or wallet details.</span>
                     </div>
                 </div>
 
@@ -1200,7 +1255,9 @@
                 <div class="pt-2">
                     <button type="button" 
                             @click="copyCredentials()" 
-                            class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] px-4 py-2 text-sm font-bold shadow-2xs">
+                            class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] px-4 py-2.5 text-sm font-bold shadow-2xs inline-flex items-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                        <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-5 h-5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copied">
+                        <svg x-show="copied" x-cloak class="w-5 h-5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                         <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
                     </button>
                 </div>

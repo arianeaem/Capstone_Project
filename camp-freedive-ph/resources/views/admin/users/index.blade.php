@@ -285,8 +285,8 @@
                                         
                                         <!-- Edit Account -->
                                         <a href="{{ route('admin.users.edit', $user) }}" 
-                                           class="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
-                                            <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-3.5 h-3.5 object-contain inline-block shrink-0">
+                                           class="w-full flex items-center gap-2.5 px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-lg transition-colors">
+                                            <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
                                             <span>Edit Profile</span>
                                         </a>
 
@@ -452,8 +452,8 @@
                                 @click="copyToClipboard('{{ addslashes($creds['email']) }}', 'email')" 
                                 class="btn-secondary px-3 py-2 text-sm font-bold whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
                             <span x-text="copiedEmail ? 'Copied!' : 'Copy'"></span>
-                            <svg x-show="!copiedEmail" class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                            <svg x-show="copiedEmail" class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copiedEmail">
+                            <svg x-show="copiedEmail" class="w-4.5 h-4.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                         </button>
                     </div>
                 </div>
@@ -477,8 +477,8 @@
                                 @click="copyToClipboard('{{ addslashes($creds['temp_password']) }}', 'password')" 
                                 class="btn-secondary px-3 py-2 text-sm font-bold whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
                             <span x-text="copiedPassword ? 'Copied!' : 'Copy'"></span>
-                            <svg x-show="!copiedPassword" class="w-3.5 h-3.5 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                            <svg x-show="copiedPassword" class="w-3.5 h-3.5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copiedPassword">
+                            <svg x-show="copiedPassword" class="w-4.5 h-4.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                         </button>
                     </div>
                 </div>
@@ -505,9 +505,9 @@
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-[#E5E5EA]">
                 <button type="button" 
                         @click="copyToClipboard({{ json_encode($fullDetails) }}, 'all')" 
-                        class="w-full sm:w-auto btn-primary px-4 py-2 text-sm font-bold flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" x-show="!copiedAll"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" x-show="copiedAll" x-cloak><polyline points="20 6 9 17 4 12"/></svg>
+                        class="w-full sm:w-auto btn-primary px-4 py-2.5 text-sm font-bold flex items-center justify-center gap-2 shadow-2xs cursor-pointer">
+                    <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-5 h-5 object-contain brightness-0 invert shrink-0" alt="" aria-hidden="true" x-show="!copiedAll">
+                    <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" x-show="copiedAll" x-cloak><polyline points="20 6 9 17 4 12"/></svg>
                     <span x-text="copiedAll ? 'All Credentials Copied!' : 'Copy Complete Login Details'"></span>
                 </button>
 

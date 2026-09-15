@@ -29,3 +29,14 @@ Schedule::command('weather:assess-batches')
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/weather_schedule.log'));
 
+/**
+ * Automated Nightly Forecast Accuracy Archive & Verification
+ * Runs daily at 00:05 to compare multi-horizon predictions against realized ocean observations.
+ */
+Schedule::command('forecast:archive-accuracy')
+    ->dailyAt('00:05')
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->appendOutputTo(storage_path('logs/forecast_accuracy.log'));
+
+

@@ -8,6 +8,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * Pricing Rule Model representing dynamic yield management rules.
+ *
+ * Revenue & Seasonal Economics Context:
+ * - Governs automatic price adjustments based on Batangas dive seasons (Amihan peak dry season vs Habagat monsoon),
+ *   demand surges (occupancy percentage), and booking lead time.
+ * - Enforces adjustment caps (clamped between -30% discount and +30% surge) to preserve customer fairness.
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $rule_type demand, seasonality, lead_time
+ * @property string $condition_operator ==, !=, >, <, >=, <=
+ * @property string $condition_value
+ * @property string $applies_to all, discovery, fundive, refinement
+ * @property string $adjustment_type increase, decrease
+ * @property string $adjustment_method percentage, fixed
+ * @property float $adjustment_value
+ * @property int $priority Execution priority ordering
+ * @property string $status active, inactive
+ */
 class PricingRule extends Model
 {
     use HasFactory, SoftDeletes;

@@ -1,13 +1,13 @@
 """
-Tiny FastAPI wrapper around assess_booking().
+FastAPI Microservice wrapper around assess_booking().
 
 Run locally:
     uvicorn app.main:app --reload --port 8001
 
-Laravel's ForecastService calls:
+Laravel's WeatherForecastService calls:
     POST http://<this-service>/assess-booking
 
-...once per window (AM window, PM window) per day, per the PRD.
+Evaluates dive safety windows (AM window: 07:00-11:00, PM window: 13:00-17:00) per batch day.
 """
 
 from typing import Optional

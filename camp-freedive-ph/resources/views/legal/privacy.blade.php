@@ -4,12 +4,27 @@
 @section('meta_description', 'Learn how Camp FreedivePH protects and manages your personal data in compliance with the Philippine Data Privacy Act of 2012 (RA 10173).')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-sm text-[#1D1D1F] leading-relaxed">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-sm text-[#1D1D1F] leading-relaxed relative"
+     x-data="{
+         showBackToTop: false,
+         scrollToSection(id) {
+             const target = document.getElementById(id);
+             if (target) {
+                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                 try { history.pushState(null, '', '#' + id); } catch(e) {}
+             }
+         },
+         scrollToTop() {
+             window.scrollTo({ top: 0, behavior: 'smooth' });
+             try { history.pushState(null, '', window.location.pathname); } catch(e) {}
+         }
+     }"
+     @scroll.window="showBackToTop = (window.pageYOffset > 400)">
 
     <!-- Legal Header -->
     <header class="space-y-4 pb-8 border-b border-[#E5E5EA]">
-        <div class="flex items-center gap-2 text-xs font-semibold text-[#6E6E73] uppercase tracking-wider">
-            <a href="{{ route('landing') }}" class="hover:text-[#1D1D1F] transition-colors">Home</a>
+        <div class="flex items-center gap-2 text-xs font-semibold text-[#636366] uppercase tracking-wider">
+            <a href="{{ route('landing') }}" class="min-h-[44px] inline-flex items-center hover:text-[#1D1D1F] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] rounded-md">Home</a>
             <span>/</span>
             <span>Legal</span>
         </div>
@@ -18,45 +33,90 @@
             Camp FreedivePH Privacy Policy
         </h1>
 
-        <p class="text-xs sm:text-sm text-[#6E6E73]">
-            <span>Effective as of September 13, 2026</span><br>
-            <span>Mabini, Batangas, Philippines</span>
+        <p class="text-xs sm:text-sm text-[#636366]">
+            Effective as of September 13, 2026
         </p>
 
         <!-- Document Switcher -->
-        <nav class="flex items-center gap-4 pt-2 text-sm" aria-label="Legal documents">
-            <a href="{{ route('legal.terms') }}" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors pb-1">
-                Terms and Conditions
-            </a>
-            <span class="font-bold text-[#1D1D1F] border-b-2 border-[#1D1D1F] pb-1">Privacy Policy</span>
+        <nav class="pt-2" aria-label="Legal documents">
+            <div class="inline-flex p-1 bg-[#F2F2F7] rounded-xl text-sm font-semibold">
+                <a href="{{ route('legal.terms') }}" 
+                   class="min-h-[44px] px-4 py-2 inline-flex items-center text-[#636366] hover:text-[#1D1D1F] transition-colors rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    Terms &amp; Conditions
+                </a>
+                <span class="px-4 py-2 bg-white text-[#1D1D1F] rounded-lg shadow-2xs">Privacy Policy</span>
+            </div>
         </nav>
     </header>
 
-    <!-- Table of Contents (Spotify Style) -->
-    <nav class="my-10 p-6 sm:p-8 bg-[#F8F9FA] rounded-xl space-y-3 border border-[#E5E5EA]" 
-         aria-label="Table of Contents"
-         x-data="{
-             scrollToSection(id) {
-                 const target = document.getElementById(id);
-                 if (target) {
-                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                     try {
-                         history.pushState(null, '', '#' + id);
-                     } catch(e) {}
-                 }
-             }
-         }">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-[#6E6E73]">Table of Contents</h2>
-        <ol class="space-y-2 text-sm text-[#1D1D1F] list-decimal list-inside">
-            <li><a href="#introduction" @click.prevent="scrollToSection('introduction')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Introduction</a></li>
-            <li><a href="#personal-data-collected" @click.prevent="scrollToSection('personal-data-collected')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Personal Data We Collect</a></li>
-            <li><a href="#how-we-use-data" @click.prevent="scrollToSection('how-we-use-data')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">How We Use Your Personal Data</a></li>
-            <li><a href="#payment-security" @click.prevent="scrollToSection('payment-security')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Payment Security and PayMongo Integration</a></li>
-            <li><a href="#third-party-sharing" @click.prevent="scrollToSection('third-party-sharing')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Sharing with Resort Partners and Authorities</a></li>
-            <li><a href="#cookies-storage" @click.prevent="scrollToSection('cookies-storage')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Cookies and Local Storage Technologies</a></li>
-            <li><a href="#data-retention-security" @click.prevent="scrollToSection('data-retention-security')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Data Retention and Security Safeguards</a></li>
-            <li><a href="#data-subject-rights" @click.prevent="scrollToSection('data-subject-rights')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Your Data Privacy Rights (RA 10173)</a></li>
-            <li><a href="#contact" @click.prevent="scrollToSection('contact')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Contact Us</a></li>
+    <!-- Table of Contents -->
+    <nav class="my-8 p-5 sm:p-6 bg-[#F2F2F7] rounded-2xl space-y-3" 
+         aria-label="Table of Contents">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-[#636366] px-1">Table of Contents</h2>
+        <ol class="space-y-1 text-sm text-[#1D1D1F]">
+            <li>
+                <a href="#introduction" @click.prevent="scrollToSection('introduction')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>1. Introduction</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#personal-data-collected" @click.prevent="scrollToSection('personal-data-collected')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>2. Personal Data We Collect</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#how-we-use-data" @click.prevent="scrollToSection('how-we-use-data')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>3. How We Use Your Personal Data</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#payment-security" @click.prevent="scrollToSection('payment-security')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>4. Payment Security and PayMongo Integration</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#third-party-sharing" @click.prevent="scrollToSection('third-party-sharing')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>5. Sharing with Resort Partners and Authorities</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#cookies-storage" @click.prevent="scrollToSection('cookies-storage')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>6. Cookies and Local Storage Technologies</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#data-retention-security" @click.prevent="scrollToSection('data-retention-security')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>7. Data Retention and Security Safeguards</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#data-subject-rights" @click.prevent="scrollToSection('data-subject-rights')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>8. Your Data Privacy Rights (RA 10173)</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#contact" @click.prevent="scrollToSection('contact')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>9. Contact Us</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
         </ol>
     </nav>
 
@@ -189,11 +249,17 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-sm">
                     <div>
                         <span class="text-[#6E6E73] font-medium">Facebook:</span>
-                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000]">@Campfreediveph</a>
+                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000] inline-flex items-center gap-1.5">
+                            <span>@Campfreediveph</span>
+                            <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                        </a>
                     </div>
                     <div>
                         <span class="text-[#6E6E73] font-medium">Instagram:</span>
-                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000]">@campfreediveph</a>
+                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000] inline-flex items-center gap-1.5">
+                            <span>@campfreediveph</span>
+                            <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                        </a>
                     </div>
                     <div>
                         <span class="text-[#6E6E73] font-medium">Email:</span>
@@ -208,5 +274,22 @@
         </section>
 
     </div>
+
+    <!-- Floating Back to Top Button -->
+    <button type="button"
+            x-show="showBackToTop"
+            x-cloak
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-3 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+            x-transition:leave-end="opacity-0 translate-y-3 scale-95"
+            @click="scrollToTop()"
+            aria-label="Back to top"
+            class="fixed bottom-6 right-6 z-40 p-2.5 sm:px-3.5 sm:py-2 rounded-2xl bg-white/90 hover:bg-white text-[#1D1D1F] shadow-lg backdrop-blur-md border border-[#E5E5EA]/80 flex items-center gap-2 cursor-pointer transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+        <img src="{{ asset('icons/icons8-up-squared-60.png') }}" class="w-5 h-5 object-contain" alt="" aria-hidden="true">
+        <span class="text-xs font-bold hidden sm:inline">Back to top</span>
+    </button>
 </div>
 @endsection

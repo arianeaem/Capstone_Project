@@ -4,12 +4,27 @@
 @section('meta_description', 'Read Camp FreedivePH terms and conditions, water safety policies, cancellation rules, and camp guidelines in Mabini, Batangas.')
 
 @section('content')
-<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-sm text-[#1D1D1F] leading-relaxed">
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20 text-sm text-[#1D1D1F] leading-relaxed relative"
+     x-data="{
+         showBackToTop: false,
+         scrollToSection(id) {
+             const target = document.getElementById(id);
+             if (target) {
+                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                 try { history.pushState(null, '', '#' + id); } catch(e) {}
+             }
+         },
+         scrollToTop() {
+             window.scrollTo({ top: 0, behavior: 'smooth' });
+             try { history.pushState(null, '', window.location.pathname); } catch(e) {}
+         }
+     }"
+     @scroll.window="showBackToTop = (window.pageYOffset > 400)">
 
     <!-- Legal Header -->
     <header class="space-y-4 pb-8 border-b border-[#E5E5EA]">
-        <div class="flex items-center gap-2 text-xs font-semibold text-[#6E6E73] uppercase tracking-wider">
-            <a href="{{ route('landing') }}" class="hover:text-[#1D1D1F] transition-colors">Home</a>
+        <div class="flex items-center gap-2 text-xs font-semibold text-[#636366] uppercase tracking-wider">
+            <a href="{{ route('landing') }}" class="min-h-[44px] inline-flex items-center hover:text-[#1D1D1F] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] rounded-md">Home</a>
             <span>/</span>
             <span>Legal</span>
         </div>
@@ -18,44 +33,83 @@
             Camp FreedivePH Terms and Conditions of Service
         </h1>
 
-        <p class="text-xs sm:text-sm text-[#6E6E73]">
-            <span>Effective as of September 13, 2026</span><br>
-            <span>Mabini, Batangas, Philippines</span>
+        <p class="text-xs sm:text-sm text-[#636366]">
+            Effective as of September 13, 2026
         </p>
 
         <!-- Document Switcher -->
-        <nav class="flex items-center gap-4 pt-2 text-sm" aria-label="Legal documents">
-            <span class="font-bold text-[#1D1D1F] border-b-2 border-[#1D1D1F] pb-1">Terms and Conditions</span>
-            <a href="{{ route('legal.privacy') }}" class="text-[#6E6E73] hover:text-[#1D1D1F] transition-colors pb-1">
-                Privacy Policy
-            </a>
+        <nav class="pt-2" aria-label="Legal documents">
+            <div class="inline-flex p-1 bg-[#F2F2F7] rounded-xl text-sm font-semibold">
+                <span class="px-4 py-2 bg-white text-[#1D1D1F] rounded-lg shadow-2xs">Terms &amp; Conditions</span>
+                <a href="{{ route('legal.privacy') }}" 
+                   class="min-h-[44px] px-4 py-2 inline-flex items-center text-[#636366] hover:text-[#1D1D1F] transition-colors rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    Privacy Policy
+                </a>
+            </div>
         </nav>
     </header>
 
-    <!-- Table of Contents (Spotify Style) -->
-    <nav class="my-10 p-6 sm:p-8 bg-[#F8F9FA] rounded-xl space-y-3 border border-[#E5E5EA]" 
-         aria-label="Table of Contents"
-         x-data="{
-             scrollToSection(id) {
-                 const target = document.getElementById(id);
-                 if (target) {
-                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                     try {
-                         history.pushState(null, '', '#' + id);
-                     } catch(e) {}
-                 }
-             }
-         }">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-[#6E6E73]">Table of Contents</h2>
-        <ol class="space-y-2 text-sm text-[#1D1D1F] list-decimal list-inside">
-            <li><a href="#introduction" @click.prevent="scrollToSection('introduction')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Introduction and Scope</a></li>
-            <li><a href="#water-safety" @click.prevent="scrollToSection('water-safety')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Water Safety, Eligibility and Health Disclosures</a></li>
-            <li><a href="#downpayment-pricing" @click.prevent="scrollToSection('downpayment-pricing')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Downpayments, Dynamic Pricing and Payment Terms</a></li>
-            <li><a href="#cancellation-policy" @click.prevent="scrollToSection('cancellation-policy')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">14-Day Cancellation and Reschedule Policy</a></li>
-            <li><a href="#weather-safety" @click.prevent="scrollToSection('weather-safety')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Weather Safety and Force Majeure</a></li>
-            <li><a href="#ocean-conservation" @click.prevent="scrollToSection('ocean-conservation')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Marine Sanctuary and Ocean Conservation</a></li>
-            <li><a href="#liability-waiver" @click.prevent="scrollToSection('liability-waiver')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Assumption of Risk and Liability Waiver</a></li>
-            <li><a href="#contact" @click.prevent="scrollToSection('contact')" class="text-[#1D1D1F] hover:text-[#780000] hover:underline transition-colors font-medium">Contact Us</a></li>
+    <!-- Table of Contents -->
+    <nav class="my-8 p-5 sm:p-6 bg-[#F2F2F7] rounded-2xl space-y-3" 
+         aria-label="Table of Contents">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-[#636366] px-1">Table of Contents</h2>
+        <ol class="space-y-1 text-sm text-[#1D1D1F]">
+            <li>
+                <a href="#introduction" @click.prevent="scrollToSection('introduction')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>1. Introduction and Scope</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#water-safety" @click.prevent="scrollToSection('water-safety')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>2. Water Safety, Eligibility and Health Disclosures</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#downpayment-pricing" @click.prevent="scrollToSection('downpayment-pricing')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>3. Downpayments, Dynamic Pricing and Payment Terms</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#cancellation-policy" @click.prevent="scrollToSection('cancellation-policy')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>4. 14-Day Cancellation and Reschedule Policy</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#weather-safety" @click.prevent="scrollToSection('weather-safety')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>5. Weather Safety and Force Majeure</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#ocean-conservation" @click.prevent="scrollToSection('ocean-conservation')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>6. Marine Sanctuary and Ocean Conservation</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#liability-waiver" @click.prevent="scrollToSection('liability-waiver')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>7. Assumption of Risk and Liability Waiver</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
+            <li>
+                <a href="#contact" @click.prevent="scrollToSection('contact')" 
+                   class="min-h-[44px] px-3.5 py-2.5 rounded-xl hover:bg-white/80 transition-all font-medium flex items-center justify-between group focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <span>8. Contact Us</span>
+                    <img src="{{ asset('icons/icons8-arrow-right-50.png') }}" class="w-4 h-4 object-contain opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0" alt="" aria-hidden="true">
+                </a>
+            </li>
         </ol>
     </nav>
 
@@ -111,29 +165,50 @@
         </section>
 
         <!-- 4. Cancellation & Reschedule -->
-        <section id="cancellation-policy" class="scroll-mt-24 sm:scroll-mt-28 space-y-3 pt-6 border-t border-[#E5E5EA]">
+        <section id="cancellation-policy" class="scroll-mt-24 sm:scroll-mt-28 space-y-4 pt-6 border-t border-[#E5E5EA]">
             <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F] tracking-tight">
                 4. 14-Day Cancellation and Reschedule Policy
             </h2>
             <p>
                 We enforce a structured 14-day policy to accommodate hotel room allocations and coach scheduling:
             </p>
-            <div class="space-y-4 pt-2">
-                <div>
-                    <h3 class="font-bold text-[#1D1D1F]">More than 14 Days Before Dive Date:</h3>
-                    <p class="text-[#3A3A3C]">
+
+            <div class="space-y-3 pt-1">
+                <!-- Tier 1: > 14 Days -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-[#F2F2F7] space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-extrabold text-[#1D1D1F] text-base">More than 14 Days Before Dive Date</h3>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+                            100% Refund or Free Reschedule
+                        </span>
+                    </div>
+                    <p class="text-sm text-[#3A3A3C]">
                         You are eligible for a <strong>100% full downpayment refund</strong> processed within 3 to 5 banking days, or a <strong>free reschedule</strong> to any available future batch date within 6 months.
                     </p>
                 </div>
-                <div>
-                    <h3 class="font-bold text-[#1D1D1F]">Within 7 to 14 Days Before Dive Date:</h3>
-                    <p class="text-[#3A3A3C]">
+
+                <!-- Tier 2: 7 - 14 Days -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-[#F2F2F7] space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-extrabold text-[#1D1D1F] text-base">Within 7 to 14 Days Before Dive Date</h3>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
+                            Free Reschedule Only
+                        </span>
+                    </div>
+                    <p class="text-sm text-[#3A3A3C]">
                         You may request a <strong>free reschedule</strong> to another open batch date. Downpayments are preserved but non-refundable at this stage.
                     </p>
                 </div>
-                <div>
-                    <h3 class="font-bold text-[#1D1D1F]">Within 7 Days Before Dive Date:</h3>
-                    <p class="text-[#3A3A3C]">
+
+                <!-- Tier 3: < 7 Days -->
+                <div class="p-4 sm:p-5 rounded-2xl bg-[#F8EAEA] space-y-2">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <h3 class="font-extrabold text-[#780000] text-base">Within 7 Days Before Dive Date</h3>
+                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#D70015] text-white">
+                            Non-Refundable / Locked
+                        </span>
+                    </div>
+                    <p class="text-sm text-[#3A3A3C]">
                         Reservations are <strong>non-refundable and locked</strong>. Downpayments are forfeited due to committed resort accommodation reservations and coach allocations.
                     </p>
                 </div>
@@ -145,12 +220,17 @@
             <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F] tracking-tight">
                 5. Weather Safety and Force Majeure
             </h2>
-            <p>
-                If official PAGASA storm signals (TCWS) are active in Batangas, or the Philippine Coast Guard (PCG) issues a sea travel suspension or gale warning, Camp FreedivePH will notify participants immediately.
-            </p>
-            <p>
-                In such force majeure events, standard cancellation restrictions are automatically waived, and guests may choose between a <strong>100% full refund</strong> or <strong>priority free rescheduling</strong>.
-            </p>
+            <div class="p-4 sm:p-5 rounded-2xl bg-sky-50/80 text-sky-950 space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-sky-200 text-sky-900">Force Majeure Protection</span>
+                </div>
+                <p class="text-sm leading-relaxed">
+                    If official PAGASA storm signals (TCWS) are active in Batangas, or the Philippine Coast Guard (PCG) issues a sea travel suspension or gale warning, Camp FreedivePH will notify participants immediately.
+                </p>
+                <p class="text-sm leading-relaxed font-medium text-sky-900">
+                    In such force majeure events, standard cancellation restrictions are automatically waived, and guests may choose between a <strong>100% full refund</strong> or <strong>priority free rescheduling</strong>.
+                </p>
+            </div>
         </section>
 
         <!-- 6. Ocean Conservation -->
@@ -192,11 +272,17 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-sm">
                     <div>
                         <span class="text-[#6E6E73] font-medium">Facebook:</span>
-                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000]">@Campfreediveph</a>
+                        <a href="https://www.facebook.com/Campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000] inline-flex items-center gap-1.5">
+                            <span>@Campfreediveph</span>
+                            <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                        </a>
                     </div>
                     <div>
                         <span class="text-[#6E6E73] font-medium">Instagram:</span>
-                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000]">@campfreediveph</a>
+                        <a href="https://www.instagram.com/campfreediveph/" target="_blank" rel="noopener noreferrer" class="text-[#780000] font-bold underline hover:text-[#5E0000] inline-flex items-center gap-1.5">
+                            <span>@campfreediveph</span>
+                            <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                        </a>
                     </div>
                     <div>
                         <span class="text-[#6E6E73] font-medium">Email:</span>
@@ -211,5 +297,22 @@
         </section>
 
     </div>
+
+    <!-- Floating Back to Top Button -->
+    <button type="button"
+            x-show="showBackToTop"
+            x-cloak
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-3 scale-95"
+            x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+            x-transition:leave-end="opacity-0 translate-y-3 scale-95"
+            @click="scrollToTop()"
+            aria-label="Back to top"
+            class="fixed bottom-6 right-6 z-40 p-2.5 sm:px-3.5 sm:py-2 rounded-2xl bg-white/90 hover:bg-white text-[#1D1D1F] shadow-lg backdrop-blur-md border border-[#E5E5EA]/80 flex items-center gap-2 cursor-pointer transition-all active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+        <img src="{{ asset('icons/icons8-up-squared-60.png') }}" class="w-5 h-5 object-contain" alt="" aria-hidden="true">
+        <span class="text-xs font-bold hidden sm:inline">Back to top</span>
+    </button>
 </div>
 @endsection

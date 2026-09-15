@@ -6,6 +6,20 @@ use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * PayMongo Payment Gateway Service.
+ *
+ * Domain & Payment Lifecycle Context:
+ * Orchestrates payment intent creation, checkout session lifecycle, automated refunds,
+ * and cryptographic webhook verification for Philippine payment methods (QR Ph, GCash,
+ * Maya, Credit/Debit cards, BPI Direct).
+ *
+ * Reliability & Security:
+ * - Dual verification: Synchronous redirect callback verification paired with asynchronous
+ *   HMAC-SHA256 signed webhooks (`Paymongo-Signature`).
+ * - Simulated fallback mode: Gracefully creates local test mock sessions if API keys are not
+ *   configured in staging/local development, preventing broken checkout flows.
+ */
 class PayMongoService
 {
     protected ?string $secretKey;
@@ -25,6 +39,9 @@ class PayMongoService
 
     /**
      * Get a configured HTTP client with credentials and SSL settings.
+     *
+     * @param int $timeout Maximum request timeout in seconds
+     * @return \Illuminate\Http\Client\PendingRequest
      */
     protected function client(int $timeout = 15)
     {

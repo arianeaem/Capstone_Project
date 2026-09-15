@@ -14,10 +14,28 @@ use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Core Logistics & Batch Lifecycle Domain Service.
+ *
+ * Business Workflow & Domain Rules:
+ * 1. Automatic Weekend Batch Grouping: Dynamically resolves or creates sequential 2D1N batch records
+ *    when reservations are placed for upcoming weekends.
+ * 2. Status Progression & State Machine:
+ *    - `open` / `confirmed`: Accepting bookings up to the 45-pax cap.
+ *    - `in_progress`: Active training execution in Anilao.
+ *    - `completed`: Logged and archived post-trip.
+ *    - `cancelled` / `cancelled_by_camp`: Force majeure weather cancellation with automated customer refunds.
+ * 3. Immediate Weather Risk Assessment: Triggers WeatherForecastService upon batch creation to establish baseline safety.
+ */
 class BatchManagementService
 {
     /**
-     * Find an existing active batch covering the date, or automatically create a new sequential Batch.
+     * Finds an active batch covering the dates or automatically creates a new sequential Batch.
+     *
+     * @param Carbon|string|\DateTimeInterface $startDate Scheduled departure date.
+     * @param Carbon|string|\DateTimeInterface|null $endDate Scheduled return date (defaults to startDate + 1 day).
+     * @param User|null $creator User performing manual creation or null for automatic system creation.
+     * @return Batch Created or existing Batch instance.
      */
     public function findOrCreateBatchForDates(Carbon|string|\DateTimeInterface $startDate, Carbon|string|\DateTimeInterface|null $endDate = null, ?User $creator = null): Batch
     {
