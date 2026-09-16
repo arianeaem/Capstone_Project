@@ -206,8 +206,8 @@ class PayMongoController extends Controller
                 'auth_booking_pin' => $booking->pin,
             ]);
 
-            return redirect()->route('manage.show', [
-                'booking_number' => $booking->booking_number,
+            return redirect()->route('booking.create', [
+                'confirmed' => $booking->booking_number,
                 'pin' => $booking->pin,
             ])->with('success', 'Your downpayment has been received via PayMongo! Your 2D1N freediving camp slot is now confirmed.');
 
@@ -219,8 +219,8 @@ class PayMongoController extends Controller
                 'auth_booking_pin' => $booking->pin,
             ]);
 
-            return redirect()->route('manage.show', [
-                'booking_number' => $booking->booking_number,
+            return redirect()->route('booking.create', [
+                'confirmed' => $booking->booking_number,
                 'pin' => $booking->pin,
             ])->with('success', 'Payment received. Your booking is confirmed.');
         }

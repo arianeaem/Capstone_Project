@@ -54,6 +54,61 @@ class BookingController extends Controller
             $selectedClass = 'discovery';
         }
 
+        $confirmedBookingData = null;
+        $initialStep = 1;
+
+        if ($request->has('confirmed')) {
+            $bookingNumber = $request->query('confirmed');
+            $pin = $request->query('pin');
+
+            $bookingQuery = Booking::with(['participants', 'priceAdjustments', 'payments'])
+                ->where('booking_number', $bookingNumber);
+
+            if ($pin) {
+                $bookingQuery->where('pin', $pin);
+            }
+
+            $confirmedBooking = $bookingQuery->first();
+            if ($confirmedBooking) {
+                $initialStep = 5;
+                $downpaymentPaid = (float) $confirmedBooking->payments()
+                    ->where('status', 'paid')
+                    ->sum('amount');
+                if ($downpaymentPaid <= 0) {
+                    $downpaymentPaid = (float) $confirmedBooking->downpayment_amount;
+                }
+
+                $confirmedBookingData = [
+                    'booking_number' => $confirmedBooking->booking_number,
+                    'pin' => $confirmedBooking->pin,
+                    'downpayment_paid' => $downpaymentPaid,
+                    'balance_due' => (float) $confirmedBooking->balance_amount,
+                    'manage_url' => route('manage.show', ['booking_number' => $confirmedBooking->booking_number, 'pin' => $confirmedBooking->pin]),
+                    'class_type' => $confirmedBooking->class_type,
+                    'start_date' => $confirmedBooking->start_date ? $confirmedBooking->start_date->format('Y-m-d') : '',
+                    'end_date' => $confirmedBooking->end_date ? $confirmedBooking->end_date->format('Y-m-d') : '',
+                    'contact_email' => $confirmedBooking->contact_email,
+                    'contact_name' => $confirmedBooking->contact_name,
+                    'pickup_option' => $confirmedBooking->pickup_option,
+                    'pickup_location' => $confirmedBooking->pickup_location,
+                    'participants' => $confirmedBooking->participants->map(fn($p) => [
+                        'name' => $p->name,
+                        'first_name' => explode(' ', $p->name)[0] ?? $p->name,
+                        'last_name' => substr(strstr($p->name, ' '), 1) ?: '',
+                        'age' => $p->age,
+                        'health_condition' => $p->health_condition,
+                        'swimmer_status' => $p->swimmer_status,
+                    ])->toArray(),
+                    'adjustments' => $confirmedBooking->priceAdjustments->map(fn($adj) => [
+                        'rule_id' => $adj->pricing_rule_id,
+                        'rule_name' => $adj->rule_name,
+                        'formatted_adjustment' => ($adj->adjustment_amount >= 0 ? '+' : '−') . '₱' . number_format(abs($adj->adjustment_amount), 2),
+                        'delta_per_pax' => (float) $adj->adjustment_amount,
+                    ])->toArray(),
+                ];
+            }
+        }
+
         $pickupPoints = [
             [
                 'id' => 'monumento',
@@ -87,7 +142,7 @@ class BookingController extends Controller
             ],
         ];
 
-        return view('booking.create', compact('selectedClass', 'pickupPoints'));
+        return view('booking.create', compact('selectedClass', 'pickupPoints', 'confirmedBookingData', 'initialStep'));
     }
 
     /**
@@ -171,7 +226,7 @@ class BookingController extends Controller
             'contact_first_name' => 'nullable|string|max:255',
             'contact_last_name' => 'nullable|string|max:255',
             'contact_email' => 'required|email|max:255',
-            'contact_phone' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
+            'contact_phone' => ['required', 'string', 'regex:/^(\+?63|0)?[\s\-]?9\d{2}[\s\-]?\d{3}[\s\-]?\d{4}$/'],
             'contact_facebook' => 'nullable|string|max:255',
             'pickup_option' => 'required|string|in:carpool,own',
             'pickup_location' => 'required_if:pickup_option,carpool|nullable|string|max:255',
@@ -180,7 +235,7 @@ class BookingController extends Controller
             'payment_method' => 'nullable|string',
         ], [
             'pickup_location.required_if' => 'Please select a carpool pickup location.',
-            'contact_phone.regex' => 'Please enter a valid Philippine mobile number (e.g. 09171234567).',
+            'contact_phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +63 917-123-4567 or 09171234567).',
         ]);
 
         $contactName = !empty($validated['contact_name']) 
@@ -229,18 +284,19 @@ class BookingController extends Controller
 
                 // Regulatory & Logistics Fees:
                 // ₱300 LGU Tourism Pass + ₱50 Mabini Marine Sanctuary Ecological Fee per participant.
-                // Carpool (₱1,000/head roundtrip) and Boat Dive (₱800/head private banca) are optional add-ons.
+                // Carpool (₱1,200/head roundtrip) and Boat Dive (₱600/head private banca) are optional add-ons.
                 $lguFee = 300.00 * $paxCount;
                 $envFee = 50.00 * $paxCount;
-                $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1000.00 * $paxCount) : 0.00;
-                $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? (800.00 * $paxCount) : 0.00;
+                $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1200.00 * $paxCount) : 0.00;
+                $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? (600.00 * $paxCount) : 0.00;
 
                 $totalAmount = $subtotal + $lguFee + $envFee + $carpoolFee + $boatDiveFee;
                 
                 // Deposit Policy:
-                // ₱3,000/head covers upfront instructor scheduling and resort room holds.
+                // If carpool is selected: ₱3,000/head. If own transportation: ₱2,000/head.
                 // The remaining balance is collected at camp on Day 1 upon physical check-in.
-                $downpaymentAmount = min($totalAmount, 3000.00 * $paxCount);
+                $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? 3000.00 : 2000.00;
+                $downpaymentAmount = min($totalAmount, $downpaymentPerHead * $paxCount);
                 $balanceAmount = max(0, $totalAmount - $downpaymentAmount);
 
                 // Auto-assign batch roster for this weekend dates

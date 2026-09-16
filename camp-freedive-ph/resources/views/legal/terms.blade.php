@@ -201,7 +201,7 @@
                 </div>
 
                 <!-- Tier 3: < 7 Days -->
-                <div class="p-4 sm:p-5 rounded-2xl bg-[#F8EAEA] space-y-2">
+                <div class="p-4 sm:p-5 rounded-2xl space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="font-extrabold text-[#780000] text-base">Within 7 Days Before Dive Date</h3>
                         <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#D70015] text-white">

@@ -101,7 +101,7 @@ class PayMongoIntegrationTest extends TestCase
 
         $response = $this->get(route('paymongo.success', ['booking' => $booking->id]));
 
-        $response->assertRedirect(route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]));
+        $response->assertRedirect(route('booking.create', ['confirmed' => $booking->booking_number, 'pin' => $booking->pin]));
         $response->assertSessionHas('success');
         $response->assertSessionHas('auth_booking_id', $booking->id);
 

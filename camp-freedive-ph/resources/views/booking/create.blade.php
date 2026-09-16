@@ -3,12 +3,13 @@
 @section('title', 'Book Camp | Camp FreedivePH')
 @section('meta_description', 'Book a 2D1N freediving camp in Mabini, Batangas.')
 @section('hide_header', true)
-@section('hide_footer', true)
 
 @section('content')
-<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 text-sm" 
+<div class="w-full bg-white min-h-screen text-sm" 
      x-data="bookingForm({
          initialClass: '{{ $selectedClass }}',
+         initialStep: {{ $initialStep ?? 1 }},
+         confirmedBookingData: {{ json_encode($confirmedBookingData ?? null) }},
          pickupPoints: {{ json_encode($pickupPoints) }},
          csrfToken: '{{ csrf_token() }}',
          checkWeatherUrl: '{{ route('api.weather.check') }}',
@@ -17,282 +18,575 @@
      })"
      x-init="initBooking()">
 
-    <!-- Booking Header -->
-    <div class="flex items-center justify-between pb-4 sm:pb-5 mb-5 sm:mb-8 border-b border-[#E5E5EA] gap-2">
-        <a href="{{ route('landing') }}" class="flex items-center gap-2 sm:gap-2.5 group min-w-0">
-            <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-contain bg-white shrink-0">
-            <div class="min-w-0">
-                <span class="font-extrabold text-sm sm:text-lg tracking-tight text-[#1D1D1F] block leading-none truncate">Camp Freedive<span class="text-[#780000]">PH</span></span>
-                <span class="text-[11px] sm:text-sm text-[#6E6E73] font-medium tracking-wider block mt-0.5 truncate">Mabini, Batangas</span>
-            </div>
-        </a>
-        <a href="{{ route('landing') }}" class="text-xs sm:text-sm font-semibold text-[#6E6E73] hover:text-[#780000] flex items-center gap-1 transition-colors shrink-0">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            <span>Exit to Home</span>
-        </a>
-    </div>
-
-    <!-- Top Stepper Header -->
-    <div class="mb-6 sm:mb-10">
-        <div class="flex items-center justify-between mb-3">
-            <div>
-                <h1 class="text-xl sm:text-3xl font-extrabold text-[#1D1D1F]" x-text="stepTitles[currentStep - 1]"></h1>
-            </div>
-            <div class="text-right shrink-0">
-                <span class="text-sm text-[#6E6E73] font-semibold">Step</span>
-                <div class="text-xl sm:text-2xl font-extrabold text-[#780000]">
-                    <span x-text="currentStep"></span> <span class="text-sm text-[#636366] font-normal">/ 5</span>
+    <!-- Combined Top Sticky Header & Numbered Circle Stepper -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-[#E5E5EA] shadow-2xs">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-6">
+            
+            <!-- Left: Brand Logo & Title (Mobile: Only Logo, Desktop: Logo + Name) -->
+            <a href="{{ route('landing') }}" class="flex items-center gap-2 sm:gap-2.5 group shrink-0 min-w-0 focus-visible:outline-none" title="Camp FreedivePH">
+                <img src="{{ asset('images/logo.png') }}" alt="Camp FreedivePH Logo" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-contain bg-white shrink-0 border border-[#E5E5EA]">
+                <div class="hidden sm:block min-w-0">
+                    <span class="font-extrabold text-sm sm:text-base tracking-tight text-[#1D1D1F] block leading-none truncate">Camp Freedive<span class="text-[#780000]">PH</span></span>
+                    <span class="text-[10px] sm:text-[11px] text-[#6E6E73] font-medium tracking-wider block mt-0.5 truncate">Mabini, Batangas</span>
                 </div>
+            </a>
+
+            <!-- Right: Stepper (Desktop: Numbered Circles + Labels, Mobile: Numbered Circles Only) -->
+            
+            <!-- Desktop Stepper (MD+) -->
+            <nav aria-label="Booking Progress" class="hidden md:flex items-center gap-1.5 lg:gap-2.5">
+                <template x-for="(label, index) in shortStepTitles" :key="index">
+                    <div class="flex items-center">
+                        <!-- Step Item -->
+                        <div class="flex items-center gap-2">
+                            <!-- Circle Number -->
+                            <span class="w-6 h-6 lg:w-7 lg:h-7 rounded-full flex items-center justify-center text-xs font-black transition-all duration-200 shrink-0"
+                                  :class="{
+                                      'bg-[#780000] text-white shadow-xs scale-105': currentStep === (index + 1),
+                                      'bg-[#780000]/15 text-[#780000] font-bold': currentStep > (index + 1),
+                                      'bg-[#F2F2F7] text-[#8E8E93]': currentStep < (index + 1)
+                                  }">
+                                <template x-if="currentStep > (index + 1)">
+                                    <svg class="w-3.5 h-3.5 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                                </template>
+                                <template x-if="currentStep <= (index + 1)">
+                                    <span x-text="index + 1"></span>
+                                </template>
+                            </span>
+                            <!-- Label -->
+                            <span class="text-xs lg:text-sm transition-colors duration-200 whitespace-nowrap"
+                                  :class="{
+                                      'text-[#1D1D1F] font-black': currentStep === (index + 1),
+                                      'text-[#1D1D1F] font-semibold': currentStep > (index + 1),
+                                      'text-[#8E8E93] font-medium': currentStep < (index + 1)
+                                  }"
+                                  x-text="label">
+                            </span>
+                        </div>
+
+                        <!-- Connecting Line (if not last step) -->
+                        <div x-show="index < 4" class="w-3 lg:w-6 h-[1.5px] mx-1 lg:mx-2 transition-colors duration-200"
+                             :class="currentStep > (index + 1) ? 'bg-[#780000]/40' : 'bg-[#E5E5EA]'"></div>
+                    </div>
+                </template>
+            </nav>
+
+            <!-- Mobile Stepper (<MD) -->
+            <nav aria-label="Booking Progress" class="flex md:hidden items-center gap-1 shrink-0">
+                <template x-for="stepNum in [1, 2, 3, 4, 5]" :key="stepNum">
+                    <div class="flex items-center">
+                        <!-- Circle Number -->
+                        <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-black transition-all duration-200 shrink-0"
+                              :class="{
+                                  'bg-[#780000] text-white shadow-xs scale-105': currentStep === stepNum,
+                                  'bg-[#780000]/15 text-[#780000] font-bold': currentStep > stepNum,
+                                  'bg-[#F2F2F7] text-[#8E8E93]': currentStep < stepNum
+                              }">
+                            <template x-if="currentStep > stepNum">
+                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                            </template>
+                            <template x-if="currentStep <= stepNum">
+                                <span x-text="stepNum"></span>
+                            </template>
+                        </span>
+
+                        <!-- Connecting Line -->
+                        <div x-show="stepNum < 5" class="w-2 sm:w-3 h-[1.5px] mx-0.5 sm:mx-1 transition-colors duration-200"
+                             :class="currentStep > stepNum ? 'bg-[#780000]/40' : 'bg-[#E5E5EA]'"></div>
+                    </div>
+                </template>
+            </nav>
+
+        </div>
+    </header>
+
+    <!-- Main Booking Page Body -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
+
+        <!-- Step Heading Banner -->
+        <div class="mb-5 sm:mb-8">
+            <h1 class="text-xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight" x-text="stepTitles[currentStep - 1]"></h1>
+            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1" x-show="currentStep === 1">Choose the package that matches your freediving experience level.</p>
+            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1" x-show="currentStep === 2">Select your 2D1N weekend dive schedule with real-time weather safety validation.</p>
+            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1" x-show="currentStep === 3">Enter guest details, emergency contact, carpool hub, and optional add-ons.</p>
+            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1" x-show="currentStep === 4">Review your reservation breakdown and complete downpayment.</p>
+            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1" x-show="currentStep === 5">Save your booking reference PIN and view your camp itinerary.</p>
+        </div>
+
+        <!-- Error Alert Banner -->
+        <div x-show="errorMessage" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#FEF2F2] text-[#991B1B] text-sm flex items-start justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span x-text="errorMessage"></span>
+            </div>
+            <button @click="errorMessage = ''" aria-label="Dismiss error message" class="text-[#991B1B] font-bold text-sm">✕</button>
+        </div>
+
+        <!-- Draft Restored Notification Banner -->
+        <div x-show="draftRestored" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#F0FDF4] text-[#166534] text-sm flex items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span>Your saved booking progress has been automatically restored.</span>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-sm">
+                    Clear
+                </button>
+                <button type="button" @click="draftRestored = false" aria-label="Dismiss restored draft notification" class="text-[#166534] font-bold text-sm">✕</button>
             </div>
         </div>
 
-        <!-- Stepper Progress Bar -->
-        <div class="w-full bg-[#E5E5EA] h-2.5 rounded-full overflow-hidden">
-            <div class="bg-[#780000] h-full transition-all duration-300 rounded-full"
-                 :style="'width: ' + ((currentStep / 5) * 100) + '%'"></div>
-        </div>
-    </div>
+        <!-- Booking Form Container -->
+        <div class="relative text-sm">
 
-    <!-- Error Alert Banner -->
-    <div x-show="errorMessage" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#FEF2F2] text-[#991B1B] text-sm flex items-start justify-between gap-3 shadow-2xs">
-        <div class="flex items-center gap-2">
-            <span x-text="errorMessage"></span>
-        </div>
-        <button @click="errorMessage = ''" aria-label="Dismiss error message" class="text-[#991B1B] font-bold text-sm">✕</button>
-    </div>
+            <!-- Step 1: Select Class -->
+            <div x-show="currentStep === 1" x-cloak class="space-y-6">
 
-    <!-- Draft Restored Notification Banner -->
-    <div x-show="draftRestored" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#F0FDF4] text-[#166534] text-sm flex items-center justify-between gap-3 shadow-2xs">
-        <div class="flex items-center gap-2">
-            <span>Your saved booking progress has been automatically restored.</span>
-        </div>
-        <div class="flex items-center gap-3 shrink-0">
-            <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-sm">
-                Clear
-            </button>
-            <button type="button" @click="draftRestored = false" aria-label="Dismiss restored draft notification" class="text-[#166534] font-bold text-sm">✕</button>
-        </div>
-    </div>
+                <!-- Mobile-Only Quick Jump Tabs -->
+                <div class="block lg:hidden sticky top-[57px] sm:top-[61px] z-30 bg-white/95 backdrop-blur-md py-2.5 -mx-3 px-3 sm:-mx-6 sm:px-6 border-b border-[#E5E5EA] shadow-2xs mb-5">
+                    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+                        <button type="button"
+                                @click="selectAndScrollPackage('discovery')"
+                                class="py-2 px-4 rounded-full text-xs font-bold transition-all shrink-0 flex items-center justify-center cursor-pointer"
+                                :class="form.class_type === 'discovery' ? 'bg-[#780000] text-white shadow-xs' : 'bg-[#F2F2F7] text-[#1D1D1F] hover:bg-[#E5E5EA]'">
+                            Discovery
+                        </button>
+                        <button type="button"
+                                @click="selectAndScrollPackage('fundive')"
+                                class="py-2 px-4 rounded-full text-xs font-bold transition-all shrink-0 flex items-center justify-center cursor-pointer"
+                                :class="form.class_type === 'fundive' ? 'bg-[#780000] text-white shadow-xs' : 'bg-[#F2F2F7] text-[#1D1D1F] hover:bg-[#E5E5EA]'">
+                            Fundive
+                        </button>
+                        <button type="button"
+                                @click="selectAndScrollPackage('refinement')"
+                                class="py-2 px-4 rounded-full text-xs font-bold transition-all shrink-0 flex items-center justify-center cursor-pointer"
+                                :class="form.class_type === 'refinement' ? 'bg-[#780000] text-white shadow-xs' : 'bg-[#F2F2F7] text-[#1D1D1F] hover:bg-[#E5E5EA]'">
+                            Refinement Class
+                        </button>
+                    </div>
+                </div>
 
-    <!-- Booking Form Container -->
-    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-8 lg:p-10 relative text-sm">
-
-        <!-- Step 1: Select Class -->
-        <div x-show="currentStep === 1" x-cloak class="space-y-6">
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-                
-                <!-- Left Side: Packages & Fundive Experience Level -->
-                <div class="lg:col-span-8 space-y-4 sm:space-y-5">
+                <!-- 3 Packages Grid (items-start prevents other cards from extending on accordion toggle) -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start" role="radiogroup" aria-label="Freediving Packages">
                     
-                    <!-- 3 Square Packages Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4" role="radiogroup" aria-label="Freediving Class Packages">
+                    <!-- 1. Discovery Package Card -->
+                    <div id="package-discovery"
+                         x-data="{ openDetails: false }"
+                         class="scroll-mt-32 lg:scroll-mt-0 bg-white rounded-2xl border border-[#E5E5EA] shadow-xs hover:border-[#D1D1D6] hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden text-sm relative">
                         
-                        <!-- 1. Discovery Square -->
-                        <div @click="form.class_type = 'discovery'" 
-                             @keydown.enter.prevent="form.class_type = 'discovery'"
-                             @keydown.space.prevent="form.class_type = 'discovery'"
-                             tabindex="0"
-                             role="radio"
-                             :aria-checked="form.class_type === 'discovery'"
-                             aria-label="Discovery beginner class, ₱4,250 per person"
-                             class="p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                             :class="form.class_type === 'discovery' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
-                            
-                            <div class="w-full flex flex-col items-center">
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-[#780000]/10">
-                                    <img src="{{ asset('icons/icons8-water-60.png') }}" class="w-10 h-10 object-contain" alt="Discovery Icon">
-                                </div>
-                                <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Discovery</h3>
-                                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] mt-1 mb-2">
+                        <!-- Package Header & Price -->
+                        <div class="p-6 sm:p-7 flex flex-col justify-between text-center flex-grow">
+                            <div>
+                                <!-- Category Badge -->
+                                <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
                                     BEGINNER CLASS
                                 </span>
-                                <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                    Solo joiners and non-swimmers welcome. Theory, pool and 2 open water dives.
-                                </p>
-                            </div>
 
-                            <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
-                                <span class="text-lg sm:text-xl font-black text-[#780000]">₱4,250</span>
-                                <span class="text-xs text-[#6E6E73]">/ person</span>
-                            </div>
-                        </div>
+                                <!-- Title -->
+                                <h3 class="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight mb-2">
+                                    Discovery
+                                </h3>
 
-                        <!-- 2. Fundive Square -->
-                        <div @click="form.class_type = 'fundive'" 
-                             @keydown.enter.prevent="form.class_type = 'fundive'"
-                             @keydown.space.prevent="form.class_type = 'fundive'"
-                             tabindex="0"
-                             role="radio"
-                             :aria-checked="form.class_type === 'fundive'"
-                             aria-label="Fundive class, prerequisite discovery class"
-                             class="p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                             :class="form.class_type === 'fundive' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
-                            
-                            <div class="w-full flex flex-col items-center">
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-[#780000]/10">
-                                    <img src="{{ asset('icons/icons8-snorkel-60.png') }}" class="w-10 h-10 object-contain" alt="Fundive Icon">
+                                <!-- Pricing Display -->
+                                <div class="my-4">
+                                    <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
+                                        ₱4,250
+                                    </div>
+                                    <span class="text-xs sm:text-sm text-[#6E6E73] font-medium block mt-1">
+                                        per person
+                                    </span>
                                 </div>
-                                <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Fundive</h3>
-                                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] mt-1 mb-2">
-                                    PREREQUISITE: DISCOVERY CLASS
-                                </span>
-                                <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                    Explore open water sanctuaries with coach guidance, 2D1N stay and photo coverage.
+
+                                <!-- Target Audience Description -->
+                                <p class="text-sm text-[#4A4A4F] font-medium my-3 mb-4 min-h-[44px] flex items-center justify-center leading-relaxed text-center">
+                                    Complete beginners, non-swimmers, and first-timers.
                                 </p>
                             </div>
 
-                            <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
-                                <span class="text-lg sm:text-xl font-black text-[#780000]" x-text="form.is_certified_diver ? '₱2,500' : '₱3,300'"></span>
-                                <span class="text-xs text-[#6E6E73]" x-text="form.is_certified_diver ? 'Certified Diver / person' : 'Non-Certified Diver / person'"></span>
-                            </div>
-                        </div>
+                            <!-- Action Row: Book Button + Quaternary See Offer Details -->
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                                <button type="button"
+                                        @click="form.class_type = 'discovery'; nextStep()"
+                                        class="w-full sm:flex-1 min-h-[44px] py-3 px-5 rounded-xl font-extrabold text-sm text-center flex items-center justify-center bg-[#00C3D0] hover:bg-[#00B2BE] active:bg-[#009DA7] text-[#1D1D1F] shadow-xs hover:shadow active:scale-[0.98] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0] focus-visible:ring-offset-2">
+                                    Select
+                                </button>
 
-                        <!-- 3. Refinement Square -->
-                        <div @click="form.class_type = 'refinement'" 
-                             @keydown.enter.prevent="form.class_type = 'refinement'"
-                             @keydown.space.prevent="form.class_type = 'refinement'"
-                             tabindex="0"
-                             role="radio"
-                             :aria-checked="form.class_type === 'refinement'"
-                             aria-label="Skill refinement practice dive, ₱4,100 per person"
-                             class="p-4 sm:p-5 rounded-2xl cursor-pointer flex flex-col justify-between items-center text-center relative group min-h-[250px] transition-all focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                             :class="form.class_type === 'refinement' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
-                            
-                            <div class="w-full flex flex-col items-center">
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-[#780000]/10">
-                                    <img src="{{ asset('icons/icons8-flippers-60.png') }}" class="w-10 h-10 object-contain" alt="Refinement Icon">
-                                </div>
-                                <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Refinement</h3>
-                                <span class="text-xs font-bold uppercase tracking-wider text-[#780000] mt-1 mb-2">
-                                    PRACTICE DIVE
-                                </span>
-                                <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                    Practice dive with 2 open water sessions, pool access, coach fee and full meals.
-                                </p>
-                            </div>
-
-                            <div class="mt-4 pt-3 border-t border-black/5 w-full flex flex-col items-center">
-                                <span class="text-lg sm:text-xl font-black text-[#780000]">₱4,100</span>
-                                <span class="text-xs text-[#6E6E73]">/ person</span>
-                            </div>
+                            <button type="button"
+                                    @click.stop="openDetails = !openDetails"
+                                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] py-2 px-1.5 transition-colors cursor-pointer shrink-0"
+                                    :aria-expanded="openDetails"
+                                    aria-controls="discovery-details"
+                                    title="Toggle offer details">
+                                <span x-text="openDetails ? 'Hide details' : 'See offer details'"></span>
+                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#780000]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Fundive Diver Certification Selection (Visible when Fundive is selected) -->
-                    <div x-show="form.class_type === 'fundive'" x-transition x-cloak class="p-4 sm:p-5 bg-amber-100 rounded-2xl space-y-3">
-                        <div class="flex items-center justify-between flex-wrap gap-2">
-                            <div>
-                                <h4 class="font-extrabold text-[#92400E] text-sm sm:text-base flex items-center gap-1.5">
-                                    <span>Fundive Experience & Certification Level</span>
-                                </h4>
-                                <p class="text-xs sm:text-sm text-[#78350F] mt-0.5">
-                                    Select whether you hold an official freediving certification or require full safety coach guidance.
-                                </p>
-                            </div>
+                    <!-- Inclusions & Exclusions Accordion -->
+                    <div x-show="openDetails" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         x-cloak 
+                         id="discovery-details" 
+                         class="p-5 sm:p-6 border-t border-[#E5E5EA] bg-white space-y-5 text-left">
+                        
+                        <!-- Inclusions -->
+                        <div>
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#1D1D1F] mb-2.5 flex items-center gap-1.5">
+                                <span>Inclusions</span>
+                            </h4>
+                            <ul class="space-y-2 text-xs sm:text-sm text-[#1D1D1F]">
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>2 open water dives (2-3 hrs per session)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>1 pool session (10 ft deep pool access)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>2D1N shared AC room accommodation</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Lesson fee and coach fee</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Safety buoy set up</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>3 full board meals</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Photos and videos</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Gears (mask, snorkel, fins, weight belt)</span>
+                                </li>
+                            </ul>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1" role="radiogroup" aria-label="Fundive Experience & Certification Level">
-                            <!-- Non-Certified -->
-                            <label @click="form.is_certified_diver = false"
-                                   @keydown.enter.prevent="form.is_certified_diver = false"
-                                   @keydown.space.prevent="form.is_certified_diver = false"
-                                   tabindex="0"
-                                   role="radio"
-                                   :aria-checked="!form.is_certified_diver"
-                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                   :class="!form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
-                                <div class="flex items-center gap-3">
-                                    <input type="radio" name="is_certified" :value="false" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
-                                    <div>
-                                        <span class="font-bold text-[#1D1D1F] block text-sm">Non-Certified Diver</span>
-                                        <span class="text-xs text-[#6E6E73] block">Includes dedicated safety coach</span>
-                                    </div>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">₱3,300</strong>
-                                    <span class="text-xs text-[#6E6E73] block">/ person</span>
-                                </div>
-                            </label>
-
-                            <!-- Certified Diver -->
-                            <label @click="form.is_certified_diver = true"
-                                   @keydown.enter.prevent="form.is_certified_diver = true"
-                                   @keydown.space.prevent="form.is_certified_diver = true"
-                                   tabindex="0"
-                                   role="radio"
-                                   :aria-checked="form.is_certified_diver"
-                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                   :class="form.is_certified_diver ? 'border-[#780000] bg-[#F8EAEA]/50' : 'border-[#E5E5EA] hover:border-[#D1D1D6]'">
-                                <div class="flex items-center gap-3">
-                                    <input type="radio" name="is_certified" :value="true" x-model="form.is_certified_diver" class="text-[#780000] focus:ring-[#780000]">
-                                    <div>
-                                        <span class="font-bold text-[#1D1D1F] block text-sm">Certified Diver</span>
-                                        <span class="text-xs text-[#6E6E73] block">Licensed (no coach fee needed)</span>
-                                    </div>
-                                </div>
-                                <div class="text-right shrink-0">
-                                    <strong class="text-sm sm:text-base font-extrabold text-[#780000]">₱2,500</strong>
-                                    <span class="text-xs text-[#6E6E73] block">/ person</span>
-                                </div>
-                            </label>
+                        <!-- Exclusions -->
+                        <div class="pt-3 border-t border-[#E5E5EA]">
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73] mb-2 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#8E8E93]"></span>
+                                <span>Exclusions</span>
+                            </h4>
+                            <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Transportation (We arrange carpool)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Boat dive (optional sanctuary trip +₱600/pax)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Mabini LGU municipal environmental fee & dive pass</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- Right Side: Inclusions & Exclusions -->
-                <div class="lg:col-span-4 space-y-6" x-show="form.class_type" x-transition x-cloak>
-                    <!-- Inclusions -->
-                    <div class="space-y-2.5">
-                        <h4 class="font-extrabold text-sm uppercase tracking-wider text-[#1D1D1F]">Inclusions</h4>
-                        
-                        <!-- Discovery Inclusions -->
-                        <ul x-show="form.class_type === 'discovery'" class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
-                            <li>2 open water dives (2-3 hrs per session)</li>
-                            <li>1 pool session (10 ft deep pool access)</li>
-                            <li>2D1N shared AC room accommodation</li>
-                            <li>Lesson fee and coach fee</li>
-                            <li>Safety buoy set up</li>
-                            <li>3 full board meals</li>
-                            <li>Photos and videos</li>
-                            <li>Gears (mask, snorkel, fins, weight belt)</li>
-                        </ul>
+                <!-- 2. Fundive Package Card (With 2-Option Direct Choice after Description) -->
+                <div id="package-fundive"
+                     x-data="{ openDetails: false }"
+                     class="scroll-mt-32 lg:scroll-mt-0 bg-white rounded-2xl border border-[#E5E5EA] shadow-xs hover:border-[#D1D1D6] hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden text-sm relative">
+                    
+                    <!-- Package Header & Price -->
+                    <div class="p-6 sm:p-7 flex flex-col justify-between flex-grow">
+                        <div>
+                            <!-- Category Badge -->
+                            <div class="text-center">
+                                <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
+                                    PREREQUISITE: DISCOVERY CLASS
+                                </span>
 
-                        <!-- Fundive Inclusions -->
-                        <ul x-show="form.class_type === 'fundive'" class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
-                            <li>2 open water dives (2-3 hrs per session)</li>
-                            <li>1 pool session (10 ft deep pool access)</li>
-                            <li>2D1N shared AC room accommodation</li>
-                            <li x-text="form.is_certified_diver ? 'Safety buoy setup and dive buddy briefing' : 'Safety coach fee included'"></li>
-                            <li>Safety buoy set up</li>
-                            <li>3 full board meals</li>
-                            <li>Photos and videos</li>
-                            <li>Gears (mask, snorkel, fins, weight belt)</li>
-                        </ul>
+                                <!-- Title -->
+                                <h3 class="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight mb-2">
+                                    Fundive
+                                </h3>
+                            </div>
 
-                        <!-- Refinement Inclusions -->
-                        <ul x-show="form.class_type === 'refinement'" class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
-                            <li>2 open water dives (2-3 hrs per session)</li>
-                            <li>1 pool session (10 ft deep pool access)</li>
-                            <li>2D1N shared AC room accommodation</li>
-                            <li>Coach fee (skills drills and form correction)</li>
-                            <li>Safety buoy set up</li>
-                            <li>3 full board meals</li>
-                            <li>Photos and videos</li>
-                            <li>Gears (mask, snorkel, fins, weight belt)</li>
-                        </ul>
+                            <!-- Target Audience Description (Placed before certification options) -->
+                            <p class="text-sm text-[#4A4A4F] font-medium my-3 mb-4 min-h-[44px] flex items-center justify-center leading-relaxed text-center">
+                                Certified or experienced freedivers who want to explore and take photos.
+                            </p>
+
+                            <!-- 2-Option Direct Choice Selector (Placed after description as requested) -->
+                            <div class="my-3 space-y-2 text-left" role="radiogroup" aria-label="Fundive certification options">
+                                <span class="text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider block text-center mb-3">
+                                    Select Your Certification Option
+                                </span>
+
+                                <!-- Option A: Certified Diver -->
+                                <button type="button"
+                                        @click.stop="form.class_type = 'fundive'; form.is_certified_diver = true; onFundiveOptionChanged()"
+                                        class="w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer"
+                                        :class="(form.is_certified_diver) 
+                                            ? 'border-[#780000] bg-white ring-1 ring-[#780000]' 
+                                            : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6] hover:bg-[#FAFAFA]'">
+                                    <div class="min-w-0">
+                                        <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block truncate">Certified Diver</span>
+                                        <span class="text-[11px] text-[#6E6E73] block italic truncate">Safety coach not included</span>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="text-sm sm:text-base font-black text-[#1D1D1F]">₱2,500</span>
+                                    </div>
+                                </button>
+
+                                <!-- Option B: Non-Certified Diver -->
+                                <button type="button"
+                                        @click.stop="form.class_type = 'fundive'; form.is_certified_diver = false; onFundiveOptionChanged()"
+                                        class="w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer"
+                                        :class="(!form.is_certified_diver) 
+                                            ? 'border-[#780000] bg-white ring-1 ring-[#780000]' 
+                                            : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6] hover:bg-[#FAFAFA]'">
+                                    <div class="min-w-0">
+                                        <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block truncate">Non-Certified Diver</span>
+                                        <span class="text-[11px] text-[#6E6E73] block italic truncate">Includes dedicated coach</span>
+                                    </div>
+                                    <div class="text-right shrink-0">
+                                        <span class="text-sm sm:text-base font-black text-[#1D1D1F]">₱3,300</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Row: Book Button + Quaternary See Offer Details -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                            <button type="button"
+                                    @click="form.class_type = 'fundive'; nextStep()"
+                                    class="w-full sm:flex-1 min-h-[44px] py-3 px-5 rounded-xl font-extrabold text-sm text-center flex items-center justify-center bg-[#00C3D0] hover:bg-[#00B2BE] active:bg-[#009DA7] text-[#1D1D1F] shadow-xs hover:shadow active:scale-[0.98] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0] focus-visible:ring-offset-2">
+                                Select
+                            </button>
+
+                            <button type="button"
+                                    @click.stop="openDetails = !openDetails"
+                                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] py-2 px-1.5 transition-colors cursor-pointer shrink-0"
+                                    :aria-expanded="openDetails"
+                                    aria-controls="fundive-details"
+                                    title="Toggle offer details">
+                                <span x-text="openDetails ? 'Hide details' : 'See offer details'"></span>
+                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#780000]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Exclusions -->
-                    <div class="space-y-2.5">
-                        <h4 class="font-extrabold text-sm uppercase tracking-wider text-[#1D1D1F]">Exclusions</h4>
+                    <!-- Inclusions & Exclusions Accordion -->
+                    <div x-show="openDetails" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         x-cloak 
+                         id="fundive-details" 
+                         class="p-5 sm:p-6 border-t border-[#E5E5EA] bg-white space-y-5 text-left">
                         
-                        <ul class="space-y-2 text-sm text-[#3A3A3C] list-disc list-outside ml-4">
-                            <li>Transportation (We arrange convenient carpool van transfers)</li>
-                            <li>Boat dive (Optional sanctuary boat trip +₱600/person)</li>
-                            <li>Mabini LGU municipal environmental fee and dive pass</li>
-                        </ul>
+                        <!-- Inclusions -->
+                        <div>
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#1D1D1F] mb-2.5 flex items-center gap-1.5">
+                                <span>Inclusions</span>
+                            </h4>
+                            <ul class="space-y-2 text-xs sm:text-sm text-[#1D1D1F]">
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>2 open water dives (2-3 hrs per session)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>1 pool session (10 ft deep pool access)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>2D1N shared AC room accommodation</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span x-text="form.is_certified_diver ? 'Safety buoy setup and dive buddy briefing' : 'Safety coach fee included'">Safety coach fee included</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Safety buoy set up</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>3 full board meals</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Photos and videos</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Gears (mask, snorkel, fins, weight belt)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Exclusions -->
+                        <div class="pt-3 border-t border-[#E5E5EA]">
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73] mb-2 flex items-center gap-1.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-[#8E8E93]"></span>
+                                <span>Exclusions</span>
+                            </h4>
+                            <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Transportation (We arrange carpool)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Boat dive (optional sanctuary trip +₱600/pax)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Mabini LGU municipal environmental fee & dive pass</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Refinement Package Card -->
+                <div id="package-refinement"
+                     x-data="{ openDetails: false }"
+                     class="scroll-mt-32 lg:scroll-mt-0 bg-white rounded-2xl border border-[#E5E5EA] shadow-xs hover:border-[#D1D1D6] hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden text-sm relative">
+                    
+                    <!-- Package Header & Price -->
+                    <div class="p-6 sm:p-7 flex flex-col justify-between text-center flex-grow">
+                        <div>
+                            <!-- Category Badge -->
+                            <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
+                                PRACTICE DIVE
+                            </span>
+
+                            <!-- Title -->
+                            <h3 class="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight mb-2">
+                                Refinement Class
+                            </h3>
+
+                            <!-- Pricing Display -->
+                            <div class="my-4">
+                                <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
+                                    ₱4,100
+                                </div>
+                                <span class="text-xs sm:text-sm text-[#6E6E73] font-medium block mt-1">
+                                    per person
+                                </span>
+                            </div>
+
+                            <!-- Target Audience Description -->
+                            <p class="text-sm text-[#4A4A4F] font-medium my-3 mb-4 min-h-[44px] flex items-center justify-center leading-relaxed text-center">
+                                Divers who already completed an intro class but want to fix their form.
+                            </p>
+                        </div>
+
+                        <!-- Action Row: Book Button + Quaternary See Offer Details -->
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+                            <button type="button"
+                                    @click="form.class_type = 'refinement'; nextStep()"
+                                    class="w-full sm:flex-1 min-h-[44px] py-3 px-5 rounded-xl font-extrabold text-sm text-center flex items-center justify-center bg-[#00C3D0] hover:bg-[#00B2BE] active:bg-[#009DA7] text-[#1D1D1F] shadow-xs hover:shadow active:scale-[0.98] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0] focus-visible:ring-offset-2">
+                                Select
+                            </button>
+
+                            <button type="button"
+                                    @click.stop="openDetails = !openDetails"
+                                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] py-2 px-1.5 transition-colors cursor-pointer shrink-0"
+                                    :aria-expanded="openDetails"
+                                    aria-controls="refinement-details"
+                                    title="Toggle offer details">
+                                <span x-text="openDetails ? 'Hide details' : 'See offer details'"></span>
+                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#780000]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Inclusions & Exclusions Accordion -->
+                    <div x-show="openDetails" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 -translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-2"
+                         x-cloak 
+                         id="refinement-details" 
+                         class="p-5 sm:p-6 border-t border-[#E5E5EA] bg-white space-y-5 text-left">
+                        
+                        <!-- Inclusions -->
+                        <div>
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#1D1D1F] mb-2.5 flex items-center gap-1.5">
+                                <span>Inclusions</span>
+                            </h4>
+                            <ul class="space-y-2 text-xs sm:text-sm text-[#1D1D1F]">
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>2 open water dives (2-3 hrs per session)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>1 pool session (10 ft deep pool access)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>2D1N shared AC room accommodation</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Coach fee (skills drills and form correction)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Safety buoy set up</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>3 full board meals</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Photos and videos</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Gears (mask, snorkel, fins, weight belt)</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Exclusions -->
+                        <div class="pt-3 border-t border-[#E5E5EA]">
+                            <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73] mb-2 flex items-center gap-1.5">
+                                <span>Exclusions</span>
+                            </h4>
+                            <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Transportation (We arrange carpool)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Boat dive (optional sanctuary trip +₱600/pax)</span>
+                                </li>
+                                <li class="flex items-start gap-2.5">
+                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    <span>Mabini LGU municipal environmental fee & dive pass</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -385,7 +679,7 @@
                                     <div class="w-11 hidden md:block shrink-0"></div>
                                     <button type="button" 
                                             @click="nextMonth()" 
-                                            class="w-11 h-11 rounded-full flex items-center justify-center hover:bg-[#F2F2F7] active:bg-[#E5E5EA] transition-all text-[#1D1D1F] md:hidden shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                            class="w-11 h-11 rounded-full flex items-center justify-center active:bg-[#E5E5EA] transition-all text-[#1D1D1F] md:hidden shrink-0 focus-visible:outline-none"
                                             title="Next Month"
                                             aria-label="Next Month">
                                         <svg class="w-5 h-5" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
@@ -418,7 +712,7 @@
                                                         :aria-pressed="dObj.dateStr === form.start_date"
                                                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
-                                                            'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
+                                                            'bg-[#780000] text-white font-bold': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
                                                             'text-[#AEAEB2] cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
@@ -477,7 +771,7 @@
                                                         :aria-pressed="dObj.dateStr === form.start_date"
                                                         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-xs sm:text-sm transition-all relative z-10 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                                         :class="{
-                                                            'bg-[#780000] text-white font-bold ring-2 ring-[#780000]/20': dObj.dateStr === form.start_date,
+                                                            'bg-[#780000] text-white font-bold': dObj.dateStr === form.start_date,
                                                             'bg-[#00C3D0] text-white font-bold ring-2 ring-[#00C3D0]/20': dObj.dateStr === form.end_date,
                                                             'text-[#AEAEB2] cursor-not-allowed': dObj.isDisabled,
                                                             'hover:bg-[#F2F2F7] hover:text-[#780000] cursor-pointer text-[#1D1D1F]': !dObj.isDisabled && dObj.dateStr !== form.start_date && dObj.dateStr !== form.end_date,
@@ -644,6 +938,21 @@
                 </div>
 
             </div>
+
+            <!-- Step 2 Navigation Controls -->
+            <div class="pt-6 flex items-center justify-between gap-3 sm:gap-4">
+                <button type="button" 
+                        @click="prevStep()" 
+                        class="btn-secondary px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span>Back</span>
+                </button>
+                <button type="button" 
+                        @click="nextStep()" 
+                        class="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm">
+                    <span>Continue</span>
+                </button>
+            </div>
         </div>
 
         <!-- Step 3: Booking Details -->
@@ -669,7 +978,7 @@
                         
                         <div class="space-y-4">
                             <template x-for="(participant, index) in form.participants" :key="index">
-                                <div class="p-3.5 sm:p-5 rounded-xl bg-[#F2F2F7] relative space-y-3.5 sm:space-y-4 shadow-2xs">
+                                <div class="p-3.5 sm:p-5 rounded-xl relative space-y-3.5 sm:space-y-4">
                                     <div class="flex items-center justify-between">
                                         <span class="font-bold text-[#780000] text-sm" x-text="'Participant #' + (index + 1)"></span>
                                         <button type="button" 
@@ -817,17 +1126,17 @@
                                 <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Mobile Number (PH) <span class="text-[#780000]">*</span></label>
                                 <input type="tel" 
                                        x-model="form.contact_phone" 
-                                       @input="form.contact_phone = form.contact_phone.replace(/[^0-9+\s-]/g, '')"
-                                       placeholder="0917 123 4567" 
+                                       @input="form.contact_phone = formatPhoneInput($event.target.value)"
+                                       placeholder="+63 917-123-4567" 
                                        autocomplete="tel"
                                        inputmode="tel"
                                        maxlength="16"
                                        :aria-invalid="touchedStep3 && !validatePhone(form.contact_phone)"
                                        aria-describedby="err-lead-phone"
-                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
+                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#780000]"
                                        :class="touchedStep3 && !validatePhone(form.contact_phone) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                 <span id="err-lead-phone" x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-xs text-[#D70015] font-semibold mt-1 block">
-                                    Valid 11-digit PH mobile number required (e.g. 09171234567 or +639171234567).
+                                    Valid 10-digit PH mobile number starting with 9 required (e.g. +63 917-123-4567).
                                 </span>
                             </div>
 
@@ -851,7 +1160,7 @@
                                        @keydown.enter.prevent="form.pickup_option = 'carpool'"
                                        @keydown.space.prevent="form.pickup_option = 'carpool'"
                                        class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000]' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -869,7 +1178,7 @@
                                        @keydown.enter.prevent="form.pickup_option = 'own'"
                                        @keydown.space.prevent="form.pickup_option = 'own'"
                                        class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                       :class="form.pickup_option === 'own' ? 'border-[#780000] bg-[#F8EAEA]/40' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       :class="form.pickup_option === 'own' ? 'border-[#780000]' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -954,218 +1263,199 @@
                     
                     <!-- Itemized Price Calculation Summary -->
                     <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden shadow-2xs">
-                        <div class="bg-[#F2F2F7] px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between gap-2">
+                        <div class="px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between gap-2">
                             <span class="font-bold text-[#1D1D1F] text-sm sm:text-base">Booking Summary</span>
-                            <span class="text-xs sm:text-sm font-bold px-2.5 py-0.5 rounded-full bg-[#EBF5FF] text-[#007DFE] capitalize shrink-0" x-text="form.class_type"></span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] capitalize shrink-0" x-text="form.class_type"></span>
                         </div>
 
                         <div class="p-3.5 sm:p-5 space-y-3 text-xs sm:text-sm">
-                            <div class="flex justify-between items-center gap-2 text-[#6E6E73]">
+                            <div class="flex justify-between items-center gap-2 text-[#1d1d1f]">
                                 <span class="min-w-0">Base Class Rate (<span class="capitalize" x-text="form.class_type"></span> × <span x-text="form.participants.length"></span>)</span>
                                 <span class="font-bold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber((pricingQuote ? pricingQuote.base_price_per_pax : calculateBasePriceUnit()) * form.participants.length)"></span>
                             </div>
 
-                            <!-- Dynamic Pricing Adjustments -->
+                            <!-- Dynamic Pricing Adjustments (with vertical line on left, badges removed) -->
                             <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
-                                <div class="space-y-2 py-2.5 border-y border-dashed border-[#E5E5EA]">
-                                    <div class="text-[11px] sm:text-xs uppercase font-bold tracking-wider text-[#6E6E73]">Seasonal & Demand Adjustments:</div>
+                                <div class="border-l-2 border-[#D1D1D6] pl-3 py-1 space-y-2 my-1.5">
                                     <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
                                         <div class="flex justify-between items-start gap-2 text-xs sm:text-sm">
-                                            <div class="min-w-0 space-y-0.5">
-                                                <div class="font-medium text-[#1D1D1F] leading-snug" x-text="adj.rule_name"></div>
-                                                <span class="inline-block text-[11px] px-1.5 py-0.5 rounded font-bold" :class="adj.delta_per_pax >= 0 ? 'bg-rose-100 text-rose-800' : 'bg-emerald-100 text-emerald-800'" x-text="adj.formatted_adjustment + ' / pax'"></span>
-                                            </div>
-                                            <span class="font-bold shrink-0 text-right" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                                            <span class="font-medium text-[#6E6E73] leading-snug" x-text="adj.rule_name"></span>
+                                            <span class="font-bold shrink-0 text-right" :class="adj.delta_per_pax >= 0 ? 'text-[#D70015]' : 'text-[#065F46]'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
                                         </div>
                                     </template>
                                 </div>
                             </template>
 
-                            <div class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
+                            <!-- Adjusted Class Subtotal (only shown if there are adjustments) -->
+                            <div x-show="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0" class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Adjusted Class Subtotal</span>
                                 <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
                             </div>
 
-                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center gap-2 text-[#6E6E73]">
+                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center gap-2 text-[#1D1D1F]">
                                 <span>Transportation (Carpool × <span x-text="form.participants.length"></span>)</span>
                                 <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
                             </div>
 
-                            <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#6E6E73]">
+                            <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#1D1D1F]">
                                 <span>Boat Dive (₱600 × <span x-text="form.participants.length"></span>)</span>
                                 <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(600 * form.participants.length)"></span>
                             </div>
 
-                            <div class="flex justify-between items-center gap-2 text-[#6E6E73]">
-                                <span>Mabini LGU Pass & Env. Fee</span>
+                            <div class="flex justify-between items-center gap-2 text-[#1D1D1F]">
+                                <span>Mabini LGU Pass &amp; Env. Fee</span>
                                 <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(350 * form.participants.length)"></span>
                             </div>
 
+                            <!-- Downpayment Due Now (No background color) -->
+                            <div class="pt-2.5 border-t border-[#E5E5EA] flex justify-between items-center gap-2">
+                                <div class="min-w-0">
+                                    <span class="font-bold text-[#1D1D1F] block text-xs sm:text-sm leading-tight">Downpayment Due Now</span>
+                                    <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head)'"></span>
+                                </div>
+                                <span class="text-sm sm:text-base font-black text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
+                            </div>
+
+                            <!-- Remaining Balance at Camp (No background color) -->
+                            <div class="flex justify-between items-center gap-2 text-[#1D1D1F]">
+                                <span class="font-medium text-xs sm:text-sm">Remaining Balance (at Camp)</span>
+                                <span class="font-bold text-xs sm:text-sm shrink-0 text-right text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                            </div>
+
+                            <!-- Total Amount (Placed after the two payments) -->
                             <div class="pt-2.5 border-t border-[#E5E5EA] flex justify-between items-center gap-2 font-extrabold text-[#1D1D1F]">
                                 <span class="text-xs sm:text-sm">Total Amount</span>
                                 <span class="text-base sm:text-lg font-black text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateTotal())"></span>
-                            </div>
-
-                            <!-- Downpayment Box -->
-                            <div class="p-3 sm:p-3.5 rounded-xl bg-[#D1FAE5] flex justify-between items-center gap-2">
-                                <div class="min-w-0">
-                                    <span class="font-extrabold text-[#065F46] block text-xs sm:text-sm leading-tight">Downpayment Due Now</span>
-                                    <span class="text-[11px] sm:text-xs text-[#065F46]/80 font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head)'"></span>
-                                </div>
-                                <span class="text-base sm:text-lg font-black text-[#065F46] shrink-0 text-right" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
-                            </div>
-
-                            <!-- Balance Box -->
-                            <div class="p-2.5 sm:p-3 rounded-xl bg-[#F2F2F7] flex justify-between items-center gap-2 text-[#1D1D1F]">
-                                <span class="font-medium text-xs sm:text-sm text-[#6E6E73]">Remaining Balance (at Camp)</span>
-                                <span class="font-bold text-xs sm:text-sm shrink-0 text-right text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
                             </div>
                         </div>
                     </div>
 
                 </div>
+
             </div>
+
+            <!-- Step 3 Navigation Controls -->
+            <div class="pt-6 flex items-center justify-between gap-3 sm:gap-4">
+                <button type="button" 
+                        @click="prevStep()" 
+                        class="btn-secondary px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center gap-1.5 cursor-pointer">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                    <span>Back</span>
+                </button>
+                <button type="button" 
+                        @click="nextStep()" 
+                        class="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm">
+                    <span x-text="'Proceed to Downpayment (₱' + formatNumber(calculateDownpayment()) + ')'">Proceed to Downpayment</span>
+                </button>
+            </div>
+
         </div>
 
         <!-- Step 4: Downpayment -->
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
-            <div class="max-w-xl mx-auto bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-8 shadow-2xs space-y-6">
-                <!-- Top Navigation & Header -->
-                <div class="flex items-center justify-between gap-3">
-                    <button type="button" 
-                            @click="prevStep()" 
-                            class="min-h-[44px] -ml-2 px-2.5 py-2 rounded-xl text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] inline-flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
-                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                        <span>Back to Booking Details</span>
-                    </button>
-                    <div class="text-right shrink-0" role="timer" aria-label="Slot hold countdown timer">
-                        <span class="text-xs font-bold uppercase tracking-wider text-[#D70015] block">Slot Hold Timer</span>
-                        <span class="text-sm sm:text-base font-mono font-black text-[#D70015]" x-text="timerDisplay" aria-live="off"></span>
-                    </div>
-                </div>
-
-                <!-- 1. Downpayment Breakdown & Summary Card (Primary Information First) -->
-                <div class="space-y-3 pt-1">
-                    <div>
-                        <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">
-                            Reservation Breakdown
-                        </h3>
-                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
-                            Review your trip summary and required downpayment to secure your slots.
-                        </p>
-                    </div>
-
-                    <div class="rounded-2xl bg-[#F2F2F7] p-4 sm:p-5 space-y-3">
-                        <div class="flex justify-between items-center text-sm text-[#6E6E73]">
-                            <span>Package</span>
-                            <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type + ' (' + form.participants.length + ' pax)'"></strong>
-                        </div>
-                        <div class="flex justify-between items-center text-sm text-[#6E6E73]" x-show="form.start_date && form.end_date">
-                            <span>Dive Dates</span>
-                            <span class="font-medium text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
-                        </div>
-                        <div class="flex justify-between items-center text-sm text-[#6E6E73]">
-                            <span>Total Trip Cost</span>
-                            <strong class="text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal())"></strong>
-                        </div>
-                        <div class="flex justify-between items-center text-sm text-[#6E6E73]">
-                            <span>Remaining Balance (at Camp)</span>
-                            <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
-                        </div>
-
-                        <!-- Downpayment Highlight -->
-                        <div class="pt-3 border-t border-[#E5E5EA]/60 flex justify-between items-center gap-2">
-                            <div>
-                                <span class="font-bold text-[#065F46] text-sm block">Downpayment Due Now:</span>
-                                <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
-                            </div>
-                            <strong class="text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Cancellation and Reschedule Policy (Secondary Policy Context) -->
-                <div class="space-y-3 pt-2 border-t border-[#F2F2F7]">
-                    <div>
-                        <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">
-                            Cancellation & Reschedule Policy
-                        </h3>
-                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
-                            Transparent booking policies for date transfers and cancellations.
-                        </p>
-                    </div>
-
-                    <div class="space-y-2 text-xs sm:text-sm text-[#6E6E73]">
-                        <!-- Tier 1: > 14 Days -->
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7]/60 space-y-0.5">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given > 14 Days</strong>
-                                <span class="text-[11px] sm:text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md">
-                                    100% Refund or 1 Free Reschedule
-                                </span>
-                            </div>
-                            <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                Eligible for full downpayment refund or one free date transfer to any future open schedule.
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- 2-Column Grid: Reservation Breakdown (Left) & Cancellation Policy (Right) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-start">
+                    
+                    <!-- Left Column: Reservation Breakdown & Payment Channels -->
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">
+                                Reservation Breakdown
+                            </h3>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
+                                Review your trip summary and required downpayment to secure your slots.
                             </p>
                         </div>
 
-                        <!-- Tier 2: 7 to 14 Days -->
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7]/60 space-y-0.5">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given 7 to 14 Days</strong>
-                                <span class="text-[11px] sm:text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md">
-                                    1 Free Date Reschedule
-                                </span>
+                        <div class="rounded-2xl space-y-3">
+                            <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <span>Package</span>
+                                <strong class="text-[#1D1D1F] capitalize" x-text="form.class_type + ' (' + form.participants.length + ' pax)'"></strong>
                             </div>
-                            <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                Free date reschedule to another available schedule. Downpayment is non-refundable.
+                            <div class="flex justify-between items-center text-sm text-[#6E6E73]" x-show="form.start_date && form.end_date">
+                                <span>Dive Dates</span>
+                                <span class="font-medium text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <span>Total Trip Cost</span>
+                                <strong class="text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal())"></strong>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <span>Remaining Balance (at Camp)</span>
+                                <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal() - calculateDownpayment())"></span>
+                            </div>
+
+                            <!-- Downpayment Highlight -->
+                            <div class="pt-3 flex justify-between items-center gap-2">
+                                <div>
+                                    <span class="font-bold text-[#065F46] text-sm block">Downpayment Due Now:</span>
+                                    <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
+                                </div>
+                                <strong class="text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right Column: Cancellation & Reschedule Policy -->
+                    <div class="space-y-4">
+                        <div>
+                            <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">
+                                Cancellation & Reschedule Policy
+                            </h3>
+                            <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">
+                                Transparent booking policies for date transfers and cancellations.
                             </p>
                         </div>
 
-                        <!-- Tier 3: < 7 Days (Locked) -->
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7]/60 space-y-0.5">
-                            <div class="flex items-center justify-between gap-2 flex-wrap">
-                                <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days</strong>
-                                <span class="text-[11px] sm:text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-md">
-                                    Non-Refundable
-                                </span>
+                        <div class="text-xs sm:text-sm text-[#6E6E73]">
+                            <!-- Tier 1: > 14 Days -->
+                            <div class="p-3 rounded-xl space-y-1">
+                                <div class="flex items-center justify-between gap-2 flex-wrap">
+                                    <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given > 14 Days</strong>
+                                    <span class="text-[11px] sm:text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-md">
+                                        100% Refund or 1 Free Reschedule
+                                    </span>
+                                </div>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    Eligible for full downpayment refund or one free date transfer to any future open schedule.
+                                </p>
                             </div>
-                            <p class="text-xs text-[#6E6E73] leading-relaxed">
-                                Slots and resort/boat allocations are finalized. Cannot be refunded or rescheduled.
-                            </p>
+
+                            <!-- Tier 2: 7 to 14 Days -->
+                            <div class="p-3 rounded-xl space-y-1">
+                                <div class="flex items-center justify-between gap-2 flex-wrap">
+                                    <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given 7 to 14 Days</strong>
+                                    <span class="text-[11px] sm:text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-md">
+                                        1 Free Date Reschedule
+                                    </span>
+                                </div>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    Free date reschedule to another available schedule. Downpayment is non-refundable.
+                                </p>
+                            </div>
+
+                            <!-- Tier 3: < 7 Days (Locked) -->
+                            <div class="p-3 rounded-xl space-y-1">
+                                <div class="flex items-center justify-between gap-2 flex-wrap">
+                                    <strong class="text-xs sm:text-sm font-bold text-[#1D1D1F]">Notice Given < 7 Days</strong>
+                                    <span class="text-[11px] sm:text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-md">
+                                        Non-Refundable
+                                    </span>
+                                </div>
+                                <p class="text-xs text-[#6E6E73] leading-relaxed">
+                                    Slots and resort/boat allocations are finalized. Cannot be refunded or rescheduled.
+                                </p>
+                            </div>
                         </div>
                     </div>
+
                 </div>
 
-                <!-- 3. Supported Hosted Payment Channels -->
-                <div class="space-y-2.5 pt-2 border-t border-[#F2F2F7]">
-                    <span class="text-xs font-bold uppercase tracking-wider text-[#636366] block">
-                        Accepted on PayMongo Hosted Checkout:
-                    </span>
-
-                    <div class="grid grid-cols-3 gap-2 text-center" role="group" aria-label="Supported Payment Channels">
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5 select-none">
-                            <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">QR Ph</span>
-                            <span class="text-[11px] text-[#636366] block">All PH Banks</span>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5 select-none">
-                            <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">GCash</span>
-                            <span class="text-[11px] text-[#636366] block">E-Wallet</span>
-                        </div>
-                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] space-y-0.5 select-none">
-                            <span class="font-bold text-xs sm:text-sm text-[#1D1D1F] block">Maya & Cards</span>
-                            <span class="text-[11px] text-[#636366] block">Visa / Master</span>
-                        </div>
-                    </div>
-
-                    <p class="text-xs text-[#6E6E73] text-center pt-0.5">
-                        You will be redirected to PayMongo's secure hosted checkout page to complete your payment.
-                    </p>
-                </div>
-
-                <!-- 4. Explicit Consent & Hosted Checkout Action Button -->
-                <div class="space-y-4 pt-2 border-t border-[#F2F2F7]">
+                <!-- Explicit Consent & Hosted Checkout Action Button (Full Width Bottom) -->
+                <div class="pt-4">
                     <div class="p-3.5 rounded-xl bg-[#F2F2F7] transition-all"
                          :class="touchedStep4 && !form.hasAgreedToTerms ? 'border border-[#D70015] bg-red-50/20' : ''">
                         <label tabindex="0"
@@ -1189,7 +1479,7 @@
                                     <span>Privacy Policy</span>
                                     <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
                                 </a>, 
-                                and Cancellation Policy. <span class="text-[#D70015]">*</span>
+                                and Cancellation & Reschedule Policy . <span class="text-[#D70015]">*</span>
                             </span>
                         </label>
                         <span id="err-terms-agreement" x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#D70015] font-semibold mt-1.5 block">
@@ -1197,154 +1487,152 @@
                         </span>
                     </div>
 
-                    <button type="button" 
-                            @click="if (!form.hasAgreedToTerms) { touchedStep4 = true; errorMessage = 'Please read and agree to the Terms & Conditions and Privacy Policy to proceed.'; window.scrollTo({ top: 0, behavior: 'smooth' }); return; } processPayment(false, true)" 
-                            :disabled="submittingPayment || !form.hasAgreedToTerms"
-                            class="btn-primary w-full py-3.5 px-6 text-base font-extrabold shadow-sm flex items-center justify-center gap-2 cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        <span x-show="!submittingPayment" class="flex items-center gap-2">
-                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            <span>Proceed to PayMongo Hosted Checkout</span>
-                        </span>
-                        <span x-show="submittingPayment" class="flex items-center gap-2">
-                            <svg class="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
-                            <span>Redirecting to PayMongo...</span>
-                        </span>
-                    </button>
+                    <!-- Step 4 Navigation Controls -->
+                    <div class="pt-6 flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-4">
+                        <button type="button" 
+                                @click="prevStep()" 
+                                class="btn-secondary px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer shrink-0 self-start">
+                            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                            <span>Back</span>
+                        </button>
 
-                    <div class="text-center text-xs text-[#6E6E73] leading-relaxed flex items-center justify-center gap-1.5 pt-1">
-                        <span>Encrypted &amp; securely processed by PayMongo. We never store card or wallet details.</span>
+                        <div class="flex flex-col items-stretch sm:items-end gap-1.5 text-right">
+                            <button type="button" 
+                                    @click="if (!form.hasAgreedToTerms) { touchedStep4 = true; errorMessage = 'Please read and agree to the Terms & Conditions and Privacy Policy to proceed.'; window.scrollTo({ top: 0, behavior: 'smooth' }); return; } processPayment(false, true)" 
+                                    :disabled="submittingPayment || !form.hasAgreedToTerms"
+                                    class="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto">
+                                <span x-show="!submittingPayment" class="flex items-center gap-2">
+                                    <span>Proceed to PayMongo Hosted Checkout</span>
+                                </span>
+                                <span x-show="submittingPayment" class="flex items-center gap-2">
+                                    <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                    <span>Redirecting to PayMongo...</span>
+                                </span>
+                            </button>
+                            <span class="text-[11px] sm:text-xs text-[#6E6E73] leading-relaxed text-center sm:text-right">
+                                Encrypted &amp; securely processed by PayMongo. We never store card or wallet details.
+                            </span>
+                        </div>
                     </div>
                 </div>
 
             </div>
-
         </div>
 
         <!-- Step 5: Confirmation & Credentials -->
-        <div x-show="currentStep === 5" x-cloak class="space-y-6 text-center">
-            <div class="w-16 h-16 bg-[#ECFDF5] text-[#34C759] rounded-full flex items-center justify-center mx-auto border border-[#A7F3D0]">
-                <svg class="w-8 h-8 text-[#166534]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
+        <div x-show="currentStep === 5" x-cloak class="space-y-6">
 
-            <div class="space-y-2">
-                <h2 class="text-xl sm:text-2xl font-bold text-[#1D1D1F]">
-                    Booking Confirmed!
-                </h2>
-                <p class="text-sm sm:text-sm text-[#6E6E73] max-w-md mx-auto">
-                    We've emailed your booking confirmation to <strong class="text-[#1D1D1F]" x-text="form.contact_email"></strong>. Please save your reference number and PIN below.
-                </p>
-            </div>
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- 2-Column Grid: Confirmation & Voucher (Left) & Summary + Checklist (Right) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-start">
+                    
+                    <!-- Left Column: Confirmation Message & Voucher -->
+                    <div class="space-y-6 text-left">
+                        <div class="space-y-2">
+                            <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                                We've emailed your booking confirmation to <strong class="text-[#1D1D1F]" x-text="form.contact_email"></strong>. Please save your reference number and PIN below.
+                            </p>
+                        </div>
 
-            <!-- Booking Credentials Voucher -->
-            <div class="max-w-md mx-auto p-5 rounded-2xl bg-[#F8EAEA]/40 border border-[#780000]/20 space-y-4">
-                <div>
-                    <span class="text-sm uppercase tracking-wider text-[#6E6E73] font-bold">Booking Reference Number</span>
-                    <div class="text-2xl sm:text-3xl font-mono font-extrabold text-[#780000] tracking-wider" x-text="confirmedBooking.booking_number"></div>
-                </div>
-
-                <div class="pt-2 border-t border-[#780000]/20">
-                    <span class="text-sm uppercase tracking-wider text-[#6E6E73] font-bold">4-Digit Security PIN</span>
-                    <div class="text-2xl font-mono font-bold text-[#1D1D1F] tracking-widest" x-text="confirmedBooking.pin"></div>
-                    <span class="text-sm text-[#6E6E73] block mt-1">Keep this PIN safe to manage or update your booking anytime.</span>
-                </div>
-
-                <div class="pt-2">
-                    <button type="button" 
-                            @click="copyCredentials()" 
-                            class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] px-4 py-2.5 text-sm font-bold shadow-2xs inline-flex items-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
-                        <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-5 h-5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copied">
-                        <svg x-show="copied" x-cloak class="w-5 h-5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                        <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Recap Summary -->
-            <div class="max-w-lg mx-auto p-4 sm:p-5 rounded-xl bg-[#F2F2F7] text-left text-sm sm:text-sm space-y-2.5 shadow-2xs">
-                <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
-                    <span class="text-[#6E6E73]">Package:</span>
-                    <span class="font-bold text-[#1D1D1F] capitalize" x-text="form.class_type"></span>
-                </div>
-                <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
-                    <span class="text-[#6E6E73]">Trip Dates:</span>
-                    <span class="font-bold text-[#1D1D1F]" x-text="form.start_date + ' to ' + form.end_date"></span>
-                </div>
-                <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
-                    <span class="text-[#6E6E73]">Participants:</span>
-                    <span class="font-bold text-[#1D1D1F]" x-text="form.participants.length + ' participant(s)'"></span>
-                </div>
-
-                <!-- Applied Dynamic Pricing Rules -->
-                <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
-                    <div class="py-2 border-b border-[#E5E5EA] space-y-1.5">
-                        <div class="text-sm uppercase font-bold tracking-wider text-[#6E6E73]">Applied Dynamic Pricing Rules:</div>
-                        <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
-                            <div class="flex justify-between items-center text-sm">
-                                <span class="text-[#1D1D1F]" x-text="adj.rule_name + ' (' + adj.formatted_adjustment + ')'"></span>
-                                <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                        <!-- Booking Credentials Voucher -->
+                        <div class="p-5 rounded-2xl bg-[#00C3D0] space-y-4">
+                            <div>
+                                <span class="text-xs uppercase tracking-wider text-[#FFFFFF] font-bold">Booking Reference Number</span>
+                                <div class="text-2xl sm:text-3xl font-mono font-extrabold text-[#FFFFFF] tracking-wider" x-text="confirmedBooking.booking_number"></div>
                             </div>
-                        </template>
+
+                            <div class="pt-2 border-t border-[#FFFFFF]/30">
+                                <span class="text-xs uppercase tracking-wider text-[#FFFFFF] font-bold">4-Digit Security PIN</span>
+                                <div class="text-2xl font-mono font-bold text-[#FFFFFF] tracking-widest" x-text="confirmedBooking.pin"></div>
+                                <span class="text-xs text-[#FFFFFF] block mt-1">Keep this PIN safe to manage or update your booking anytime.</span>
+                            </div>
+
+                            <div class="pt-2">
+                                <button type="button" 
+                                        @click="copyCredentials()" 
+                                        class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] px-4 py-2.5 text-xs sm:text-sm font-bold shadow-2xs inline-flex items-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                                    <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copied">
+                                    <svg x-show="copied" x-cloak class="w-4.5 h-4.5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                </template>
 
-                <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
-                    <span class="text-[#6E6E73]">Transportation:</span>
-                    <span class="font-bold text-[#1D1D1F]" x-text="form.pickup_option === 'carpool' ? form.pickup_location : 'Own Transportation'"></span>
-                </div>
-                <div class="flex justify-between border-b border-[#E5E5EA] pb-2">
-                    <span class="text-[#6E6E73]">Downpayment Paid:</span>
-                    <span class="font-bold text-[#34C759]" x-text="'₱' + formatNumber(confirmedBooking.downpayment_paid)"></span>
-                </div>
-                <div class="flex justify-between text-[#780000] font-bold">
-                    <span>Balance Due at Camp:</span>
-                    <span x-text="'₱' + formatNumber(confirmedBooking.balance_due)"></span>
-                </div>
-            </div>
+                    <!-- Right Column: Recap Summary & Things to Bring Checklist -->
+                    <div class="space-y-4">
+                        <!-- Recap Summary -->
+                        <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5 shadow-2xs">
+                            <div class="flex justify-between">
+                                <span class="text-[#6E6E73]">Package:</span>
+                                <span class="font-bold text-[#1D1D1F] capitalize" x-text="form.class_type"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#6E6E73]">Trip Dates:</span>
+                                <span class="font-bold text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#6E6E73]">Participants:</span>
+                                <span class="font-bold text-[#1D1D1F]" x-text="form.participants.length + ' participant(s)'"></span>
+                            </div>
 
-            <!-- Things to Bring Checklist -->
-            <div class="max-w-lg mx-auto p-5 rounded-xl bg-[#F2F2F7] text-left text-sm sm:text-sm space-y-2 shadow-2xs">
-                <h4 class="font-bold text-[#1D1D1F]">Things to Bring:</h4>
-                <ul class="space-y-1 text-sm sm:text-sm text-[#6E6E73] list-disc list-inside">
-                    <li>Swimming clothes (anything you’re comfortable wearing)</li>
-                    <li>Toiletries</li>
-                    <li>Personal things</li>
-                    <li>A pair of socks (in any kind) for fin fitting</li>
-                </ul>
-                <p class="text-sm text-[#065F46] font-semibold pt-1">
-                    (Towels, shampoo and soap are all provided)
-                </p>
-            </div>
+                            <!-- Applied Dynamic Pricing Rules -->
+                            <template x-if="pricingQuote && pricingQuote.adjustments && pricingQuote.adjustments.length > 0">
+                                <div class="border-l-2 border-[#D1D1D6] pl-3 py-1 space-y-1.5 my-1.5">
+                                    <div class="text-xs uppercase font-bold tracking-wider text-[#6E6E73]">Applied Pricing Rules:</div>
+                                    <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
+                                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                                            <span class="text-[#1D1D1F]" x-text="adj.rule_name + ' (' + adj.formatted_adjustment + ')'"></span>
+                                            <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
 
-            <!-- Navigation Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4">
-                <a :href="confirmedBooking.manage_url" class="btn-primary w-full sm:w-auto px-6 py-3 text-sm">
-                    Manage This Booking
-                </a>
-                <a href="{{ route('landing') }}" class="btn-secondary w-full sm:w-auto px-6 py-3 text-sm">
-                    Done / Back to Home
-                </a>
+                            <div class="flex justify-between">
+                                <span class="text-[#6E6E73]">Transportation:</span>
+                                <span class="font-bold text-[#1D1D1F]" x-text="form.pickup_option === 'carpool' ? form.pickup_location : 'Own Transportation'"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-[#6E6E73]">Downpayment Paid:</span>
+                                <span class="font-bold text-[#34C759]" x-text="'₱' + formatNumber(confirmedBooking.downpayment_paid)"></span>
+                            </div>
+                            <div class="flex justify-between text-[#780000] font-bold">
+                                <span>Balance Due at Camp:</span>
+                                <span x-text="'₱' + formatNumber(confirmedBooking.balance_due)"></span>
+                            </div>
+                        </div>
+
+                        <!-- Things to Bring Checklist -->
+                        <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5 shadow-2xs">
+                            <h4 class="font-bold text-[#1D1D1F]">Things to Bring:</h4>
+                            <ul class="space-y-1 text-[#6E6E73] list-disc list-inside">
+                                <li>Swimming clothes (anything you’re comfortable wearing)</li>
+                                <li>Toiletries</li>
+                                <li>Personal things</li>
+                                <li>A pair of socks (in any kind) for fin fitting</li>
+                            </ul>
+                            <p class="text-xs sm:text-sm text-[#065F46] font-semibold pt-1">
+                                (Towels, shampoo and soap are all provided)
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6">
+                    <a :href="confirmedBooking.manage_url" class="btn-primary w-full sm:w-auto px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold">
+                        Manage This Booking
+                    </a>
+                    <a href="{{ route('landing') }}" class="btn-secondary w-full sm:w-auto px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold">
+                        Done / Back to Home
+                    </a>
+                </div>
             </div>
         </div>
 
-        <!-- Step Navigation Controls -->
-        <div x-show="currentStep < 4" class="mt-8 pt-6 flex items-center justify-between gap-2.5 sm:gap-4">
-            <button type="button" 
-                    @click="prevStep()" 
-                    x-show="currentStep > 1"
-                    class="btn-secondary px-3.5 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center gap-1.5 shrink-0 cursor-pointer">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back</span>
-            </button>
-            <div x-show="currentStep === 1"></div>
-
-            <button type="button" 
-                    @click="nextStep()" 
-                    class="btn-primary px-4 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all text-center leading-snug flex-1 sm:flex-initial shadow-sm">
-                <span x-text="currentStep === 3 ? 'Proceed to Downpayment (₱' + formatNumber(calculateDownpayment()) + ')' : 'Continue'"></span>
-            </button>
-        </div>
-
-    </div>
+    </main>
 </div>
 @endsection
 
@@ -1369,7 +1657,14 @@
 // TODO: Implement Web Worker background sync for offline draft storage in IndexedDB.
 function bookingForm(config) {
     return {
-        currentStep: 1,
+        currentStep: config.initialStep || 1,
+        shortStepTitles: [
+            "Class",
+            "Dates",
+            "Details",
+            "Payment",
+            "Confirmed"
+        ],
         stepTitles: [
             "Select Class",
             "Choose Dive Dates",
@@ -1391,7 +1686,7 @@ function bookingForm(config) {
             contact_last_name: '',
             contact_name: '',
             contact_email: '',
-contact_phone: '',
+            contact_phone: '',
             contact_facebook: '',
             pickup_option: 'carpool',
             pickup_location: '',
@@ -1422,7 +1717,7 @@ contact_phone: '',
         timerSeconds: 15 * 60,
         timerDisplay: '15:00',
         timerInterval: null,
-        confirmedBooking: {
+        confirmedBooking: config.confirmedBookingData || {
             booking_number: '',
             pin: '',
             downpayment_paid: 0,
@@ -1431,6 +1726,28 @@ contact_phone: '',
         },
         copied: false,
         draftRestored: false,
+
+        selectAndScrollPackage(type) {
+            this.form.class_type = type;
+            this.$nextTick(() => {
+                const el = document.getElementById('package-' + type);
+                if (el) {
+                    const headerOffset = 115;
+                    const elementPosition = el.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                    window.scrollTo({
+                        top: Math.max(0, offsetPosition),
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        },
+
+        onFundiveOptionChanged() {
+            if (this.form.start_date) {
+                this.fetchPricingQuote();
+            }
+        },
 
         // Dual Calendar State & Helpers
         calendarYear: new Date().getFullYear(),
@@ -1531,7 +1848,60 @@ contact_phone: '',
             this.onStartDateChange();
         },
 
+        formatPhoneInput(val) {
+            if (!val) return '';
+            let digits = val.toString().replace(/\D/g, '');
+            if (digits.startsWith('63')) {
+                digits = digits.substring(2);
+            }
+            if (digits.startsWith('0')) {
+                digits = digits.substring(1);
+            }
+            digits = digits.substring(0, 10);
+            if (!digits) return '';
+
+            let res = '+63 ';
+            if (digits.length <= 3) {
+                res += digits;
+            } else if (digits.length <= 6) {
+                res += digits.substring(0, 3) + '-' + digits.substring(3);
+            } else {
+                res += digits.substring(0, 3) + '-' + digits.substring(3, 6) + '-' + digits.substring(6);
+            }
+            return res;
+        },
+
         initBooking() {
+            if (config.confirmedBookingData) {
+                this.confirmedBooking = config.confirmedBookingData;
+                this.currentStep = 5;
+                if (config.confirmedBookingData.class_type) {
+                    this.form.class_type = config.confirmedBookingData.class_type;
+                }
+                if (config.confirmedBookingData.start_date) {
+                    this.form.start_date = config.confirmedBookingData.start_date;
+                    this.form.end_date = config.confirmedBookingData.end_date;
+                }
+                if (config.confirmedBookingData.contact_email) {
+                    this.form.contact_email = config.confirmedBookingData.contact_email;
+                }
+                if (config.confirmedBookingData.contact_name) {
+                    this.form.contact_name = config.confirmedBookingData.contact_name;
+                }
+                if (config.confirmedBookingData.participants && config.confirmedBookingData.participants.length > 0) {
+                    this.form.participants = config.confirmedBookingData.participants;
+                }
+                if (config.confirmedBookingData.pickup_option) {
+                    this.form.pickup_option = config.confirmedBookingData.pickup_option;
+                    this.form.pickup_location = config.confirmedBookingData.pickup_location || '';
+                }
+                if (config.confirmedBookingData.adjustments) {
+                    this.pricingQuote = { adjustments: config.confirmedBookingData.adjustments };
+                }
+                this.clearDraft();
+                return;
+            }
+
             this.loadDraft();
 
             // Auto-save form inputs whenever they change
@@ -1903,8 +2273,10 @@ contact_phone: '',
 
         validatePhone(phone) {
             if (!phone) return false;
-            const clean = phone.toString().replace(/[\s\-]/g, '');
-            return /^(\+?63|0)9\d{9}$/.test(clean);
+            const digits = phone.toString().replace(/\D/g, '');
+            return (digits.length === 12 && digits.startsWith('639')) ||
+                   (digits.length === 11 && digits.startsWith('09')) ||
+                   (digits.length === 10 && digits.startsWith('9'));
         },
 
         nextStep() {
