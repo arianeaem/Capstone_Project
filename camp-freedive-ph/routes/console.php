@@ -39,4 +39,15 @@ Schedule::command('forecast:archive-accuracy')
     ->runInBackground()
     ->appendOutputTo(storage_path('logs/forecast_accuracy.log'));
 
+/**
+ * Phase 0 ML Multi-Horizon Model Re-benchmarking
+ * Runs quarterly to re-evaluate AutoGluon, Chronos-2, and XGBoost predictors on latest trailing data.
+ */
+Schedule::command('ml:rebenchmark')
+    ->quarterly()
+    ->withoutOverlapping()
+    ->runInBackground()
+    ->appendOutputTo(storage_path('logs/ml_rebenchmark.log'));
+
+
 

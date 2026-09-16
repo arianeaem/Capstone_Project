@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use App\Services\WeatherForecastService;
+use App\Services\WeatherSafetyMLService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -28,7 +29,8 @@ use Illuminate\View\View;
 class WeatherSafetyController extends Controller
 {
     public function __construct(
-        protected WeatherForecastService $forecastService
+        protected WeatherForecastService $forecastService,
+        protected WeatherSafetyMLService $mlService
     ) {}
 
     /**
@@ -95,8 +97,9 @@ class WeatherSafetyController extends Controller
             }
         }
 
-        // ML Microservice Health Check
+        // ML Microservice & Circuit Breaker Status
         $mlSafetyUrl = config('services.ml_safety.url', 'http://127.0.0.1:8001');
+        $circuitStatus = $this->mlService->getCircuitStatus();
         $isMLReachable = false;
         try {
             $res = Http::timeout(1)->get("{$mlSafetyUrl}/health");
@@ -107,7 +110,7 @@ class WeatherSafetyController extends Controller
 
         // Prepare batch ML assessments for the ML tab
         $batchMLAssessments = [];
-        if ($isMLReachable) {
+        if ($isMLReachable && $circuitStatus['is_available']) {
             foreach ($batches as $b) {
                 $d1Date = $b->start_date->format('Y-m-d');
                 $d2Date = $b->end_date ? $b->end_date->format('Y-m-d') : $b->start_date->copy()->addDay()->format('Y-m-d');
@@ -119,11 +122,37 @@ class WeatherSafetyController extends Controller
                     $wRank = max(WeatherForecastService::RISK_RANK[$rec1] ?? 1, WeatherForecastService::RISK_RANK[$rec2] ?? 1);
                     $wRec = array_search($wRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
                     $horizonInfo = WeatherForecastService::getOperationalHorizon($b);
+                    $daysOut = $horizonInfo['days_out'] ?? max(0, Carbon::now(WeatherForecastService::TIMEZONE)->startOfDay()->diffInDays($b->start_date->copy()->startOfDay(), false));
+
+                    $d1Conf = ($daysOut >= 4 || ($d1ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+                    $d2Conf = (($daysOut + 1) >= 4 || ($d2ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+                    $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $daysOut >= 4) ? 'low' : 'high';
+
+                    $confidenceTier = match(true) {
+                        $daysOut >= 4 => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
+                        $batchConfidence === 'low' => 'LOW_CONFIDENCE_ML_UNCERTAIN',
+                        $daysOut >= 2 => 'MODERATE_CONFIDENCE',
+                        default => 'HIGH_CONFIDENCE',
+                    };
+
+                    $servingSource = match(true) {
+                        $daysOut >= 4 => 'Batangas Climatology Fallback',
+                        $daysOut >= 2 => 'DirectTabular Multi-Step (ONNX)',
+                        default => 'ONNX C++ Ultra-Fast Engine',
+                    };
+
+                    $opStatus = ($horizonInfo['status'] === 'CONCLUDED') ? 'CONCLUDED' : ($d1ML['operational_status'] ?? $d2ML['operational_status'] ?? $horizonInfo['status']);
+                    $opLabel = ($horizonInfo['status'] === 'CONCLUDED') ? ($horizonInfo['label'] ?? 'Concluded Session') : ($d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? $horizonInfo['label']);
+
                     $batchMLAssessments[$b->id] = [
                         'batch' => $b,
                         'overall_recommendation' => $wRec,
-                        'operational_status' => $d1ML['operational_status'] ?? $d2ML['operational_status'] ?? $horizonInfo['status'],
-                        'operational_status_label' => $d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? $horizonInfo['label'],
+                        'operational_status' => $opStatus,
+                        'operational_status_label' => $opLabel,
+                        'confidence' => $batchConfidence,
+                        'confidence_tier' => $confidenceTier,
+                        'serving_source' => $servingSource,
+                        'confidence_advisory' => ($batchConfidence === 'low') ? "{$wRec}. Confidence is low this far out, recheck in 2 days." : null,
                         'day1' => $d1ML,
                         'day2' => $d2ML,
                         'safety_threshold_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
@@ -139,6 +168,7 @@ class WeatherSafetyController extends Controller
             'lastUpdatedAt',
             'masterForecast',
             'isMLReachable',
+            'circuitStatus',
             'mlSafetyUrl',
             'batchMLAssessments'
         ));
@@ -309,12 +339,38 @@ class WeatherSafetyController extends Controller
             $worseMLRec = array_search($worseMLRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
 
             $horizonInfo = WeatherForecastService::getOperationalHorizon($batch);
+            $daysOut = $horizonInfo['days_out'] ?? max(0, Carbon::now(WeatherForecastService::TIMEZONE)->startOfDay()->diffInDays($batch->start_date->copy()->startOfDay(), false));
+
+            $d1Conf = ($daysOut >= 4 || ($day1MLAssessment['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+            $d2Conf = (($daysOut + 1) >= 4 || ($day2MLAssessment['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+            $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $daysOut >= 4) ? 'low' : 'high';
+
+            $confidenceTier = match(true) {
+                $daysOut >= 4 => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
+                $batchConfidence === 'low' => 'LOW_CONFIDENCE_ML_UNCERTAIN',
+                $daysOut >= 2 => 'MODERATE_CONFIDENCE',
+                default => 'HIGH_CONFIDENCE',
+            };
+
+            $servingSource = match(true) {
+                $daysOut >= 4 => 'Batangas Climatology Fallback',
+                $daysOut >= 2 => 'DirectTabular Multi-Step (ONNX)',
+                default => 'ONNX C++ Ultra-Fast Engine',
+            };
+
+            $opStatus = ($horizonInfo['status'] === 'CONCLUDED') ? 'CONCLUDED' : ($day1MLAssessment['operational_status'] ?? $day2MLAssessment['operational_status'] ?? $horizonInfo['status']);
+            $opLabel = ($horizonInfo['status'] === 'CONCLUDED') ? ($horizonInfo['label'] ?? 'Concluded Session') : ($day1MLAssessment['operational_status_label'] ?? $day2MLAssessment['operational_status_label'] ?? $horizonInfo['label']);
+
             $batchMLAssessment = [
                 'overall_recommendation' => $worseMLRec,
                 'ml_recommendation' => $worseMLRec,
                 'ml_classification' => $worseMLRec,
-                'operational_status' => $day1MLAssessment['operational_status'] ?? $day2MLAssessment['operational_status'] ?? $horizonInfo['status'],
-                'operational_status_label' => $day1MLAssessment['operational_status_label'] ?? $day2MLAssessment['operational_status_label'] ?? $horizonInfo['label'],
+                'operational_status' => $opStatus,
+                'operational_status_label' => $opLabel,
+                'confidence' => $batchConfidence,
+                'confidence_tier' => $confidenceTier,
+                'serving_source' => $servingSource,
+                'confidence_advisory' => ($batchConfidence === 'low') ? "{$worseMLRec}. Confidence is low this far out, recheck in 2 days." : null,
                 'day1' => $day1MLAssessment,
                 'day2' => $day2MLAssessment,
                 'is_authoritative_go' => ($day1MLAssessment['is_authoritative_go'] ?? false) && ($day2MLAssessment['is_authoritative_go'] ?? false),
@@ -322,6 +378,8 @@ class WeatherSafetyController extends Controller
                 'hard_gate_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),
             ];
         }
+
+        $circuitStatus = $this->mlService->getCircuitStatus();
 
         return view('admin.weather.show', compact(
             'batch',
@@ -334,7 +392,8 @@ class WeatherSafetyController extends Controller
             'day2Continuous24h',
             'day1MLAssessment',
             'day2MLAssessment',
-            'batchMLAssessment'
+            'batchMLAssessment',
+            'circuitStatus'
         ));
     }
 

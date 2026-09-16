@@ -252,17 +252,116 @@ class WeatherSafetyMLService
                 return null;
             }
 
-            $this->recordSuccess();
             $data = $response->json();
+
+            // Strict Quantile Integrity: If physics_forecast object is present, validate all quantile bounds
+            if (isset($data['physics_forecast'])) {
+                $this->validateQuantiles($data['physics_forecast']);
+            }
+
+            $this->recordSuccess();
             return $this->standardizeResponse($data);
         } catch (Exception $e) {
             $this->recordFailure($e->getMessage());
-            Log::info('[WeatherSafetyMLService] ML Safety microservice unreachable, continuing with native heuristic engine', [
+            Log::info('[WeatherSafetyMLService] ML Safety microservice failure (unreachable or malformed schema), continuing with native heuristic engine', [
                 'error' => $e->getMessage(),
                 'date' => $date,
             ]);
             return null;
         }
+    }
+
+    /**
+     * Fetch multi-horizon physics forecast with quantiles from /forecast endpoint.
+     * Enforces strict validation: malformed or missing quantiles increment the circuit breaker failure counter.
+     *
+     * @param int $horizonHours
+     * @param array|null $boundaryWeather
+     * @return array|null
+     */
+    public function fetchPhysicsForecast(int $horizonHours = 24, ?array $boundaryWeather = null): ?array
+    {
+        if (!$this->isEnabled() || !$this->isCircuitAvailable()) {
+            return null;
+        }
+
+        try {
+            $payload = [
+                'horizon_hours' => $horizonHours,
+            ];
+            if (!empty($boundaryWeather)) {
+                $payload['readings'] = $boundaryWeather;
+            }
+
+            $response = Http::timeout($this->timeout)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                ])
+                ->post("{$this->baseUrl}/forecast", $payload);
+
+            if (!$response->successful()) {
+                $this->recordFailure("HTTP {$response->status()} on /forecast");
+                return null;
+            }
+
+            $data = $response->json();
+            $physics = $data['physics_forecast'] ?? $data['physics'] ?? null;
+
+            if (!$physics || !is_array($physics)) {
+                throw new Exception("Missing physics_forecast object in /forecast response");
+            }
+
+            // Strictly validate quantile schema — throws Exception on malformed/missing fields
+            $this->validateQuantiles($physics);
+
+            $this->recordSuccess();
+            return $data;
+        } catch (Exception $e) {
+            $this->recordFailure("Quantile validation or connection failure: " . $e->getMessage());
+            Log::warning('[WeatherSafetyMLService] Failed physics forecast request: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Validate that the physics forecast contains valid numeric p10, p50, p90 quantile structures.
+     *
+     * @param array $physics
+     * @return bool
+     * @throws Exception If any required quantile field is missing or malformed
+     */
+    public function validateQuantiles(array $physics): bool
+    {
+        $requiredQuantileFields = [
+            'significant_wave_height_m',
+            'peak_period_s',
+            'swell_height_m',
+            'wind_wave_height_m',
+            'wind_speed_kmh',
+            'wind_gust_kmh',
+            'wind_direction_deg',
+            'sea_level_pressure_hpa',
+            'current_speed_ms',
+            'current_direction_deg',
+        ];
+
+        foreach ($requiredQuantileFields as $field) {
+            if (!isset($physics[$field])) {
+                throw new Exception("Missing required quantile field: {$field}");
+            }
+
+            $q = $physics[$field];
+            if (!is_array($q) || !isset($q['p10']) || !isset($q['p50']) || !isset($q['p90'])) {
+                throw new Exception("Malformed quantile object for field '{$field}' (must contain p10, p50, p90)");
+            }
+
+            if (!is_numeric($q['p10']) || !is_numeric($q['p50']) || !is_numeric($q['p90'])) {
+                throw new Exception("Non-numeric quantile bounds detected for field '{$field}'");
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -139,6 +139,10 @@ class WeatherForecastService
         $now = Carbon::now(self::TIMEZONE);
 
         if ($dateOrBatch instanceof Batch) {
+            $startDate = $dateOrBatch->start_date->copy()->startOfDay();
+            $leadTimeHours = max(0, $now->diffInHours($dateOrBatch->start_date->copy()->setTime(9, 30), false));
+            $daysOut = $now->startOfDay()->diffInDays($startDate, false);
+
             $isPastOrConcluded = in_array($dateOrBatch->status, ['completed', 'cancelled', 'cancelled_by_camp']) ||
                                  in_array($dateOrBatch->lifecycle_status, ['completed', 'cancelled', 'cancelled_by_camp']) ||
                                  ($dateOrBatch->end_date && $dateOrBatch->end_date->copy()->endOfDay()->isPast()) ||
@@ -149,31 +153,33 @@ class WeatherForecastService
                     'status' => 'CONCLUDED',
                     'label' => 'Concluded Session',
                     'description' => 'Dive operations have concluded for this batch.',
+                    'days_out' => $daysOut,
+                    'lead_time_hours' => $leadTimeHours,
                 ];
             }
-
-            $startDate = $dateOrBatch->start_date->copy()->startOfDay();
-            $leadTimeHours = max(0, $now->diffInHours($dateOrBatch->start_date->copy()->setTime(9, 30), false));
         } else {
             $startDate = $dateOrBatch->copy()->startOfDay();
             $leadTimeHours = max(0, $now->diffInHours($dateOrBatch->copy()->setTime(9, 30), false));
+            $daysOut = $now->startOfDay()->diffInDays($startDate, false);
 
             if ($dateOrBatch->copy()->endOfDay()->isPast()) {
                 return [
                     'status' => 'CONCLUDED',
                     'label' => 'Concluded Session',
                     'description' => 'Dive date is in the past.',
+                    'days_out' => $daysOut,
+                    'lead_time_hours' => $leadTimeHours,
                 ];
             }
         }
-
-        $daysOut = $now->startOfDay()->diffInDays($startDate, false);
 
         if ($daysOut < 0) {
             return [
                 'status' => 'CONCLUDED',
                 'label' => 'Concluded Session',
                 'description' => 'Dive date is in the past.',
+                'days_out' => $daysOut,
+                'lead_time_hours' => $leadTimeHours,
             ];
         }
 
@@ -182,6 +188,8 @@ class WeatherForecastService
                 'status' => 'TACTICAL_CLEARANCE',
                 'label' => 'Live Departure Clearance (1 hour before departure)',
                 'description' => 'Real-time dockside clearance for immediate departure.',
+                'days_out' => $daysOut,
+                'lead_time_hours' => $leadTimeHours,
             ];
         }
 
@@ -190,6 +198,8 @@ class WeatherForecastService
                 'status' => 'PROVISIONAL_TREND_OUTLOOK',
                 'label' => '24-Hour Planning Forecast (Final clearance evaluated 1 hour before departure)',
                 'description' => '24-hour advance planning outlook. Final go/no-go cleared 1h before departure.',
+                'days_out' => $daysOut,
+                'lead_time_hours' => $leadTimeHours,
             ];
         }
 
@@ -198,6 +208,8 @@ class WeatherForecastService
                 'status' => 'EXTENDED_TREND_OUTLOOK',
                 'label' => 'Extended Planning Outlook (Advance Planning)',
                 'description' => 'Medium to long-range forecast for advance scheduling.',
+                'days_out' => $daysOut,
+                'lead_time_hours' => $leadTimeHours,
             ];
         }
 
@@ -205,6 +217,8 @@ class WeatherForecastService
             'status' => 'BEYOND_HORIZON',
             'label' => 'Beyond 16-Day Forecast Horizon',
             'description' => 'Forecast models unlock 16 days before dive date.',
+            'days_out' => $daysOut,
+            'lead_time_hours' => $leadTimeHours,
         ];
     }
 
@@ -536,6 +550,8 @@ class WeatherForecastService
             ];
         }
 
+        $reliability = self::getReliabilityCategory($daysOut);
+
         // Check if day 1 and day 2 are in the unified cache
         $d1Key = $startDate->format('Y-m-d');
         $d2Key = $endDate->format('Y-m-d');
@@ -583,31 +599,10 @@ class WeatherForecastService
             }
 
             $reliability = self::getReliabilityCategory($daysOut);
-
-            // ML Safety Microservice Assessment (Dual-Engine Pipeline)
-            $day1ML = $this->assessMLSafetyForDate($startDate->format('Y-m-d'), '08:00', '18:00');
-            $day2ML = $this->assessMLSafetyForDate($endDate->format('Y-m-d'), '08:00', '18:00');
-            $tripML = null;
-            if ($day1ML || $day2ML) {
-                $mlRec1 = $day1ML['overall_recommendation'] ?? 'Safe';
-                $mlRec2 = $day2ML['overall_recommendation'] ?? 'Safe';
-                $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
-                $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
-
-                $horizonInfo = self::getOperationalHorizon($startDate);
-                $tripML = [
-                    'overall_recommendation' => $worseMLRec,
-                    'ml_recommendation' => $worseMLRec,
-                    'ml_classification' => $worseMLRec,
-                    'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? $horizonInfo['status'],
-                    'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? $horizonInfo['label'],
-                    'day1' => $day1ML,
-                    'day2' => $day2ML,
-                    'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
-                    'safety_threshold_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
-                    'hard_gate_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
-                ];
-            }
+            $d1Confidence = ($daysOut >= 4) ? 'low' : 'high';
+            $d2Confidence = (($daysOut + 1) >= 4) ? 'low' : 'high';
+            $overallConfidence = ($daysOut >= 4) ? 'low' : 'high';
+            $overallAdvisory = ($overallConfidence === 'low') ? "Confidence is low this far out, recheck in 2 days." : null;
 
             return [
                 'available' => true,
@@ -616,25 +611,28 @@ class WeatherForecastService
                 'end_date' => $endDate->format('Y-m-d'),
                 'end_date_formatted' => $endDate->format('M d, Y (l)'),
                 'overall_classification' => $overallClass,
+                'confidence' => $overallConfidence,
+                'confidence_advisory' => $overallAdvisory,
                 'data_source' => 'Live Open-Meteo Marine & Weather Radar (Anilao, Batangas)',
                 'days_out' => $daysOut,
                 'reliability' => $reliability,
-                'ml_assessment' => $tripML,
                 'day1' => [
                     'date' => $startDate->format('M d, Y'),
                     'classification' => $day1Class,
+                    'confidence' => $d1Confidence,
+                    'confidence_advisory' => ($d1Confidence === 'low') ? "Confidence is low this far out, recheck in 2 days." : null,
                     'recommended_action' => self::MEANING_MAP[$day1Class] ?? 'Proceed with caution.',
                     'worst_hour' => $d1WorstHour ? Carbon::parse($d1WorstHour)->format('g:i A') : '11:00 AM',
                     'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->copy()->setTime(9, 30), false)) . ' hours',
-                    'ml_assessment' => $day1ML,
                 ],
                 'day2' => [
                     'date' => $endDate->format('M d, Y'),
                     'classification' => $day2Class,
+                    'confidence' => $d2Confidence,
+                    'confidence_advisory' => ($d2Confidence === 'low') ? "Confidence is low this far out, recheck in 2 days." : null,
                     'recommended_action' => self::MEANING_MAP[$day2Class] ?? 'Proceed with caution.',
                     'worst_hour' => $d2WorstHour ? Carbon::parse($d2WorstHour)->format('g:i A') : '11:00 AM',
                     'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->copy()->setTime(9, 30), false)) . ' hours',
-                    'ml_assessment' => $day2ML,
                 ],
                 'advisory_notes' => [
                     'Forecast models are updated hourly as the scheduled trip approaches.',
@@ -643,7 +641,7 @@ class WeatherForecastService
             ];
         }
 
-        // Fallback to Window Evaluation
+        // Fallback to Window Evaluation (Open-Meteo)
         $day1AM = $this->assessWindow($startDate->format('Y-m-d'), '09:30', '12:00', 'am');
         $day1PM = $this->assessWindow($startDate->format('Y-m-d'), '15:30', '17:30', 'pm');
         $day1Class = (self::RISK_RANK[$day1PM['classification']] ?? 1) > (self::RISK_RANK[$day1AM['classification']] ?? 1)
@@ -667,29 +665,10 @@ class WeatherForecastService
             ? ($day2PM['worst_hour'] ?: $day2AM['worst_hour'])
             : ($day2AM['worst_hour'] ?: $day2PM['worst_hour']);
 
-        $day1ML = $this->assessMLSafetyForDate($startDate->format('Y-m-d'), '08:00', '18:00');
-        $day2ML = $this->assessMLSafetyForDate($endDate->format('Y-m-d'), '08:00', '18:00');
-        $tripML = null;
-        if ($day1ML || $day2ML) {
-            $mlRec1 = $day1ML['overall_recommendation'] ?? 'Safe';
-            $mlRec2 = $day2ML['overall_recommendation'] ?? 'Safe';
-            $worseMLRank = max(self::RISK_RANK[$mlRec1] ?? 1, self::RISK_RANK[$mlRec2] ?? 1);
-            $worseMLRec = array_search($worseMLRank, self::RISK_RANK) ?: 'Safe';
-
-            $horizonInfo = self::getOperationalHorizon($startDate);
-            $tripML = [
-                'overall_recommendation' => $worseMLRec,
-                'ml_recommendation' => $worseMLRec,
-                'ml_classification' => $worseMLRec,
-                'operational_status' => $day1ML['operational_status'] ?? $day2ML['operational_status'] ?? $horizonInfo['status'],
-                'operational_status_label' => $day1ML['operational_status_label'] ?? $day2ML['operational_status_label'] ?? $horizonInfo['label'],
-                'day1' => $day1ML,
-                'day2' => $day2ML,
-                'is_authoritative_go' => ($day1ML['is_authoritative_go'] ?? false) && ($day2ML['is_authoritative_go'] ?? false),
-                'safety_threshold_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
-                'hard_gate_triggered' => ($day1ML['safety_threshold_triggered'] ?? $day1ML['hard_gate_triggered'] ?? false) || ($day2ML['safety_threshold_triggered'] ?? $day2ML['hard_gate_triggered'] ?? false),
-            ];
-        }
+        $d1Confidence = ($daysOut >= 4) ? 'low' : 'high';
+        $d2Confidence = (($daysOut + 1) >= 4) ? 'low' : 'high';
+        $overallConfidence = ($daysOut >= 4) ? 'low' : 'high';
+        $overallAdvisory = ($overallConfidence === 'low') ? "Confidence is low this far out, recheck in 2 days." : null;
 
         return [
             'available' => true,
@@ -698,23 +677,28 @@ class WeatherForecastService
             'end_date' => $endDate->format('Y-m-d'),
             'end_date_formatted' => $endDate->format('M d, Y (l)'),
             'overall_classification' => $overallClass,
+            'confidence' => $overallConfidence,
+            'confidence_advisory' => $overallAdvisory,
             'data_source' => 'Live Open-Meteo Marine & Weather Radar (Anilao, Batangas)',
-            'ml_assessment' => $tripML,
+            'days_out' => $daysOut,
+            'reliability' => $reliability,
             'day1' => [
                 'date' => $startDate->format('M d, Y'),
                 'classification' => $day1Class,
+                'confidence' => $d1Confidence,
+                'confidence_advisory' => ($d1Confidence === 'low') ? "Confidence is low this far out, recheck in 2 days." : null,
                 'recommended_action' => self::MEANING_MAP[$day1Class] ?? 'Proceed with caution.',
                 'worst_hour' => $worstHourD1 ? Carbon::parse($worstHourD1)->format('g:i A') : '11:00 AM',
                 'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($startDate->copy()->setTime(9, 30), false)) . ' hours',
-                'ml_assessment' => $day1ML,
             ],
             'day2' => [
                 'date' => $endDate->format('M d, Y'),
                 'classification' => $day2Class,
+                'confidence' => $d2Confidence,
+                'confidence_advisory' => ($d2Confidence === 'low') ? "Confidence is low this far out, recheck in 2 days." : null,
                 'recommended_action' => self::MEANING_MAP[$day2Class] ?? 'Proceed with caution.',
                 'worst_hour' => $worstHourD2 ? Carbon::parse($worstHourD2)->format('g:i A') : '11:00 AM',
                 'lead_time' => max(0, Carbon::now(self::TIMEZONE)->diffInHours($endDate->copy()->setTime(9, 30), false)) . ' hours',
-                'ml_assessment' => $day2ML,
             ],
             'advisory_notes' => [
                 'Forecast models are updated hourly as the scheduled trip approaches.',
@@ -1634,7 +1618,116 @@ class WeatherForecastService
         return 3;
     }
 
-    protected function computeWeightedScore(array $scores): float
+    public function computeWeightedScore(array $scoresOrForecast): array|float
+    {
+        // If passed a physics forecast payload (e.g. ['physics' => [...]] or directly carrying quantile objects)
+        if (isset($scoresOrForecast['physics']) || isset($scoresOrForecast['significant_wave_height_m']) || isset($scoresOrForecast['wind_speed_kmh'])) {
+            $physics = $scoresOrForecast['physics'] ?? $scoresOrForecast;
+            $scoreDetails = $this->calculatePhysicsWeightedScore($physics);
+            $confidence = $this->evaluateConfidence($physics);
+
+            return array_merge($scoreDetails, ['confidence' => $confidence]);
+        }
+
+        // Backward-compatible path for direct 0-4 point scores array
+        return $this->computeScoreFromWeights($scoresOrForecast);
+    }
+
+    /**
+     * Evaluate Coast Guard safety ceiling confidence against p10-p90 quantile intervals.
+     * Returns 'low' if any safety ceiling is straddled by [p10, p90], otherwise 'high'.
+     */
+    public function evaluateConfidence(array $physics): string
+    {
+        $ceilings = [
+            'wind_speed_kmh' => 42.0,
+            'wind_gust_kmh' => 48.0,
+            'significant_wave_height_m' => 1.80,
+            'current_speed_ms' => 0.80,
+        ];
+
+        foreach ($ceilings as $field => $ceiling) {
+            if (!isset($physics[$field])) {
+                continue;
+            }
+
+            $val = $physics[$field];
+            $p10 = is_array($val) && isset($val['p10']) ? (float) $val['p10'] : null;
+            $p90 = is_array($val) && isset($val['p90']) ? (float) $val['p90'] : null;
+
+            if ($p10 !== null && $p90 !== null) {
+                // If interval straddles the safety ceiling
+                if ($p10 < $ceiling && $p90 >= $ceiling) {
+                    return 'low';
+                }
+            }
+        }
+
+        return 'high';
+    }
+
+    /**
+     * Calculate 9-parameter weighted score from physics forecast values.
+     */
+    public function calculatePhysicsWeightedScore(array $physics): array
+    {
+        $extractVal = function ($key, $default = 0.0) use ($physics) {
+            if (!isset($physics[$key])) return $default;
+            $v = $physics[$key];
+            if (is_array($v) && isset($v['p50'])) return (float) $v['p50'];
+            if (is_array($v) && isset($v['p10'])) return (float) $v['p10'];
+            return (float) $v;
+        };
+
+        $hs = $extractVal('significant_wave_height_m', 0.50);
+        $tp = $extractVal('peak_period_s', 6.0);
+        $swell = $extractVal('swell_height_m', 0.30);
+        $windWave = $extractVal('wind_wave_height_m', 0.20);
+        $windSpeedKmh = $extractVal('wind_speed_kmh', 12.0);
+        $windGustKmh = $extractVal('wind_gust_kmh', 15.0);
+        $windDir = $extractVal('wind_direction_deg', 45.0);
+        $pressure = $extractVal('sea_level_pressure_hpa', 1011.0);
+        $currentSpeed = $extractVal('current_speed_ms', 0.20);
+        $rainRate = $extractVal('rain_rate_mm_hr', 0.0);
+
+        // Check absolute physical hard-gate ceilings
+        $isPhysicalBreach = (
+            $windSpeedKmh >= 42.0 ||
+            $windGustKmh >= 48.0 ||
+            $hs >= 1.80 ||
+            $swell >= 1.80 ||
+            $currentSpeed >= 0.80 ||
+            $rainRate >= 25.0 ||
+            $pressure <= 998.0
+        );
+
+        $scores = [
+            'wave_height' => $this->scoreWaveHeight($hs),
+            'wind_speed' => $this->scoreWindSpeed($windSpeedKmh, $windGustKmh),
+            'ocean_current' => $this->scoreOceanCurrent($currentSpeed),
+            'swell_height' => $this->scoreSwellHeight($swell),
+            'wave_period' => $this->scoreWavePeriod($tp),
+            'wind_wave_height' => $this->scoreWindWaveHeight($windWave),
+            'rain' => $this->scoreRain($rainRate),
+            'sea_level_pressure' => $this->scoreSeaLevelPressure($pressure),
+            'wind_direction' => $this->scoreWindDirection($windDir),
+        ];
+
+        $scorePct = $isPhysicalBreach ? 100.0 : $this->computeScoreFromWeights($scores);
+        $classification = $isPhysicalBreach ? 'Critical Risk' : $this->classifyScore($scorePct);
+
+        return [
+            'weighted_score_pct' => $scorePct,
+            'classification' => $classification,
+            'is_physical_breach' => $isPhysicalBreach,
+            'scores' => $scores,
+        ];
+    }
+
+    /**
+     * Compute weighted score from 9-parameter scores (0-4) with multi-hazard synergy multipliers.
+     */
+    protected function computeScoreFromWeights(array $scores): float
     {
         $maxPossible = 4.0 * array_sum(self::WEIGHTS);
         $weightedSum = 0.0;
@@ -1662,7 +1755,7 @@ class WeatherForecastService
         return min(100.0, round($rawScorePct * $synergyMultiplier, 1));
     }
 
-    protected function classifyScore(float $weightedPct): string
+    public function classifyScore(float $weightedPct): string
     {
         if ($weightedPct <= 20) return 'Very Safe';
         if ($weightedPct <= 40) return 'Safe';

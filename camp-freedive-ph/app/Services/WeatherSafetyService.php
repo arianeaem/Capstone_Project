@@ -80,37 +80,48 @@ class WeatherSafetyService
             }
 
                 $reliability = $assessment['reliability'] ?? WeatherForecastService::getReliabilityCategory($daysOut);
+            $confidence = $assessment['confidence'] ?? ($daysOut >= 4 ? 'low' : 'high');
+            $rawAdvisory = $assessment['confidence_advisory'] ?? ($confidence === 'low' ? "Confidence is low this far out, recheck in 2 days." : null);
+            $confidenceAdvisory = $rawAdvisory ? preg_replace('/^(Very Safe|Safe|Moderate|High Risk|Critical Risk)[\.\:\-]\s*/i', '', $rawAdvisory) : null;
 
-                return [
-                    'is_benchmark' => false,
-                    'risk_level' => $riskLevel,
-                    'overall_classification' => $overallClass,
-                    'title' => $riskConfig['title'],
-                    'badge_color' => $riskConfig['badge_color'],
-                    'border_color' => $riskConfig['border_color'],
-                    'bg_color' => $riskConfig['bg_color'],
-                    'text_color' => $riskConfig['text_color'],
-                    'icon' => $riskConfig['icon'],
-                    'description' => $riskConfig['description'],
-                    'is_bookable' => $riskLevel !== 'critical_risk',
-                    'has_storm_signal' => $riskLevel === 'critical_risk',
-                    'days_out' => $daysOut,
-                    'reliability' => $reliability,
-                    'day1' => [
-                        'date' => $start->format('M d, Y'),
-                        'classification' => $day1['classification'] ?? 'Safe',
-                        'recommended_action' => $day1['recommended_action'] ?? 'Conditions are generally safe, but normal safety protocols should still be followed.',
-                        'worst_hour' => $day1['worst_hour'] ?? '11:00 AM',
-                    ],
-                    'day2' => [
-                        'date' => $end->format('M d, Y'),
-                        'classification' => $day2['classification'] ?? 'Safe',
-                        'recommended_action' => $day2['recommended_action'] ?? 'Conditions are generally safe, but normal safety protocols should still be followed.',
-                        'worst_hour' => $day2['worst_hour'] ?? '11:00 AM',
-                    ],
-                    'suggested_dates' => $suggestedDates,
-                    'location' => 'Mabini / Anilao, Batangas',
-                ];
+            $formattedDescription = $riskConfig['description'];
+
+            return [
+                'is_benchmark' => false,
+                'risk_level' => $riskLevel,
+                'overall_classification' => $overallClass,
+                'confidence' => $confidence,
+                'confidence_advisory' => $confidenceAdvisory,
+                'title' => $riskConfig['title'],
+                'badge_color' => $riskConfig['badge_color'],
+                'border_color' => $riskConfig['border_color'],
+                'bg_color' => $riskConfig['bg_color'],
+                'text_color' => $riskConfig['text_color'],
+                'icon' => $riskConfig['icon'],
+                'description' => $formattedDescription,
+                'is_bookable' => $riskLevel !== 'critical_risk',
+                'has_storm_signal' => $riskLevel === 'critical_risk',
+                'days_out' => $daysOut,
+                'reliability' => $reliability,
+                'day1' => [
+                    'date' => $start->format('M d, Y'),
+                    'classification' => $day1['classification'] ?? 'Safe',
+                    'confidence' => $day1['confidence'] ?? $confidence,
+                    'confidence_advisory' => $day1['confidence_advisory'] ?? $confidenceAdvisory,
+                    'recommended_action' => $day1['recommended_action'] ?? 'Conditions are generally safe, but normal safety protocols should still be followed.',
+                    'worst_hour' => $day1['worst_hour'] ?? '11:00 AM',
+                ],
+                'day2' => [
+                    'date' => $end->format('M d, Y'),
+                    'classification' => $day2['classification'] ?? 'Safe',
+                    'confidence' => $day2['confidence'] ?? $confidence,
+                    'confidence_advisory' => $day2['confidence_advisory'] ?? $confidenceAdvisory,
+                    'recommended_action' => $day2['recommended_action'] ?? 'Conditions are generally safe, but normal safety protocols should still be followed.',
+                    'worst_hour' => $day2['worst_hour'] ?? '11:00 AM',
+                ],
+                'suggested_dates' => $suggestedDates,
+                'location' => 'Mabini / Anilao, Batangas',
+            ];
             }
         }
 

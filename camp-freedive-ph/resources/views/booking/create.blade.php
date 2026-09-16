@@ -100,8 +100,7 @@
                              :class="form.class_type === 'discovery' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                             
                             <div class="w-full flex flex-col items-center">
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
-                                     :class="form.class_type === 'discovery' ? 'bg-[#780000]/20 ring-2 ring-[#780000]' : 'bg-[#780000]/10'">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-[#780000]/10">
                                     <img src="{{ asset('icons/icons8-water-60.png') }}" class="w-10 h-10 object-contain" alt="Discovery Icon">
                                 </div>
                                 <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Discovery</h3>
@@ -131,8 +130,7 @@
                              :class="form.class_type === 'fundive' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                             
                             <div class="w-full flex flex-col items-center">
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
-                                     :class="form.class_type === 'fundive' ? 'bg-[#780000]/20 ring-2 ring-[#780000]' : 'bg-[#780000]/10'">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-[#780000]/10">
                                     <img src="{{ asset('icons/icons8-snorkel-60.png') }}" class="w-10 h-10 object-contain" alt="Fundive Icon">
                                 </div>
                                 <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Fundive</h3>
@@ -162,8 +160,7 @@
                              :class="form.class_type === 'refinement' ? 'border-2 border-[#780000] bg-[#F8EAEA]/25 ring-2 ring-[#780000]/15 shadow-sm' : 'border border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                             
                             <div class="w-full flex flex-col items-center">
-                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 transition-colors duration-150"
-                                     :class="form.class_type === 'refinement' ? 'bg-[#780000]/20 ring-2 ring-[#780000]' : 'bg-[#780000]/10'">
+                                <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-3 bg-[#780000]/10">
                                     <img src="{{ asset('icons/icons8-flippers-60.png') }}" class="w-10 h-10 object-contain" alt="Refinement Icon">
                                 </div>
                                 <h3 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Refinement</h3>
@@ -572,21 +569,28 @@
                             <div class="space-y-4">
                                 <!-- Overall Assessment (5 Lines Indicator) -->
                                 <div class="space-y-2 pb-1">
-                                    <div class="flex flex-wrap items-center justify-between gap-2">
-                                        <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
-                                            <span class="text-base sm:text-xl font-black uppercase tracking-wide"
-                                                  :class="getSafetyTextClass(forecast.overall_classification)"
-                                                  x-text="forecast.overall_classification"></span>
+                                    <div class="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+                                        <span class="text-base sm:text-xl font-black uppercase tracking-wide"
+                                              :class="getSafetyTextClass(forecast.overall_classification)"
+                                              x-text="forecast.overall_classification"></span>
 
-                                            <!-- 5 Lines Indicator -->
-                                            <div class="flex items-center gap-1 sm:gap-1.5">
-                                                <template x-for="i in 5" :key="i">
-                                                    <div class="h-1.5 w-4 sm:w-7 rounded-full transition-all duration-300"
-                                                         :class="i <= getSafetyScore(forecast.overall_classification) ? getSafetyBarClass(forecast.overall_classification) : 'bg-[#E5E5EA]'"></div>
-                                                </template>
-                                            </div>
+                                        <!-- 5 Lines Indicator -->
+                                        <div class="flex items-center gap-1 sm:gap-1.5">
+                                            <template x-for="i in 5" :key="i">
+                                                <div class="h-1.5 w-4 sm:w-7 rounded-full transition-all duration-300"
+                                                     :class="i <= getSafetyScore(forecast.overall_classification) ? getSafetyBarClass(forecast.overall_classification) : 'bg-[#E5E5EA]'"></div>
+                                            </template>
                                         </div>
                                     </div>
+
+                                    <!-- Single Clean Confidence Advisory Notice (if applicable) -->
+                                    <template x-if="forecast.confidence === 'low' || forecast.confidence_advisory">
+                                        <div class="p-3 rounded-xl bg-amber-50 border border-amber-200 text-amber-950 text-xs sm:text-sm my-1.5 flex items-start gap-2">
+                                            <svg class="w-4 h-4 text-amber-700 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                            <p class="font-medium text-amber-900" x-text="forecast.confidence_advisory || 'Confidence is low this far out, recheck in 2 days.'"></p>
+                                        </div>
+                                    </template>
+
                                     <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed" x-text="forecast.description"></p>
                                 </div>
 
