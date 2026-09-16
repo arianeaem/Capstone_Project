@@ -503,32 +503,35 @@
         <!-- ML Safety Intelligence Summary Card -->
         @php
             $mlRec = $batchMLAssessment['overall_recommendation'] ?? ($overallClassification ?? 'Safe');
-            $mlConfig = match ($mlRec) {
-                'Very Safe' => ['pill' => 'bg-emerald-600 text-white', 'dot' => 'bg-emerald-300', 'border' => 'border-emerald-200'],
-                'Safe' => ['pill' => 'bg-emerald-600 text-white', 'dot' => 'bg-emerald-300', 'border' => 'border-emerald-200'],
-                'Moderate' => ['pill' => 'bg-amber-500 text-white', 'dot' => 'bg-amber-300', 'border' => 'border-amber-200'],
-                'High Risk' => ['pill' => 'bg-rose-600 text-white', 'dot' => 'bg-rose-300', 'border' => 'border-rose-200'],
-                'Critical Risk' => ['pill' => 'bg-red-700 text-white', 'dot' => 'bg-red-300', 'border' => 'border-red-300'],
-                default => ['pill' => 'bg-gray-600 text-white', 'dot' => 'bg-gray-300', 'border' => 'border-gray-200'],
+            $mlScore = match ($mlRec) {
+                'Very Safe' => 5,
+                'Safe' => 4,
+                'Moderate' => 3,
+                'High Risk' => 2,
+                'Critical Risk' => 1,
+                default => 4,
             };
-            $horizon = \App\Services\WeatherForecastService::getOperationalHorizon($batch);
-            $opLabel = $batchMLAssessment['operational_status_label'] ?? $horizon['label'];
+            $mlBarColor = match ($mlRec) {
+                'Very Safe', 'Safe' => 'bg-emerald-500',
+                'Moderate' => 'bg-amber-500',
+                'High Risk' => 'bg-rose-500',
+                'Critical Risk' => 'bg-red-600',
+                default => 'bg-emerald-500',
+            };
+            $mlTextColor = match ($mlRec) {
+                'Very Safe', 'Safe' => 'text-emerald-600',
+                'Moderate' => 'text-amber-600',
+                'High Risk' => 'text-rose-600',
+                'Critical Risk' => 'text-red-600',
+                default => 'text-emerald-600',
+            };
             
             $cbState = $circuitStatus['state'] ?? 'CLOSED';
             $cbAvailable = $circuitStatus['is_available'] ?? true;
-            $cbFails = $circuitStatus['consecutive_failures'] ?? 0;
-            $cbThreshold = $circuitStatus['failure_threshold'] ?? 3;
-            $cbRemaining = $circuitStatus['seconds_remaining'] ?? 0;
-            
-            $confTier = $batchMLAssessment['confidence_tier'] ?? 'HIGH_CONFIDENCE';
-            $servingSrc = $batchMLAssessment['serving_source'] ?? 'ONNX C++ (99 Cells)';
-            $confAdvisory = $batchMLAssessment['confidence_advisory'] ?? null;
-            $cleanAdvisory = $confAdvisory ? preg_replace('/^(Very Safe|Safe|Moderate|High Risk|Critical Risk)[\.\:\-]\s*/i', '', $confAdvisory) : null;
-            $isLimitTriggered = $batchMLAssessment && ($batchMLAssessment['safety_threshold_triggered'] ?? $batchMLAssessment['hard_gate_triggered'] ?? false);
         @endphp
 
         <!-- Main ML Safety Banner -->
-        <div class="bg-white rounded-xl border {{ $mlConfig['border'] }} p-6 sm:p-7 space-y-4 shadow-xs">
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-7 space-y-4 shadow-xs">
             
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div class="space-y-2">
@@ -544,36 +547,35 @@
                         </span>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <span class="inline-flex items-center px-4 py-1.5 rounded-full text-base font-black tracking-wide uppercase shadow-2xs {{ $mlConfig['pill'] }}">
-                            <span>{{ $mlRec }}</span>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <span class="text-base sm:text-xl font-black uppercase tracking-wide {{ $mlTextColor }}">
+                            {{ $mlRec }}
                         </span>
+
+                        <!-- 5 Lines Indicator -->
+                        <div class="flex items-center gap-1 sm:gap-1.5">
+                            @for($i = 1; $i <= 5; $i++)
+                                <div class="h-1.5 w-4 sm:w-6 rounded-full transition-all duration-300 {{ $i <= $mlScore ? $mlBarColor : 'bg-[#E5E5EA]' }}"></div>
+                            @endfor
+                        </div>
                     </div>
                 </div>
 
-                <div class="lg:text-right space-y-1 shrink-0">
-                    <span class="text-xs uppercase font-bold text-[#6E6E73] block">Mandatory Safety Limits</span>
-                    @if($isLimitTriggered)
+                <!-- Override Advisory Status -->
+                <div class="md:text-right space-y-1 shrink-0">
+                    <span class="text-xs uppercase font-bold text-[#6E6E73] block">Override Advisory Status</span>
+                    @if($latestOverride && count($latestOverride->active_advisories) > 0)
                         <span class="text-xs sm:text-sm font-bold text-[#991B1B] bg-[#FEF2F2] px-3.5 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-[#991B1B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                            <span>Safety Limit Triggered</span>
+                            <span>Active: {{ implode(', ', $latestOverride->active_advisories) }}</span>
                         </span>
                     @else
                         <span class="text-xs sm:text-sm font-bold text-[#065F46] bg-[#ECFDF5] px-3.5 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5">
-                            <svg class="w-4 h-4 text-[#065F46]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span>All Safety Limits Cleared</span>
+                            <svg class="w-3.5 h-3.5 text-[#065F46]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>NOT OVERRIDDEN</span>
                         </span>
                     @endif
                 </div>
             </div>
-
-            <!-- Operational Confidence Notice (if applicable) -->
-            @if($cleanAdvisory)
-            <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200 flex items-start gap-2.5 text-amber-900 text-xs sm:text-sm">
-                <svg class="w-4 h-4 text-amber-600 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                <p class="text-amber-800 font-medium">{{ $cleanAdvisory }}</p>
-            </div>
-            @endif
 
         </div>
 
@@ -651,12 +653,12 @@
                                     $mlRisk = $h['final_tier_name'] ?? $h['ml_raw_tier_name'] ?? $h['classification'] ?? 'Safe';
                                     
                                     // Vertical color line before forecast time indicating risk rating
-                                    $riskBorder = match($mlRisk) {
-                                        'Very Safe', 'Safe' => 'border-l-4 border-l-emerald-500',
-                                        'Moderate' => 'border-l-4 border-l-amber-500',
-                                        'High Risk' => 'border-l-4 border-l-rose-500',
-                                        'Critical Risk' => 'border-l-4 border-l-red-600',
-                                        default => 'border-l-4 border-l-gray-300',
+                                    $riskBarColor = match($mlRisk) {
+                                        'Very Safe', 'Safe' => 'bg-emerald-500',
+                                        'Moderate' => 'bg-amber-500',
+                                        'High Risk' => 'bg-rose-500',
+                                        'Critical Risk' => 'bg-red-600',
+                                        default => 'bg-gray-300',
                                     };
 
                                     $hsP50 = (float) ($h['predicted_hs'] ?? $h['wave_height'] ?? 0.70);
@@ -676,9 +678,10 @@
                                     $windDir = round($h['predicted_wind_dir'] ?? $h['wind_direction'] ?? 0);
                                 @endphp
                                 <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25' : '' }} {{ $riskBorder }}">
+                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25' : '' }}">
                                     <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
-                                        <div class="flex items-center gap-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-1 h-4 rounded-full {{ $riskBarColor }} shrink-0"></span>
                                             <span>{{ sprintf('%02d:00', $hourNum) }}</span>
                                             @if($isAmHour)
                                                 <span class="text-xs px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
@@ -797,12 +800,12 @@
                                     $mlRisk = $h['final_tier_name'] ?? $h['ml_raw_tier_name'] ?? $h['classification'] ?? 'Safe';
                                     
                                     // Vertical color line before forecast time indicating risk rating
-                                    $riskBorder = match($mlRisk) {
-                                        'Very Safe', 'Safe' => 'border-l-4 border-l-emerald-500',
-                                        'Moderate' => 'border-l-4 border-l-amber-500',
-                                        'High Risk' => 'border-l-4 border-l-rose-500',
-                                        'Critical Risk' => 'border-l-4 border-l-red-600',
-                                        default => 'border-l-4 border-l-gray-300',
+                                    $riskBarColor = match($mlRisk) {
+                                        'Very Safe', 'Safe' => 'bg-emerald-500',
+                                        'Moderate' => 'bg-amber-500',
+                                        'High Risk' => 'bg-rose-500',
+                                        'Critical Risk' => 'bg-red-600',
+                                        default => 'bg-gray-300',
                                     };
 
                                     $hsP50 = (float) ($h['predicted_hs'] ?? $h['wave_height'] ?? 0.70);
@@ -822,9 +825,10 @@
                                     $windDir = round($h['predicted_wind_dir'] ?? $h['wind_direction'] ?? 0);
                                 @endphp
                                 <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25' : '' }} {{ $riskBorder }}">
+                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25' : '' }}">
                                     <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
-                                        <div class="flex items-center gap-1.5">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-1 h-4 rounded-full {{ $riskBarColor }} shrink-0"></span>
                                             <span>{{ sprintf('%02d:00', $hourNum) }}</span>
                                             @if($isAmHour)
                                                 <span class="text-xs px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
