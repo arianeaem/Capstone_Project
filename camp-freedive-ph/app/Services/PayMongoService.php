@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Services\ExternalApi\ExternalApiClient;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +19,8 @@ use Illuminate\Support\Facades\Log;
  * Reliability & Security:
  * - Dual verification: Synchronous redirect callback verification paired with asynchronous
  *   HMAC-SHA256 signed webhooks (`Paymongo-Signature`).
+ * - Outbound Rate-Limiting & Backoff: Routes requests through ExternalApiClient to prevent
+ *   provider 429 errors and handle transient gateway hiccups with exponential backoff.
  * - Simulated fallback mode: Gracefully creates local test mock sessions if API keys are not
  *   configured in staging/local development, preventing broken checkout flows.
  */
@@ -27,28 +31,29 @@ class PayMongoService
     protected ?string $webhookSecret;
     protected string $baseUrl;
     protected string $currency;
+    protected ExternalApiClient $apiClient;
 
-    public function __construct()
+    public function __construct(?ExternalApiClient $apiClient = null)
     {
         $this->secretKey = config('paymongo.secret_key') ?: config('services.paymongo.secret_key');
         $this->publicKey = config('paymongo.public_key') ?: config('services.paymongo.public_key');
         $this->webhookSecret = config('paymongo.webhook_signature_secret') ?: config('services.paymongo.webhook_secret');
         $this->baseUrl = config('paymongo.base_url') ?: config('services.paymongo.base_url', 'https://api.paymongo.com/v1');
         $this->currency = config('paymongo.currency', 'PHP');
+        $this->apiClient = $apiClient ?? app(ExternalApiClient::class);
     }
 
     /**
-     * Get a configured HTTP client with credentials and SSL settings.
-     *
-     * @param int $timeout Maximum request timeout in seconds
-     * @return \Illuminate\Http\Client\PendingRequest
+     * Helper to execute outbound PayMongo API request through ExternalApiClient.
      */
-    protected function client(int $timeout = 15)
+    protected function request(string $method, string $url, array $payload = [], int $timeout = 15)
     {
-        return Http::withBasicAuth($this->secretKey ?? '', '')
-            ->timeout($timeout)
-            ->withoutVerifying()
-            ->acceptJson();
+        return $this->apiClient->execute('paymongo', $method, $url, [
+            'json' => $payload,
+            'basic_auth' => [$this->secretKey ?? '', ''],
+            'timeout' => $timeout,
+            'without_verifying' => true,
+        ]);
     }
 
     /**
@@ -112,7 +117,7 @@ class PayMongoService
             ];
 
             // Use PayMongo v2 checkout_sessions endpoint for deferred payment intent and modern payment channels
-            $response = $this->client()->post("https://api.paymongo.com/v2/checkout_sessions", $payload);
+            $response = $this->request('POST', "https://api.paymongo.com/v2/checkout_sessions", $payload);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -128,7 +133,7 @@ class PayMongoService
             Log::warning('PayMongo Create v2 Checkout Session Failed: ' . $response->body());
             
             // Attempt fallback to v1 if necessary
-            $responseV1 = $this->client()->post("https://api.paymongo.com/v1/checkout_sessions", $payload);
+            $responseV1 = $this->request('POST', "https://api.paymongo.com/v1/checkout_sessions", $payload);
             if ($responseV1->successful()) {
                 $dataV1 = $responseV1->json();
                 return [
@@ -176,7 +181,7 @@ class PayMongoService
         }
 
         try {
-            $response = $this->client()->post("{$this->baseUrl}/payment_intents", [
+            $response = $this->request('POST', "{$this->baseUrl}/payment_intents", [
                 'data' => [
                     'attributes' => [
                         'amount' => $amountInCentavos,
@@ -232,7 +237,7 @@ class PayMongoService
         }
 
         try {
-            $response = $this->client()->post("{$this->baseUrl}/payment_methods", [
+            $response = $this->request('POST', "{$this->baseUrl}/payment_methods", [
                 'data' => [
                     'attributes' => [
                         'type' => $type,
@@ -293,7 +298,7 @@ class PayMongoService
                 $payload['data']['attributes']['client_key'] = $clientKey;
             }
 
-            $response = $this->client()->post("{$this->baseUrl}/payment_intents/{$paymentIntentId}/attach", $payload);
+            $response = $this->request('POST', "{$this->baseUrl}/payment_intents/{$paymentIntentId}/attach", $payload);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -341,7 +346,7 @@ class PayMongoService
         // If secret key is provided and this is a real PayMongo payment identifier
         if (!empty($this->secretKey) && !str_contains($this->secretKey, 'your_secret_key') && str_starts_with($paymentId, 'pay_')) {
             try {
-                $response = $this->client()->post("{$this->baseUrl}/refunds", [
+                $response = $this->request('POST', "{$this->baseUrl}/refunds", [
                     'data' => [
                         'attributes' => [
                             'amount' => $amountInCentavos,
@@ -423,7 +428,7 @@ class PayMongoService
     }
 
     /**
-     * Retrieve payment information from PayMongo.
+     * Retrieve payment information from PayMongo (with caching).
      */
     public function getPayment(string $paymentId): ?array
     {
@@ -431,21 +436,22 @@ class PayMongoService
             return null;
         }
 
-        try {
-            $response = $this->client(10)->get("{$this->baseUrl}/payments/{$paymentId}");
-
-            if ($response->successful()) {
-                return $response->json();
+        $cacheTtl = (int) config('external_apis.paymongo.cache_ttl_seconds', 300);
+        return Cache::remember("paymongo_payment_{$paymentId}", $cacheTtl, function () use ($paymentId) {
+            try {
+                $response = $this->request('GET', "{$this->baseUrl}/payments/{$paymentId}", [], 10);
+                if ($response->successful()) {
+                    return $response->json();
+                }
+            } catch (Exception $e) {
+                Log::error('PayMongo Get Payment Exception: ' . $e->getMessage());
             }
-        } catch (Exception $e) {
-            Log::error('PayMongo Get Payment Exception: ' . $e->getMessage());
-        }
-
-        return null;
+            return null;
+        });
     }
 
     /**
-     * Retrieve a Checkout Session by ID.
+     * Retrieve a Checkout Session by ID (with caching).
      */
     public function getCheckoutSession(string $checkoutId): ?array
     {
@@ -453,17 +459,18 @@ class PayMongoService
             return null;
         }
 
-        try {
-            $response = $this->client(10)->get("{$this->baseUrl}/checkout_sessions/{$checkoutId}");
-
-            if ($response->successful()) {
-                return $response->json();
+        $cacheTtl = (int) config('external_apis.paymongo.cache_ttl_seconds', 300);
+        return Cache::remember("paymongo_session_{$checkoutId}", $cacheTtl, function () use ($checkoutId) {
+            try {
+                $response = $this->request('GET', "{$this->baseUrl}/checkout_sessions/{$checkoutId}", [], 10);
+                if ($response->successful()) {
+                    return $response->json();
+                }
+            } catch (Exception $e) {
+                Log::error('PayMongo Get Checkout Session Exception: ' . $e->getMessage());
             }
-        } catch (Exception $e) {
-            Log::error('PayMongo Get Checkout Session Exception: ' . $e->getMessage());
-        }
-
-        return null;
+            return null;
+        });
     }
 
     /**

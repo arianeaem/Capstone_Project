@@ -175,15 +175,16 @@
                         <!-- Package Header & Price -->
                         <div class="p-6 sm:p-7 flex flex-col justify-between text-center flex-grow">
                             <div>
-                                <!-- Category Badge -->
-                                <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
-                                    BEGINNER CLASS
-                                </span>
 
                                 <!-- Title -->
                                 <h3 class="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight mb-2">
                                     Discovery
                                 </h3>
+                                
+                                 <!-- Category Badge -->
+                                <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
+                                    BEGINNER CLASS
+                                </span>
 
                                 <!-- Pricing Display -->
                                 <div class="my-4">
@@ -306,16 +307,17 @@
                     <!-- Package Header & Price -->
                     <div class="p-6 sm:p-7 flex flex-col justify-between flex-grow">
                         <div>
-                            <!-- Category Badge -->
                             <div class="text-center">
-                                <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
-                                    PREREQUISITE: DISCOVERY CLASS
-                                </span>
 
                                 <!-- Title -->
                                 <h3 class="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight mb-2">
                                     Fundive
                                 </h3>
+                            
+                            <!-- Category Badge -->
+                                <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
+                                    PREREQUISITE: DISCOVERY CLASS
+                                </span>
                             </div>
 
                             <!-- Target Audience Description (Placed before certification options) -->
@@ -468,15 +470,16 @@
                     <!-- Package Header & Price -->
                     <div class="p-6 sm:p-7 flex flex-col justify-between text-center flex-grow">
                         <div>
-                            <!-- Category Badge -->
-                            <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
-                                PRACTICE DIVE
-                            </span>
 
                             <!-- Title -->
                             <h3 class="text-2xl sm:text-3xl font-black text-[#1D1D1F] tracking-tight mb-2">
                                 Refinement Class
                             </h3>
+
+                            <!-- Category Badge -->
+                            <span class="inline-block text-xs font-bold text-[#780000] uppercase tracking-wider mb-2">
+                                PRACTICE DIVE
+                            </span>
 
                             <!-- Pricing Display -->
                             <div class="my-4">
@@ -1265,7 +1268,6 @@
                     <div class="border border-[#E5E5EA] rounded-2xl bg-white overflow-hidden shadow-2xs">
                         <div class="px-4 py-3 border-b border-[#E5E5EA] flex items-center justify-between gap-2">
                             <span class="font-bold text-[#1D1D1F] text-sm sm:text-base">Booking Summary</span>
-                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] capitalize shrink-0" x-text="form.class_type"></span>
                         </div>
 
                         <div class="p-3.5 sm:p-5 space-y-3 text-xs sm:text-sm">
@@ -1292,19 +1294,19 @@
                                 <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
                             </div>
 
-                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center gap-2 text-[#1D1D1F]">
+                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Transportation (Carpool × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
                             </div>
 
-                            <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#1D1D1F]">
+                            <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Boat Dive (₱600 × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(600 * form.participants.length)"></span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(600 * form.participants.length)"></span>
                             </div>
 
-                            <div class="flex justify-between items-center gap-2 text-[#1D1D1F]">
+                            <div class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Mabini LGU Pass &amp; Env. Fee</span>
-                                <span class="font-semibold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(350 * form.participants.length)"></span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(350 * form.participants.length)"></span>
                             </div>
 
                             <!-- Downpayment Due Now (No background color) -->
@@ -1455,9 +1457,9 @@
                 </div>
 
                 <!-- Explicit Consent & Hosted Checkout Action Button (Full Width Bottom) -->
-                <div class="pt-4">
-                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] transition-all"
-                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border border-[#D70015] bg-red-50/20' : ''">
+                <div class="pt-4 space-y-4">
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-[#F8EAEA] border border-[#F1D5D5] transition-all"
+                         :class="touchedStep4 && !form.hasAgreedToTerms ? 'border-2 border-[#D70015] bg-red-50/40 ring-2 ring-[#D70015]/20' : ''">
                         <label tabindex="0"
                                role="checkbox"
                                :aria-checked="form.hasAgreedToTerms"
@@ -1468,18 +1470,18 @@
                                class="flex items-start gap-2.5 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 rounded-lg">
                             <input type="checkbox" 
                                    x-model="form.hasAgreedToTerms" 
-                                   class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
-                            <span class="text-xs sm:text-sm text-[#1D1D1F] leading-relaxed">
+                                   class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0 cursor-pointer">
+                            <span class="font-bold text-[#780000] text-xs sm:text-sm leading-relaxed">
                                 I have read and agree to the 
                                 <a href="{{ route('legal.terms') }}" target="_blank" rel="noopener noreferrer" @click.stop aria-label="Terms and Conditions (opens in a new tab)" class="text-[#780000] font-bold underline hover:text-[#500000] inline-flex items-center gap-1">
                                     <span>Terms &amp; Conditions</span>
-                                    <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                                    <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4 h-4 object-contain shrink-0" alt="" aria-hidden="true">
                                 </a>, 
                                 <a href="{{ route('legal.privacy') }}" target="_blank" rel="noopener noreferrer" @click.stop aria-label="Privacy Policy (opens in a new tab)" class="text-[#780000] font-bold underline hover:text-[#500000] inline-flex items-center gap-1">
                                     <span>Privacy Policy</span>
-                                    <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true">
+                                    <img src="{{ asset('icons/icons8-linking-60.png') }}" class="w-4 h-4 object-contain shrink-0" alt="" aria-hidden="true">
                                 </a>, 
-                                and Cancellation & Reschedule Policy . <span class="text-[#D70015]">*</span>
+                                and Cancellation &amp; Reschedule Policy. <span class="text-[#D70015]">*</span>
                             </span>
                         </label>
                         <span id="err-terms-agreement" x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#D70015] font-semibold mt-1.5 block">
@@ -1488,23 +1490,23 @@
                     </div>
 
                     <!-- Step 4 Navigation Controls -->
-                    <div class="pt-6 flex flex-col sm:flex-row items-stretch sm:items-start justify-between gap-4">
+                    <div class="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
                         <button type="button" 
                                 @click="prevStep()" 
-                                class="btn-secondary px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer shrink-0 self-start">
+                                class="btn-secondary w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
                             <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                             <span>Back</span>
                         </button>
 
-                        <div class="flex flex-col items-stretch sm:items-end gap-1.5 text-right">
+                        <div class="flex flex-col items-stretch sm:items-end gap-1.5 text-right w-full sm:w-auto order-1 sm:order-2">
                             <button type="button" 
                                     @click="if (!form.hasAgreedToTerms) { touchedStep4 = true; errorMessage = 'Please read and agree to the Terms & Conditions and Privacy Policy to proceed.'; window.scrollTo({ top: 0, behavior: 'smooth' }); return; } processPayment(false, true)" 
                                     :disabled="submittingPayment || !form.hasAgreedToTerms"
-                                    class="btn-primary px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto">
-                                <span x-show="!submittingPayment" class="flex items-center gap-2">
+                                    class="btn-primary w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span x-show="!submittingPayment" class="flex items-center justify-center gap-2">
                                     <span>Proceed to PayMongo Hosted Checkout</span>
                                 </span>
-                                <span x-show="submittingPayment" class="flex items-center gap-2">
+                                <span x-show="submittingPayment" class="flex items-center justify-center gap-2">
                                     <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                                     <span>Redirecting to PayMongo...</span>
                                 </span>
@@ -1527,18 +1529,18 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-start">
                     
                     <!-- Left Column: Confirmation Message & Voucher -->
-                    <div class="space-y-6 text-left">
+                    <div class="space-y-4 sm:space-y-6 text-left">
                         <div class="space-y-2">
                             <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
-                                We've emailed your booking confirmation to <strong class="text-[#1D1D1F]" x-text="form.contact_email"></strong>. Please save your reference number and PIN below.
+                                We've emailed your booking confirmation to <strong class="text-[#1D1D1F] break-all" x-text="form.contact_email"></strong>. Please save your reference number and PIN below.
                             </p>
                         </div>
 
                         <!-- Booking Credentials Voucher -->
-                        <div class="p-5 rounded-2xl bg-[#00C3D0] space-y-4">
+                        <div class="p-4 sm:p-5 rounded-2xl bg-[#00C3D0] space-y-4">
                             <div>
                                 <span class="text-xs uppercase tracking-wider text-[#FFFFFF] font-bold">Booking Reference Number</span>
-                                <div class="text-2xl sm:text-3xl font-mono font-extrabold text-[#FFFFFF] tracking-wider" x-text="confirmedBooking.booking_number"></div>
+                                <div class="text-xl sm:text-2xl md:text-3xl font-mono font-extrabold text-[#FFFFFF] tracking-wider break-all" x-text="confirmedBooking.booking_number"></div>
                             </div>
 
                             <div class="pt-2 border-t border-[#FFFFFF]/30">
@@ -1550,7 +1552,7 @@
                             <div class="pt-2">
                                 <button type="button" 
                                         @click="copyCredentials()" 
-                                        class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] px-4 py-2.5 text-xs sm:text-sm font-bold shadow-2xs inline-flex items-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                                        class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-bold shadow-2xs inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
                                     <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copied">
                                     <svg x-show="copied" x-cloak class="w-4.5 h-4.5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                                     <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
@@ -1562,18 +1564,18 @@
                     <!-- Right Column: Recap Summary & Things to Bring Checklist -->
                     <div class="space-y-4">
                         <!-- Recap Summary -->
-                        <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5 shadow-2xs">
-                            <div class="flex justify-between">
-                                <span class="text-[#6E6E73]">Package:</span>
-                                <span class="font-bold text-[#1D1D1F] capitalize" x-text="form.class_type"></span>
+                        <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5 shadow-2xs bg-white">
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-[#6E6E73] shrink-0">Package:</span>
+                                <span class="font-bold text-[#1D1D1F] capitalize text-right" x-text="form.class_type"></span>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-[#6E6E73]">Trip Dates:</span>
-                                <span class="font-bold text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-[#6E6E73] shrink-0">Trip Dates:</span>
+                                <span class="font-bold text-[#1D1D1F] text-right" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-[#6E6E73]">Participants:</span>
-                                <span class="font-bold text-[#1D1D1F]" x-text="form.participants.length + ' participant(s)'"></span>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-[#6E6E73] shrink-0">Participants:</span>
+                                <span class="font-bold text-[#1D1D1F] text-right" x-text="form.participants.length + ' participant(s)'"></span>
                             </div>
 
                             <!-- Applied Dynamic Pricing Rules -->
@@ -1581,52 +1583,60 @@
                                 <div class="border-l-2 border-[#D1D1D6] pl-3 py-1 space-y-1.5 my-1.5">
                                     <div class="text-xs uppercase font-bold tracking-wider text-[#6E6E73]">Applied Pricing Rules:</div>
                                     <template x-for="adj in pricingQuote.adjustments" :key="adj.rule_id">
-                                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                                        <div class="flex justify-between items-start gap-2 text-xs sm:text-sm">
                                             <span class="text-[#1D1D1F]" x-text="adj.rule_name + ' (' + adj.formatted_adjustment + ')'"></span>
-                                            <span class="font-bold" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
+                                            <span class="font-bold shrink-0 text-right" :class="adj.delta_per_pax >= 0 ? 'text-rose-700' : 'text-emerald-700'" x-text="(adj.delta_per_pax >= 0 ? '+' : '−') + '₱' + formatNumber(Math.abs(adj.delta_per_pax) * form.participants.length)"></span>
                                         </div>
                                     </template>
                                 </div>
                             </template>
 
-                            <div class="flex justify-between">
-                                <span class="text-[#6E6E73]">Transportation:</span>
-                                <span class="font-bold text-[#1D1D1F]" x-text="form.pickup_option === 'carpool' ? form.pickup_location : 'Own Transportation'"></span>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-[#6E6E73] shrink-0">Transportation:</span>
+                                <span class="font-bold text-[#1D1D1F] text-right" x-text="form.pickup_option === 'carpool' ? form.pickup_location : 'Own Transportation'"></span>
                             </div>
-                            <div class="flex justify-between">
+                            <div class="flex justify-between items-center gap-2">
                                 <span class="text-[#6E6E73]">Downpayment Paid:</span>
                                 <span class="font-bold text-[#34C759]" x-text="'₱' + formatNumber(confirmedBooking.downpayment_paid)"></span>
                             </div>
-                            <div class="flex justify-between text-[#780000] font-bold">
+                            <div class="flex justify-between items-center gap-2 text-[#780000] font-bold">
                                 <span>Balance Due at Camp:</span>
                                 <span x-text="'₱' + formatNumber(confirmedBooking.balance_due)"></span>
                             </div>
                         </div>
 
-                        <!-- Things to Bring Checklist -->
-                        <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5 shadow-2xs">
-                            <h4 class="font-bold text-[#1D1D1F]">Things to Bring:</h4>
+                        <!-- Things to Bring Checklist & Carpool Guidelines -->
+                        <div class="p-4 sm:p-5 rounded-xl border border-[#E5E5EA] text-left text-xs sm:text-sm space-y-2.5 shadow-2xs bg-white">
+                            <h4 class="font-bold text-[#1D1D1F]">Things to Bring (Towels, shampoo and soap are all provided):</h4>
                             <ul class="space-y-1 text-[#6E6E73] list-disc list-inside">
                                 <li>Swimming clothes (anything you’re comfortable wearing)</li>
                                 <li>Toiletries</li>
                                 <li>Personal things</li>
                                 <li>A pair of socks (in any kind) for fin fitting</li>
                             </ul>
-                            <p class="text-xs sm:text-sm text-[#065F46] font-semibold pt-1">
-                                (Towels, shampoo and soap are all provided)
-                            </p>
+
+                            <!-- Carpool Guidelines (if carpool availed) -->
+                            <div x-show="form.pickup_option === 'carpool'" class="pt-2.5 border-t border-[#E5E5EA] space-y-1">
+                                <h4 class="font-bold text-[#1D1D1F]">Carpool Reminder:</h4>
+                                <p class="text-[#6E6E73] leading-relaxed">
+                                    Please arrive at your selected pickup location (<strong class="text-[#1D1D1F]" x-text="form.pickup_location"></strong>) before the designated departure time. A strict <strong>10-minute grace period</strong> will be provided before the van departs but we are kindly asking to not maximize it.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- Navigation Buttons -->
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-6">
-                    <a :href="confirmedBooking.manage_url" class="btn-primary w-full sm:w-auto px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold">
-                        Manage This Booking
+                <!-- Step 5 Navigation Controls -->
+                <div class="pt-6 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
+                    <a href="{{ route('landing') }}" 
+                       class="btn-secondary w-full sm:w-auto px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold flex items-center justify-center gap-1.5 cursor-pointer order-2 sm:order-1">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                        <span>Done / Back to Home</span>
                     </a>
-                    <a href="{{ route('landing') }}" class="btn-secondary w-full sm:w-auto px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold">
-                        Done / Back to Home
+                    <a :href="confirmedBooking.manage_url" 
+                       class="btn-primary w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-1.5 order-1 sm:order-2">
+                        <span>Manage This Booking</span>
                     </a>
                 </div>
             </div>

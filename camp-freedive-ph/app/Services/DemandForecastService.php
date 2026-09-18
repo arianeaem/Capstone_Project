@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Batch;
 use App\Models\DemandForecast;
 use App\Models\Payment;
+use App\Services\ExternalApi\ExternalApiClient;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -15,11 +16,13 @@ class DemandForecastService
 {
     protected string $serviceUrl;
     protected string $apiToken;
+    protected ExternalApiClient $apiClient;
 
-    public function __construct()
+    public function __construct(?ExternalApiClient $apiClient = null)
     {
         $this->serviceUrl = rtrim(config('services.ml.url') ?: env('ML_SERVICE_URL', 'http://127.0.0.1:8001'), '/');
         $this->apiToken = config('services.ml.token') ?: env('ML_API_TOKEN', 'cfml_live_8eef173d6b5670cab3ec93d7ae53736a4128e079484c718819f20625');
+        $this->apiClient = $apiClient ?? app(ExternalApiClient::class);
     }
 
     /**
@@ -48,30 +51,25 @@ class DemandForecastService
      */
     public function getForecastForDate(string|Carbon $date): ?array
     {
-        $targetDate = Carbon::parse($date)->format('Y-m-d');
-        $allData = $this->getForecastData();
-        $forecasts = $allData['forecasts'] ?? [];
+        $targetDate = $date instanceof Carbon ? $date->toDateString() : Carbon::parse($date)->toDateString();
+        $forecasts = $this->getForecastData()['forecasts'] ?? $this->getForecastData();
 
-        foreach ($forecasts as $f) {
-            if (($f['forecast_date'] ?? null) === $targetDate) {
-                return $f;
+        foreach ($forecasts as $item) {
+            if (($item['forecast_date'] ?? null) === $targetDate) {
+                return $item;
             }
         }
 
-        // Direct DB fallback if not found in cache list
-        $record = DemandForecast::whereDate('forecast_date', $targetDate)
-            ->latest('synced_at')
-            ->first();
-
-        if ($record) {
+        $dbRecord = DemandForecast::whereDate('forecast_date', $targetDate)->first();
+        if ($dbRecord) {
             return [
-                'forecast_date' => $record->forecast_date?->format('Y-m-d'),
-                'days_ahead' => $record->days_ahead,
-                'predicted_participants' => (float) $record->predicted_participants,
-                'predicted_revenue_php' => (float) $record->predicted_revenue_php,
-                'demand_level' => $record->demand_level ?: 'Medium',
-                'season_period' => $record->season_period ?: 'Off-Peak',
-                'instructors_needed' => (int) $record->instructors_needed,
+                'forecast_date' => $dbRecord->forecast_date?->toDateString(),
+                'days_ahead' => $dbRecord->days_ahead,
+                'predicted_participants' => $dbRecord->predicted_participants,
+                'predicted_revenue_php' => (float) $dbRecord->predicted_revenue_php,
+                'demand_level' => $dbRecord->demand_level,
+                'season_period' => $dbRecord->season_period,
+                'instructors_needed' => $dbRecord->instructors_needed,
             ];
         }
 
@@ -85,10 +83,11 @@ class DemandForecastService
     {
         try {
             $endpoint = "{$this->serviceUrl}/forecast/demand";
-            $response = Http::withHeaders([
-                'Authorization' => "Bearer {$this->apiToken}",
-                'Accept' => 'application/json',
-            ])->timeout(3)->get($endpoint);
+            $response = $this->apiClient->execute('ml_service', 'GET', $endpoint, [
+                'bearer_token' => $this->apiToken,
+                'timeout' => 3,
+                'max_retries' => 1,
+            ]);
 
             if ($response->successful()) {
                 $payload = $response->json();

@@ -42,27 +42,27 @@ Route::get('/privacy-policy', [LegalController::class, 'privacy'])->name('legal.
 Route::redirect('/privacy', '/privacy-policy', 301);
 
 Route::get('/book', [BookingController::class, 'create'])->name('booking.create');
-Route::post('/api/weather/check', [BookingController::class, 'checkWeather'])->name('api.weather.check');
-Route::post('/api/pricing/quote', [BookingController::class, 'getPricingQuote'])->name('api.pricing.quote');
-Route::post('/book', [BookingController::class, 'store'])->name('booking.store');
+Route::post('/api/weather/check', [BookingController::class, 'checkWeather'])->name('api.weather.check')->middleware('throttle:booking_quote_weather');
+Route::post('/api/pricing/quote', [BookingController::class, 'getPricingQuote'])->name('api.pricing.quote')->middleware('throttle:booking_quote_weather');
+Route::post('/book', [BookingController::class, 'store'])->name('booking.store')->middleware('throttle:booking_create');
 
 Route::get('/manage-booking', [ManageBookingController::class, 'index'])->name('manage.index');
-Route::post('/manage-booking/search', [ManageBookingController::class, 'search'])->name('manage.search');
+Route::post('/manage-booking/search', [ManageBookingController::class, 'search'])->name('manage.search')->middleware('throttle:manage_lookup');
 Route::get('/manage-booking/{booking_number}', [ManageBookingController::class, 'show'])->name('manage.show');
-Route::post('/manage-booking/{booking_number}/reschedule', [ManageBookingController::class, 'reschedule'])->name('manage.reschedule');
-Route::post('/manage-booking/{booking_number}/cancel', [ManageBookingController::class, 'cancel'])->name('manage.cancel');
+Route::post('/manage-booking/{booking_number}/reschedule', [ManageBookingController::class, 'reschedule'])->name('manage.reschedule')->middleware('throttle:manage_requests');
+Route::post('/manage-booking/{booking_number}/cancel', [ManageBookingController::class, 'cancel'])->name('manage.cancel')->middleware('throttle:manage_requests');
 
 // Weather Safety Forecast Instant Preview (Client date selection)
-Route::get('/api/weather/preview', [\App\Http\Controllers\Api\WeatherPreviewController::class, 'preview'])->name('api.weather.preview');
+Route::get('/api/weather/preview', [\App\Http\Controllers\Api\WeatherPreviewController::class, 'preview'])->name('api.weather.preview')->middleware('throttle:booking_quote_weather');
 
 // PayMongo Customer Payment Integration
-Route::post('/booking/{booking}/paymongo/checkout', [\App\Http\Controllers\Payment\PayMongoController::class, 'checkout'])->name('paymongo.checkout');
+Route::post('/booking/{booking}/paymongo/checkout', [\App\Http\Controllers\Payment\PayMongoController::class, 'checkout'])->name('paymongo.checkout')->middleware('throttle:paymongo_checkout');
 Route::get('/booking/{booking}/paymongo/success', [\App\Http\Controllers\Payment\PayMongoController::class, 'success'])->name('paymongo.success');
 Route::get('/booking/{booking}/paymongo/cancel', [\App\Http\Controllers\Payment\PayMongoController::class, 'cancel'])->name('paymongo.cancel');
 
 // PayMongo Webhook Endpoints
-Route::post('/api/webhooks/paymongo', [\App\Http\Controllers\Payment\PayMongoController::class, 'webhook'])->name('paymongo.webhook.api');
-Route::post('/webhooks/paymongo', [\App\Http\Controllers\Payment\PayMongoController::class, 'webhook'])->name('paymongo.webhook');
+Route::post('/api/webhooks/paymongo', [\App\Http\Controllers\Payment\PayMongoController::class, 'webhook'])->name('paymongo.webhook.api')->middleware('throttle:paymongo_webhook');
+Route::post('/webhooks/paymongo', [\App\Http\Controllers\Payment\PayMongoController::class, 'webhook'])->name('paymongo.webhook')->middleware('throttle:paymongo_webhook');
 
 // =========================================================================
 // 2. INTERNAL AUTHENTICATION (STAFF ROUTES)
@@ -71,14 +71,14 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/admin/login', [LoginController::class, 'showLoginForm']);
 Route::get('/staff/login', [LoginController::class, 'showLoginForm']);
 Route::get('/staff', [LoginController::class, 'showLoginForm']);
-Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::post('/login', [LoginController::class, 'login'])->name('login.post')->middleware('throttle:login');
 
 // Password Reset Routes
 Route::get('/forgot-password', [PasswordResetController::class, 'showForgotForm'])->name('password.request');
-Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email');
+Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])->name('password.email')->middleware('throttle:password_reset');
 
 Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])->name('password.update')->middleware('throttle:password_reset');
 
 // =========================================================================
 // 3. AUTHENTICATED STAFF ROUTES (SHARED)
@@ -88,7 +88,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     // First-login mandatory password change
     Route::get('/force-password-change', [ForcePasswordChangeController::class, 'show'])->name('password.force_change');
-    Route::post('/force-password-change', [ForcePasswordChangeController::class, 'update'])->name('password.force_change.update');
+    Route::post('/force-password-change', [ForcePasswordChangeController::class, 'update'])->name('password.force_change.update')->middleware('throttle:password_reset');
 });
 
 // =========================================================================
@@ -154,8 +154,8 @@ $registerBackofficeRoutes = function (string $portalRole) {
     // Weather & Marine Safety Monitoring Module
     Route::get('/safety-monitoring', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'index'])->name('weather.index');
     Route::get('/weather', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'index']);
-    Route::post('/safety-monitoring/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache'])->name('weather.sync_cache');
-    Route::post('/weather/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache']);
+    Route::post('/safety-monitoring/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache'])->name('weather.sync_cache')->middleware('throttle:weather_sync');
+    Route::post('/weather/sync-cache', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'syncCache'])->middleware('throttle:weather_sync');
     Route::get('/safety-monitoring/{batch}', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'show'])->name('weather.show');
     Route::get('/weather/{batch}', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'show']);
     Route::post('/safety-monitoring/{batch}/assess', [\App\Http\Controllers\Admin\WeatherSafetyController::class, 'assess'])->name('weather.assess');

@@ -36,4 +36,23 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (\Illuminate\Http\Exceptions\ThrottleRequestsException $e, Request $request) {
+            $retryAfter = $e->getHeaders()['Retry-After'] ?? 60;
+            $headers = [
+                'Retry-After' => $retryAfter,
+                'X-RateLimit-Reset' => now()->addSeconds((int) $retryAfter)->getTimestamp(),
+            ];
+
+            if ($request->is('api/*') || $request->expectsJson() || $request->wantsJson()) {
+                return response()->json([
+                    'error' => 'Too many requests. Please try again later.',
+                ], 429, $headers);
+            }
+
+            return back()
+                ->withInput()
+                ->with('error', "Too many requests. Please try again in {$retryAfter} seconds.")
+                ->withHeaders($headers);
+        });
     })->create();

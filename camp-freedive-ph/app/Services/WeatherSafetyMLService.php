@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Services\ExternalApi\ExternalApiClient;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -30,6 +31,7 @@ class WeatherSafetyMLService
     protected string $baseUrl;
     protected int $timeout;
     protected bool $enabled;
+    protected ExternalApiClient $apiClient;
 
     // Circuit Breaker State Constants
     public const CIRCUIT_STATE_CLOSED = 'CLOSED';
@@ -73,11 +75,12 @@ class WeatherSafetyMLService
      * Note: Timeout is deliberately capped at 4s so slow network conditions
      * never block the customer-facing booking checkout page.
      */
-    public function __construct()
+    public function __construct(?ExternalApiClient $apiClient = null)
     {
         $this->baseUrl = rtrim((string) config('services.ml_safety.url', 'http://127.0.0.1:8001'), '/');
         $this->timeout = (int) config('services.ml_safety.timeout', 4);
         $this->enabled = (bool) config('services.ml_safety.enabled', true);
+        $this->apiClient = $apiClient ?? app(ExternalApiClient::class);
     }
 
     /**
@@ -235,12 +238,11 @@ class WeatherSafetyMLService
                 'site_name' => 'Anilao, Mabini, Batangas',
             ];
 
-            $response = Http::timeout($this->timeout)
-                ->withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post("{$this->baseUrl}/assess-booking", $payload);
+            $response = $this->apiClient->execute('ml_service', 'POST', "{$this->baseUrl}/assess-booking", [
+                'json' => $payload,
+                'timeout' => $this->timeout,
+                'max_retries' => 1,
+            ]);
 
             if (!$response->successful()) {
                 $this->recordFailure("HTTP {$response->status()}");
@@ -263,10 +265,7 @@ class WeatherSafetyMLService
             return $this->standardizeResponse($data);
         } catch (Exception $e) {
             $this->recordFailure($e->getMessage());
-            Log::info('[WeatherSafetyMLService] ML Safety microservice failure (unreachable or malformed schema), continuing with native heuristic engine', [
-                'error' => $e->getMessage(),
-                'date' => $date,
-            ]);
+            Log::warning('[WeatherSafetyMLService] Exception calling ML assessment: ' . $e->getMessage());
             return null;
         }
     }
@@ -281,7 +280,12 @@ class WeatherSafetyMLService
      */
     public function fetchPhysicsForecast(int $horizonHours = 24, ?array $boundaryWeather = null): ?array
     {
-        if (!$this->isEnabled() || !$this->isCircuitAvailable()) {
+        if (!$this->isEnabled()) {
+            return null;
+        }
+
+        if (!$this->isCircuitAvailable()) {
+            Log::warning('[WeatherSafetyMLService] fetchPhysicsForecast blocked by circuit breaker.');
             return null;
         }
 
@@ -293,12 +297,11 @@ class WeatherSafetyMLService
                 $payload['readings'] = $boundaryWeather;
             }
 
-            $response = Http::timeout($this->timeout)
-                ->withHeaders([
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                ])
-                ->post("{$this->baseUrl}/forecast", $payload);
+            $response = $this->apiClient->execute('ml_service', 'POST', "{$this->baseUrl}/forecast", [
+                'json' => $payload,
+                'timeout' => $this->timeout,
+                'max_retries' => 1,
+            ]);
 
             if (!$response->successful()) {
                 $this->recordFailure("HTTP {$response->status()} on /forecast");
@@ -322,6 +325,14 @@ class WeatherSafetyMLService
             Log::warning('[WeatherSafetyMLService] Failed physics forecast request: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Directly query the ONNX raw physics engine without formatting or domain heuristics.
+     */
+    public function assessRaw(int $horizonHours, ?array $boundaryWeather = null): ?array
+    {
+        return $this->fetchPhysicsForecast($horizonHours, $boundaryWeather);
     }
 
     /**

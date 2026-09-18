@@ -88,8 +88,8 @@ class PricingRuleEngineTest extends TestCase
 
         PricingRule::create([
             'name' => 'Rule B',
-            'rule_type' => 'demand',
-            'condition_value' => 'high',
+            'rule_type' => 'seasonality',
+            'condition_value' => 'peak',
             'applies_to' => 'all',
             'adjustment_type' => 'increase',
             'adjustment_method' => 'percentage',

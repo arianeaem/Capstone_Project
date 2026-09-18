@@ -17,6 +17,7 @@ use App\Models\NotificationLog;
 use App\Models\RefundRequest;
 use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\ExternalApi\ExternalApiClient;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
@@ -44,6 +45,13 @@ use Illuminate\Support\Facades\Mail;
  */
 class WeatherForecastService
 {
+    protected ExternalApiClient $apiClient;
+
+    public function __construct(?ExternalApiClient $apiClient = null)
+    {
+        $this->apiClient = $apiClient ?? app(ExternalApiClient::class);
+    }
+
     // Anilao / Mabini, Batangas Site Coordinates (Camp FreedivePH primary training basin)
     public const LATITUDE = 13.7481;
     public const LONGITUDE = 120.9408;
@@ -938,12 +946,16 @@ class WeatherForecastService
         if (config('services.forecast_engine.enabled', false)) {
             try {
                 $serviceUrl = config('services.forecast_engine.url', 'http://127.0.0.1:8001');
-                $response = Http::timeout(1)->post("{$serviceUrl}/assess-booking", [
-                    'planned_date' => $plannedDate,
-                    'dive_start' => $diveStart,
-                    'dive_end' => $diveEnd,
-                    'overrides' => $overrides,
-                    'tide_score' => 0,
+                $response = $this->apiClient->execute('ml_service', 'POST', "{$serviceUrl}/assess-booking", [
+                    'json' => [
+                        'planned_date' => $plannedDate,
+                        'dive_start' => $diveStart,
+                        'dive_end' => $diveEnd,
+                        'overrides' => $overrides,
+                        'tide_score' => 0,
+                    ],
+                    'timeout' => 1,
+                    'max_retries' => 0,
                 ]);
 
                 if ($response->successful()) {
@@ -1184,30 +1196,53 @@ class WeatherForecastService
         $today = Carbon::today(self::TIMEZONE);
         $startDateStr = $today->format('Y-m-d');
         $endDateStr = $today->copy()->addDays($forecastDays - 1)->format('Y-m-d');
+        $cachedContinuous = Cache::get('forecast:continuous_16d');
 
-        // 1. Fetch 16-Day Marine Forecast in a single API call
-        $marineRes = Http::timeout(10)->withoutVerifying()->get('https://marine-api.open-meteo.com/v1/marine', [
-            'latitude' => self::LATITUDE,
-            'longitude' => self::LONGITUDE,
-            'timezone' => self::TIMEZONE,
-            'start_date' => $startDateStr,
-            'end_date' => $endDateStr,
-            'hourly' => 'wave_height,wave_period,swell_wave_height,wind_wave_height,ocean_current_velocity',
-        ]);
-        $marineHourly = $marineRes->successful() ? ($marineRes->json()['hourly'] ?? []) : [];
+        // 1. Fetch 16-Day Marine Forecast in a single API call through rate-controlled ExternalApiClient
+        try {
+            $marineRes = $this->apiClient->execute('open_meteo', 'GET', 'https://marine-api.open-meteo.com/v1/marine', [
+                'query' => [
+                    'latitude' => self::LATITUDE,
+                    'longitude' => self::LONGITUDE,
+                    'timezone' => self::TIMEZONE,
+                    'start_date' => $startDateStr,
+                    'end_date' => $endDateStr,
+                    'hourly' => 'wave_height,wave_period,swell_wave_height,wind_wave_height,ocean_current_velocity',
+                ],
+                'timeout' => 10,
+                'without_verifying' => true,
+            ]);
+            $marineHourly = $marineRes->successful() ? ($marineRes->json()['hourly'] ?? []) : [];
+        } catch (\Throwable $e) {
+            Log::warning('Open-Meteo marine fetch warning: ' . $e->getMessage());
+            $marineHourly = [];
+        }
 
-        // 2. Fetch 16-Day Atmospheric Weather Forecast in a single API call
-        $weatherRes = Http::timeout(10)->withoutVerifying()->get('https://api.open-meteo.com/v1/forecast', [
-            'latitude' => self::LATITUDE,
-            'longitude' => self::LONGITUDE,
-            'timezone' => self::TIMEZONE,
-            'start_date' => $startDateStr,
-            'end_date' => $endDateStr,
-            'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
-        ]);
-        $weatherHourly = $weatherRes->successful() ? ($weatherRes->json()['hourly'] ?? []) : [];
+        // 2. Fetch 16-Day Atmospheric Weather Forecast in a single API call through rate-controlled ExternalApiClient
+        try {
+            $weatherRes = $this->apiClient->execute('open_meteo', 'GET', 'https://api.open-meteo.com/v1/forecast', [
+                'query' => [
+                    'latitude' => self::LATITUDE,
+                    'longitude' => self::LONGITUDE,
+                    'timezone' => self::TIMEZONE,
+                    'start_date' => $startDateStr,
+                    'end_date' => $endDateStr,
+                    'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
+                ],
+                'timeout' => 10,
+                'without_verifying' => true,
+            ]);
+            $weatherHourly = $weatherRes->successful() ? ($weatherRes->json()['hourly'] ?? []) : [];
+        } catch (\Throwable $e) {
+            Log::warning('Open-Meteo weather fetch warning: ' . $e->getMessage());
+            $weatherHourly = [];
+        }
 
         if (empty($marineHourly) && empty($weatherHourly)) {
+            if (!empty($cachedContinuous) && is_array($cachedContinuous)) {
+                Log::info('Serving stale 16-day continuous forecast from cache due to external provider unavailability.');
+                return $cachedContinuous;
+            }
             throw new Exception("Unable to communicate with Open-Meteo forecast servers.");
         }
 
@@ -1482,18 +1517,23 @@ class WeatherForecastService
         }
 
         try {
-            $res = Http::timeout(6)->withoutVerifying()->get('https://marine-api.open-meteo.com/v1/marine', [
-                'latitude' => self::LATITUDE,
-                'longitude' => self::LONGITUDE,
-                'timezone' => self::TIMEZONE,
-                'start_date' => $date,
-                'end_date' => $date,
-                'hourly' => 'wave_height,wave_period,swell_wave_height,wind_wave_height,ocean_current_velocity',
+            $res = $this->apiClient->execute('open_meteo', 'GET', 'https://marine-api.open-meteo.com/v1/marine', [
+                'query' => [
+                    'latitude' => self::LATITUDE,
+                    'longitude' => self::LONGITUDE,
+                    'timezone' => self::TIMEZONE,
+                    'start_date' => $date,
+                    'end_date' => $date,
+                    'hourly' => 'wave_height,wave_period,swell_wave_height,wind_wave_height,ocean_current_velocity',
+                ],
+                'timeout' => 8,
+                'without_verifying' => true,
             ]);
 
             if ($res->successful()) {
                 $data = $res->json()['hourly'] ?? [];
-                Cache::put("forecast:marine_cache:{$date}", $data, now()->addMinutes(30));
+                $cacheMins = (int) config('external_apis.open_meteo.single_date_cache_ttl_minutes', 60);
+                Cache::put("forecast:marine_cache:{$date}", $data, now()->addMinutes($cacheMins));
                 return $data;
             }
         } catch (Exception $e) {
@@ -1514,18 +1554,23 @@ class WeatherForecastService
         }
 
         try {
-            $res = Http::timeout(6)->withoutVerifying()->get('https://api.open-meteo.com/v1/forecast', [
-                'latitude' => self::LATITUDE,
-                'longitude' => self::LONGITUDE,
-                'timezone' => self::TIMEZONE,
-                'start_date' => $date,
-                'end_date' => $date,
-                'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
+            $res = $this->apiClient->execute('open_meteo', 'GET', 'https://api.open-meteo.com/v1/forecast', [
+                'query' => [
+                    'latitude' => self::LATITUDE,
+                    'longitude' => self::LONGITUDE,
+                    'timezone' => self::TIMEZONE,
+                    'start_date' => $date,
+                    'end_date' => $date,
+                    'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
+                ],
+                'timeout' => 8,
+                'without_verifying' => true,
             ]);
 
             if ($res->successful()) {
                 $data = $res->json()['hourly'] ?? [];
-                Cache::put("forecast:weather_cache:{$date}", $data, now()->addMinutes(30));
+                $cacheMins = (int) config('external_apis.open_meteo.single_date_cache_ttl_minutes', 60);
+                Cache::put("forecast:weather_cache:{$date}", $data, now()->addMinutes($cacheMins));
                 return $data;
             }
         } catch (Exception $e) {
@@ -1804,13 +1849,17 @@ class WeatherForecastService
         $weatherData = [];
 
         try {
-            $marineRes = Http::timeout(6)->withoutVerifying()->get('https://marine-api.open-meteo.com/v1/marine', [
-                'latitude' => self::LATITUDE,
-                'longitude' => self::LONGITUDE,
-                'timezone' => self::TIMEZONE,
-                'start_date' => $date,
-                'end_date' => $date,
-                'hourly' => 'wave_height,wave_period,swell_wave_height,wind_wave_height,ocean_current_velocity',
+            $marineRes = $this->apiClient->execute('open_meteo', 'GET', 'https://marine-api.open-meteo.com/v1/marine', [
+                'query' => [
+                    'latitude' => self::LATITUDE,
+                    'longitude' => self::LONGITUDE,
+                    'timezone' => self::TIMEZONE,
+                    'start_date' => $date,
+                    'end_date' => $date,
+                    'hourly' => 'wave_height,wave_period,swell_wave_height,wind_wave_height,ocean_current_velocity',
+                ],
+                'timeout' => 8,
+                'without_verifying' => true,
             ]);
             if ($marineRes->successful()) {
                 $marineData = $marineRes->json()['hourly'] ?? [];
@@ -1820,24 +1869,32 @@ class WeatherForecastService
         }
 
         try {
-            $weatherRes = Http::timeout(6)->withoutVerifying()->get('https://archive-api.open-meteo.com/v1/archive', [
-                'latitude' => self::LATITUDE,
-                'longitude' => self::LONGITUDE,
-                'timezone' => self::TIMEZONE,
-                'start_date' => $date,
-                'end_date' => $date,
-                'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
-            ]);
-            if ($weatherRes->successful()) {
-                $weatherData = $weatherRes->json()['hourly'] ?? [];
-            } else {
-                $forecastPastRes = Http::timeout(6)->withoutVerifying()->get('https://api.open-meteo.com/v1/forecast', [
+            $weatherRes = $this->apiClient->execute('open_meteo', 'GET', 'https://archive-api.open-meteo.com/v1/archive', [
+                'query' => [
                     'latitude' => self::LATITUDE,
                     'longitude' => self::LONGITUDE,
                     'timezone' => self::TIMEZONE,
                     'start_date' => $date,
                     'end_date' => $date,
                     'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
+                ],
+                'timeout' => 8,
+                'without_verifying' => true,
+            ]);
+            if ($weatherRes->successful()) {
+                $weatherData = $weatherRes->json()['hourly'] ?? [];
+            } else {
+                $forecastPastRes = $this->apiClient->execute('open_meteo', 'GET', 'https://api.open-meteo.com/v1/forecast', [
+                    'query' => [
+                        'latitude' => self::LATITUDE,
+                        'longitude' => self::LONGITUDE,
+                        'timezone' => self::TIMEZONE,
+                        'start_date' => $date,
+                        'end_date' => $date,
+                        'hourly' => 'precipitation,rain,showers,pressure_msl,wind_speed_10m,wind_gusts_10m,wind_direction_10m',
+                    ],
+                    'timeout' => 8,
+                    'without_verifying' => true,
                 ]);
                 if ($forecastPastRes->successful()) {
                     $weatherData = $forecastPastRes->json()['hourly'] ?? [];

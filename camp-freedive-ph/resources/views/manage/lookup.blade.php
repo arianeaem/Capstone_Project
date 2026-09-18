@@ -15,14 +15,6 @@
             </p>
         </div>
 
-        <!-- Flash & Validation Alert -->
-        @if(session('error'))
-        <div class="mb-5 p-3.5 rounded-xl bg-red-50 border border-[#D70015]/30 text-xs sm:text-sm text-[#D70015] font-semibold flex items-center gap-2" role="alert">
-            <svg class="w-4 h-4 shrink-0 text-[#D70015]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span>{{ session('error') }}</span>
-        </div>
-        @endif
-
         <!-- Booking Lookup Form -->
         <form action="{{ route('manage.search') }}" method="POST" class="space-y-5" novalidate>
             @csrf

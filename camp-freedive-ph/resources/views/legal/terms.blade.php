@@ -178,9 +178,6 @@
                 <div class="p-4 sm:p-5 rounded-2xl bg-[#F2F2F7] space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="font-extrabold text-[#1D1D1F] text-base">More than 14 Days Before Dive Date</h3>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                            100% Refund or Free Reschedule
-                        </span>
                     </div>
                     <p class="text-sm text-[#3A3A3C]">
                         You are eligible for a <strong>100% full downpayment refund</strong> processed within 3 to 5 banking days, or a <strong>free reschedule</strong> to any available future batch date within 6 months.
@@ -191,9 +188,6 @@
                 <div class="p-4 sm:p-5 rounded-2xl bg-[#F2F2F7] space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="font-extrabold text-[#1D1D1F] text-base">Within 7 to 14 Days Before Dive Date</h3>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-900">
-                            Free Reschedule Only
-                        </span>
                     </div>
                     <p class="text-sm text-[#3A3A3C]">
                         You may request a <strong>free reschedule</strong> to another open batch date. Downpayments are preserved but non-refundable at this stage.
@@ -204,9 +198,6 @@
                 <div class="p-4 sm:p-5 rounded-2xl space-y-2">
                     <div class="flex flex-wrap items-center justify-between gap-2">
                         <h3 class="font-extrabold text-[#780000] text-base">Within 7 Days Before Dive Date</h3>
-                        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-[#D70015] text-white">
-                            Non-Refundable / Locked
-                        </span>
                     </div>
                     <p class="text-sm text-[#3A3A3C]">
                         Reservations are <strong>non-refundable and locked</strong>. Downpayments are forfeited due to committed resort accommodation reservations and coach allocations.

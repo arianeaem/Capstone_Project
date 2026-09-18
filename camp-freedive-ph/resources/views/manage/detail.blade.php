@@ -61,17 +61,17 @@
             </div>
 
             <!-- Security PIN -->
-            <div class="bg-[#F8EAEA] rounded-xl p-3 sm:p-3.5 flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
+            <div class="bg-[#00C3D0] rounded-xl p-3 sm:p-3.5 flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
                 <div>
-                    <span class="text-xs font-bold text-[#780000] block">Security PIN</span>
-                    <span class="text-base sm:text-lg font-mono font-extrabold text-[#780000] tracking-widest">{{ $booking->pin }}</span>
+                    <span class="text-xs font-bold text-[#FFFFFF] block">Security PIN</span>
+                    <span class="text-base sm:text-lg font-mono font-extrabold text-[#FFFFFF] tracking-widest">{{ $booking->pin }}</span>
                 </div>
                 <button type="button" 
                         @click="navigator.clipboard.writeText('{{ $booking->pin }}'); copiedPin = true; setTimeout(() => copiedPin = false, 2000)"
                         aria-label="Copy Security PIN"
-                        class="min-h-[34px] px-2.5 py-1.5 rounded-lg bg-white/90 hover:bg-white text-xs font-bold text-[#780000] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                        class="min-h-[34px] px-2.5 py-1.5 rounded-lg bg-white/90 hover:bg-white text-xs font-bold text-[#1D1D1F] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
                     <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copiedPin">
-                    <svg x-show="copiedPin" x-cloak class="w-4.5 h-4.5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg x-show="copiedPin" x-cloak class="w-4.5 h-4.5 text-[#1D1D1F] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                     <span x-text="copiedPin ? 'Copied' : 'Copy'"></span>
                 </button>
             </div>
@@ -79,19 +79,19 @@
 
         <!-- Booking Key Information -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 text-sm">
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+            <div class="p-3.5 sm:p-4 rounded-xl ">
                 <span class="text-sm text-[#6E6E73] block mb-1">Lead Booker:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->contact_name }}</strong>
                 <span class="text-sm text-[#6E6E73] break-all">{{ $booking->contact_email }}</span>
             </div>
 
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+            <div class="p-3.5 sm:p-4 rounded-xl ">
                 <span class="text-sm text-[#6E6E73] block mb-1">Class Package:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->formatted_class_type }}</strong>
                 <span class="text-sm text-[#6E6E73]">{{ $booking->participants->count() }} Participant(s)</span>
             </div>
 
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+            <div class="p-3.5 sm:p-4 rounded-xl ">
                 <span class="text-sm text-[#6E6E73] block mb-1">Trip Dates:</span>
                 <strong class="text-sm text-[#1D1D1F] block">{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</strong>
                 <span class="text-sm text-[#780000] font-semibold">
@@ -105,7 +105,7 @@
                 </span>
             </div>
 
-            <div class="p-3.5 sm:p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+            <div class="p-3.5 sm:p-4 rounded-xl ">
                 <span class="text-sm text-[#6E6E73] block mb-1">Payment Status:</span>
                 @if($booking->status === 'pending_downpayment')
                     <strong class="text-sm text-amber-700 block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Unpaid</strong>
@@ -137,7 +137,7 @@
                         <span class="font-bold text-[#1D1D1F] whitespace-nowrap">₱{{ number_format($booking->priceAdjustments->first()->base_price ?? 4250, 2) }} <span class="font-normal text-[#636366]">/ person</span></span>
                     </div>
 
-                    <div class="space-y-2 py-2.5 border-y border-[#E5E5EA]/60">
+                    <div class="border-l-2 border-[#D1D1D6] pl-3 py-1 space-y-2 my-1.5">
                         @foreach($booking->priceAdjustments as $adj)
                         <div class="flex flex-wrap sm:flex-nowrap justify-between items-start sm:items-center gap-1 sm:gap-3">
                             <div class="flex flex-wrap items-center gap-1.5 min-w-0">
@@ -183,10 +183,10 @@
             </div>
 
             <!-- Logistics and Add-ons -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8">
-                <h3 class="text-base font-bold text-[#1D1D1F] mb-4">Transportation & Add-ons</h3>
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-4">
+                <h3 class="text-base font-bold text-[#1D1D1F]">Transportation & Add-ons</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA]">
                         <span class="text-sm text-[#6E6E73] block mb-1">Transportation:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->pickup_option === 'carpool' ? 'Manila Carpool Service' : 'Own Transportation' }}
@@ -196,7 +196,7 @@
                         @endif
                     </div>
 
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] shadow-2xs">
+                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA]">
                         <span class="text-sm text-[#6E6E73] block mb-1">Boat Dive:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->boat_dive ? 'Included (+₱600 / person)' : 'Not Included' }}
@@ -204,6 +204,26 @@
                         <span class="text-sm text-[#6E6E73] block mt-1">Mabini LGU pass included</span>
                     </div>
                 </div>
+
+                @if($booking->pickup_option === 'carpool')
+                <div class="p-4 rounded-xl bg-[#F8EAEA] border border-[#F1D5D5] text-xs sm:text-sm">
+                    <strong class="font-bold text-[#780000] block mb-1">Carpool Arrival & Grace Period Notice:</strong>
+                    <p class="text-[#4A4A4F] leading-relaxed">
+                        Please arrive at your pickup location (<strong>{{ $booking->pickup_location }}</strong>) before the designated departure time. A strict <strong>30-minute grace period</strong> will be provided before the van departs but we are kindly asking to not maximize it.
+                    </p>
+                </div>
+                @endif
+            </div>
+
+            <!-- Things to Bring Checklist -->
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-3">
+                <h3 class="text-base font-bold text-[#1D1D1F]">Things to Bring (Towels, shampoo and soap are all provided)</h3>
+                <ul class="space-y-1.5 text-[#6E6E73] text-xs sm:text-sm list-disc list-inside">
+                    <li>Swimming clothes (anything you’re comfortable wearing)</li>
+                    <li>Toiletries</li>
+                    <li>Personal things</li>
+                    <li>A pair of socks (in any kind) for fin fitting</li>
+                </ul>
             </div>
 
             <!-- Request History -->
@@ -269,7 +289,7 @@
                 </div>
                 @else
                 <!-- Reschedule Status -->
-                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 shadow-2xs">
+                <div class="p-4 rounded-xl space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Reschedule</span>
                         <span class="text-sm font-bold px-2 py-0.5 rounded {{ $policy['reschedule_allowed'] ? 'bg-[#ECFDF5] text-emerald-800' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">
@@ -288,7 +308,7 @@
                 </div>
 
                 <!-- Cancellation Status -->
-                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 shadow-2xs">
+                <div class="p-4 rounded-xl space-y-2">
                     <div class="flex items-center justify-between">
                         <span class="font-bold text-[#1D1D1F]">Cancel / Refund</span>
                         <span class="text-sm font-bold px-2 py-0.5 rounded {{ $policy['cancel_allowed'] ? 'bg-[#FEF3C7] text-amber-900' : 'bg-[#E5E5EA] text-[#6E6E73]' }}">

@@ -85,8 +85,8 @@ class AdminBatchModuleTest extends TestCase
         $this->actingAs($admin);
 
         $booking = Booking::where('booking_number', 'CFP-2026-1002')->first() ?: Booking::first();
-        $startDate = Carbon::now()->addDays(30)->format('Y-m-d');
-        $endDate = Carbon::now()->addDays(31)->format('Y-m-d');
+        $startDate = Carbon::now()->addDays(120)->format('Y-m-d');
+        $endDate = Carbon::now()->addDays(121)->format('Y-m-d');
 
         $response = $this->post('/admin/batches', [
             'batch_number' => 'Batch 99',
