@@ -17,9 +17,6 @@
                 <span class="font-bold text-[#780000] text-sm">Coach Requests Queue</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Review Coach Requests</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Review slot applications submitted by coaches for upcoming weekend batches.
-            </p>
         </div>
 
         <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs">

@@ -28,9 +28,6 @@
                 </a>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Pending Guest Requests</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Review and approve reschedule or cancellation requests submitted by guests.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">

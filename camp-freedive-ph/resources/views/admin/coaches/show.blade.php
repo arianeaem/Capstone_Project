@@ -41,7 +41,7 @@
         <div class="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
             <a href="{{ route('admin.users.edit', $coach) }}" class="btn-secondary px-3.5 sm:px-4 py-2 text-sm font-semibold flex items-center justify-center gap-2 flex-1 sm:flex-initial">
                 <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-5 h-5 object-contain inline-block shrink-0">
-                <span>Edit Account in Settings</span>
+                <span>Edit Account</span>
             </a>
 
             <a href="{{ route('admin.coaches.matching') }}" class="btn-primary px-4 py-2 text-sm font-bold flex items-center justify-center gap-1.5 flex-1 sm:flex-initial shadow-2xs">
@@ -56,12 +56,11 @@
         <!-- Assigned Students & Schedule -->
         <div class="lg:col-span-2 space-y-6">
             
-            <!-- Assigned Students -->
-            <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+            <!-- Assigned Students Section -->
+            <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Students & Participants</h3>
-                        <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Students currently placed under Coach {{ $coach->name }}'s guidance.</p>
                     </div>
 
                     <span class="text-xs sm:text-sm text-[#6E6E73] font-medium sm:text-right">
@@ -94,59 +93,71 @@
                         ];
                         $isNoMedical = empty($rawCondition) || in_array($cleanCondition, $nonMedicalEntries);
                     @endphp
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] flex flex-col justify-between space-y-3 shadow-2xs">
-                        <div class="space-y-2.5">
-                            <!-- Student Information -->
-                            <div class="flex items-start justify-between gap-2">
-                                <div>
-                                    <h4 class="font-bold text-sm sm:text-base text-[#1D1D1F]">{{ $p->name }}</h4>
-                                    <div class="text-xs text-[#6E6E73] space-y-0.5 mt-0.5">
-                                        <div>Age {{ $p->age }}</div>
-                                        <div>{{ $swimmerLabel }}</div>
-                                    </div>
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-2xs hover:border-[#780000] transition-all">
+                        <div class="space-y-3">
+                            <!-- Student Header: Name, Age • Swimmer & Class Badge -->
+                            <div>
+                                <h4 class="font-extrabold text-base text-[#1D1D1F] leading-tight">{{ $p->name }}</h4>
+                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                    <span class="text-sm text-[#6E6E73] font-medium">
+                                        Age {{ $p->age }} <span class="text-[#AEAEB2] mx-1">•</span> {{ $swimmerLabel }}
+                                    </span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E5E5EA] text-[#1D1D1F] shrink-0">
+                                        {{ $p->booking?->class_type === 'discovery' ? 'Discovery' : ($p->booking?->class_type === 'fundive' ? 'Fundive' : 'Refinement') }}
+                                    </span>
                                 </div>
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#E5E5EA] text-[#1D1D1F] shrink-0">
-                                    {{ $p->booking?->class_type === 'discovery' ? 'Discovery' : ($p->booking?->class_type === 'fundive' ? 'Fundive' : 'Refinement') }}
-                                </span>
                             </div>
 
                             @if($assignment->is_ratio_override)
                                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FDE8E8] text-[#9B1C1C]">
-                                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    <svg class="w-3 h-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                     <span>Ratio Override Active</span>
                                 </div>
                             @endif
 
-                            @if(!$isNoMedical)
-                                <div class="p-2.5 rounded-lg bg-[#FFF8E1] text-xs text-[#7A4100] leading-snug">
-                                    <strong>Medical Note:</strong> {{ $rawCondition }}
+                            <!-- 2x2 Data Grid (Medical Note, Batch, Booking Ref, Dive Date) -->
+                            <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-1">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">MEDICAL NOTE</span>
+                                    <span class="text-sm font-semibold block mt-0.5 {{ !$isNoMedical ? 'text-amber-800' : 'text-[#1D1D1F]' }}">
+                                        {{ !$isNoMedical ? $rawCondition : 'None' }}
+                                    </span>
                                 </div>
-                            @endif
 
-                            <!-- Assignment Details -->
-                            <div class="pt-1 text-xs sm:text-sm text-[#6E6E73] space-y-1">
-                                <div class="flex items-center justify-between">
-                                    <span>Booking Ref:</span>
-                                    <a href="{{ route('admin.bookings.show', $p->booking) }}" class="font-mono font-bold text-[#1D1D1F] hover:text-[#780000] transition-colors">
-                                        {{ $p->booking->booking_number }}
-                                    </a>
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">BATCH</span>
+                                    <span class="text-sm font-semibold text-[#1D1D1F] block mt-0.5">
+                                        {{ $assignment->batch?->batch_number ?? ($assignment->batch?->batch_code ?? '—') }}
+                                    </span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span>Batch:</span>
-                                    <strong class="text-[#1D1D1F] font-semibold">{{ $assignment->batch?->batch_code ?? 'Ad-hoc' }}</strong>
+
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">BOOKING REF</span>
+                                    <span class="text-sm font-semibold text-[#1D1D1F] block mt-0.5">
+                                        @if($p->booking)
+                                            <a href="{{ route('admin.bookings.show', $p->booking) }}" class="font-mono hover:text-[#780000] transition-colors">
+                                                {{ $p->booking->booking_number }}
+                                            </a>
+                                        @else
+                                            —
+                                        @endif
+                                    </span>
                                 </div>
-                                <div class="flex items-center justify-between">
-                                    <span>Dive Date:</span>
-                                    <strong class="text-[#1D1D1F] font-semibold">{{ $assignment->dive_date->format('M d, Y (D)') }}</strong>
+
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">DIVE DATE</span>
+                                    <span class="text-sm font-semibold text-[#1D1D1F] block mt-0.5">
+                                        {{ $assignment->dive_date ? $assignment->dive_date->format('M d, Y') : 'N/A' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Action Footer -->
-                        <div class="pt-2 flex items-center justify-end border-t border-[#E5E5EA]">
+                        <!-- Action Footer: Reassign Away -->
+                        <div class="pt-3 border-t border-[#E5E5EA] flex items-center justify-end">
                             <button type="button" 
                                     @click="selectedParticipantId = {{ $p->id }}; selectedParticipantName = '{{ addslashes($p->name) }}'; openReassignModal = true"
-                                    class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-white hover:bg-[#E5E5EA] text-[#1D1D1F] shadow-2xs transition-colors">
+                                    class="px-4 py-1.5 text-xs sm:text-sm font-bold rounded-xl border border-[#D1D1D6] bg-white hover:border-[#780000] hover:text-[#780000] text-[#1D1D1F] shadow-2xs transition-colors cursor-pointer">
                                 Reassign Away
                             </button>
                         </div>
@@ -228,7 +239,7 @@
 
     <!-- Reassign Student Modal -->
     <div x-show="openReassignModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openReassignModal = false">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openReassignModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Reassign Student Away</h3>
             <p class="text-sm text-[#6E6E73]">
                 Reassign <strong class="text-[#1D1D1F]" x-text="selectedParticipantName"></strong> away from Coach {{ $coach->name }} to another coach.
@@ -240,7 +251,7 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">Select New Coach <span class="text-[#780000]">*</span></label>
-                    <select name="new_coach_id" required class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <select name="new_coach_id" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="">-- Choose Active Coach --</option>
                         @foreach($otherCoaches as $c)
                             <option value="{{ $c->id }}">{{ $c->name }} ({{ $c->email }})</option>
@@ -250,7 +261,7 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-1.5">Reassignment Reason <span class="text-[#780000]">*</span></label>
-                    <textarea name="reason" required rows="3" placeholder="e.g. Original coach reported sick / Schedule balance adjustment" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="reason" required rows="3" placeholder="e.g. Original coach reported sick / Schedule balance adjustment" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">

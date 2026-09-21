@@ -62,7 +62,7 @@
                            placeholder="name@example.com" 
                            required 
                            autofocus
-                           class="w-full px-4 py-3 rounded-xl border {{ (isset($errors) && $errors->has('email') && !session('error')) ? 'border-[#FF3B3C] ring-2 ring-[#FF3B3C]/20 bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm text-[#1D1D1F] bg-white transition-all">
+                           class="w-full px-4 py-3 rounded-xl border {{ (isset($errors) && $errors->has('email') && !session('error')) ? 'border-[#FF3B3C] bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-all">
                 </div>
 
                 <!-- Password Input -->
@@ -81,7 +81,7 @@
                                id="password" 
                                placeholder="••••••••" 
                                required
-                               class="w-full px-4 py-3 rounded-xl border {{ (session('error') || (isset($errors) && $errors->has('password'))) ? 'border-[#FF3B3C] ring-2 ring-[#FF3B3C]/20 bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 text-sm text-[#1D1D1F] bg-white transition-all pr-11">
+                               class="w-full px-4 py-3 rounded-xl border {{ (session('error') || (isset($errors) && $errors->has('password'))) ? 'border-[#FF3B3C] bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-all pr-11">
                         <button type="button" 
                                 @click="show = !show" 
                                 class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93] hover:text-[#1D1D1F] p-1">

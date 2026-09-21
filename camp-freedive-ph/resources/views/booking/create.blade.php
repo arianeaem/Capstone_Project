@@ -1050,7 +1050,7 @@
 
                                         <div x-show="form.class_type === 'discovery'">
                                             <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Swimming Ability</label>
-                                            <select x-model="participant.swimmer_status" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                            <select x-model="participant.swimmer_status" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                                                 <option value="non_swimmer">Non-Swimmer</option>
                                                 <option value="casual_swimmer">Casual / Beginner Swimmer</option>
                                                 <option value="confident_swimmer">Confident Swimmer</option>
@@ -1136,7 +1136,7 @@
                                        maxlength="16"
                                        :aria-invalid="touchedStep3 && !validatePhone(form.contact_phone)"
                                        aria-describedby="err-lead-phone"
-                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-[#780000]"
+                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors focus:outline-none"
                                        :class="touchedStep3 && !validatePhone(form.contact_phone) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                 <span id="err-lead-phone" x-show="touchedStep3 && !validatePhone(form.contact_phone)" class="text-xs text-[#D70015] font-semibold mt-1 block">
                                     Valid 10-digit PH mobile number starting with 9 required (e.g. +63 917-123-4567).
@@ -1200,7 +1200,7 @@
                                 <select x-model="form.pickup_location" 
                                         :aria-invalid="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location"
                                         aria-describedby="err-carpool-hub"
-                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#780000]"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer focus:outline-none"
                                         :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                     <option value="" disabled selected>-- Select Carpool Pickup Hub & Schedule --</option>
                                     <template x-for="p in pickupPoints" :key="p.id">

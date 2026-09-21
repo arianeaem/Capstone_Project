@@ -12,7 +12,7 @@
                 <div class="relative inline-flex items-center">
                     <select onchange="window.handleTablePerPageChange(this.value)"
                             aria-label="Rows per page"
-                            class="pl-2.5 pr-7 py-1 rounded-lg border border-[#D1D1D6] bg-white text-sm font-bold text-[#1D1D1F] hover:border-[#8E8E93] focus:outline-none focus:ring-2 focus:ring-[#780000]/15 focus:border-[#780000] cursor-pointer transition-all appearance-none">
+                            class="pl-3 pr-7 py-1 rounded-xl border border-[#D1D1D6] bg-white text-sm font-bold text-[#1D1D1F] hover:border-[#AEAEB2] focus:border-[#780000] cursor-pointer transition-all appearance-none shadow-2xs">
                         @php
                             $currentPerPage = (int) request('per_page', $paginator->perPage() ?? 10);
                         @endphp
@@ -22,7 +22,7 @@
                             </option>
                         @endforeach
                     </select>
-                    <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 flex items-center text-[#6E6E73]">
+                    <div class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center text-[#6E6E73]">
                         <svg class="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                         </svg>

@@ -9,9 +9,6 @@
     <div class="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5E5EA] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-xl sm:text-2xl font-black text-[#1D1D1F] mt-1">Open Dive Slot Requests</h1>
-            <p class="text-sm text-[#6E6E73] leading-relaxed">
-                Volunteer to take unstaffed dive batches. Submitting interest alerts Camp Admin to review and make the official match.
-            </p>
         </div>
 
         <!-- Tab Switcher -->

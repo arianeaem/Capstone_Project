@@ -101,22 +101,48 @@
         line-height: 1.35;
     }
 
-    /* Ensure comfortable breathing room and well-spaced dropdown arrow on all select inputs */
+    /* Universal Native Select Inputs */
     select, .form-select {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236E6E73' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 0.75rem center;
-        background-repeat: no-repeat;
-        background-size: 1.15em 1.15em;
+        appearance: none !important;
+        -webkit-appearance: none !important;
+        -moz-appearance: none !important;
+        background-color: #FFFFFF;
+        border: 1px solid #D1D1D6;
+        border-radius: 0.75rem; /* 12px */
+        color: #1D1D1F;
+        font-size: 0.9375rem; /* 15px */
+        font-weight: 500;
+        line-height: 1.45;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236E6E73' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+        background-position: right 0.75rem center !important;
+        background-repeat: no-repeat !important;
+        background-size: 1.15em 1.15em !important;
         padding-right: 2.25rem !important;
         cursor: pointer;
+        transition: border-color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
     }
 
-    /* Clean input focus to eliminate double borders */
-    input:focus, select:focus, textarea:focus, .form-input:focus {
+    select:hover, .form-select:hover {
+        border-color: #AEAEB2;
+    }
+
+    select:focus, .form-select:focus {
         outline: none !important;
+        border-color: #780000 !important;
+        box-shadow: none !important;
+    }
+
+    select:disabled, .form-select:disabled {
+        background-color: #F2F2F7 !important;
+        color: #8E8E93 !important;
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    /* Clean input focus to eliminate double borders / double rings */
+    input:focus, textarea:focus, .form-input:focus {
+        outline: none !important;
+        border-color: #780000 !important;
         box-shadow: none !important;
     }
 }
@@ -410,7 +436,17 @@
     }
 }
 
-/* 8. Alerts & Notices */
+/* 8. Unified Dropdown Menus & Popovers */
+.dropdown-menu, .dropdown-card, .filter-dropdown {
+    background-color: #ffffff;
+    border-radius: 16px; /* 1rem */
+    border: 1px solid #E5E5EA;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 4px 10px -2px rgba(0, 0, 0, 0.03);
+    padding: 1rem;
+    z-index: 50;
+}
+
+/* 9. Alerts & Notices */
 .alert-box {
     border-radius: 12px;
     padding: 1rem 1.25rem;

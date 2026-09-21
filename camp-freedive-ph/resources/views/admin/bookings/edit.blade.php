@@ -16,7 +16,7 @@
      }">
     
     <!-- Top Breadcrumb -->
-    <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
+    <div class="flex items-center justify-between pb-4">
         <div>
             <div class="flex items-center gap-2">
                 <a href="{{ route('admin.bookings.show', $booking) }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
@@ -102,7 +102,7 @@
 
             <div class="space-y-4">
                 <template x-for="(p, index) in participants" :key="index">
-                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-3">
+                    <div class="p-4 rounded-xl space-y-3">
                         <input type="hidden" :name="'participants[' + index + '][id]'" :value="p.id">
 
                         <div class="flex items-center justify-between">
@@ -124,7 +124,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Status</label>
-                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                                     <option value="non_swimmer">Non-Swimmer</option>
                                     <option value="casual_swimmer">Casual / Beginner Swimmer</option>
                                     <option value="swimmer">Confident Swimmer</option>

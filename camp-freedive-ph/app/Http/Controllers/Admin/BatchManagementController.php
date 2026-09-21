@@ -111,7 +111,7 @@ class BatchManagementController extends Controller
 
         // Paginate batches collection
         $page = (int) $request->input('page', 1);
-        $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
+        $perPage = max(4, min(100, (int) $request->input('per_page', 12)));
         $total = $batches->count();
         $batches = new \Illuminate\Pagination\LengthAwarePaginator(
             $batches->forPage($page, $perPage)->values(),
@@ -140,9 +140,8 @@ class BatchManagementController extends Controller
         $defaultEndDate = $defaultDate->copy()->addDay();
         $defaultStartDateStr = $defaultDate->format('Y-m-d');
         $defaultEndDateStr = $defaultEndDate->format('Y-m-d');
-        $batchCount = Batch::count();
-        $priorCount = Batch::whereDate('start_date', '<=', $defaultDate)->count();
-        $defaultBatchNumber = 'Batch ' . ($priorCount + 1);
+        $suggestedNum = $this->batchService->getNextBatchNumber($defaultDate);
+        $defaultBatchNumber = 'Batch ' . $suggestedNum;
 
         $unbatchedBookings = $this->batchService->getUnbatchedBookingsForDate($defaultDate);
 
@@ -195,8 +194,7 @@ class BatchManagementController extends Controller
         $dateStr = $request->input('date', Carbon::today()->format('Y-m-d'));
         $date = Carbon::parse($dateStr);
         $bookings = $this->batchService->getUnbatchedBookingsForDate($date);
-        $priorCount = Batch::whereDate('start_date', '<=', $date)->count();
-        $suggestedNum = $priorCount + 1;
+        $suggestedNum = $this->batchService->getNextBatchNumber($date);
         $mlRec = $this->forecastService->getStaffingRecommendationForDate($date);
 
         $existingForDate = Batch::whereDate('start_date', $date)->get()->map(function ($b) {
@@ -255,8 +253,8 @@ class BatchManagementController extends Controller
         if (preg_match('/(\d+)/', (string) $batchRaw, $m)) {
             $batchIdentifier = 'Batch ' . $m[1];
         } else {
-            $priorCount = Batch::whereDate('start_date', '<=', Carbon::parse($validated['start_date']))->count();
-            $batchIdentifier = 'Batch ' . ($priorCount + 1);
+            $nextNum = $this->batchService->getNextBatchNumber(Carbon::parse($validated['start_date']));
+            $batchIdentifier = 'Batch ' . $nextNum;
         }
 
         $validated['batch_number'] = $batchIdentifier;

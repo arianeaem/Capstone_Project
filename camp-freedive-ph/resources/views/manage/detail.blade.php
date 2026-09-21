@@ -57,7 +57,6 @@
                         {{ $booking->status_badge['label'] }}
                     </span>
                 </div>
-                <p class="text-sm text-[#6E6E73] mt-1">Booking overview, scheduled dates, and management actions.</p>
             </div>
 
             <!-- Security PIN -->
@@ -383,7 +382,7 @@
          @keydown.escape.window="openRescheduleModal = false" 
          class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
+            <div class="flex items-center justify-between pb-4">
                 <div>
                     <h3 id="reschedule-modal-title" class="text-lg font-bold text-[#1D1D1F]">Reschedule Dive Dates</h3>
                     <p class="text-sm text-[#6E6E73]">Pick a new 2D1N date pair.</p>
@@ -411,7 +410,7 @@
                                @change="onRescheduleDateChange()"
                                min="{{ date('Y-m-d', strtotime('+3 days')) }}"
                                required
-                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none text-sm font-medium text-[#1D1D1F] bg-white transition-colors">
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm font-medium text-[#1D1D1F] bg-white transition-colors">
                     </div>
                     <div>
                         <label class="block font-bold text-[#6E6E73] mb-1">New End Date (Auto)</label>
@@ -442,7 +441,7 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Reason for Rescheduling (Optional)</label>
-                    <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
+                    <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
                 </div>
 
                 <div class="p-3.5 bg-[#FFFBEB] rounded-xl text-sm text-[#92400E]">
@@ -470,7 +469,7 @@
          @keydown.escape.window="openCancelModal = false" 
          class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
-            <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
+            <div class="flex items-center justify-between pb-4">
                 <div>
                     <h3 id="cancel-modal-title" class="text-lg font-bold text-[#1D1D1F]">Request Booking Cancellation</h3>
                     <p class="text-sm text-[#6E6E73]">Review your refund calculation according to camp policy.</p>
@@ -508,7 +507,7 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] text-sm mb-1.5">Reason for Cancellation</label>
-                    <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
+                    <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
                 </div>
 
                 <!-- Cancellation Confirmation Checkbox -->

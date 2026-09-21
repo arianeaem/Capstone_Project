@@ -13,9 +13,6 @@
                 <span>Back to Batches</span>
             </a>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Create Batch Schedule</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Set up a new weekend trip schedule for guest bookings and coach assignments.
-            </p>
         </div>
     </div>
 

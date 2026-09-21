@@ -17,9 +17,6 @@
                 <span class="font-bold text-[#FF3B3C]">Deactivation Requests</span>
             </div>
             <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Pending Coach Deactivations</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Owner review queue for staff-proposed coach deactivations.
-            </p>
         </div>
 
         <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-4 py-2 text-sm sm:text-sm font-semibold">

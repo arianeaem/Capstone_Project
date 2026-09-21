@@ -11,9 +11,6 @@
             <div class="flex items-center gap-2.5">
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">System Audit Logs</h1>
             </div>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Review account activity, security logs, and changes made across the system.
-            </p>
         </div>
     </div>
 
@@ -66,7 +63,7 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search actor, details, IP..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-[#F2F2F7] focus:bg-white focus:border-[#780000]">
+                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-white focus:bg-white focus:border-[#780000]">
                             <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -86,14 +83,20 @@
                             @endif
                         </button>
 
-                        <!-- Advanced Filter Options -->
+                        <!-- Advanced Filter Options Dropdown -->
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
-                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                            <div class="flex items-center justify-between pb-2">
+                             x-transition:enter="transition ease-out duration-150 transform"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100 transform"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <div class="flex items-center justify-between">
                                 <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Audit Logs</h4>
-                                <a href="{{ route('admin.audit_logs.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
+                                <a href="{{ route('admin.audit_logs.index') }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
                             </div>
 
                             <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="space-y-3 text-sm">
@@ -102,8 +105,8 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-semibold text-[#6E6E73] mb-1">Event Action</label>
-                                    <select name="action" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm font-medium">
+                                    <label class="block font-bold text-[#6E6E73] text-sm mb-1">Event Action</label>
+                                    <select name="action" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                         <option value="">All Actions</option>
                                         @foreach($actions as $act)
                                             <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
@@ -115,24 +118,24 @@
 
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block font-semibold text-[#6E6E73] mb-1">Date From</label>
+                                        <label class="block font-bold text-[#6E6E73] text-sm mb-1">Date From</label>
                                         <input type="date" 
                                                name="date_from" 
                                                value="{{ request('date_from') }}" 
-                                               class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                     </div>
                                     <div>
-                                        <label class="block font-semibold text-[#6E6E73] mb-1">Date To</label>
+                                        <label class="block font-bold text-[#6E6E73] text-sm mb-1">Date To</label>
                                         <input type="date" 
                                                name="date_to" 
                                                value="{{ request('date_to') }}" 
-                                               class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                     </div>
                                 </div>
 
                                 <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                    <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
-                                        Apply Filters
+                                    <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
+                                        Apply Filter
                                     </button>
                                 </div>
                             </form>

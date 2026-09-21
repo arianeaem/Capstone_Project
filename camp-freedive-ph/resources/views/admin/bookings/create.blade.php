@@ -11,18 +11,15 @@
      })"
      x-init="initForm()">
     
-    <!-- Top Header -->
-    <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
+    <!-- Top Breadcrumb & Header -->
+    <div class="flex items-center justify-between pb-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Add Manual Reservation</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Create a reservation for walk-in guests or direct inquiries.
-            </p>
+            <a href="{{ route('admin.bookings.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                <span>Back to Bookings</span>
+            </a>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Add Manual Reservation</h1>
         </div>
-        <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-4 py-2 text-sm sm:text-sm flex items-center gap-1.5 font-medium">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            <span>Back to List</span>
-        </a>
     </div>
 
     <!-- Create Booking Form -->
@@ -90,14 +87,19 @@
 
         <!-- Participants Information -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-            <div class="flex items-center justify-between pb-2">
+            <div class="flex items-center justify-between">
                 <h3 class="text-base font-bold text-[#1D1D1F]">2. Divers & Participants</h3>
-                <span class="text-sm text-[#6E6E73]">Data Privacy Act (RA 10173) Protected</span>
+                <button type="button" 
+                        @click="addParticipant()"
+                        class="btn-primary text-xs sm:text-sm px-3.5 py-1.5 font-bold flex items-center gap-1.5 shadow-2xs">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+                    <span>Add Participant</span>
+                </button>
             </div>
 
             <div class="space-y-4">
                 <template x-for="(p, index) in participants" :key="index">
-                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#F2F2F7] space-y-3">
+                    <div class="p-4 rounded-xl border border-[#E5E5EA] bg-[#F8F9FA] space-y-3">
                         <div class="flex items-center justify-between">
                             <span class="font-bold text-[#780000]" x-text="'Participant #' + (index + 1)"></span>
                             <button type="button" 
@@ -108,10 +110,14 @@
                             </button>
                         </div>
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" :name="'participants[' + index + '][first_name]'" x-model="p.first_name" required placeholder="First Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                            </div>
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text" :name="'participants[' + index + '][last_name]'" x-model="p.last_name" required placeholder="Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                             </div>
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age <span class="text-[#780000]">*</span></label>
@@ -122,7 +128,7 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Status</label>
-                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                                     <option value="non_swimmer">Non-Swimmer</option>
                                     <option value="casual_swimmer">Casual / Beginner Swimmer</option>
                                     <option value="swimmer">Confident Swimmer</option>
@@ -136,24 +142,24 @@
                     </div>
                 </template>
             </div>
-
-            <button type="button" 
-                    @click="addParticipant()"
-                    class="w-full py-2.5 rounded-xl border border-dashed border-[#780000]/30 hover:border-[#780000] text-[#780000] font-bold text-sm bg-[#F8EAEA]/20 hover:bg-[#F8EAEA]/50 transition-colors flex items-center justify-center gap-1.5">
-                <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                <span>Add Another Participant</span>
-            </button>
         </div>
 
         <!-- Primary Contact & Transportation -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
-            <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Primary Contact & Transportation</h3>
+            <h3 class="text-base font-bold text-[#1D1D1F] pb-2 border-b border-[#E5E5EA]">3. Primary Contact & Transportation</h3>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First Name <span class="text-[#780000]">*</span></label>
+                    <input type="text" name="first_name" required placeholder="First Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                </div>
+                <div>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Last Name <span class="text-[#780000]">*</span></label>
+                    <input type="text" name="last_name" required placeholder="Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                </div>
+            </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Contact Name <span class="text-[#780000]">*</span></label>
-                    <input type="text" name="contact_name" required placeholder="Lead Contact" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
-                </div>
                 <div>
                     <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Contact Email <span class="text-[#780000]">*</span></label>
                     <input type="email" name="contact_email" required placeholder="email@example.com" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
@@ -161,6 +167,10 @@
                 <div>
                     <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Mobile Number <span class="text-[#780000]">*</span></label>
                     <input type="tel" name="contact_phone" required placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                </div>
+                <div>
+                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Facebook / Messenger Profile</label>
+                    <input type="text" name="contact_facebook" placeholder="fb.com/username (Optional)" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
             </div>
 
@@ -176,7 +186,7 @@
 
                 <div x-show="pickupOption === 'carpool'" x-cloak>
                     <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Carpool Pickup Location & Schedule</label>
-                    <select name="pickup_location" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <select name="pickup_location" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <template x-for="p in pickupPoints" :key="p.id">
                             <option :value="p.name" x-text="p.name"></option>
                         </template>
@@ -257,7 +267,7 @@ function adminBookingCreate(config) {
         endDate: '',
         forecast: null,
         participants: [
-            { name: '', age: '', swimmer_status: 'non_swimmer', health_condition: '' }
+            { first_name: '', last_name: '', age: '', swimmer_status: 'non_swimmer', health_condition: '' }
         ],
 
         initForm() {
@@ -293,7 +303,8 @@ function adminBookingCreate(config) {
 
         addParticipant() {
             this.participants.push({
-                name: '',
+                first_name: '',
+                last_name: '',
                 age: '',
                 swimmer_status: 'non_swimmer',
                 health_condition: ''

@@ -64,7 +64,7 @@
                  }
                  groupsMap.get(key).actual = {
                      ...it,
-                     display_title: it.label || (getShortMonth(key, it.label) + ' Actual')
+                     display_title: it.label || getShortMonth(key, it.label)
                  };
              }
 
@@ -81,7 +81,7 @@
                  }
                  groupsMap.get(key).forecast = {
                      ...it,
-                     display_title: it.month_name ? (it.month_name + ' (Forecast)') : (getShortMonth(key, it.short_name) + ' (Forecast)')
+                     display_title: it.month_name || getShortMonth(key, it.short_name)
                  };
              }
 
@@ -242,10 +242,10 @@
                         <!-- Secondary Metrics Grid (No Emojis) -->
                         <div class="pt-2 border-t border-[#F2F2F7] space-y-1.5 text-xs sm:text-sm text-[#6E6E73]">
                             
-                            <!-- Diver Volume -->
+                            <!-- Participant Volume -->
                             <div class="flex items-center justify-between">
-                                <span>Diver Volume:</span>
-                                <strong class="text-[#1D1D1F] font-extrabold" x-text="card.diver_volume + ' Divers'"></strong>
+                                <span>Participant Volume:</span>
+                                <strong class="text-[#1D1D1F] font-extrabold" x-text="card.diver_volume + ' Participants'"></strong>
                             </div>
 
                             <!-- Estimated Bookings -->
@@ -260,9 +260,9 @@
                                 <span class="font-bold text-[#1D1D1F]" x-text="card.batches_count + ' ' + (card.batches_count === 1 ? 'Batch' : 'Batches')"></span>
                             </div>
 
-                            <!-- Peak Staffing Needed -->
+                            <!-- Coaches per Batch Needed -->
                             <div class="flex items-center justify-between pt-1.5 text-[#780000] font-black">
-                                <span>Peak Coaches:</span>
+                                <span>Coaches per Batch:</span>
                                 <span class="bg-[#780000]/10 px-2 py-0.5 rounded-md text-xs font-black" x-text="card.coaches_needed + ' ' + (card.coaches_needed === 1 ? 'Coach' : 'Coaches')"></span>
                             </div>
 
@@ -284,12 +284,12 @@
     <!-- 4 Separate Visual Cards: Divers, Bookings, Revenue, Coaches (2x2 Grid) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
-        <!-- Visual Card 1: Diver Volume Trend -->
+        <!-- Visual Card 1: Participant Volume Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#F2F2F7]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Diver Volume Trend</h3>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical turnout vs. AI projected diver count by month</p>
+                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Participant Volume Trend</h3>
+                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical turnout vs. AI projected participant count by month</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs sm:text-sm shrink-0 self-start sm:self-auto">
                     <div class="flex items-center gap-1.5">
@@ -327,12 +327,12 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[190px] sm:min-w-[210px] w-max max-w-[240px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-[#F1D5D5]" x-text="group.actual.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#780000] text-white">Actual</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-[#F1D5D5] break-words" x-text="group.actual.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#780000] text-white">Actual</span>
                                             </div>
-                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.actual.participants + ' Divers'"></div>
+                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.actual.participants + ' Participants'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
                                                 <span>Demand:</span>
                                                 <span class="font-bold text-white" x-text="group.actual.demand_level"></span>
@@ -358,12 +358,12 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[190px] sm:min-w-[210px] w-max max-w-[240px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-sky-200" x-text="group.forecast.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#003049] text-white">Forecast</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-sky-200 break-words" x-text="group.forecast.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#003049] text-white">Forecast</span>
                                             </div>
-                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.forecast.participants + ' Divers'"></div>
+                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.forecast.participants + ' Participants'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
                                                 <span>Demand:</span>
                                                 <span class="font-bold text-white" x-text="group.forecast.demand_level"></span>
@@ -402,7 +402,7 @@
 
         <!-- Visual Card 2: Bookings Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#F2F2F7]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Bookings Volume Trend</h3>
                     <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical realized vs. projected booking groups by month</p>
@@ -443,10 +443,10 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[190px] sm:min-w-[210px] w-max max-w-[240px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-[#F1D5D5]" x-text="group.actual.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#780000] text-white">Actual</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-[#F1D5D5] break-words" x-text="group.actual.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#780000] text-white">Actual</span>
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="group.actual.bookings + ' Bookings'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
@@ -474,10 +474,10 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[190px] sm:min-w-[210px] w-max max-w-[240px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-sky-200" x-text="group.forecast.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#003049] text-white">Forecast</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-sky-200 break-words" x-text="group.forecast.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#003049] text-white">Forecast</span>
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="group.forecast.bookings + ' Bookings'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
@@ -518,7 +518,7 @@
 
         <!-- Visual Card 3: Revenue Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#F2F2F7]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue Projections & Actuals</h3>
                     <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Realized trip payments vs. forecasted gross revenue (PHP)</p>
@@ -559,14 +559,14 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[200px] sm:min-w-[220px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-[#F1D5D5]" x-text="group.actual.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#780000] text-white">Actual</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-[#F1D5D5] break-words" x-text="group.actual.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#780000] text-white">Actual</span>
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="formatCurrency(group.actual.revenue_php)"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
-                                                <span>Diver Pax:</span>
+                                                <span>Participants:</span>
                                                 <span class="font-bold text-white" x-text="group.actual.participants"></span>
                                             </div>
                                         </div>
@@ -590,14 +590,14 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[200px] sm:min-w-[220px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-sky-200" x-text="group.forecast.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#003049] text-white">Forecast</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-sky-200 break-words" x-text="group.forecast.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#003049] text-white">Forecast</span>
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="formatCurrency(group.forecast.revenue_php)"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
-                                                <span>Diver Pax:</span>
+                                                <span>Participants:</span>
                                                 <span class="font-bold text-white" x-text="group.forecast.participants"></span>
                                             </div>
                                         </div>
@@ -634,10 +634,10 @@
 
         <!-- Visual Card 4: Coach Staffing Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#F2F2F7]">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Coach Staffing Requirements</h3>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical assigned coaches vs. model recommended peak capacity</p>
+                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical assigned coaches vs. model recommended staffing per batch</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs sm:text-sm shrink-0 self-start sm:self-auto">
                     <div class="flex items-center gap-1.5">
@@ -675,10 +675,10 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[190px] sm:min-w-[210px] w-max max-w-[240px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-[#F1D5D5]" x-text="group.actual.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#780000] text-white">Actual</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-[#F1D5D5] break-words" x-text="group.actual.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#780000] text-white">Actual</span>
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="group.actual.coaches + ' Coaches'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
@@ -706,10 +706,10 @@
                                          :class="(group.actual && group.forecast) ? 'max-w-[38px] sm:max-w-[48px] lg:max-w-[56px]' : 'max-w-[56px] sm:max-w-[70px] lg:max-w-[80px]'">
                                         
                                         <!-- Hover Tooltip -->
-                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[190px] sm:min-w-[210px] w-max max-w-[240px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
-                                            <div class="flex items-center justify-between gap-2 pb-1 border-b border-white/10">
-                                                <span class="font-bold text-xs whitespace-nowrap text-sky-200" x-text="group.forecast.display_title"></span>
-                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider whitespace-nowrap bg-[#003049] text-white">Forecast</span>
+                                        <div class="absolute bottom-full mb-2.5 left-1/2 -translate-x-1/2 min-w-[180px] sm:min-w-[200px] w-max max-w-[250px] p-2.5 sm:p-3 rounded-xl bg-[#1D1D1F] text-white opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-30 pointer-events-none shadow-xl space-y-1.5 text-left">
+                                            <div class="flex items-center justify-between gap-1.5 pb-1 border-b border-white/10 flex-wrap">
+                                                <span class="font-bold text-xs text-sky-200 break-words" x-text="group.forecast.display_title"></span>
+                                                <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#003049] text-white">Forecast</span>
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="group.forecast.coaches + ' Coaches'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">

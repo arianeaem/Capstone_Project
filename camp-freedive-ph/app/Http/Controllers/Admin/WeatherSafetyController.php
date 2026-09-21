@@ -82,7 +82,7 @@ class WeatherSafetyController extends Controller
             ->count();
 
         // Sort safety monitoring to latest first
-        $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
+        $perPage = max(4, min(100, (int) $request->input('per_page', 12)));
         $batches = $query->orderBy('start_date', 'desc')->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
 
         // 24-Hour Master Continuous Cache Info
@@ -108,57 +108,96 @@ class WeatherSafetyController extends Controller
             $isMLReachable = false;
         }
 
-        // Prepare batch ML assessments for the ML tab
+        // Prepare batch ML and risk assessments
         $batchMLAssessments = [];
-        if ($isMLReachable && $circuitStatus['is_available']) {
-            foreach ($batches as $b) {
-                $d1Date = $b->start_date->format('Y-m-d');
-                $d2Date = $b->end_date ? $b->end_date->format('Y-m-d') : $b->start_date->copy()->addDay()->format('Y-m-d');
-                $d1ML = $this->forecastService->assessMLSafetyForDate($d1Date, '08:00', '18:00');
-                $d2ML = $this->forecastService->assessMLSafetyForDate($d2Date, '08:00', '18:00');
-                if ($d1ML || $d2ML) {
-                    $rec1 = $d1ML['overall_recommendation'] ?? 'Safe';
-                    $rec2 = $d2ML['overall_recommendation'] ?? 'Safe';
-                    $wRank = max(WeatherForecastService::RISK_RANK[$rec1] ?? 1, WeatherForecastService::RISK_RANK[$rec2] ?? 1);
-                    $wRec = array_search($wRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
-                    $horizonInfo = WeatherForecastService::getOperationalHorizon($b);
-                    $daysOut = $horizonInfo['days_out'] ?? max(0, Carbon::now(WeatherForecastService::TIMEZONE)->startOfDay()->diffInDays($b->start_date->copy()->startOfDay(), false));
+        foreach ($batches as $b) {
+            $d1Date = $b->start_date->format('Y-m-d');
+            $d2Date = $b->end_date ? $b->end_date->format('Y-m-d') : $b->start_date->copy()->addDay()->format('Y-m-d');
+            $horizonInfo = WeatherForecastService::getOperationalHorizon($b);
+            $isConcluded = ($horizonInfo['status'] === 'CONCLUDED') || ($b->end_date && $b->end_date->isPast()) || in_array($b->status, ['completed', 'cancelled_by_camp']);
 
-                    $d1Conf = ($daysOut >= 4 || ($d1ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
-                    $d2Conf = (($daysOut + 1) >= 4 || ($d2ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
-                    $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $daysOut >= 4) ? 'low' : 'high';
+            $d1ML = ($isMLReachable && $circuitStatus['is_available'] && !$isConcluded) 
+                ? $this->forecastService->assessMLSafetyForDate($d1Date, '08:00', '18:00') 
+                : null;
+            $d2ML = ($isMLReachable && $circuitStatus['is_available'] && !$isConcluded) 
+                ? $this->forecastService->assessMLSafetyForDate($d2Date, '08:00', '18:00') 
+                : null;
 
-                    $confidenceTier = match(true) {
-                        $daysOut >= 4 => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
-                        $batchConfidence === 'low' => 'LOW_CONFIDENCE_ML_UNCERTAIN',
-                        $daysOut >= 2 => 'MODERATE_CONFIDENCE',
-                        default => 'HIGH_CONFIDENCE',
-                    };
+            if ($d1ML || $d2ML) {
+                $rec1 = $d1ML['overall_recommendation'] ?? 'Safe';
+                $rec2 = $d2ML['overall_recommendation'] ?? 'Safe';
+                $wRank = max(WeatherForecastService::RISK_RANK[$rec1] ?? 1, WeatherForecastService::RISK_RANK[$rec2] ?? 1);
+                $wRec = array_search($wRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
+                $daysOut = $horizonInfo['days_out'] ?? max(0, Carbon::now(WeatherForecastService::TIMEZONE)->startOfDay()->diffInDays($b->start_date->copy()->startOfDay(), false));
 
-                    $servingSource = match(true) {
-                        $daysOut >= 4 => 'Batangas Climatology Fallback',
-                        $daysOut >= 2 => 'DirectTabular Multi-Step (ONNX)',
-                        default => 'ONNX C++ Ultra-Fast Engine',
-                    };
+                $d1Conf = ($daysOut >= 4 || ($d1ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+                $d2Conf = (($daysOut + 1) >= 4 || ($d2ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+                $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $daysOut >= 4) ? 'low' : 'high';
 
-                    $opStatus = ($horizonInfo['status'] === 'CONCLUDED') ? 'CONCLUDED' : ($d1ML['operational_status'] ?? $d2ML['operational_status'] ?? $horizonInfo['status']);
-                    $opLabel = ($horizonInfo['status'] === 'CONCLUDED') ? ($horizonInfo['label'] ?? 'Concluded Session') : ($d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? $horizonInfo['label']);
+                $confidenceTier = match(true) {
+                    $daysOut >= 4 => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
+                    $batchConfidence === 'low' => 'LOW_CONFIDENCE_ML_UNCERTAIN',
+                    $daysOut >= 2 => 'MODERATE_CONFIDENCE',
+                    default => 'HIGH_CONFIDENCE',
+                };
 
-                    $batchMLAssessments[$b->id] = [
-                        'batch' => $b,
-                        'overall_recommendation' => $wRec,
-                        'operational_status' => $opStatus,
-                        'operational_status_label' => $opLabel,
-                        'confidence' => $batchConfidence,
-                        'confidence_tier' => $confidenceTier,
-                        'serving_source' => $servingSource,
-                        'confidence_advisory' => ($batchConfidence === 'low') ? "{$wRec}. Confidence is low this far out, recheck in 2 days." : null,
-                        'day1' => $d1ML,
-                        'day2' => $d2ML,
-                        'safety_threshold_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
-                        'hard_gate_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
-                    ];
+                $servingSource = match(true) {
+                    $daysOut >= 4 => 'Batangas Climatology Fallback',
+                    $daysOut >= 2 => 'DirectTabular Multi-Step (ONNX)',
+                    default => 'ONNX C++ Ultra-Fast Engine',
+                };
+
+                $opStatus = ($horizonInfo['status'] === 'CONCLUDED') ? 'CONCLUDED' : ($d1ML['operational_status'] ?? $d2ML['operational_status'] ?? $horizonInfo['status']);
+                $opLabel = ($horizonInfo['status'] === 'CONCLUDED') ? ($horizonInfo['label'] ?? 'Concluded Session') : ($d1ML['operational_status_label'] ?? $d2ML['operational_status_label'] ?? $horizonInfo['label']);
+
+                $batchMLAssessments[$b->id] = [
+                    'batch' => $b,
+                    'overall_recommendation' => $wRec,
+                    'operational_status' => $opStatus,
+                    'operational_status_label' => $opLabel,
+                    'confidence' => $batchConfidence,
+                    'confidence_tier' => $confidenceTier,
+                    'serving_source' => $servingSource,
+                    'confidence_advisory' => ($batchConfidence === 'low') ? "{$wRec}. Confidence is low this far out, recheck in 2 days." : null,
+                    'day1' => $d1ML,
+                    'day2' => $d2ML,
+                    'safety_threshold_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
+                    'hard_gate_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
+                ];
+            } else {
+                // Concluded or physics fallback assessment from recorded DB data
+                $existingD1 = $b->riskAssessments->where('day_number', 1)->first() ?? $b->riskAssessments->filter(fn($a) => $a->dive_date?->toDateString() === $b->start_date?->toDateString())->first();
+                $existingD2 = $b->riskAssessments->where('day_number', 2)->first() ?? $b->riskAssessments->filter(fn($a) => $a->dive_date?->toDateString() === $b->end_date?->toDateString())->first();
+                
+                $overallRec = $b->risk_classification ? ucfirst(str_replace('_', ' ', $b->risk_classification)) : ($existingD1?->overall_classification ?? 'Safe');
+                if ($existingD1 && $existingD2) {
+                    $r1 = WeatherForecastService::RISK_RANK[$existingD1->overall_classification] ?? 1;
+                    $r2 = WeatherForecastService::RISK_RANK[$existingD2->overall_classification] ?? 1;
+                    $overallRec = array_search(max($r1, $r2), WeatherForecastService::RISK_RANK) ?: $overallRec;
                 }
+
+                $batchMLAssessments[$b->id] = [
+                    'batch' => $b,
+                    'overall_recommendation' => $overallRec,
+                    'operational_status' => $isConcluded ? 'CONCLUDED' : ($horizonInfo['status'] ?? 'EXTENDED_TREND_OUTLOOK'),
+                    'operational_status_label' => $isConcluded ? 'Concluded Session' : ($horizonInfo['label'] ?? 'Operational Monitoring'),
+                    'confidence' => 'high',
+                    'confidence_tier' => $isConcluded ? 'ARCHIVED_RECORD' : 'PHYSICS_BACKUP',
+                    'serving_source' => $isConcluded ? 'Archived Operational Telemetry' : 'Open-Meteo Marine Physics',
+                    'confidence_advisory' => null,
+                    'day1' => $existingD1 ? [
+                        'overall_recommendation' => $existingD1->overall_classification,
+                        'worst_hour' => $existingD1->worst_hour ? $existingD1->worst_hour->format('g:i A') : 'N/A',
+                        'worst_window' => $existingD1->worst_window ?? 'N/A',
+                    ] : null,
+                    'day2' => $existingD2 ? [
+                        'overall_recommendation' => $existingD2->overall_classification,
+                        'worst_hour' => $existingD2->worst_hour ? $existingD2->worst_hour->format('g:i A') : 'N/A',
+                        'worst_window' => $existingD2->worst_window ?? 'N/A',
+                    ] : null,
+                    'safety_threshold_triggered' => false,
+                    'hard_gate_triggered' => false,
+                ];
             }
         }
 
@@ -377,9 +416,45 @@ class WeatherSafetyController extends Controller
                 'safety_threshold_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),
                 'hard_gate_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),
             ];
+        } else {
+            $isConcluded = ($batch->end_date && $batch->end_date->isPast()) || in_array($batch->status, ['completed', 'cancelled_by_camp']);
+            $batchMLAssessment = [
+                'overall_recommendation' => $overallClassification,
+                'ml_recommendation' => $overallClassification,
+                'ml_classification' => $overallClassification,
+                'operational_status' => $isConcluded ? 'CONCLUDED' : 'PHYSICS_FALLBACK',
+                'operational_status_label' => $isConcluded ? 'Concluded Session' : 'Operational Monitoring',
+                'confidence' => 'high',
+                'confidence_tier' => $isConcluded ? 'ARCHIVED_RECORD' : 'PHYSICS_BACKUP',
+                'serving_source' => $isConcluded ? 'Archived Operational Telemetry' : 'Open-Meteo Marine Physics Backup',
+                'confidence_advisory' => null,
+                'day1' => $day1Assessment ? [
+                    'overall_recommendation' => $day1Assessment->overall_classification,
+                    'worst_hour' => $day1Assessment->worst_hour ? $day1Assessment->worst_hour->format('g:i A') : 'N/A',
+                    'worst_window' => $day1Assessment->worst_window ?? 'N/A',
+                    'hourly_assessments' => $day1Continuous24h['hourly'] ?? [],
+                ] : null,
+                'day2' => $day2Assessment ? [
+                    'overall_recommendation' => $day2Assessment->overall_classification,
+                    'worst_hour' => $day2Assessment->worst_hour ? $day2Assessment->worst_hour->format('g:i A') : 'N/A',
+                    'worst_window' => $day2Assessment->worst_window ?? 'N/A',
+                    'hourly_assessments' => $day2Continuous24h['hourly'] ?? [],
+                ] : null,
+                'is_authoritative_go' => true,
+                'safety_threshold_triggered' => false,
+                'hard_gate_triggered' => false,
+            ];
         }
 
+        $mlSafetyUrl = config('services.ml_safety.url', 'http://127.0.0.1:8001');
         $circuitStatus = $this->mlService->getCircuitStatus();
+        $isMLReachable = false;
+        try {
+            $res = Http::timeout(1)->get("{$mlSafetyUrl}/health");
+            $isMLReachable = $res->successful();
+        } catch (\Throwable $e) {
+            $isMLReachable = false;
+        }
 
         return view('admin.weather.show', compact(
             'batch',
@@ -393,7 +468,8 @@ class WeatherSafetyController extends Controller
             'day1MLAssessment',
             'day2MLAssessment',
             'batchMLAssessment',
-            'circuitStatus'
+            'circuitStatus',
+            'isMLReachable'
         ));
     }
 

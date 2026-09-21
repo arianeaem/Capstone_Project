@@ -260,8 +260,10 @@ class PricingRuleEngineTest extends TestCase
 
     public function test_pricing_engine_uses_ml_demand_forecast_for_future_unbooked_batches(): void
     {
+        DemandForecast::query()->delete();
+        \Illuminate\Support\Facades\Cache::forget('ml_demand_forecast');
         $engine = app(PricingRuleEngine::class);
-        $futureDate = '2026-11-20';
+        $futureDate = '2027-08-20';
 
         // 1. Without ML forecast or bookings, demand is low
         $this->assertEquals('low', $engine->getDemandForDate($futureDate));

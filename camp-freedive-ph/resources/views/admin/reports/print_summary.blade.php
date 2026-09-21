@@ -63,7 +63,7 @@
                     </div>
                 @endif
                 <div class="p-3.5 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA]">
-                    <span class="text-sm font-bold uppercase text-[#6E6E73] block">Total Divers (Pax)</span>
+                    <span class="text-sm font-bold uppercase text-[#6E6E73] block">Total Participants (Pax)</span>
                     <span class="text-lg font-black text-[#1D1D1F] block mt-0.5">{{ $data['bookings']['total_participants'] ?? 0 }} pax</span>
                 </div>
                 <div class="p-3.5 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA]">
@@ -87,7 +87,7 @@
                             <tr>
                                 <th class="p-2.5">Course Package</th>
                                 <th class="p-2.5 text-center">Bookings</th>
-                                <th class="p-2.5 text-center">Divers</th>
+                                <th class="p-2.5 text-center">Participants</th>
                                 <th class="p-2.5 text-right">Revenue (PHP)</th>
                                 <th class="p-2.5 text-right">Revenue Share</th>
                             </tr>
@@ -125,7 +125,7 @@
                             <th class="p-2.5">Batch ID</th>
                             <th class="p-2.5">Schedule</th>
                             <th class="p-2.5">Package</th>
-                            <th class="p-2.5 text-center">Divers</th>
+                            <th class="p-2.5 text-center">Participants</th>
                             <th class="p-2.5 text-center">Occupancy</th>
                             <th class="p-2.5">Assigned Coaches</th>
                             <th class="p-2.5 text-center">Coach Staffing</th>

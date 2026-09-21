@@ -89,30 +89,28 @@
                                 {{ $connectedBookingsCount }} Connected Customer {{ Str::plural('Booking', $connectedBookingsCount) }}
                             </h3>
                         </div>
-                        <p class="text-sm text-[#6E6E73] mt-0.5">Guest reservations and on-site coaching groups in this batch.</p>
                     </div>
                 </div>
 
                 <!-- Bookings List -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                     @forelse($batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']) as $booking)
-                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover: hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:border-[#780000] transition-all flex flex-col justify-between space-y-4">
                         <!-- Card Content -->
                         <div class="space-y-3.5">
-                            <!-- Header: Booking Number, Status, Class Type & Lead Guest -->
-                            <div class="space-y-1.5">
-                                <div class="flex items-center justify-between gap-2">
+                            <!-- Header: Booking Number & Status with Class Category Together -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
                                     <a href="{{ route('admin.bookings.show', $booking) }}" class="text-base sm:text-lg font-black text-[#1D1D1F] hover:text-[#780000] transition-colors tracking-tight font-mono whitespace-nowrap">
                                         {{ $booking->booking_number }}
                                     </a>
-
-                                    <span class="px-2.5 py-0.5 rounded-full text-sm font-bold shrink-0 whitespace-nowrap {{ $booking->status_badge['class'] }}">
-                                        {{ $booking->status_badge['label'] }}
-                                    </span>
                                 </div>
 
-                                <div class="flex items-center gap-2 flex-wrap text-sm">
-                                    <span class="px-2 py-0.5 rounded-full text-sm font-bold uppercase tracking-wider bg-gray-100 text-[#48484A] shrink-0">
+                                <div class="flex items-center gap-1.5 flex-wrap justify-end shrink-0">
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs sm:text-sm font-bold whitespace-nowrap {{ $booking->status_badge['class'] }}">
+                                        {{ $booking->status_badge['label'] }}
+                                    </span>
+                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-[#E5E5EA] text-[#1D1D1F] whitespace-nowrap">
                                         {{ ucfirst($booking->class_type ?? 'Discovery') }}
                                     </span>
                                 </div>
@@ -154,7 +152,6 @@
 
                                             @if($hasMedical)
                                                 <div class="text-xs font-medium text-amber-900 bg-amber-50/80 px-2.5 py-1 rounded-lg flex items-start gap-1.5" title="{{ $p->health_condition }}">
-                                                    <svg class="w-3.5 h-3.5 text-amber-700 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                                                     <span class="break-words leading-tight">{{ $p->health_condition }}</span>
                                                 </div>
                                             @endif
@@ -168,9 +165,9 @@
                                                           class="w-full">
                                                         @csrf
                                                         <input type="hidden" name="participant_id" value="{{ $p->id }}">
-                                                        <select name="coach_id" 
+                                                         <select name="coach_id" 
                                                                 onchange="this.form.submit()" 
-                                                                class="w-full text-xs sm:text-sm font-semibold py-1.5 px-2.5 rounded-lg border border-[#E5E5EA] bg-white text-[#1D1D1F] hover:border-[#D1D1D6] focus:ring-1 focus:ring-[#780000] focus:outline-hidden cursor-pointer transition-all shadow-2xs {{ $coach ? 'text-[#780000] font-bold bg-[#FDF5F5] border-[#F1D5D5]' : '' }}">
+                                                                class="w-full text-xs sm:text-sm font-semibold py-1.5 px-3 rounded-xl border border-[#D1D1D6] bg-white text-[#1D1D1F] hover:border-[#AEAEB2] focus:border-[#780000] cursor-pointer transition-all shadow-2xs {{ $coach ? 'text-[#780000] font-bold bg-[#FDF5F5] border-[#F1D5D5]' : '' }}">
                                                             <option value="" {{ !$coach ? 'selected' : '' }}>-- Shared Pool (Unassigned) --</option>
                                                             @foreach($assignedCoaches as $batchCoach)
                                                                 <option value="{{ $batchCoach->id }}" {{ $coach && $coach->id === $batchCoach->id ? 'selected' : '' }}>
@@ -331,7 +328,7 @@
                 <div class="flex items-center justify-between">
                     <h3 class="text-base font-bold text-[#1D1D1F]">Financial Overview</h3>
                     <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#780000] font-bold hover:underline">
-                        Ledger →
+                        Ledger
                     </a>
                 </div>
 
@@ -362,7 +359,7 @@
                         @if($batch->outstanding_balance_bookings->isNotEmpty())
                             <div class="space-y-1 pt-1">
                                 @foreach($batch->outstanding_balance_bookings as $balBooking)
-                                    <div class="flex items-center justify-between text-sm bg-amber-50/70 rounded-lg px-2.5 py-1 text-amber-900">
+                                    <div class="flex items-center justify-between text-sm px-2.5 py-1 text-amber-900">
                                         <a href="{{ route('admin.bookings.show', $balBooking) }}" class="font-bold hover:underline text-[#780000] flex items-center gap-1 font-mono truncate mr-2">
                                             <span>{{ $balBooking->booking_number }}</span>
                                         </a>
@@ -475,7 +472,7 @@
 
     <!-- Move Booking Modal -->
     <div x-show="openMoveModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openMoveModal = false">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openMoveModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Move Booking to Another Batch</h3>
             <p class="text-sm text-[#6E6E73]">
                 Reassign booking <strong class="text-[#780000] font-mono" x-text="selectedBookingNumber"></strong> to another scheduled 2D1N batch or unbatch it.
@@ -487,7 +484,7 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Target Batch</label>
-                    <select name="target_batch_id" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
+                    <select name="target_batch_id" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="">-- Remove from Batch (Unbatch) --</option>
                         @foreach($otherBatches as $ob)
                             <option value="{{ $ob->id }}">
@@ -499,7 +496,7 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Reason / Note</label>
-                    <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <input type="text" name="reason" placeholder="e.g. Correcting booking grouping misassignment" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">

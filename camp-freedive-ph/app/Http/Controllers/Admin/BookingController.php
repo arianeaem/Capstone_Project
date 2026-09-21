@@ -134,6 +134,28 @@ class BookingController extends Controller
     {
         $currentUser = Auth::user();
 
+        // Merge lead contact first_name and last_name if present
+        if ($request->filled('first_name') || $request->filled('last_name')) {
+            $contactName = trim(($request->input('first_name') ?? '') . ' ' . ($request->input('last_name') ?? ''));
+            if ($contactName !== '') {
+                $request->merge(['contact_name' => $contactName]);
+            }
+        }
+
+        // Merge participant first_name and last_name if present
+        if ($request->has('participants') && is_array($request->input('participants'))) {
+            $participants = $request->input('participants');
+            foreach ($participants as $i => $p) {
+                if (isset($p['first_name']) || isset($p['last_name'])) {
+                    $pName = trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ?? ''));
+                    if ($pName !== '') {
+                        $participants[$i]['name'] = $pName;
+                    }
+                }
+            }
+            $request->merge(['participants' => $participants]);
+        }
+
         // Sanitize phone number spacing/dashes before validation
         if ($request->has('contact_phone')) {
             $cleanedPhone = preg_replace('/[\s\-]/', '', (string)$request->input('contact_phone'));

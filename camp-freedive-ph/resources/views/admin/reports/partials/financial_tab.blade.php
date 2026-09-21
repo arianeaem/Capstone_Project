@@ -10,54 +10,58 @@
             
             <!-- Net Collections -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Net Collections</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Net Collections</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     ₱{{ number_format($fin['net_revenue'] ?? 0, 2) }}
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Gross: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-bold shrink-0 {{ ($fin['revenue_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    @if(($fin['refunds_processed'] ?? 0) > 0)
+                        <span>Gross: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }} (₱{{ number_format($fin['refunds_processed'] ?? 0, 2) }} refunded)</span>
+                    @else
+                        <span>From confirmed bookings</span>
+                    @endif
+                    <span class="px-1.5 py-0.5 rounded text-xs font-bold shrink-0 {{ ($fin['revenue_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
                         {{ ($fin['revenue_delta'] ?? 0) >= 0 ? '+' : '' }}{{ $fin['revenue_delta'] ?? 0 }}%
                     </span>
                 </div>
             </div>
 
-            <!-- Downpayments vs Balance -->
+            <!-- Downpayments Collected -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Payment Stage Breakdown</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Downpayments Collected</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     ₱{{ number_format($fin['downpayment_revenue'] ?? 0, 2) }}
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Downpayments: {{ ($fin['gross_revenue'] ?? 0) > 0 ? round((($fin['downpayment_revenue'] ?? 0) / $fin['gross_revenue']) * 100, 1) : 0 }}%</span>
-                    <span>Settlements: ₱{{ number_format($fin['balance_revenue'] ?? 0, 2) }}</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>{{ ($fin['gross_revenue'] ?? 0) > 0 ? round((($fin['downpayment_revenue'] ?? 0) / $fin['gross_revenue']) * 100, 1) : 0 }}% of collections</span>
+                    <span>Settled: ₱{{ number_format($fin['balance_revenue'] ?? 0, 2) }}</span>
                 </div>
             </div>
 
-            <!-- Outstanding Receivables -->
+            <!-- Remaining Receivables -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Unsettled Receivables</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Remaining Receivables</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#92400E] mt-0.5 break-words">
                     ₱{{ number_format($fin['outstanding_receivables'] ?? 0, 2) }}
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Pending check-in settlement</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-bold text-[#92400E] bg-amber-50 border border-amber-200 shrink-0">Confirmed</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>Due on check-in arrival</span>
+                    <span class="px-1.5 py-0.5 rounded text-xs font-bold text-[#92400E] bg-amber-50 border border-amber-200 shrink-0">Pending</span>
                 </div>
             </div>
 
-            <!-- Average Revenue Per Diver (ARPD) -->
+            <!-- Average Revenue Per Participant -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Avg Revenue / Diver (ARPD)</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Avg Revenue / Participant</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#00C3D0] mt-0.5 break-words">
                     ₱{{ number_format($fin['arpd'] ?? 0, 2) }}
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Avg / Booking: ₱{{ number_format($fin['arpb'] ?? 0, 2) }}</span>
-                    <span class="text-sm font-semibold text-[#6E6E73] shrink-0">Realized Yield</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>Avg per booking: ₱{{ number_format($fin['arpb'] ?? 0, 2) }}</span>
+                    <span class="text-xs font-semibold text-[#6E6E73] shrink-0">Per Capita</span>
                 </div>
             </div>
 
@@ -72,7 +76,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
                 <div>
                     <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue by Class Package</h3>
-                    <p class="text-sm text-[#6E6E73]">Revenue share, bookings, and diver distribution per course.</p>
+                    <p class="text-sm text-[#6E6E73]">Revenue share, bookings, and participant distribution per course.</p>
                 </div>
                 <span class="text-sm font-bold text-[#780000] self-start sm:self-auto">Total: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
             </div>
@@ -155,7 +159,7 @@
                                 </div>
                                 <div class="text-sm sm:text-sm text-[#6E6E73] flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 pl-4.5">
                                     <span class="font-semibold text-[#1D1D1F] whitespace-nowrap">{{ $pData['bookings_count'] }} {{ Str::plural('booking', $pData['bookings_count']) }}</span>
-                                    <span class="whitespace-nowrap">{{ $pData['pax_count'] }} {{ Str::plural('diver', $pData['pax_count']) }}</span>
+                                    <span class="whitespace-nowrap">{{ $pData['pax_count'] }} {{ Str::plural('participant', $pData['pax_count']) }}</span>
                                 </div>
                             </div>
 
@@ -188,7 +192,7 @@
                     ₱{{ number_format($fin['carpool']['estimated_revenue'] ?? 0, 2) }}
                 </div>
                 <div class="text-sm text-[#6E6E73] flex items-center justify-between">
-                    <span>{{ $fin['carpool']['pax_count'] ?? 0 }} divers transported</span>
+                    <span>{{ $fin['carpool']['pax_count'] ?? 0 }} participants transported</span>
                     <span>{{ $fin['carpool']['bookings_count'] ?? 0 }} bookings</span>
                 </div>
             </div>
@@ -203,7 +207,7 @@
                     ₱{{ number_format($fin['boat_dive']['estimated_revenue'] ?? 0, 2) }}
                 </div>
                 <div class="text-sm text-[#6E6E73] flex items-center justify-between">
-                    <span>{{ $fin['boat_dive']['pax_count'] ?? 0 }} divers enrolled</span>
+                    <span>{{ $fin['boat_dive']['pax_count'] ?? 0 }} participants enrolled</span>
                     <span>{{ $fin['boat_dive']['bookings_count'] ?? 0 }} bookings</span>
                 </div>
             </div>

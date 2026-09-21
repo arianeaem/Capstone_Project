@@ -25,9 +25,6 @@
     <div class="bg-white rounded-2xl p-4 sm:p-6 border border-[#E5E5EA] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-xl sm:text-2xl font-black text-[#1D1D1F] mt-1">My Assigned Schedule & Student Rosters</h1>
-            <p class="text-sm text-[#6E6E73] leading-relaxed">
-                Review your upcoming dive assignments, student health conditions, live weather safety ratings, and historical dive records.
-            </p>
         </div>
 
         <!-- Tab Controls -->
@@ -322,14 +319,19 @@
                             <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
                         @endif
                     </button>
-
-                    <!-- Filter Dropdown Menu (Admin Format) -->
+                    <!-- Filter Dropdown Menu (Standardized) -->
                     <div x-show="openFilters" 
                          @click.outside="openFilters = false" 
                          x-cloak 
+                         x-transition:enter="transition ease-out duration-150 transform"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100 transform"
+                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
                          class="absolute right-0 top-full mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                        <div class="flex items-center justify-between pb-2 border-b border-[#E5E5EA]">
-                            <h4 class="font-black text-sm text-[#1D1D1F]">Filter Past History</h4>
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Past History</h4>
                             <a href="{{ route('coach.schedule.index', ['tab' => 'history']) }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
                         </div>
 
@@ -337,24 +339,24 @@
                             <input type="hidden" name="tab" value="history">
 
                             <div>
-                                <label class="block font-bold text-[#6E6E73] mb-1">From Date</label>
+                                <label class="block font-bold text-[#6E6E73] text-sm mb-1">From Date</label>
                                 <input type="date" 
                                        name="date_from" 
                                        value="{{ request('date_from') }}" 
-                                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm focus:border-[#780000] focus:ring-[#780000]">
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#6E6E73] mb-1">To Date</label>
+                                <label class="block font-bold text-[#6E6E73] text-sm mb-1">To Date</label>
                                 <input type="date" 
                                        name="date_to" 
                                        value="{{ request('date_to') }}" 
-                                       class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm focus:border-[#780000] focus:ring-[#780000]">
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                             </div>
 
                             <div>
-                                <label class="block font-bold text-[#6E6E73] mb-1">Class Type</label>
-                                <select name="class_type" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm focus:border-[#780000] focus:ring-[#780000]">
+                                <label class="block font-bold text-[#6E6E73] text-sm mb-1">Class Type</label>
+                                <select name="class_type" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                     <option value="">All Class Types</option>
                                     <option value="discovery" {{ request('class_type') === 'discovery' ? 'selected' : '' }}>Discovery</option>
                                     <option value="fundive" {{ request('class_type') === 'fundive' ? 'selected' : '' }}>Fundive</option>
@@ -362,8 +364,8 @@
                                 </select>
                             </div>
 
-                            <div class="pt-2 border-t border-[#E5E5EA]">
-                                <button type="submit" class="w-full py-2 rounded-xl bg-[#780000] hover:bg-[#5E0000] text-white text-sm font-bold transition-all">
+                            <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
+                                <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
                                     Apply Filter
                                 </button>
                             </div>

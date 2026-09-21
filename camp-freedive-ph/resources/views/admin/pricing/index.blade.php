@@ -9,9 +9,6 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Dynamic Pricing Management</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Configure demand, seasonality, and lead-time pricing rules to optimize camp utilization and drive off-peak bookings.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5">
@@ -105,10 +102,16 @@
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
-                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                            <div class="flex items-center justify-between pb-2">
+                             x-transition:enter="transition ease-out duration-150 transform"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100 transform"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <div class="flex items-center justify-between">
                                 <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Rules</h4>
-                                <a href="{{ route('admin.pricing.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
+                                <a href="{{ route('admin.pricing.index') }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
                             </div>
 
                             <form method="GET" action="{{ route('admin.pricing.index') }}" class="space-y-3 text-sm">
@@ -117,8 +120,8 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-semibold text-[#6E6E73] mb-1">Status</label>
-                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                    <label class="block font-bold text-[#6E6E73] text-sm mb-1">Status</label>
+                                    <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                         <option value="all" {{ request('status') === 'all' || !request('status') ? 'selected' : '' }}>All Statuses</option>
                                         <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only</option>
                                         <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive Only</option>
@@ -126,8 +129,8 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-semibold text-[#6E6E73] mb-1">Applies To</label>
-                                    <select name="applies_to" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                    <label class="block font-bold text-[#6E6E73] text-sm mb-1">Applies To</label>
+                                    <select name="applies_to" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                         <option value="all" {{ request('applies_to') === 'all' || !request('applies_to') ? 'selected' : '' }}>All Classes</option>
                                         <option value="discovery" {{ request('applies_to') === 'discovery' ? 'selected' : '' }}>Discovery Class</option>
                                         <option value="fundive" {{ request('applies_to') === 'fundive' ? 'selected' : '' }}>Fundive</option>
@@ -136,7 +139,7 @@
                                 </div>
 
                                 <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                    <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
+                                    <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
                                         Apply Filter
                                     </button>
                                 </div>

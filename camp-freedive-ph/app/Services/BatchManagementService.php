@@ -30,6 +30,71 @@ use Illuminate\Support\Facades\DB;
 class BatchManagementService
 {
     /**
+     * Resequences all batches in strictly ascending order by start_date.
+     * Guarantees Batch 1 is earliest, Batch 2 is next, ..., Batch N is latest.
+     */
+    public function resequenceBatches(): void
+    {
+        $batches = Batch::orderBy('start_date', 'asc')->orderBy('id', 'asc')->get();
+        if ($batches->isEmpty()) {
+            return;
+        }
+
+        // Pass 1: Set temporary codes to avoid unique constraint collisions
+        $mapping = [];
+        $index = 1;
+        foreach ($batches as $batch) {
+            $newIdentifier = "Batch {$index}";
+            $oldCode = $batch->batch_code;
+            $mapping[] = [
+                'batch' => $batch,
+                'newIdentifier' => $newIdentifier,
+                'oldCode' => $oldCode,
+                'startDate' => $batch->start_date,
+            ];
+            $tempCode = "Batch-Temp-{$batch->id}-" . uniqid();
+            $batch->update([
+                'name' => $tempCode,
+                'batch_code' => $tempCode,
+            ]);
+            $index++;
+        }
+
+        // Pass 2: Assign final chronological batch identifiers
+        foreach ($mapping as $item) {
+            $item['batch']->update([
+                'name' => $item['newIdentifier'],
+                'batch_code' => $item['newIdentifier'],
+            ]);
+
+            if ($item['oldCode'] && $item['oldCode'] !== $item['newIdentifier']) {
+                $old = $item['oldCode'];
+                $new = $item['newIdentifier'];
+                \App\Models\CoachAvailability::where('notes', 'like', "%{$old}%")
+                    ->whereDate('date', $item['startDate'])
+                    ->get()
+                    ->each(function ($a) use ($old, $new) {
+                        $a->update(['notes' => str_replace($old, $new, $a->notes)]);
+                    });
+            }
+        }
+    }
+
+    /**
+     * Get the next suggested batch number.
+     */
+    public function getNextBatchNumber(?Carbon $date = null): int
+    {
+        $maxNum = 0;
+        foreach (Batch::pluck('batch_code') as $code) {
+            if (preg_match('/(\d+)/', (string) $code, $m)) {
+                $maxNum = max($maxNum, (int)$m[1]);
+            }
+        }
+        return max($maxNum + 1, Batch::count() + 1);
+    }
+
+    /**
      * Finds an active batch covering the dates or automatically creates a new sequential Batch.
      *
      * @param Carbon|string|\DateTimeInterface $startDate Scheduled departure date.
@@ -51,26 +116,12 @@ class BatchManagementService
             return $existing;
         }
 
-        // Determine chronological batch number based on start date
-        $priorCount = Batch::whereDate('start_date', '<=', $startDate)->count();
-        $nextBatchNum = $priorCount + 1;
-        $batchIdentifier = "Batch {$nextBatchNum}";
-
-        if (Batch::where('batch_code', $batchIdentifier)->exists()) {
-            $maxNum = 0;
-            foreach (Batch::pluck('batch_code') as $code) {
-                if (preg_match('/(\d+)/', (string) $code, $m)) {
-                    $maxNum = max($maxNum, (int)$m[1]);
-                }
-            }
-            $batchIdentifier = 'Batch ' . ($maxNum + 1);
-        }
-
         $creatorId = $creator?->id ?? \Illuminate\Support\Facades\Auth::id() ?? null;
+        $tempCode = 'Batch-Temp-' . uniqid();
 
         $batch = Batch::create([
-            'name' => $batchIdentifier,
-            'batch_code' => $batchIdentifier,
+            'name' => $tempCode,
+            'batch_code' => $tempCode,
             'start_date' => $startDate,
             'end_date' => $endDate,
             'status' => 'confirmed',
@@ -79,12 +130,15 @@ class BatchManagementService
             'created_by' => $creatorId,
         ]);
 
+        $this->resequenceBatches();
+        $batch->refresh();
+
         BatchStatusLog::create([
             'batch_id' => $batch->id,
             'old_status' => null,
             'new_status' => 'confirmed',
             'changed_by' => $creatorId,
-            'note' => "Auto-created {$batchIdentifier} for dive date {$startDate->format('M d, Y')}.",
+            'note' => "Auto-created {$batch->batch_code} for dive date {$startDate->format('M d, Y')}.",
         ]);
 
         try {
@@ -106,40 +160,52 @@ class BatchManagementService
             $startDate = Carbon::parse($data['start_date'])->startOfDay();
             $endDate = isset($data['end_date']) ? Carbon::parse($data['end_date'])->startOfDay() : $startDate->copy()->addDay();
 
-            // Auto-generate or sanitize unified batch identifier to always be 'Batch [Number]'
             $batchNumberInput = trim($data['batch_number'] ?? $data['name'] ?? $data['batch_code'] ?? '');
+            $hasCustomNumber = false;
             if (preg_match('/(\d+)/', $batchNumberInput, $matches)) {
                 $batchIdentifier = 'Batch ' . (int)$matches[1];
-            } else {
-                $priorCount = Batch::whereDate('start_date', '<=', $startDate)->count();
-                $batchIdentifier = 'Batch ' . ($priorCount + 1);
+                $hasCustomNumber = true;
             }
 
-            // Guarantee unique batch_code even if duplicate number exists
-            $batchCode = $batchIdentifier;
-            if (Batch::where('batch_code', $batchCode)->exists()) {
-                $maxNum = 0;
-                foreach (Batch::pluck('batch_code') as $code) {
-                    if (preg_match('/(\d+)/', (string) $code, $m)) {
-                        $maxNum = max($maxNum, (int)$m[1]);
-                    }
+            if ($hasCustomNumber) {
+                $batchCode = $batchIdentifier;
+                if (Batch::where('batch_code', $batchCode)->exists()) {
+                    $nextNum = $this->getNextBatchNumber($startDate);
+                    $batchCode = 'Batch ' . $nextNum;
+                    $batchIdentifier = $batchCode;
                 }
-                $batchCode = 'Batch ' . ($maxNum + 1);
-                $batchIdentifier = $batchCode;
-            }
 
-            $batch = Batch::create([
-                'name' => $batchIdentifier,
-                'batch_code' => $batchCode,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'status' => 'confirmed',
-                'lifecycle_status' => 'confirmed',
-                'risk_classification' => $data['risk_classification'] ?? 'safe',
-                'capacity_note' => $data['capacity_note'] ?? null,
-                'notes' => $data['notes'] ?? null,
-                'created_by' => $creator->id,
-            ]);
+                $batch = Batch::create([
+                    'name' => $batchIdentifier,
+                    'batch_code' => $batchCode,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'status' => 'confirmed',
+                    'lifecycle_status' => 'confirmed',
+                    'risk_classification' => $data['risk_classification'] ?? 'safe',
+                    'capacity_note' => $data['capacity_note'] ?? null,
+                    'notes' => $data['notes'] ?? null,
+                    'created_by' => $creator->id,
+                ]);
+            } else {
+                $tempCode = 'Batch-Temp-' . uniqid();
+                $batch = Batch::create([
+                    'name' => $tempCode,
+                    'batch_code' => $tempCode,
+                    'start_date' => $startDate,
+                    'end_date' => $endDate,
+                    'status' => 'confirmed',
+                    'lifecycle_status' => 'confirmed',
+                    'risk_classification' => $data['risk_classification'] ?? 'safe',
+                    'capacity_note' => $data['capacity_note'] ?? null,
+                    'notes' => $data['notes'] ?? null,
+                    'created_by' => $creator->id,
+                ]);
+
+                // Resequence if standard auto batch numbering is used
+                $this->resequenceBatches();
+                $batch->refresh();
+            }
 
             // Link selected bookings
             if (!empty($bookingIds)) {

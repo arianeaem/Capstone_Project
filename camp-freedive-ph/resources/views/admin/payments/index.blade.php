@@ -9,9 +9,6 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Payments & Refunds</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Keep track of guest downpayments, balances, online transactions, and refunds.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
@@ -112,7 +109,7 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search booking, txn, guest..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-[#F2F2F7] focus:bg-white focus:border-[#780000]">
+                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-white focus:bg-white focus:border-[#780000]">
                             <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -136,10 +133,16 @@
                         <div x-show="openFilters" 
                              @click.outside="openFilters = false" 
                              x-cloak 
-                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
-                            <div class="flex items-center justify-between pb-2">
+                             x-transition:enter="transition ease-out duration-150 transform"
+                             x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-100 transform"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                             class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                            <div class="flex items-center justify-between">
                                 <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Payments</h4>
-                                <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
+                                <a href="{{ route('admin.payments.index') }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
                             </div>
 
                             <form method="GET" action="{{ route('admin.payments.index') }}" class="space-y-3 text-sm">
@@ -151,8 +154,8 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-semibold text-[#6E6E73] mb-1">Payment Status</label>
-                                    <select name="status" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                    <label class="block font-bold text-[#6E6E73] text-sm mb-1">Payment Status</label>
+                                    <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                         <option value="">All Statuses</option>
                                         <option value="paid" {{ request('status') === 'paid' ? 'selected' : '' }}>Paid / Completed</option>
                                         <option value="pending" {{ request('status') === 'pending' ? 'selected' : '' }}>Pending</option>
@@ -164,8 +167,8 @@
                                 </div>
 
                                 <div>
-                                    <label class="block font-semibold text-[#6E6E73] mb-1">Payment Method</label>
-                                    <select name="method" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                    <label class="block font-bold text-[#6E6E73] text-sm mb-1">Payment Method</label>
+                                    <select name="method" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                         <option value="">All Methods</option>
                                         <option value="gcash" {{ request('method') === 'gcash' ? 'selected' : '' }}>GCash</option>
                                         <option value="bpi_bank_transfer" {{ request('method') === 'bpi_bank_transfer' ? 'selected' : '' }}>BPI Bank Transfer</option>
@@ -175,7 +178,7 @@
                                 </div>
 
                                 <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                    <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
+                                    <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
                                         Apply Filter
                                     </button>
                                 </div>

@@ -24,10 +24,10 @@
                 </div>
             </div>
 
-            <!-- Total Divers (Headcount) -->
+            <!-- Total Participants (Headcount) -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Divers (Headcount)</span>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Participants (Headcount)</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     {{ number_format($b['total_participants'] ?? 0) }} pax
                 </div>
@@ -85,10 +85,10 @@
                     <div class="space-y-3 text-sm">
                         @php
                             $groups = [
-                                ['label' => 'Solo Joiners (1 Diver)', 'count' => $b['group_sizes']['solo'] ?? 0, 'color' => 'bg-[#780000]'],
-                                ['label' => 'Pairs & Duos (2 Divers)', 'count' => $b['group_sizes']['duo'] ?? 0, 'color' => 'bg-[#00C3D0]'],
-                                ['label' => 'Small Groups (3-4 Divers)', 'count' => $b['group_sizes']['small_group'] ?? 0, 'color' => 'bg-[#D45D5D]'],
-                                ['label' => 'Large Groups (5+ Divers)', 'count' => $b['group_sizes']['large_group'] ?? 0, 'color' => 'bg-[#2C2C2E]'],
+                                ['label' => 'Solo Joiners (1 Participant)', 'count' => $b['group_sizes']['solo'] ?? 0, 'color' => 'bg-[#780000]'],
+                                ['label' => 'Pairs & Duos (2 Participants)', 'count' => $b['group_sizes']['duo'] ?? 0, 'color' => 'bg-[#00C3D0]'],
+                                ['label' => 'Small Groups (3-4 Participants)', 'count' => $b['group_sizes']['small_group'] ?? 0, 'color' => 'bg-[#D45D5D]'],
+                                ['label' => 'Large Groups (5+ Participants)', 'count' => $b['group_sizes']['large_group'] ?? 0, 'color' => 'bg-[#2C2C2E]'],
                             ];
                         @endphp
 

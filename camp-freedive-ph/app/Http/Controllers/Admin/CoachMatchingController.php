@@ -28,11 +28,24 @@ class CoachMatchingController extends Controller
      */
     public function matching(): View
     {
-        // 1. Fetch upcoming active batches
+        $today = Carbon::today();
+
+        // 1. Fetch upcoming active batches, excluding batches that are already done and have no participants
         $batches = Batch::with(['bookings.participants', 'activeParticipantAssignments.coach'])
             ->whereNotIn('status', ['completed', 'cancelled_by_camp'])
             ->orderBy('start_date', 'asc')
-            ->get();
+            ->get()
+            ->filter(function ($batch) use ($today) {
+                $isDone = ($batch->end_date && $batch->end_date->lt($today))
+                    || ($batch->start_date && !$batch->end_date && $batch->start_date->lt($today))
+                    || in_array($batch->status, ['completed', 'cancelled_by_camp']);
+
+                $hasNoParticipants = ($batch->total_participants_count === 0);
+
+                // Hide batches that are already done AND have no participants
+                return !($isDone && $hasNoParticipants);
+            })
+            ->values();
 
         // 2. Fetch all active coaches with availability
         $activeCoaches = User::where('role', 'coach')

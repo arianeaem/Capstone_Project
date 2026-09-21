@@ -7,6 +7,7 @@ use App\Models\Batch;
 use App\Models\Coach;
 use App\Services\AuditLogger;
 use App\Services\CoachAssignmentService;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -24,7 +25,25 @@ class CoachAssignmentController extends Controller
      */
     public function index(Request $request): View
     {
+        $today = Carbon::today()->toDateString();
+
         $query = Batch::with(['activeAssignments.coach', 'activeAssignments.assignedByUser'])
+            ->where(function ($q) use ($today) {
+                // Keep if NOT done (upcoming / today)
+                $q->where(function ($sub) use ($today) {
+                    $sub->whereDate('end_date', '>=', $today)
+                        ->whereNotIn('status', ['completed', 'cancelled_by_camp']);
+                })
+                // OR keep if it HAS active participants
+                ->orWhereHas('bookings', function ($b) {
+                    $b->whereNotIn('status', [
+                        'cancelled_by_camp',
+                        'cancelled_by_guest',
+                        'cancelled',
+                        'pending_downpayment'
+                    ])->has('participants');
+                });
+            })
             ->orderBy('start_date', 'asc');
 
         if ($request->filled('status')) {

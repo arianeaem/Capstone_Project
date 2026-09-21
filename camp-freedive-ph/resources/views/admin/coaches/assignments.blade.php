@@ -114,7 +114,7 @@
 
     <!-- Create Batch Schedule Modal -->
     <div x-show="openBatchModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openBatchModal = false">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openBatchModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Create 2D1N Batch Schedule</h3>
             <p class="text-sm text-[#6E6E73]">
                 Create an upcoming weekend dive schedule. Capacity will compute automatically as coaches are assigned.
@@ -125,24 +125,24 @@
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Batch Code (Optional)</label>
-                    <input type="text" name="batch_code" placeholder="e.g. BATCH-2026-SEP05" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <input type="text" name="batch_code" placeholder="e.g. BATCH-2026-SEP05" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block font-bold text-[#1D1D1F] mb-2">Start Date (Day 1) <span class="text-[#780000]">*</span></label>
-                        <input type="date" name="start_date" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                        <input type="date" name="start_date" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                     </div>
 
                     <div>
                         <label class="block font-bold text-[#1D1D1F] mb-2">End Date (Day 2) <span class="text-[#780000]">*</span></label>
-                        <input type="date" name="end_date" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                        <input type="date" name="end_date" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                     </div>
                 </div>
 
                 <div>
                     <label class="block font-bold text-[#1D1D1F] mb-2">Notes / Destination</label>
-                    <textarea name="notes" rows="2" placeholder="e.g. Open for Discovery & Practice Dive students" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="notes" rows="2" placeholder="e.g. Open for Discovery & Practice Dive students" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-3">
@@ -155,7 +155,7 @@
 
     <!-- Assign Coach Modal -->
     <div x-show="openAssignModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openAssignModal = false">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openAssignModal = false">
             <h3 class="text-lg font-bold text-[#1D1D1F]">Assign Coach to Batch</h3>
             <p class="text-sm text-[#6E6E73]">
                 Assigning a certified coach to <strong class="text-[#780000]" x-text="assignBatchCode"></strong> increases student capacity by +4 pax.

@@ -49,7 +49,7 @@ class CoachController extends Controller
             }
         }
 
-        $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
+        $perPage = max(4, min(100, (int) $request->input('per_page', 12)));
         $coaches = $query->paginate($perPage)->withQueryString();
 
         $stats = [

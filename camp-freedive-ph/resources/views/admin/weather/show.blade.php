@@ -4,7 +4,6 @@
 
 @section('content')
 <div class="space-y-6 text-sm" x-data="{
-    activeProfile: '{{ request('profile', 'operations') }}',
     openOverrideModal: false,
     openCancelModal: false,
     cancelReason: '{{ $overallClassification === 'Critical Risk' ? 'Critical Risk' : 'Elevated Marine Conditions (Moderate/High Risk)' }}'
@@ -15,13 +14,13 @@
         <div>
             <!-- Breadcrumbs -->
             <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.weather.index', ['tab' => request('profile') === 'ml_model' ? 'ml_model' : 'batches']) }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
+                <a href="{{ route('admin.weather.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Weather & Safety Roster</span>
+                    <span>Weather &amp; Safety Roster</span>
                 </a>
                 @if($batch->status === 'cancelled_by_camp')
                     <span class="text-[#D1D1D6]">/</span>
-                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
                         Cancelled by Camp
                     </span>
                 @endif
@@ -31,7 +30,7 @@
                 {{ $batch->batch_number }}
             </h1>
             
-            <div class="mt-1.5 text-sm text-[#6E6E73] space-y-1">
+            <div class="mt-1 text-sm text-[#6E6E73] space-y-1">
                 <div class="flex items-center gap-1 font-medium text-[#1D1D1F]">
                     <span>{{ $batch->start_date->format('F d, Y (l)') }} to {{ $batch->end_date->format('F d, Y (l)') }}</span>
                 </div>
@@ -40,28 +39,43 @@
 
         <!-- Action Controls -->
         <div class="flex items-center gap-2.5 flex-wrap">
-            
+            @php
+                $cbState = $circuitStatus['state'] ?? 'CLOSED';
+                $isCbOpen = ($cbState === 'OPEN');
+                $isCbHalfOpen = ($cbState === 'HALF_OPEN');
+                $isPrimaryActive = ($isMLReachable && !$isCbOpen);
+                $isConcluded = ($batch->end_date && $batch->end_date->isPast()) || in_array($batch->status, ['completed', 'cancelled_by_camp']);
+            @endphp
+
+            @if($isConcluded)
+                <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-100 text-slate-700 text-xs font-bold shadow-2xs">
+                    <span class="w-2 h-2 rounded-full bg-slate-500"></span>
+                    <span>Concluded Session · Archived Records</span>
+                </div>
+            @endif
+
             <!-- Refresh / Run Live Assessment -->
+            @if(!$isConcluded)
             <form action="{{ route('admin.weather.assess', $batch) }}" method="POST">
                 @csrf
-                <button type="submit" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
+                <button type="submit" class="btn-secondary px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
                     <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
                     <span>Run Live Assessment</span>
                 </button>
             </form>
+            @endif
 
-            <!-- Manual Override Modal Trigger -->
-            <button type="button" 
-                    @click="openOverrideModal = true"
-                    class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5">
-                <span>Manual Override</span>
-            </button>
+            <!-- Direct View Batch Profile Button -->
+            <a href="{{ route('admin.batches.show', $batch) }}" class="btn-secondary px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
+                <svg class="w-4 h-4 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                <span>View Batch Profile</span>
+            </a>
 
             <!-- Risk-Based / Override Cancellation Trigger -->
             @if($batch->status !== 'cancelled_by_camp')
                 <button type="button" 
                         @click="openCancelModal = true"
-                        class="btn-danger px-3.5 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5">
+                        class="btn-danger px-3.5 py-2 text-sm font-bold flex items-center gap-1.5">
                     <span>Cancel Batch</span>
                 </button>
             @endif
@@ -69,842 +83,436 @@
         </div>
     </div>
 
-    <!-- Batch Profile Selection Tabs -->
-    <div class="border-b border-[#E5E5EA] flex items-center gap-6 overflow-x-auto no-scrollbar">
-        <button type="button" 
-                @click="activeProfile = 'operations'"
-                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap cursor-pointer"
-                :class="activeProfile === 'operations' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
-            Batch Operations Profile
-        </button>
-
-        <button type="button" 
-                @click="activeProfile = 'ml_model'"
-                class="pb-3 text-sm sm:text-sm transition-all border-b-2 whitespace-nowrap cursor-pointer"
-                :class="activeProfile === 'ml_model' ? 'border-[#780000] text-[#780000] font-bold' : 'border-transparent text-[#6E6E73] hover:text-[#1D1D1F] hover:border-[#D1D1D6] font-semibold'">
-            ML Safety Model Profile
-        </button>
-    </div>
-
+    <!-- Main Safety Assessment Summary Banner -->
     @php
-        $overallConfig = match ($overallClassification) {
-            'Very Safe' => [
-                'border' => 'border-emerald-200',
-                'bg' => 'bg-emerald-50/70',
-                'text' => 'text-emerald-900',
-                'pill' => 'bg-emerald-600 text-white',
-                'dot' => 'bg-emerald-400',
-            ],
-            'Safe' => [
-                'border' => 'border-emerald-200',
-                'bg' => 'bg-emerald-50/70',
-                'text' => 'text-emerald-900',
-                'pill' => 'bg-emerald-600 text-white',
-                'dot' => 'bg-emerald-400',
-            ],
-            'Moderate' => [
-                'border' => 'border-amber-200',
-                'bg' => 'bg-amber-50/70',
-                'text' => 'text-amber-900',
-                'pill' => 'bg-amber-500 text-white',
-                'dot' => 'bg-amber-300',
-            ],
-            'High Risk' => [
-                'border' => 'border-rose-200',
-                'bg' => 'bg-rose-50/70',
-                'text' => 'text-rose-900',
-                'pill' => 'bg-rose-600 text-white',
-                'dot' => 'bg-rose-400',
-            ],
-            'Critical Risk' => [
-                'border' => 'border-red-300',
-                'bg' => 'bg-red-50/80',
-                'text' => 'text-red-900',
-                'pill' => 'bg-red-700 text-white',
-                'dot' => 'bg-red-400',
-            ],
-            default => [
-                'border' => 'border-gray-200',
-                'bg' => 'bg-gray-50',
-                'text' => 'text-gray-900',
-                'pill' => 'bg-gray-600 text-white',
-                'dot' => 'bg-gray-400',
-            ],
+        $mlRec = $batchMLAssessment['overall_recommendation'] ?? ($overallClassification ?? 'Safe');
+        $displayVerdict = ($isPrimaryActive || $isConcluded) ? $mlRec : $overallClassification;
+        $verdictBadgeClass = match($displayVerdict) {
+            'Very Safe', 'Safe' => 'bg-emerald-600 text-white',
+            'Moderate' => 'bg-amber-500 text-white',
+            'High Risk' => 'bg-rose-600 text-white',
+            'Critical Risk' => 'bg-red-700 text-white',
+            default => 'bg-gray-600 text-white',
+        };
+        $verdictScore = match($displayVerdict) {
+            'Very Safe' => 5,
+            'Safe' => 4,
+            'Moderate' => 3,
+            'High Risk' => 2,
+            'Critical Risk' => 1,
+            default => 4,
+        };
+        $verdictBarColor = match($displayVerdict) {
+            'Very Safe', 'Safe' => 'bg-emerald-500',
+            'Moderate' => 'bg-amber-500',
+            'High Risk' => 'bg-rose-500',
+            'Critical Risk' => 'bg-red-600',
+            default => 'bg-emerald-500',
         };
     @endphp
-
-    <!-- ==================================================================== -->
-    <!-- PROFILE 1: BATCH OPERATIONS PROFILE (ORIGINAL VIEW BEFORE ML) -->
-    <!-- ==================================================================== -->
-    <div x-show="activeProfile === 'operations'" class="space-y-6" x-cloak>
-        
-        <!-- Batch Weather Safety Summary -->
-        <div class="bg-white rounded-xl border {{ $overallConfig['border'] }} p-6 sm:p-7 space-y-4">
-            
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <span class="text-sm font-extrabold uppercase tracking-widest text-[#6E6E73] block mb-1">
-                        Overall Batch Assessment
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-7 space-y-4 shadow-2xs">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div class="space-y-2">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-[#6E6E73] block">
+                    Overall Batch Assessment
+                </span>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="inline-flex items-center px-4 py-1.5 rounded-full text-base font-black tracking-wide uppercase {{ $verdictBadgeClass }}">
+                        {{ $displayVerdict }}
                     </span>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <span class="inline-flex items-center px-3.5 py-1 rounded-full text-base font-black tracking-wide uppercase {{ $overallConfig['pill'] }}">
-                            <span>{{ $overallClassification }}</span>
-                        </span>
+
+                    <!-- 5-Bar Visual Score Gauge -->
+                    <div class="flex items-center gap-1 sm:gap-1.5">
+                        @for($i = 1; $i <= 5; $i++)
+                            <div class="h-2 w-5 sm:w-6 rounded-full transition-all duration-300 {{ $i <= $verdictScore ? $verdictBarColor : 'bg-[#E5E5EA]' }}"></div>
+                        @endfor
                     </div>
                 </div>
+            </div>
 
-                <!-- Override Status Badge -->
-                <div class="md:text-right">
-                    <span class="text-sm uppercase font-bold text-[#6E6E73] block">Override Advisory Status</span>
+            <!-- Override Status & Manual Override Action -->
+            <div class="flex flex-col sm:flex-row sm:items-end md:items-center gap-3 md:justify-end shrink-0">
+                <div class="space-y-1 md:text-right">
+                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-[#6E6E73] block">Override Advisory Status</span>
                     @if($latestOverride && count($latestOverride->active_advisories) > 0)
-                        <span class="text-sm font-bold text-[#991B1B] bg-[#FEF2F2] px-3 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5 mt-1">
+                        <span class="text-xs font-bold text-white bg-rose-600 px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-2xs">
+                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                             <span>Active: {{ implode(', ', $latestOverride->active_advisories) }}</span>
                         </span>
                     @else
-                        <span class="text-sm font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5 mt-1">
-                            <svg class="w-3.5 h-3.5 text-[#065F46]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                        <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1 rounded-full inline-flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-[#065F46] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             <span>NOT OVERRIDDEN</span>
                         </span>
                     @endif
                 </div>
-            </div>
 
-            <!-- Action / Recommendation Text -->
-            <div class="space-y-1.5">
-                <div class="flex items-start gap-2">
-                    <div>
-                        <h3 class="text-sm font-black text-[#1D1D1F]">
-                            {{ \App\Services\WeatherForecastService::MEANING_MAP[$overallClassification] ?? 'Proceed with caution.' }}
-                        </h3>
-                    </div>
-                </div>
+                <!-- Manual Override Button inside Banner -->
+                <button type="button" 
+                        @click="openOverrideModal = true"
+                        class="btn-secondary px-3.5 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs shrink-0 cursor-pointer h-fit">
+                    <svg class="w-3.5 h-3.5 text-[#780000] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span class="whitespace-nowrap">Manual Override</span>
+                </button>
             </div>
-
         </div>
 
-        <!-- Day 1 & Day 2 Comparative Forecast (Original Operations View) -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            <!-- Day 1 Forecast -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-5">
-                
-                <!-- Day 1 Header -->
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                                DAY 1
-                            </span>
-                            <h2 class="text-lg font-black text-[#1D1D1F]">
-                                {{ $day1Assessment->dive_date->format('F d, Y (l)') }}
-                            </h2>
-                        </div>
-
-                        <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $day1Assessment->classification_badge['class'] }}">
-                            {{ $day1Assessment->overall_classification }}
-                        </span>
-                    </div>
-
-                    <!-- Recommended Action after Day 1 Header -->
-                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] text-sm text-[#1D1D1F] space-y-1">
-                        <span class="font-bold text-[#6E6E73] block uppercase text-sm tracking-wider">Recommended Action:</span>
-                        <p class="font-semibold text-[#1D1D1F] leading-snug">{{ $day1Assessment->recommended_action }}</p>
-                    </div>
-
-                    <!-- Day 1 Quick Stat Chips -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
-                            <div>
-                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Worst Hour</span>
-                                <strong class="text-sm font-extrabold text-[#1D1D1F]">
-                                    {{ $day1Assessment->worst_hour ? $day1Assessment->worst_hour->format('g:i A') : 'N/A' }}
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
-                            <div>
-                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Forecast Horizon</span>
-                                <strong class="text-sm font-extrabold text-[#1D1D1F]">
-                                    {{ round($day1Assessment->lead_time_hours) }}h before dive
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-[#F2F2F7] space-y-1.5">
-                            <div>
-                                <div class="flex items-center gap-1.5 mt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md text-sm font-extrabold {{ $day1Assessment->reliability['badge_class'] }}">
-                                        {{ $day1Assessment->reliability['label'] }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="text-sm text-[#6E6E73] font-medium leading-tight pt-1">
-                                {{ $day1Assessment->reliability['description'] }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Day 1 Hourly Timeline -->
-                @if(!empty($day1Continuous24h['hourly']))
-                @php $hasFull24hD1 = count($day1Continuous24h['hourly']) > 5; @endphp
-                <div x-data="{ showAllHours: false }" class="pt-3 space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        @if($hasFull24hD1)
-                        <button type="button" 
-                                @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
-                            <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
-                            <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                        @else
-                        <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2.5 py-1 rounded-lg border border-[#E5E5EA]">
-                            Active Dive Window Hours (AM & PM)
-                        </span>
-                        @endif
-                    </div>
-
-                    <!-- Comprehensive Weather Forecast Table -->
-                    <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-extrabold text-[#6E6E73]">
-                                <tr>
-                                    <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
-                                    <th class="py-3 px-2 whitespace-nowrap">Risk Rating</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Significant Wave Height (m)">Wave Height (Hs)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Peak Wave Period (sec)">Wave Period (Tp)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Swell Wave Height (m)">Swell Height</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Ocean Current Velocity (m/s)">Ocean Current</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Wind Wave Height (m)">Wind Wave</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Precipitation / Rain (mm)">Rain (mm)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Mean Sea Level Pressure (hPa)">Pressure (hPa)</th>
-                                    <th class="py-3 px-3 whitespace-nowrap" title="10m Wind Speed and Direction">Wind Speed & Dir</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#E5E5EA] bg-white">
-                                @foreach($day1Continuous24h['hourly'] as $h)
-                                @php
-                                    $isAmHour = in_array($h['hour'], [10, 11, 12]);
-                                    $isPmHour = in_array($h['hour'], [16, 17]);
-                                    $badgeClass = match($h['classification'] ?? 'Safe') {
-                                        'Very Safe' => 'bg-emerald-50 text-emerald-700',
-                                        'Safe' => 'bg-emerald-50 text-emerald-700',
-                                        'Moderate' => 'bg-amber-50 text-amber-700',
-                                        'High Risk' => 'bg-rose-50 text-rose-700',
-                                        'Critical Risk' => 'bg-red-50 text-red-700',
-                                        default => 'bg-gray-50 text-gray-700',
-                                    };
-                                @endphp
-                                <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
-                                        <div class="flex items-center gap-1.5">
-                                            <span>{{ sprintf('%02d:00', $h['hour']) }}</span>
-                                            @if($isAmHour)
-                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
-                                            @elseif($isPmHour)
-                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $badgeClass }}">
-                                            {{ $h['classification'] }}
-                                        </span>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['wave_height'] ?? 0.7, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['wave_period'] ?? 6.1, 1) }} s</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['swell_height'] ?? 0.6, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['ocean_current'] ?? 0.3, 2) }} m/s</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['wind_wave_height'] ?? 0.35, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['rain'] ?? 0.0, 1) }} mm</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['sea_level_pressure'] ?? 1010.5, 0) }} hPa</td>
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-medium text-[#1D1D1F]">{{ round($h['wind_speed'] ?? 12.0) }} km/h ({{ round($h['wind_direction'] ?? 245) }}°)</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @else
-                <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
-                        <span class="font-bold text-[#1D1D1F] block">Detailed Hourly Forecast Not Yet Available</span>
-                        <span>Detailed hourly marine & weather forecasts become available 16 days prior to the dive date (available on {{ $batch->start_date->copy()->subDays(16)->format('M d, Y') }}).</span>
-                    </div>
-                </div>
-                @endif
-
-            </div>
-
-            <!-- Day 2 Forecast -->
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-5">
-                
-                <!-- Day 2 Header -->
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2.5">
-                            <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                                DAY 2
-                            </span>
-                            <h2 class="text-lg font-black text-[#1D1D1F]">
-                                {{ $day2Assessment->dive_date->format('F d, Y (l)') }}
-                            </h2>
-                        </div>
-
-                        <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $day2Assessment->classification_badge['class'] }}">
-                            {{ $day2Assessment->overall_classification }}
-                        </span>
-                    </div>
-
-                    <!-- Recommended Action after Day 2 Header -->
-                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] text-sm text-[#1D1D1F] space-y-1">
-                        <span class="font-bold text-[#6E6E73] block uppercase text-sm tracking-wider">Recommended Action:</span>
-                        <p class="font-semibold text-[#1D1D1F] leading-snug">{{ $day2Assessment->recommended_action }}</p>
-                    </div>
-
-                    <!-- Day 2 Quick Stat Chips -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
-                            <div>
-                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Worst Hour</span>
-                                <strong class="text-sm font-extrabold text-[#1D1D1F]">
-                                    {{ $day2Assessment->worst_hour ? $day2Assessment->worst_hour->format('g:i A') : 'N/A' }}
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-[#F2F2F7] flex items-center justify-between">
-                            <div>
-                                <span class="text-[#6E6E73] block text-sm uppercase font-bold">Forecast Horizon</span>
-                                <strong class="text-sm font-extrabold text-[#1D1D1F]">
-                                    {{ round($day2Assessment->lead_time_hours) }}h before dive
-                                </strong>
-                            </div>
-                        </div>
-
-                        <div class="p-3 rounded-xl bg-[#F2F2F7] space-y-1.5">
-                            <div>
-                                <div class="flex items-center gap-1.5 mt-0.5">
-                                    <span class="px-2 py-0.5 rounded-md text-sm font-extrabold {{ $day2Assessment->reliability['badge_class'] }}">
-                                        {{ $day2Assessment->reliability['label'] }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="text-sm text-[#6E6E73] font-medium leading-tight pt-1">
-                                {{ $day2Assessment->reliability['description'] }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Day 2 Hourly Timeline -->
-                @if(!empty($day2Continuous24h['hourly']))
-                @php $hasFull24hD2 = count($day2Continuous24h['hourly']) > 5; @endphp
-                <div x-data="{ showAllHours: false }" class="pt-3 space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        @if($hasFull24hD2)
-                        <button type="button" 
-                                @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
-                            <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
-                            <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                        @else
-                        <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2.5 py-1 rounded-lg border border-[#E5E5EA]">
-                            Active Dive Window Hours (AM & PM)
-                        </span>
-                        @endif
-                    </div>
-
-                    <!-- Comprehensive Weather Forecast Table -->
-                    <div class="overflow-x-auto rounded-xl border border-[#E5E5EA] shadow-2xs">
-                        <table class="w-full text-left text-sm">
-                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-extrabold text-[#6E6E73]">
-                                <tr>
-                                    <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
-                                    <th class="py-3 px-2 whitespace-nowrap">Risk Rating</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Significant Wave Height (m)">Wave Height (Hs)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Peak Wave Period (sec)">Wave Period (Tp)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Swell Wave Height (m)">Swell Height</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Ocean Current Velocity (m/s)">Ocean Current</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Wind Wave Height (m)">Wind Wave</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Precipitation / Rain (mm)">Rain (mm)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Mean Sea Level Pressure (hPa)">Pressure (hPa)</th>
-                                    <th class="py-3 px-3 whitespace-nowrap" title="10m Wind Speed and Direction">Wind Speed & Dir</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#E5E5EA] bg-white">
-                                @foreach($day2Continuous24h['hourly'] as $h)
-                                @php
-                                    $isAmHour = in_array($h['hour'], [10, 11, 12]);
-                                    $isPmHour = in_array($h['hour'], [16, 17]);
-                                    $badgeClass = match($h['classification'] ?? 'Safe') {
-                                        'Very Safe' => 'bg-emerald-50 text-emerald-700',
-                                        'Safe' => 'bg-emerald-50 text-emerald-700',
-                                        'Moderate' => 'bg-amber-50 text-amber-700',
-                                        'High Risk' => 'bg-rose-50 text-rose-700',
-                                        'Critical Risk' => 'bg-red-50 text-red-700',
-                                        default => 'bg-gray-50 text-gray-700',
-                                    };
-                                @endphp
-                                <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25 font-semibold' : '' }}">
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
-                                        <div class="flex items-center gap-1.5">
-                                            <span>{{ sprintf('%02d:00', $h['hour']) }}</span>
-                                            @if($isAmHour)
-                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
-                                            @elseif($isPmHour)
-                                                <span class="text-sm px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap">
-                                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $badgeClass }}">
-                                            {{ $h['classification'] }}
-                                        </span>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['wave_height'] ?? 0.7, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['wave_period'] ?? 6.1, 1) }} s</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['swell_height'] ?? 0.6, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['ocean_current'] ?? 0.3, 2) }} m/s</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['wind_wave_height'] ?? 0.35, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['rain'] ?? 0.0, 1) }} mm</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['sea_level_pressure'] ?? 1010.5, 0) }} hPa</td>
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-medium text-[#1D1D1F]">{{ round($h['wind_speed'] ?? 12.0) }} km/h ({{ round($h['wind_direction'] ?? 245) }}°)</td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @else
-                <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
-                        <span class="font-bold text-[#1D1D1F] block">Detailed Hourly Forecast Not Yet Available</span>
-                        <span>Detailed hourly marine & weather forecasts become available 16 days prior to the dive date (available on {{ ($batch->end_date ?? $batch->start_date->copy()->addDay())->copy()->subDays(16)->format('M d, Y') }}).</span>
-                    </div>
-                </div>
-                @endif
-
-            </div>
-
+        <!-- Recommendation Text -->
+        <div>
+            <h3 class="text-sm font-bold text-[#1D1D1F]">
+                {{ \App\Services\WeatherForecastService::MEANING_MAP[$displayVerdict] ?? 'Proceed with standard camp freediving protocols.' }}
+            </h3>
         </div>
-
     </div>
 
-    <!-- ==================================================================== -->
-    <!-- PROFILE 2: ML SAFETY MODEL PROFILE (DEDICATED ML INTELLIGENCE VIEW) -->
-    <!-- ==================================================================== -->
-    <div x-show="activeProfile === 'ml_model'" class="space-y-6" x-cloak>
+    <!-- Day 1 & Day 2 Comparative Marine Condition Panels -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
-        <!-- ML Safety Intelligence Summary Card -->
+        <!-- Day 1 Panel -->
         @php
-            $mlRec = $batchMLAssessment['overall_recommendation'] ?? ($overallClassification ?? 'Safe');
-            $mlScore = match ($mlRec) {
-                'Very Safe' => 5,
-                'Safe' => 4,
-                'Moderate' => 3,
-                'High Risk' => 2,
-                'Critical Risk' => 1,
-                default => 4,
+            $hourlyD1 = !empty($day1MLAssessment['hourly_assessments']) ? $day1MLAssessment['hourly_assessments'] : ($day1Continuous24h['hourly'] ?? []);
+            $recD1 = ($isPrimaryActive || $isConcluded) ? ($day1MLAssessment['overall_recommendation'] ?? ($day1Assessment->overall_classification ?? 'Safe')) : ($day1Assessment->overall_classification ?? 'Safe');
+            $badgeD1 = match($recD1) {
+                'Very Safe', 'Safe' => 'bg-emerald-600 text-white',
+                'Moderate' => 'bg-amber-500 text-white',
+                'High Risk' => 'bg-rose-600 text-white',
+                'Critical Risk' => 'bg-red-700 text-white',
+                default => 'bg-gray-600 text-white',
             };
-            $mlBarColor = match ($mlRec) {
-                'Very Safe', 'Safe' => 'bg-emerald-500',
-                'Moderate' => 'bg-amber-500',
-                'High Risk' => 'bg-rose-500',
-                'Critical Risk' => 'bg-red-600',
-                default => 'bg-emerald-500',
-            };
-            $mlTextColor = match ($mlRec) {
-                'Very Safe', 'Safe' => 'text-emerald-600',
-                'Moderate' => 'text-amber-600',
-                'High Risk' => 'text-rose-600',
-                'Critical Risk' => 'text-red-600',
-                default => 'text-emerald-600',
-            };
-            
-            $cbState = $circuitStatus['state'] ?? 'CLOSED';
-            $cbAvailable = $circuitStatus['is_available'] ?? true;
+            $hasFull24hD1 = count($hourlyD1) > 5;
         @endphp
-
-        <!-- Main ML Safety Banner -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-7 space-y-4 shadow-xs">
-            
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div class="space-y-2">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-extrabold uppercase tracking-widest text-[#6E6E73]">
-                            ML Marine Safety Assessment
-                        </span>
-                        
-                        <!-- Single Clean Circuit Status Tag -->
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold {{ $cbState === 'CLOSED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200' }}">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $cbState === 'CLOSED' ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500' }}"></span>
-                            {{ $cbState === 'CLOSED' ? 'ML Online' : 'Fail-Fast Active' }}
-                        </span>
-                    </div>
-
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <span class="text-base sm:text-xl font-black uppercase tracking-wide {{ $mlTextColor }}">
-                            {{ $mlRec }}
-                        </span>
-
-                        <!-- 5 Lines Indicator -->
-                        <div class="flex items-center gap-1 sm:gap-1.5">
-                            @for($i = 1; $i <= 5; $i++)
-                                <div class="h-1.5 w-4 sm:w-6 rounded-full transition-all duration-300 {{ $i <= $mlScore ? $mlBarColor : 'bg-[#E5E5EA]' }}"></div>
-                            @endfor
-                        </div>
-                    </div>
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4 shadow-2xs">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                        DAY 1
+                    </span>
+                    <h2 class="text-base font-extrabold text-[#1D1D1F]">
+                        {{ $day1Assessment->dive_date->format('F d, Y (l)') }}
+                    </h2>
                 </div>
 
-                <!-- Override Advisory Status -->
-                <div class="md:text-right space-y-1 shrink-0">
-                    <span class="text-xs uppercase font-bold text-[#6E6E73] block">Override Advisory Status</span>
-                    @if($latestOverride && count($latestOverride->active_advisories) > 0)
-                        <span class="text-xs sm:text-sm font-bold text-[#991B1B] bg-[#FEF2F2] px-3.5 py-1.5 rounded-xl border border-[#FECACA] inline-flex items-center gap-1.5">
-                            <span>Active: {{ implode(', ', $latestOverride->active_advisories) }}</span>
-                        </span>
+                <span class="px-3 py-1 rounded-full text-xs font-black uppercase {{ $badgeD1 }}">
+                    {{ $recD1 }}
+                </span>
+            </div>
+
+            <!-- Day 1 Quick Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">Worst Hour</span>
+                    <strong class="text-sm font-extrabold text-[#1D1D1F]">
+                        {{ $day1Assessment->worst_hour ? $day1Assessment->worst_hour->format('g:i A') : 'N/A' }}
+                    </strong>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">Forecast Horizon</span>
+                    <strong class="text-sm font-extrabold text-[#1D1D1F]">
+                        @if($isConcluded)
+                            Concluded
+                        @else
+                            {{ round($day1Assessment->lead_time_hours ?? 0) }}h before dive
+                        @endif
+                    </strong>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">Reliability</span>
+                    <strong class="text-xs font-bold text-[#1D1D1F]">
+                        {{ $isConcluded ? 'Archived Record' : ($day1Assessment->reliability['label'] ?? 'High') }}
+                    </strong>
+                </div>
+            </div>
+
+            <!-- Day 1 Hourly Table -->
+            @if(!empty($hourlyD1))
+            <div x-data="{ showAllHours: false }" class="space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    @if($hasFull24hD1)
+                    <button type="button" 
+                            @click="showAllHours = !showAllHours" 
+                            class="px-3 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#780000] bg-white hover:bg-[#F2F2F7] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                        <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
+                        <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
                     @else
-                        <span class="text-xs sm:text-sm font-bold text-[#065F46] bg-[#ECFDF5] px-3.5 py-1.5 rounded-xl border border-[#A7F3D0] inline-flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-[#065F46]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span>NOT OVERRIDDEN</span>
-                        </span>
+                    <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded-md border border-[#E5E5EA]">
+                        Active Dive Window Hours (AM &amp; PM)
+                    </span>
                     @endif
                 </div>
-            </div>
 
+                <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] uppercase font-extrabold text-[#6E6E73]">
+                            <tr>
+                                <th class="py-2.5 px-3 whitespace-nowrap">Forecast Time</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Significant Wave Height (Hs)">Significant Wave Height (Hs)</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Peak Wave Period (Tp)">Peak Wave Period (Tp)</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Swell Wave Height">Swell Wave Height</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Ocean Current Speed">Ocean Current Speed</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Precipitation / Rain">Precipitation / Rain</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Sea Level Pressure">Sea Level Pressure</th>
+                                <th class="py-2.5 px-3 whitespace-nowrap" title="Wind Speed & Direction">Wind Speed &amp; Gusts</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#E5E5EA] bg-white">
+                            @foreach($hourlyD1 as $h)
+                            @php
+                                $hourNum = (int) ($h['hour'] ?? 0);
+                                $isAmHour = in_array($hourNum, [10, 11, 12]);
+                                $isPmHour = in_array($hourNum, [16, 17]);
+                                $rowRisk = $h['final_tier_name'] ?? $h['classification'] ?? 'Safe';
+                                $rowLineColor = match($rowRisk) {
+                                    'Very Safe', 'Safe' => 'bg-emerald-500',
+                                    'Moderate' => 'bg-amber-500',
+                                    'High Risk' => 'bg-rose-500',
+                                    'Critical Risk' => 'bg-red-600',
+                                    default => 'bg-gray-400',
+                                };
+                                $hs = (float) ($h['predicted_hs'] ?? $h['wave_height'] ?? 0.70);
+                                $hsP10 = (float) ($h['hs_p10'] ?? max(0.05, round($hs - 0.15, 2)));
+                                $hsP90 = (float) ($h['hs_p90'] ?? round($hs + 0.18, 2));
+                                $tp = (float) ($h['predicted_tp'] ?? $h['wave_period'] ?? 6.1);
+                                $swell = (float) ($h['predicted_swell_height'] ?? $h['swell_height'] ?? 0.50);
+                                $current = (float) ($h['predicted_current_speed'] ?? $h['ocean_current'] ?? 0.30);
+                                $rain = (float) ($h['rain_rate_mm_hr'] ?? $h['rain'] ?? 0.0);
+                                $pressure = (float) ($h['slp'] ?? $h['sea_level_pressure'] ?? 1010.5);
+                                $ws = (float) ($h['predicted_wind_speed'] ?? $h['wind_speed'] ?? 12.0);
+                                $wg = (float) ($h['wind_gusts'] ?? $ws * 1.25);
+                            @endphp
+                            <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
+                                class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/20 font-semibold' : '' }}">
+                                <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-4.5 rounded-full {{ $rowLineColor }} shrink-0" title="Rating: {{ $rowRisk }}"></span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span>{{ sprintf('%02d:00', $hourNum) }}</span>
+                                            @if($isAmHour)
+                                                <span class="text-[10px] px-1 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase tracking-wider">AM</span>
+                                            @elseif($isPmHour)
+                                                <span class="text-[10px] px-1 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase tracking-wider">PM</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">
+                                    <strong>{{ number_format($hs, 2) }}m</strong>
+                                    <span class="text-[11px] text-[#8E8E93] block font-mono" title="Expected wave height range from lowest to highest">Range: {{ number_format($hsP10, 2) }} – {{ number_format($hsP90, 2) }}m</span>
+                                </td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($tp, 1) }}s</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($swell, 2) }}m</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($current, 2) }}m/s</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($rain, 1) }}mm</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ round($pressure) }}hPa</td>
+                                <td class="py-2 px-3 whitespace-nowrap font-medium text-[#1D1D1F]">
+                                    <span>{{ round($ws) }} km/h</span>
+                                    <span class="text-xs text-[#8E8E93] block">Gusts: {{ round($wg) }} km/h</span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @else
+            <p class="text-xs text-[#6E6E73] italic py-4 text-center">Detailed hourly telemetry not yet available.</p>
+            @endif
         </div>
 
-        <!-- Day 1 & Day 2 ML Condition Panels -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
-            <!-- Day 1 ML Panel -->
-            @php
-                $hourlyML1 = !empty($day1MLAssessment['hourly_assessments']) ? $day1MLAssessment['hourly_assessments'] : ($day1Continuous24h['hourly'] ?? []);
-                $d1Rec = $day1MLAssessment['overall_recommendation'] ?? ($day1Assessment->overall_classification ?? 'Safe');
-                $d1Badge = match($d1Rec) {
-                    'Very Safe', 'Safe' => 'bg-emerald-600 text-white',
-                    'Moderate' => 'bg-amber-500 text-white',
-                    'High Risk' => 'bg-rose-600 text-white',
-                    'Critical Risk' => 'bg-red-700 text-white',
-                    default => 'bg-gray-600 text-white',
-                };
-                $hasFull24hML1 = count($hourlyML1) > 5;
-            @endphp
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4">
-                <div class="flex items-center justify-between pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                            DAY 1 ML
-                        </span>
-                        <h3 class="text-base font-extrabold text-[#1D1D1F]">
-                            {{ $day1Assessment->dive_date->format('F d, Y (l)') }}
-                        </h3>
-                    </div>
-
-                    <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $d1Badge }}">
-                        {{ $d1Rec }}
+        <!-- Day 2 Panel -->
+        @php
+            $hourlyD2 = !empty($day2MLAssessment['hourly_assessments']) ? $day2MLAssessment['hourly_assessments'] : ($day2Continuous24h['hourly'] ?? []);
+            $recD2 = ($isPrimaryActive || $isConcluded) ? ($day2MLAssessment['overall_recommendation'] ?? ($day2Assessment->overall_classification ?? 'Safe')) : ($day2Assessment->overall_classification ?? 'Safe');
+            $badgeD2 = match($recD2) {
+                'Very Safe', 'Safe' => 'bg-emerald-600 text-white',
+                'Moderate' => 'bg-amber-500 text-white',
+                'High Risk' => 'bg-rose-600 text-white',
+                'Critical Risk' => 'bg-red-700 text-white',
+                default => 'bg-gray-600 text-white',
+            };
+            $hasFull24hD2 = count($hourlyD2) > 5;
+        @endphp
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4 shadow-2xs">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                        DAY 2
                     </span>
+                    <h2 class="text-base font-extrabold text-[#1D1D1F]">
+                        {{ $day2Assessment->dive_date->format('F d, Y (l)') }}
+                    </h2>
                 </div>
 
-                @if(!empty($hourlyML1))
-                <div x-data="{ showAllHours: false }" class="space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        @if($hasFull24hML1)
-                        <button type="button" 
-                                @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
-                            <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
-                            <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
-                        @else
-                        <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2.5 py-1 rounded-lg border border-[#E5E5EA]">
-                            Active Dive Window Hours (AM & PM)
-                        </span>
-                        @endif
-                        <span class="text-xs text-[#8E8E93] font-medium">Expected forecast with [best case – worst case] range</span>
-                    </div>
-
-                    <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-xs uppercase font-extrabold text-[#6E6E73]">
-                                <tr>
-                                    <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Significant Wave Height">Wave Height (Hs)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Peak Wave Period">Wave Period (Tp)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Swell Wave Height">Swell Height</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Ocean Current Velocity">Ocean Current</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Wind Wave Height">Wind Wave</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Precipitation / Rain">Rain (mm)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Sea Level Pressure">Pressure (hPa)</th>
-                                    <th class="py-3 px-3 whitespace-nowrap" title="Model Predicted Wind Speed and Direction">Wind Speed & Dir</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#E5E5EA] bg-white">
-                                @foreach($hourlyML1 as $h)
-                                @php
-                                    $hourNum = (int) ($h['hour'] ?? 0);
-                                    $isAmHour = in_array($hourNum, [10, 11, 12]);
-                                    $isPmHour = in_array($hourNum, [16, 17]);
-                                    $mlRisk = $h['final_tier_name'] ?? $h['ml_raw_tier_name'] ?? $h['classification'] ?? 'Safe';
-                                    
-                                    // Vertical color line before forecast time indicating risk rating
-                                    $riskBarColor = match($mlRisk) {
-                                        'Very Safe', 'Safe' => 'bg-emerald-500',
-                                        'Moderate' => 'bg-amber-500',
-                                        'High Risk' => 'bg-rose-500',
-                                        'Critical Risk' => 'bg-red-600',
-                                        default => 'bg-gray-300',
-                                    };
-
-                                    $hsP50 = (float) ($h['predicted_hs'] ?? $h['wave_height'] ?? 0.70);
-                                    $hsP10 = (float) ($h['hs_p10'] ?? max(0.1, round($hsP50 * 0.82, 2)));
-                                    $hsP90 = (float) ($h['hs_p90'] ?? round($hsP50 * 1.22, 2));
-
-                                    $tp = (float) ($h['predicted_tp'] ?? $h['wave_period'] ?? 6.1);
-                                    $swellH = (float) ($h['predicted_swell_height'] ?? $h['swell_height'] ?? 0.60);
-
-                                    $currP50 = (float) ($h['predicted_current_speed'] ?? $h['ocean_current'] ?? 0.30);
-                                    $currP10 = (float) ($h['curr_p10'] ?? max(0.05, round($currP50 * 0.85, 2)));
-                                    $currP90 = (float) ($h['curr_p90'] ?? round($currP50 * 1.20, 2));
-
-                                    $windP50 = (float) ($h['predicted_wind_speed'] ?? $h['wind_speed'] ?? 12.0);
-                                    $windP10 = (float) ($h['wind_p10'] ?? max(2.0, round($windP50 * 0.85, 1)));
-                                    $windP90 = (float) ($h['wind_p90'] ?? round($windP50 * 1.20, 1));
-                                    $windDir = round($h['predicted_wind_dir'] ?? $h['wind_direction'] ?? 0);
-                                @endphp
-                                <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25' : '' }}">
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1 h-4 rounded-full {{ $riskBarColor }} shrink-0"></span>
-                                            <span>{{ sprintf('%02d:00', $hourNum) }}</span>
-                                            @if($isAmHour)
-                                                <span class="text-xs px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
-                                            @elseif($isPmHour)
-                                                <span class="text-xs px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">
-                                        <div>
-                                            <span>{{ number_format($hsP50, 2) }} m</span>
-                                            <span class="text-xs text-[#8E8E93] block font-mono">[{{ number_format($hsP10, 2) }}-{{ number_format($hsP90, 2) }}]</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($tp, 1) }} s</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($swellH, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">
-                                        <div>
-                                            <span>{{ number_format($currP50, 2) }} m/s</span>
-                                            <span class="text-xs text-[#8E8E93] block font-mono">[{{ number_format($currP10, 2) }}-{{ number_format($currP90, 2) }}]</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['predicted_wind_wave_height'] ?? $h['wind_wave_height'] ?? 0.35, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['rain_rate_mm_hr'] ?? $h['rain'] ?? 0.0, 1) }} mm</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['slp'] ?? $h['sea_level_pressure'] ?? 1010.5, 0) }} hPa</td>
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-medium text-[#1D1D1F]">
-                                        <div>
-                                            <span>{{ round($windP50) }} km/h ({{ $windDir }}°)</span>
-                                            <span class="text-xs text-[#8E8E93] block font-mono">[{{ round($windP10) }}-{{ round($windP90) }} km/h]</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @else
-                <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
-                        <span class="font-bold text-[#1D1D1F] block">ML Forecast Data Generating</span>
-                        <span>Ensure the ML microservice on port 8001 is running.</span>
-                    </div>
-                </div>
-                @endif
+                <span class="px-3 py-1 rounded-full text-xs font-black uppercase {{ $badgeD2 }}">
+                    {{ $recD2 }}
+                </span>
             </div>
 
-            <!-- Day 2 ML Panel -->
-            @php
-                $hourlyML2 = !empty($day2MLAssessment['hourly_assessments']) ? $day2MLAssessment['hourly_assessments'] : ($day2Continuous24h['hourly'] ?? []);
-                $d2Rec = $day2MLAssessment['overall_recommendation'] ?? ($day2Assessment->overall_classification ?? 'Safe');
-                $d2Badge = match($d2Rec) {
-                    'Very Safe', 'Safe' => 'bg-emerald-600 text-white',
-                    'Moderate' => 'bg-amber-500 text-white',
-                    'High Risk' => 'bg-rose-600 text-white',
-                    'Critical Risk' => 'bg-red-700 text-white',
-                    default => 'bg-gray-600 text-white',
-                };
-                $hasFull24hML2 = count($hourlyML2) > 5;
-            @endphp
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4">
-                <div class="flex items-center justify-between pb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2.5 py-1 rounded-lg text-sm font-black bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
-                            DAY 2 ML
-                        </span>
-                        <h3 class="text-base font-extrabold text-[#1D1D1F]">
-                            {{ $day2Assessment->dive_date->format('F d, Y (l)') }}
-                        </h3>
-                    </div>
-
-                    <span class="px-3 py-1 rounded-full text-sm font-black uppercase {{ $d2Badge }}">
-                        {{ $d2Rec }}
-                    </span>
+            <!-- Day 2 Quick Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">Worst Hour</span>
+                    <strong class="text-sm font-extrabold text-[#1D1D1F]">
+                        {{ $day2Assessment->worst_hour ? $day2Assessment->worst_hour->format('g:i A') : 'N/A' }}
+                    </strong>
                 </div>
 
-                @if(!empty($hourlyML2))
-                <div x-data="{ showAllHours: false }" class="space-y-3">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                        @if($hasFull24hML2)
-                        <button type="button" 
-                                @click="showAllHours = !showAllHours" 
-                                class="px-3.5 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#00c3d0] bg-white hover:bg-[#F2F2F7] text-sm font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
-                            <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
-                            <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
-                        </button>
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">Forecast Horizon</span>
+                    <strong class="text-sm font-extrabold text-[#1D1D1F]">
+                        @if($isConcluded)
+                            Concluded
                         @else
-                        <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2.5 py-1 rounded-lg border border-[#E5E5EA]">
-                            Active Dive Window Hours (AM & PM)
-                        </span>
+                            {{ round($day2Assessment->lead_time_hours ?? 0) }}h before dive
                         @endif
-                        <span class="text-xs text-[#8E8E93] font-medium">Expected forecast with [best case – worst case] range</span>
-                    </div>
-
-                    <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
-                        <table class="w-full text-left text-xs">
-                            <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-xs uppercase font-extrabold text-[#6E6E73]">
-                                <tr>
-                                    <th class="py-3 px-3 whitespace-nowrap">Forecast Time</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Significant Wave Height">Wave Height (Hs)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Peak Wave Period">Wave Period (Tp)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Swell Wave Height">Swell Height</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Ocean Current Velocity">Ocean Current</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Model Predicted Wind Wave Height">Wind Wave</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Precipitation / Rain">Rain (mm)</th>
-                                    <th class="py-3 px-2 whitespace-nowrap" title="Sea Level Pressure">Pressure (hPa)</th>
-                                    <th class="py-3 px-3 whitespace-nowrap" title="Model Predicted Wind Speed and Direction">Wind Speed & Dir</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-[#E5E5EA] bg-white">
-                                @foreach($hourlyML2 as $h)
-                                @php
-                                    $hourNum = (int) ($h['hour'] ?? 0);
-                                    $isAmHour = in_array($hourNum, [10, 11, 12]);
-                                    $isPmHour = in_array($hourNum, [16, 17]);
-                                    $mlRisk = $h['final_tier_name'] ?? $h['ml_raw_tier_name'] ?? $h['classification'] ?? 'Safe';
-                                    
-                                    // Vertical color line before forecast time indicating risk rating
-                                    $riskBarColor = match($mlRisk) {
-                                        'Very Safe', 'Safe' => 'bg-emerald-500',
-                                        'Moderate' => 'bg-amber-500',
-                                        'High Risk' => 'bg-rose-500',
-                                        'Critical Risk' => 'bg-red-600',
-                                        default => 'bg-gray-300',
-                                    };
-
-                                    $hsP50 = (float) ($h['predicted_hs'] ?? $h['wave_height'] ?? 0.70);
-                                    $hsP10 = (float) ($h['hs_p10'] ?? max(0.1, round($hsP50 * 0.82, 2)));
-                                    $hsP90 = (float) ($h['hs_p90'] ?? round($hsP50 * 1.22, 2));
-
-                                    $tp = (float) ($h['predicted_tp'] ?? $h['wave_period'] ?? 6.1);
-                                    $swellH = (float) ($h['predicted_swell_height'] ?? $h['swell_height'] ?? 0.60);
-
-                                    $currP50 = (float) ($h['predicted_current_speed'] ?? $h['ocean_current'] ?? 0.30);
-                                    $currP10 = (float) ($h['curr_p10'] ?? max(0.05, round($currP50 * 0.85, 2)));
-                                    $currP90 = (float) ($h['curr_p90'] ?? round($currP50 * 1.20, 2));
-
-                                    $windP50 = (float) ($h['predicted_wind_speed'] ?? $h['wind_speed'] ?? 12.0);
-                                    $windP10 = (float) ($h['wind_p10'] ?? max(2.0, round($windP50 * 0.85, 1)));
-                                    $windP90 = (float) ($h['wind_p90'] ?? round($windP50 * 1.20, 1));
-                                    $windDir = round($h['predicted_wind_dir'] ?? $h['wind_direction'] ?? 0);
-                                @endphp
-                                <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
-                                    class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/25' : '' }}">
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
-                                        <div class="flex items-center gap-2">
-                                            <span class="w-1 h-4 rounded-full {{ $riskBarColor }} shrink-0"></span>
-                                            <span>{{ sprintf('%02d:00', $hourNum) }}</span>
-                                            @if($isAmHour)
-                                                <span class="text-xs px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">AM Window</span>
-                                            @elseif($isPmHour)
-                                                <span class="text-xs px-1.5 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase">PM Window</span>
-                                            @endif
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">
-                                        <div>
-                                            <span>{{ number_format($hsP50, 2) }} m</span>
-                                            <span class="text-xs text-[#8E8E93] block font-mono">[{{ number_format($hsP10, 2) }}-{{ number_format($hsP90, 2) }}]</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($tp, 1) }} s</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($swellH, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">
-                                        <div>
-                                            <span>{{ number_format($currP50, 2) }} m/s</span>
-                                            <span class="text-xs text-[#8E8E93] block font-mono">[{{ number_format($currP10, 2) }}-{{ number_format($currP90, 2) }}]</span>
-                                        </div>
-                                    </td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['predicted_wind_wave_height'] ?? $h['wind_wave_height'] ?? 0.35, 2) }} m</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['rain_rate_mm_hr'] ?? $h['rain'] ?? 0.0, 1) }} mm</td>
-                                    <td class="py-2.5 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($h['slp'] ?? $h['sea_level_pressure'] ?? 1010.5, 0) }} hPa</td>
-                                    <td class="py-2.5 px-3 whitespace-nowrap font-medium text-[#1D1D1F]">
-                                        <div>
-                                            <span>{{ round($windP50) }} km/h ({{ $windDir }}°)</span>
-                                            <span class="text-xs text-[#8E8E93] block font-mono">[{{ round($windP10) }}-{{ round($windP90) }} km/h]</span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
+                    </strong>
                 </div>
-                @else
-                <div class="pt-3">
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] text-center text-sm text-[#6E6E73] space-y-1">
-                        <span class="font-bold text-[#1D1D1F] block">ML Forecast Data Generating</span>
-                        <span>Ensure the ML microservice on port 8001 is running.</span>
-                    </div>
+
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">Reliability</span>
+                    <strong class="text-xs font-bold text-[#1D1D1F]">
+                        {{ $isConcluded ? 'Archived Record' : ($day2Assessment->reliability['label'] ?? 'High') }}
+                    </strong>
                 </div>
-                @endif
             </div>
 
+            <!-- Day 2 Hourly Table -->
+            @if(!empty($hourlyD2))
+            <div x-data="{ showAllHours: false }" class="space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    @if($hasFull24hD2)
+                    <button type="button" 
+                            @click="showAllHours = !showAllHours" 
+                            class="px-3 py-1.5 rounded-xl border border-[#D1D1D6] hover:border-[#780000] bg-white hover:bg-[#F2F2F7] text-xs font-bold text-[#1D1D1F] flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer">
+                        <span x-text="showAllHours ? 'Collapse to AM & PM Windows' : 'Expand to All 24 Hours'"></span>
+                        <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+                    </button>
+                    @else
+                    <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded-md border border-[#E5E5EA]">
+                        Active Dive Window Hours (AM &amp; PM)
+                    </span>
+                    @endif
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-[#E5E5EA]">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] uppercase font-extrabold text-[#6E6E73]">
+                            <tr>
+                                <th class="py-2.5 px-3 whitespace-nowrap">Forecast Time</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Significant Wave Height (Hs)">Significant Wave Height (Hs)</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Peak Wave Period (Tp)">Peak Wave Period (Tp)</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Swell Wave Height">Swell Wave Height</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Ocean Current Speed">Ocean Current Speed</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Precipitation / Rain">Precipitation / Rain</th>
+                                <th class="py-2.5 px-2 whitespace-nowrap" title="Sea Level Pressure">Sea Level Pressure</th>
+                                <th class="py-2.5 px-3 whitespace-nowrap" title="Wind Speed & Direction">Wind Speed &amp; Gusts</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-[#E5E5EA] bg-white">
+                            @foreach($hourlyD2 as $h)
+                            @php
+                                $hourNum = (int) ($h['hour'] ?? 0);
+                                $isAmHour = in_array($hourNum, [10, 11, 12]);
+                                $isPmHour = in_array($hourNum, [16, 17]);
+                                $rowRisk = $h['final_tier_name'] ?? $h['classification'] ?? 'Safe';
+                                $rowLineColor = match($rowRisk) {
+                                    'Very Safe', 'Safe' => 'bg-emerald-500',
+                                    'Moderate' => 'bg-amber-500',
+                                    'High Risk' => 'bg-rose-500',
+                                    'Critical Risk' => 'bg-red-600',
+                                    default => 'bg-gray-400',
+                                };
+                                $hs = (float) ($h['predicted_hs'] ?? $h['wave_height'] ?? 0.70);
+                                $hsP10 = (float) ($h['hs_p10'] ?? max(0.05, round($hs - 0.15, 2)));
+                                $hsP90 = (float) ($h['hs_p90'] ?? round($hs + 0.18, 2));
+                                $tp = (float) ($h['predicted_tp'] ?? $h['wave_period'] ?? 6.1);
+                                $swell = (float) ($h['predicted_swell_height'] ?? $h['swell_height'] ?? 0.50);
+                                $current = (float) ($h['predicted_current_speed'] ?? $h['ocean_current'] ?? 0.30);
+                                $rain = (float) ($h['rain_rate_mm_hr'] ?? $h['rain'] ?? 0.0);
+                                $pressure = (float) ($h['slp'] ?? $h['sea_level_pressure'] ?? 1010.5);
+                                $ws = (float) ($h['predicted_wind_speed'] ?? $h['wind_speed'] ?? 12.0);
+                                $wg = (float) ($h['wind_gusts'] ?? $ws * 1.25);
+                            @endphp
+                            <tr x-show="showAllHours || {{ ($isAmHour || $isPmHour) ? 'true' : 'false' }}" 
+                                class="hover:bg-[#F2F2F7] transition-colors {{ ($isAmHour || $isPmHour) ? 'bg-[#F8EAEA]/20 font-semibold' : '' }}">
+                                <td class="py-2.5 px-3 whitespace-nowrap font-mono text-[#1D1D1F]">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-1.5 h-4.5 rounded-full {{ $rowLineColor }} shrink-0" title="Rating: {{ $rowRisk }}"></span>
+                                        <div class="flex items-center gap-1.5">
+                                            <span>{{ sprintf('%02d:00', $hourNum) }}</span>
+                                            @if($isAmHour)
+                                                <span class="text-[10px] px-1 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase tracking-wider">AM</span>
+                                            @elseif($isPmHour)
+                                                <span class="text-[10px] px-1 py-0.2 rounded bg-[#780000] text-white font-extrabold uppercase tracking-wider">PM</span>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">
+                                    <strong>{{ number_format($hs, 2) }}m</strong>
+                                    <span class="text-[11px] text-[#8E8E93] block font-mono" title="Expected wave height range from lowest to highest">Range: {{ number_format($hsP10, 2) }} – {{ number_format($hsP90, 2) }}m</span>
+                                </td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($tp, 1) }}s</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($swell, 2) }}m</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($current, 2) }}m/s</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ number_format($rain, 1) }}mm</td>
+                                <td class="py-2 px-2 whitespace-nowrap font-medium text-[#1D1D1F]">{{ round($pressure) }}hPa</td>
+                                <td class="py-2 px-3 whitespace-nowrap font-medium text-[#1D1D1F]">
+                                    <span>{{ round($ws) }} km/h</span>
+                                    <span class="text-xs text-[#8E8E93] block">Gusts: {{ round($wg) }} km/h</span>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @else
+            <p class="text-xs text-[#6E6E73] italic py-4 text-center">Detailed hourly telemetry not yet available.</p>
+            @endif
         </div>
 
     </div>
 
-    <!-- ==================================================================== -->
-    <!-- COMMON COMPONENTS: AUDIT TRAIL & MODALS -->
-    <!-- ==================================================================== -->
-    
-    <!-- Assessment History -->
-    <div x-data="{ openAuditTrail: false }" class="mt-8 bg-white rounded-xl border border-[#E5E5EA] overflow-hidden transition-all">
+    <!-- Assessment History & Audit Trail -->
+    <div x-data="{ openAuditTrail: false }" class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         <button type="button" 
                 @click="openAuditTrail = !openAuditTrail" 
                 class="w-full p-5 sm:p-6 flex items-center justify-between text-left hover:bg-[#F2F2F7] transition-colors cursor-pointer select-none">
             <div class="flex items-center gap-3">
-                <span class="text-base font-extrabold text-[#1D1D1F]">Assessment Audit Trail & History</span>
-                <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
+                <span class="text-base font-extrabold text-[#1D1D1F]">Assessment Audit Trail &amp; History</span>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
                     {{ count($assessmentRuns) }} run(s)
                 </span>
             </div>
-            <div class="flex items-center gap-2 text-sm font-bold text-[#780000]">
+            <div class="flex items-center gap-2 text-xs font-bold text-[#780000]">
                 <span x-text="openAuditTrail ? 'Hide History' : 'View Audit History'"></span>
                 <svg class="w-4 h-4 transition-transform duration-200" :class="openAuditTrail ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
             </div>
         </button>
 
         <div x-show="openAuditTrail" x-cloak class="p-5 sm:p-6 pt-0 border-t border-[#E5E5EA] space-y-3">
-            <div class="flex items-center justify-between text-sm text-[#6E6E73] pt-4 pb-1">
-                <span>Chronological assessment history (Newest first)</span>
-                <span>Auto-logged by marine forecast service & staff</span>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-[#6E6E73] pt-4 pb-2 border-b border-[#E5E5EA] gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-[#1D1D1F]">Engine:</span>
+                    <span class="inline-flex items-center gap-1.5 font-medium {{ $isPrimaryActive ? 'text-emerald-700' : 'text-blue-700' }}">
+                        <span class="w-1.5 h-1.5 rounded-full {{ $isPrimaryActive ? 'bg-emerald-500' : 'bg-blue-500' }}"></span>
+                        <span>
+                            @if($isPrimaryActive)
+                                AI Safety Model
+                            @elseif($isCbOpen)
+                                Backup Weather Rules
+                            @elseif($isCbHalfOpen)
+                                Reconnecting AI Model
+                            @else
+                                Backup Weather Rules
+                            @endif
+                        </span>
+                    </span>
+                </div>
+                <span>Chronological assessment history</span>
             </div>
 
             @forelse($assessmentRuns as $timestamp => $records)
@@ -912,73 +520,72 @@
                 $d1 = $records->firstWhere('day_number', 1);
                 $d2 = $records->firstWhere('day_number', 2);
                 $primary = $d1 ?: $d2;
-                $runAssessor = ($d1 && $d1->assessor) ? $d1->assessor->name : (($d2 && $d2->assessor) ? $d2->assessor->name : 'Camp Operator / Automated Evaluation');
+                $runAssessor = ($d1 && $d1->assessor) ? $d1->assessor->name : (($d2 && $d2->assessor) ? $d2->assessor->name : 'System Automated Engine');
                 $runTime = ($primary && $primary->assessed_at) ? $primary->assessed_at->format('M d, Y, h:i A') : $timestamp;
             @endphp
-            <div class="p-3.5 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
+            <div class="p-3.5 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div class="flex items-center gap-3">
                     <div class="w-2.5 h-2.5 rounded-full bg-[#780000] shrink-0"></div>
                     <div>
                         <strong class="text-[#1D1D1F] font-bold">
                             Run at {{ $runTime }}
                         </strong>
-                        <span class="text-sm text-[#6E6E73] block mt-0.5">
-                            Assessed by: <strong>{{ $runAssessor }}</strong>
-                        </span>
+                        <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                            <span class="text-xs text-[#6E6E73]">
+                                Assessor: <strong class="text-[#1D1D1F]">{{ $runAssessor }}</strong>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-4 self-end sm:self-center">
                     <div class="flex items-center gap-1.5">
                         <span class="text-[#6E6E73] font-semibold">Day 1:</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $d1 ? $d1->classification_badge['class'] : 'bg-gray-100 text-gray-600' }}">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $d1 ? $d1->classification_badge['class'] : 'bg-gray-100 text-gray-600' }}">
                             {{ $d1 ? $d1->overall_classification : 'N/A' }}
                         </span>
                     </div>
 
                     <div class="flex items-center gap-1.5">
                         <span class="text-[#6E6E73] font-semibold">Day 2:</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-sm font-bold {{ $d2 ? $d2->classification_badge['class'] : 'bg-gray-100 text-gray-600' }}">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $d2 ? $d2->classification_badge['class'] : 'bg-gray-100 text-gray-600' }}">
                             {{ $d2 ? $d2->overall_classification : 'N/A' }}
                         </span>
                     </div>
 
                     @if(($d1 && $d1->override_triggered) || ($d2 && $d2->override_triggered))
-                        <span class="px-2.5 py-0.5 rounded-full text-sm font-black bg-[#FEF2F2] text-[#991B1B]">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-[#FEF2F2] text-[#991B1B]">
                             Manual Override
                         </span>
                     @endif
                 </div>
             </div>
             @empty
-            <p class="text-sm text-[#6E6E73] py-2 text-center">No past assessment runs recorded yet.</p>
+            <p class="text-xs text-[#6E6E73] py-2 text-center">No past assessment runs recorded yet.</p>
             @endforelse
         </div>
     </div>
 
     <!-- Manual Safety Override Modal -->
     <div x-show="openOverrideModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openOverrideModal = false">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openOverrideModal = false">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <h3 class="text-lg font-bold text-[#1D1D1F]">Apply Manual PAGASA Override</h3>
-                </div>
+                <h3 class="text-base font-extrabold text-[#1D1D1F]">Apply Manual PAGASA Override</h3>
                 <button type="button" @click="openOverrideModal = false" aria-label="Close override modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
-            <p class="text-sm text-[#6E6E73]">
+            <p class="text-xs text-[#6E6E73]">
                 Forces both <strong>Day 1</strong> and <strong>Day 2</strong> to <strong>Critical Risk</strong> due to official PAGASA gale warnings, tropical cyclones, or severe marine advisories.
             </p>
 
-            <form action="{{ route('admin.weather.override', $batch) }}" method="POST" class="space-y-4 text-sm">
+            <form action="{{ route('admin.weather.override', $batch) }}" method="POST" class="space-y-4 text-xs">
                 @csrf
 
-                <!-- TCWS Signal -->
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">
+                    <label class="block font-bold text-[#1D1D1F] mb-1">
                         Tropical Cyclone Wind Signal (TCWS)
                     </label>
-                    <select name="tcws_signal" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <select name="tcws_signal" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                         <option value="0">No Active TCWS Signal</option>
                         <option value="1">Signal No. 1</option>
                         <option value="2">Signal No. 2</option>
@@ -988,52 +595,49 @@
                     </select>
                 </div>
 
-                <!-- Boolean Advisory Checkboxes -->
                 <div class="space-y-2 bg-[#F2F2F7] p-3.5 rounded-xl border border-[#E5E5EA]">
-                    <span class="block font-bold text-[#1D1D1F] mb-2 text-sm uppercase tracking-wider">Active Severe Marine Advisories</span>
+                    <span class="block font-bold text-[#1D1D1F] mb-1 uppercase tracking-wider text-xs">Active Severe Marine Advisories</span>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="gale_warning" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-sm font-semibold text-[#1D1D1F]">PAGASA Marine Gale Warning</span>
+                        <span class="font-semibold text-[#1D1D1F]">PAGASA Marine Gale Warning</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="thunderstorm_advisory" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-sm font-semibold text-[#1D1D1F]">Severe Thunderstorm / Lightning Advisory</span>
+                        <span class="font-semibold text-[#1D1D1F]">Severe Thunderstorm / Lightning Advisory</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="typhoon_within_distance" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-sm font-semibold text-[#1D1D1F]">Typhoon within Safety Distance (Batangas Coast)</span>
+                        <span class="font-semibold text-[#1D1D1F]">Typhoon within Safety Distance (Batangas Coast)</span>
                     </label>
 
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="tsunami_warning" value="1" class="rounded border-[#D1D1D6] text-[#780000]">
-                        <span class="text-sm font-semibold text-[#1D1D1F]">Tsunami / Severe Marine Hazard Warning</span>
+                        <span class="font-semibold text-[#1D1D1F]">Tsunami / Severe Marine Hazard Warning</span>
                     </label>
                 </div>
 
-                <!-- Reason / Description -->
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">
+                    <label class="block font-bold text-[#1D1D1F] mb-1">
                         Advisory Details / Source <span class="text-[#780000]">*</span>
                     </label>
-                    <textarea name="reason" required rows="2" placeholder="e.g. PAGASA Severe Weather Bulletin #4 - Gale Warning in Southern Luzon coasts" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white"></textarea>
+                    <textarea name="reason" required rows="2" placeholder="e.g. PAGASA Severe Weather Bulletin #4 - Gale Warning in Southern Luzon coasts" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white"></textarea>
                 </div>
 
-                <!-- Auto-Cancel Option -->
                 <div class="p-3 bg-[#FEF2F2] rounded-xl border border-[#FECACA]">
                     <label class="flex items-start gap-2 cursor-pointer">
                         <input type="checkbox" name="cancel_batch" value="1" class="rounded border-[#D1D1D6] text-[#780000] mt-0.5">
-                        <span class="text-sm font-bold text-[#991B1B]">
+                        <span class="font-bold text-[#991B1B]">
                             Cancel batch immediately, trigger 100% force majeure refunds, and dispatch cancellation emails.
                         </span>
                     </label>
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
-                    <button type="button" @click="openOverrideModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
-                    <button type="submit" class="btn-primary px-5 py-1.5 text-sm font-bold">
+                    <button type="button" @click="openOverrideModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
+                    <button type="submit" class="btn-primary px-5 py-1.5 text-xs font-bold shadow-2xs">
                         Apply Override
                     </button>
                 </div>
@@ -1043,36 +647,34 @@
 
     <!-- Batch Cancellation Modal -->
     <div x-show="openCancelModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
             <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <h3 class="text-lg font-bold text-[#FF3B3C]">Cancel Batch & Dispatch Customer Notifications</h3>
-                </div>
+                <h3 class="text-base font-extrabold text-[#DC2626]">Cancel Batch &amp; Dispatch Customer Notifications</h3>
                 <button type="button" @click="openCancelModal = false" aria-label="Close cancellation modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
             </div>
 
-            <p class="text-sm text-[#6E6E73]">
+            <p class="text-xs text-[#6E6E73]">
                 Confirming whole-batch cancellation will automatically update all connected bookings, initiate <strong>100% full refund eligibility</strong>, and send official cancellation notices to all customers.
             </p>
 
-            <form action="{{ route('admin.weather.cancel', $batch) }}" method="POST" class="space-y-4 text-sm">
+            <form action="{{ route('admin.weather.cancel', $batch) }}" method="POST" class="space-y-4 text-xs">
                 @csrf
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">
+                    <label class="block font-bold text-[#1D1D1F] mb-1">
                         Cancellation Reasons / Marine Hazard Drivers <span class="text-[#780000]">*</span>
                     </label>
                     <input type="text" 
                            name="cancellation_reason" 
                            x-model="cancelReason" 
                            required 
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
+                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white font-medium">
                 </div>
 
                 <!-- Email Notification Preview -->
                 <div class="space-y-1.5">
-                    <span class="block font-bold text-[#6E6E73] text-sm uppercase tracking-wider">Outbound Email Notification Preview</span>
-                    <div class="p-4 bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] font-sans text-sm text-[#1D1D1F] whitespace-pre-line leading-relaxed">
+                    <span class="block font-bold text-[#6E6E73] text-xs uppercase tracking-wider">Outbound Email Notification Preview</span>
+                    <div class="p-4 bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] font-sans text-xs text-[#1D1D1F] whitespace-pre-line leading-relaxed">
 Good day, <strong class="text-[#780000]">[Customer Name]</strong>. Your scheduled date for <strong class="text-[#780000]">{{ $batch->start_date->format('M d') }} to {{ $batch->end_date->format('M d, Y') }}</strong> will be canceled due to:
 
 - <span x-text="cancelReason" class="font-bold"></span>
@@ -1086,9 +688,9 @@ You can select your preferred option by entering your booking number and PIN in 
                 </div>
 
                 <div class="flex items-center justify-end gap-2 pt-2 border-t border-[#E5E5EA]">
-                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
-                    <button type="submit" class="btn-danger px-4 py-2 text-sm font-bold shadow-2xs">
-                        Confirm Cancellation & Send Emails
+                    <button type="button" @click="openCancelModal = false" class="btn-secondary px-3.5 py-1.5 text-xs">Cancel</button>
+                    <button type="submit" class="btn-danger px-4 py-2 text-xs font-bold shadow-2xs">
+                        Confirm Cancellation &amp; Send Emails
                     </button>
                 </div>
             </form>

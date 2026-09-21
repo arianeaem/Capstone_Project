@@ -30,9 +30,6 @@
                 <span class="text-sm font-bold text-[#780000]">Refund Queue</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Pending Refund Requests</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Review, forfeit, or approve customer refund claims based on the 14-day camp cancellation policy.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">

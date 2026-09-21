@@ -9,9 +9,6 @@
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Batches & Schedules</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Organize weekend dive trips, group guest bookings, and check coach assignments and occupancy.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
@@ -76,7 +73,7 @@
                                name="search" 
                                value="{{ request('search') }}" 
                                placeholder="Search batch (e.g. Batch 4)..." 
-                               class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-[#F2F2F7] focus:bg-white focus:border-[#780000]">
+                               class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-white focus:bg-white focus:border-[#780000]">
                         <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="11" cy="11" r="8"></circle>
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
@@ -96,14 +93,20 @@
                         @endif
                     </button>
 
-                    <!-- Advanced Filter Options -->
+                    <!-- Advanced Filter Options Dropdown -->
                     <div x-show="openFilters" 
                          x-cloak 
                          @click.outside="openFilters = false" 
-                         class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-xl shadow-xl border border-[#E5E5EA] p-4 z-30 space-y-3">
-                        <div class="flex items-center justify-between pb-2">
+                         x-transition:enter="transition ease-out duration-150 transform"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100 transform"
+                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                         class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl shadow-xl border border-[#E5E5EA] p-4 z-50 space-y-3">
+                        <div class="flex items-center justify-between">
                             <h4 class="font-bold text-sm text-[#1D1D1F]">Filter & Sort Batches</h4>
-                            <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#780000] hover:underline font-semibold">Reset</a>
+                            <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
                         </div>
 
                         <form action="{{ route('admin.batches.index') }}" method="GET" class="space-y-3 text-sm">
@@ -115,8 +118,8 @@
                             @endif
 
                             <div>
-                                <label class="block font-semibold text-[#6E6E73] mb-1">Sort By</label>
-                                <select name="sort" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                <label class="block font-bold text-[#6E6E73] text-sm mb-1">Sort By</label>
+                                <select name="sort" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                     <option value="date_asc" {{ request('sort', 'date_asc') === 'date_asc' ? 'selected' : '' }}>Soonest Dive Date (Upcoming First)</option>
                                     <option value="date_desc" {{ request('sort') === 'date_desc' ? 'selected' : '' }}>Latest Dive Date (Newest to Oldest)</option>
                                     <option value="batch_asc" {{ request('sort') === 'batch_asc' ? 'selected' : '' }}>Batch Number (Ascending)</option>
@@ -128,8 +131,8 @@
                             </div>
 
                             <div>
-                                <label class="block font-semibold text-[#6E6E73] mb-1">Staffing Status</label>
-                                <select name="staffing" class="w-full px-2.5 py-1.5 rounded-lg border border-[#D1D1D6] text-sm">
+                                <label class="block font-bold text-[#6E6E73] text-sm mb-1">Staffing Status</label>
+                                <select name="staffing" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
                                     <option value="">All Staffing States</option>
                                     <option value="pending" {{ request('staffing') === 'pending' ? 'selected' : '' }}>Instructor Pending</option>
                                     <option value="staffed" {{ request('staffing') === 'staffed' ? 'selected' : '' }}>Fully Staffed</option>
@@ -137,7 +140,7 @@
                             </div>
 
                             <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                <button type="submit" class="btn-primary w-full py-1.5 text-sm font-bold">
+                                <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
                                     Apply Filter & Sort
                                 </button>
                             </div>
@@ -158,7 +161,7 @@
             <div>
                 <div class="flex items-start justify-between gap-2">
                     <div>
-                        <span class="font-extrabold text-[#1D1D1F] group-hover:text-[#780000] text-base block leading-tight transition-colors">
+                        <span class="font-extrabold text-[#1D1D1F] text-base block leading-tight">
                             {{ $batch->batch_number }}
                         </span>
                     </div>
@@ -182,7 +185,7 @@
                     <div class="space-y-1.5">
                         <div class="flex items-center justify-between text-sm">
                             <span class="font-bold text-[#1D1D1F]">
-                                {{ $batch->total_participants_count }} Pax ({{ $batch->bookings->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])->count() }} bookings)
+                                {{ $batch->total_participants_count }} pax / {{ $batch->computed_capacity }}
                             </span>
                             @if($batch->total_participants_count > 0 && $batch->is_coach_pending)
                                 <span class="text-sm font-bold text-amber-700">
@@ -190,20 +193,12 @@
                                 </span>
                             @elseif($batch->assigned_coaches_count > 0)
                                 <span class="text-sm text-emerald-700 font-bold">
-                                    {{ $batch->assigned_coaches_count }} Coach(es)
-                                </span>
-                            @else
-                                <span class="text-sm text-[#8E8E93] font-medium">
-                                    No Bookings Yet
+                                    {{ $batch->assigned_coaches_count }} {{ Str::plural('Coach', $batch->assigned_coaches_count) }}
                                 </span>
                             @endif
                         </div>
-                        <div class="flex items-center justify-between text-sm text-[#6E6E73]">
-                            <span>{{ $batch->occupancy_percentage }}% Full</span>
-                            <span class="text-[#8E8E93]">{{ $batch->remaining_capacity }} free slot(s)</span>
-                        </div>
-                        <div class="w-full bg-[#E5E5EA] rounded-full h-1.5 overflow-hidden">
-                            <div class="h-1.5 rounded-full {{ $batch->occupancy_percentage >= 100 ? 'bg-[#780000]' : ($batch->occupancy_percentage > 70 ? 'bg-amber-600' : 'bg-emerald-600') }}" 
+                        <div class="w-full bg-[#E5E5EA] rounded-full h-2.5 overflow-hidden">
+                            <div class="h-2.5 rounded-full {{ $batch->occupancy_percentage >= 100 ? 'bg-[#780000]' : ($batch->occupancy_percentage > 70 ? 'bg-amber-600' : 'bg-emerald-600') }}" 
                                  style="width: {{ min(100, $batch->occupancy_percentage ?? 0) }}%"></div>
                         </div>
                     </div>

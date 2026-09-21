@@ -52,4 +52,10 @@ return [
         'benchmark_script' => env('ML_BENCHMARK_SCRIPT', base_path('../CapstoneProject_ML_SafetyMonitoring/src/models/benchmark_autogluon_timeseries.py')),
     ],
 
+    'ml_demand' => [
+        'retrain_script' => env('ML_DEMAND_RETRAIN_SCRIPT', base_path('../CapstoneProject_ML/retrain_pipeline.py')),
+        'working_dir' => env('ML_DEMAND_WORKING_DIR', base_path('../CapstoneProject_ML')),
+        'python_path' => env('PYTHON_PATH', 'python'),
+    ],
+
 ];

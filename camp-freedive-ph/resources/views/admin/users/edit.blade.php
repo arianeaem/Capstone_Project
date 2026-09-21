@@ -38,7 +38,7 @@
                        value="{{ old('name', $user->name) }}" 
                        required
                        placeholder="First & Last Name"
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 @error('name')
                     <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
                 @enderror
@@ -54,7 +54,7 @@
                        id="email" 
                        value="{{ old('email', $user->email) }}" 
                        required
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 @error('email')
                     <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
                 @enderror
@@ -70,7 +70,7 @@
                        id="phone" 
                        value="{{ old('phone', $user->phone) }}" 
                        placeholder="0917 123 4567"
-                       class="w-full px-3 py-2 rounded-lg border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 @error('phone')
                     <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
                 @enderror
@@ -82,7 +82,7 @@
                     <label for="role" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                         Assigned Role <span class="text-[#780000]">*</span>
                     </label>
-                    <select name="role" id="role" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
+                    <select name="role" id="role" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="coach" {{ old('role', $user->role) === 'coach' ? 'selected' : '' }}>Freediving Coach</option>
                         @if($currentUser->isOwner())
                             <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Camp Admin</option>
@@ -95,7 +95,7 @@
                     <label for="status" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
                         Account Status <span class="text-[#780000]">*</span>
                     </label>
-                    <select name="status" id="status" class="w-full px-2.5 py-2 rounded-lg border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
+                    <select name="status" id="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
                         <option value="active" {{ old('status', $user->status) === 'active' ? 'selected' : '' }}>Active</option>
                         <option value="inactive" {{ old('status', $user->status) === 'inactive' ? 'selected' : '' }}>Inactive / Deactivated</option>
                     </select>

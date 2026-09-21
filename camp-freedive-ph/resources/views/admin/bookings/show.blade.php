@@ -143,7 +143,7 @@
 
                 <div class="space-y-2.5 text-sm">
                     <div class="flex justify-between items-center gap-2">
-                        <span class="text-[#6E6E73]">Course Tuition ({{ $booking->participants->count() }} pax):</span>
+                        <span class="text-[#6E6E73]">Course Fee ({{ $booking->participants->count() }} pax):</span>
                         <strong class="text-[#1D1D1F]">₱{{ number_format($booking->subtotal, 2) }}</strong>
                     </div>
 

@@ -349,6 +349,8 @@ class WeatherForecastService
             return [
                 'batch' => $batch,
                 'overall_classification' => $overallClassification,
+                'evaluating_engine' => $batchML ? 'primary_ml' : 'open_meteo_physics_backup',
+                'evaluating_engine_label' => $batchML ? 'Primary AI Model' : 'Open-Meteo Marine Physics Backup',
                 'day1' => array_merge($day1Result, ['ml_assessment' => $day1ML]),
                 'day2' => array_merge($day2Result, ['ml_assessment' => $day2ML]),
                 'ml_assessment' => $batchML,

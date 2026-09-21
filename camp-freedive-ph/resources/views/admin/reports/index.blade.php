@@ -3,15 +3,12 @@
 @section('title', 'Reports & Analytics - Camp FreedivePH')
 
 @section('content')
-<div class="space-y-6" x-data="{ activeTab: '{{ $activeTab }}' }">
+<div class="space-y-6 text-sm" x-data="{ activeTab: '{{ $activeTab }}' }">
 
     <!-- Page Header with Title, Description, and Actions on Right -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-            <h1 class="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight">Reports & Analytics</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-0.5">
-                Comprehensive performance metrics, financial yield, operational capacity, and diver insights.
-            </p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Reports & Analytics</h1>
         </div>
 
         <!-- Right Side: Export CSV & Print Summary Buttons -->
@@ -45,7 +42,7 @@
 
                     <a href="{{ (auth()->user()->isOwner() ? route('owner.reports.export') : route('admin.reports.export')) . '?' . http_build_query(['type' => 'divers', 'preset' => $range['preset'], 'start_date' => $range['start']->format('Y-m-d'), 'end_date' => $range['end']->format('Y-m-d')]) }}" 
                        class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors">
-                        <span>Diver Roster</span>
+                        <span>Participant Roster</span>
                     </a>
                 </div>
             </div>

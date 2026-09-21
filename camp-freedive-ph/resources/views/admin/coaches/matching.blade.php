@@ -3,15 +3,23 @@
 @section('title', 'Batch Coach Assignment | Camp FreedivePH')
 
 @section('content')
-<div class="space-y-6 text-sm">
+<div class="space-y-6 text-sm" x-data="{ 
+    shareModalOpen: false, 
+    shareBatchId: null, 
+    shareBatchNumber: '', 
+    shareActionUrl: '',
+    unassignModalOpen: false,
+    unassignBatchId: null,
+    unassignCoachId: null,
+    unassignCoachName: '',
+    unassignBatchNumber: '',
+    unassignActionUrl: ''
+}">
     
     <!-- Top Header & Navigation -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Batch Coach Assignment</h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
-                Assign certified coaches to upcoming batches based on availability. Student groupings are organized on-site at camp.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
@@ -61,9 +69,9 @@
                                     <div>Participants: <strong class="text-[#1D1D1F]">{{ $totalPax }}</strong></div>
                                     <div>
                                         @if($totalPax > 0)
-                                            <span>Recommended: <strong class="text-[#780000]">{{ $neededCoaches }} {{ Str::plural('coach', $neededCoaches) }}</strong></span>
+                                            Required: <strong class="text-[#1D1D1F]">{{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }} (1:4 ratio)</strong>
                                         @else
-                                            <span class="text-[#8E8E93] italic font-medium">0 Coaches Needed (No Participants)</span>
+                                            Required: <span class="text-[#8E8E93]">No participants</span>
                                         @endif
                                     </div>
                                 </div>
@@ -89,15 +97,11 @@
                                     Shared
                                 </span>
                             @elseif($totalPax > 0)
-                                <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.broadcast') : route('admin.coaches.matching.broadcast') }}" method="POST" class="inline-block">
-                                    @csrf
-                                    <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-                                    <button type="submit" 
-                                            onclick="return confirm('Share an open coaching slot for {{ $batch->batch_number }} to all coaches in the portal?')"
-                                            class="btn-secondary px-3 py-1.5 text-sm font-semibold whitespace-nowrap">
-                                        <span>Share to Coaches</span>
-                                    </button>
-                                </form>
+                                <button type="button" 
+                                        @click="shareBatchId = {{ $batch->id }}; shareBatchNumber = '{{ addslashes($batch->batch_number) }}'; shareActionUrl = '{{ auth()->user()->isOwner() ? route('owner.coaches.matching.broadcast') : route('admin.coaches.matching.broadcast') }}'; shareModalOpen = true"
+                                        class="btn-secondary px-3 py-1.5 text-sm font-semibold whitespace-nowrap cursor-pointer">
+                                    <span>Share to Coaches</span>
+                                </button>
                             @endif
                         </div>
                     </div>
@@ -126,16 +130,11 @@
                                             <span class="font-bold text-sm text-[#1D1D1F] truncate">{{ $assignedCoach->name }}</span>
                                         </div>
 
-                                        <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.unassign') : route('admin.coaches.matching.unassign') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-                                            <input type="hidden" name="coach_id" value="{{ $assignedCoach->id }}">
-                                            <button type="submit" 
-                                                    onclick="return confirm('Remove Coach {{ $assignedCoach->name }} from {{ $batch->batch_number }}?')"
-                                                    class="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-1.5 py-0.5 rounded transition-colors shrink-0">
-                                                Remove
-                                            </button>
-                                        </form>
+                                        <button type="button" 
+                                                @click="unassignBatchId = {{ $batch->id }}; unassignCoachId = {{ $assignedCoach->id }}; unassignCoachName = '{{ addslashes($assignedCoach->name) }}'; unassignBatchNumber = '{{ addslashes($batch->batch_number) }}'; unassignActionUrl = '{{ auth()->user()->isOwner() ? route('owner.coaches.matching.unassign') : route('admin.coaches.matching.unassign') }}'; unassignModalOpen = true"
+                                                class="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-1.5 py-0.5 rounded transition-colors shrink-0 cursor-pointer">
+                                            Remove
+                                        </button>
                                     </div>
                                 @endforeach
                             </div>
@@ -198,6 +197,61 @@
             <p class="text-sm text-[#6E6E73]">When new batches are created, you can assign coaches to them here.</p>
         </div>
     @endif
+
+    <!-- Share to Coaches Modal -->
+    <div x-show="shareModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="shareModalOpen = false">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-[#1D1D1F]">Share to Coach Portal</h3>
+                <button type="button" @click="shareModalOpen = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F] cursor-pointer" aria-label="Close modal">✕</button>
+            </div>
+            <p class="text-sm text-[#6E6E73] leading-relaxed">
+                Broadcast an open coaching slot for <strong class="text-[#780000] font-bold" x-text="shareBatchNumber"></strong> to all certified coaches in the Coach Portal. Coaches will be notified and can volunteer directly from their dashboard.
+            </p>
+
+            <form :action="shareActionUrl" method="POST" class="space-y-4 pt-1">
+                @csrf
+                <input type="hidden" name="batch_id" :value="shareBatchId">
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                    <button type="button" @click="shareModalOpen = false" class="btn-secondary px-4 py-2 text-sm font-semibold rounded-xl cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn-primary px-5 py-2 text-sm font-bold rounded-xl shadow-2xs cursor-pointer">
+                        Confirm &amp; Share
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Unassign Coach Modal -->
+    <div x-show="unassignModalOpen" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-[#E5E5EA]" @click.outside="unassignModalOpen = false">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-[#1D1D1F]">Remove Coach Assignment</h3>
+                <button type="button" @click="unassignModalOpen = false" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F] cursor-pointer" aria-label="Close modal">✕</button>
+            </div>
+            <p class="text-sm text-[#6E6E73] leading-relaxed">
+                Are you sure you want to remove <strong class="text-[#1D1D1F]" x-text="'Coach ' + unassignCoachName"></strong> from <strong class="text-[#780000]" x-text="unassignBatchNumber"></strong>?
+            </p>
+
+            <form :action="unassignActionUrl" method="POST" class="space-y-4 pt-1">
+                @csrf
+                <input type="hidden" name="batch_id" :value="unassignBatchId">
+                <input type="hidden" name="coach_id" :value="unassignCoachId">
+
+                <div class="flex items-center justify-end gap-2 pt-3 border-t border-[#E5E5EA]">
+                    <button type="button" @click="unassignModalOpen = false" class="btn-secondary px-4 py-2 text-sm font-semibold rounded-xl cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-5 py-2 text-sm font-bold rounded-xl bg-rose-600 hover:bg-rose-700 text-white shadow-2xs cursor-pointer transition-colors">
+                        Remove Coach
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 </div>
 @endsection

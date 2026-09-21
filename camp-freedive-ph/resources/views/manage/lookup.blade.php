@@ -35,7 +35,7 @@
                        aria-invalid="{{ $errors->has('booking_number') ? 'true' : 'false' }}"
                        @if($errors->has('booking_number')) aria-describedby="err-booking-number" @endif
                        required
-                       class="w-full px-4 py-3 rounded-xl border text-sm font-mono uppercase tracking-wider text-[#1D1D1F] bg-white transition-colors {{ $errors->has('booking_number') ? 'border-[#D70015] bg-red-50/10 focus:border-[#D70015] focus:ring-2 focus:ring-[#D70015]/20' : 'border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20' }}">
+                        class="w-full px-4 py-3 rounded-xl border text-sm font-mono uppercase tracking-wider text-[#1D1D1F] bg-white transition-colors {{ $errors->has('booking_number') ? 'border-[#D70015] bg-red-50/10 focus:border-[#D70015]' : 'border-[#D1D1D6] focus:border-[#780000]' }}">
                 @error('booking_number')
                 <span id="err-booking-number" class="text-xs text-[#D70015] font-semibold mt-1.5 block">
                     {{ $message }}
@@ -60,7 +60,7 @@
                        aria-invalid="{{ $errors->has('pin') ? 'true' : 'false' }}"
                        aria-describedby="{{ $errors->has('pin') ? 'err-pin' : 'pin-helper' }}"
                        required
-                       class="w-full px-4 py-3 rounded-xl border text-sm font-mono tracking-widest text-[#1D1D1F] bg-white transition-colors {{ $errors->has('pin') ? 'border-[#D70015] bg-red-50/10 focus:border-[#D70015] focus:ring-2 focus:ring-[#D70015]/20' : 'border-[#D1D1D6] focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20' }}">
+                       class="w-full px-4 py-3 rounded-xl border text-sm font-mono tracking-widest text-[#1D1D1F] bg-white transition-colors {{ $errors->has('pin') ? 'border-[#D70015] bg-red-50/10 focus:border-[#D70015]' : 'border-[#D1D1D6] focus:border-[#780000]' }}">
                 @error('pin')
                 <span id="err-pin" class="text-xs text-[#D70015] font-semibold mt-1.5 block">
                     {{ $message }}

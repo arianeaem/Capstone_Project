@@ -174,7 +174,7 @@
                     <tr>
                         <th class="p-4 pl-6">Batch / Dates</th>
                         <th class="p-4">Class Package</th>
-                        <th class="p-4 text-center">Divers Booked</th>
+                        <th class="p-4 text-center">Participants Booked</th>
                         <th class="p-4 min-w-[150px]">Occupancy Rate</th>
                         <th class="p-4 min-w-[200px]">Assigned Coaches</th>
                         <th class="p-4 text-center">Coach Staffing</th>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-[#F2F2F7]">
+<html lang="en" class="h-full bg-[#F8F9FA]">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
@@ -17,7 +17,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @stack('styles')
 </head>
-<body class="h-full text-[#1D1D1F] antialiased text-sm overflow-x-hidden min-w-[320px] bg-[#F2F2F7]"
+<body class="h-full text-[#1D1D1F] antialiased text-sm overflow-x-hidden min-w-[320px] bg-[#F8F9FA]"
       x-data="{ 
           sidebarCollapsed: localStorage.getItem('sidebar_collapsed') === 'true',
           mobileMenuOpen: false,
@@ -366,7 +366,7 @@
                             aria-label="User account settings and menu">
                         
                         <!-- User Avatar -->
-                        <div class="w-8 h-8 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-sm shrink-0 group-hover:ring-[#780000]/30 transition-all">
+                        <div class="w-9 h-9 rounded-full bg-[#F8EAEA] text-[#780000] flex items-center justify-center font-bold text-sm shrink-0 transition-all">
                             {{ $userInitials }}
                         </div>
                     </button>
@@ -380,7 +380,7 @@
                          x-transition:leave="transition ease-in duration-100 transform"
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
-                         class="absolute right-0 mt-2 w-64 bg-white rounded-xl border border-[#E5E5EA] shadow-xl p-3 z-50 space-y-3">
+                         class="absolute right-0 mt-2 w-64 bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-3.5 z-50 space-y-3">
                         
                         <!-- User Information -->
                         <div class="flex items-center gap-3 pb-3 border-b border-[#E5E5EA]">
