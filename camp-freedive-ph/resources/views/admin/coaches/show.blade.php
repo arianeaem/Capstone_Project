@@ -2,6 +2,12 @@
 
 @section('title', $coach->name . ' - Coach Detail | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('coaches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Coaches &amp; Schedules</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">{{ $coach->name }}</span>
+@endsection
+
 @section('content')
 <div class="space-y-6 text-sm" x-data="{ 
     openReassignModal: false, 
@@ -9,18 +15,9 @@
     selectedParticipantName: '' 
 }">
     
-    <!-- Top Breadcrumb & Coach Overview Banner Header -->
+    <!-- Top Coach Overview Banner Header -->
     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div class="space-y-1.5 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap text-sm">
-                <a href="{{ route('admin.coaches.index') }}" class="text-[#6E6E73] hover:text-[#1D1D1F] inline-flex items-center gap-1.5 font-medium transition-colors">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Back to Coach Roster</span>
-                </a>
-                <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000]">Coach Profile Overview</span>
-            </div>
-
             <!-- Coach Overview Heading & Details -->
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">{{ $coach->name }}</h1>

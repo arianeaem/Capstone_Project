@@ -2,20 +2,18 @@
 
 @section('title', 'Review Coach Requests | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('coaches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Coaches &amp; Schedules</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Coach Requests</span>
+@endsection
+
 @section('content')
 <div class="space-y-6 text-sm">
     
     <!-- Top Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.coaches.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Coach Roster</span>
-                </a>
-                <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000] text-sm">Coach Requests Queue</span>
-            </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Review Coach Requests</h1>
         </div>
 
@@ -78,7 +76,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
                 @foreach($groupRequests as $req)
                 <label class="bg-[#F2F2F7] p-4 rounded-xl flex flex-col justify-between gap-2.5 shadow-2xs hover:bg-white hover:border-[#D1D1D6] border border-[#E5E5EA] transition-all cursor-pointer select-none"
-                       :class="selectedRequests.includes({{ $req->id }}) ? 'border-[#780000] bg-white ring-1 ring-[#780000]/30' : ''">
+                       :class="selectedRequests.includes({{ $req->id }}) ? 'border-[#780000] bg-white' : ''">
                     <div class="space-y-2.5">
                         <div class="flex items-center gap-3">
                             <input type="checkbox" 

@@ -2,6 +2,12 @@
 
 @section('title', 'Add Pricing Rule | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('pricing.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Dynamic Pricing</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Create Rule</span>
+@endsection
+
 @section('content')
 <div class="max-w-3xl mx-auto space-y-6 text-sm"
      x-data="{
@@ -39,14 +45,6 @@
     <!-- Top Navigation Header -->
     <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-5">
         <div>
-            <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.pricing.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Dynamic Pricing</span>
-                </a>
-                <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000] text-sm">Rule Builder</span>
-            </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Pricing Rule</h1>
         </div>
 
@@ -121,21 +119,21 @@
                 <label class="block text-sm font-bold text-[#1D1D1F] mb-2">Rule Type <span class="text-[#780000]">*</span></label>
                 <div class="grid grid-cols-3 gap-3">
                     <label class="p-3 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1"
-                           :class="rule_type === 'seasonality' ? 'border-[#780000] bg-[#F8EAEA]/50 text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7]'">
+                           :class="rule_type === 'seasonality' ? 'border-[#780000] bg-white text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7]'">
                         <input type="radio" name="rule_type" value="seasonality" x-model="rule_type" @change="condition_value = 'peak'" class="sr-only">
                         <span class="font-extrabold text-sm">Seasonality</span>
                         <span class="text-sm opacity-75">Peak, Shoulder, Off-Peak</span>
                     </label>
 
                     <label class="p-3 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1"
-                           :class="rule_type === 'demand' ? 'border-[#780000] bg-[#F8EAEA]/50 text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7]'">
+                           :class="rule_type === 'demand' ? 'border-[#780000] bg-white text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7]'">
                         <input type="radio" name="rule_type" value="demand" x-model="rule_type" @change="condition_value = 'high'" class="sr-only">
                         <span class="font-extrabold text-sm">Demand Level</span>
                         <span class="text-sm opacity-75">Live Booking Occupancy</span>
                     </label>
 
                     <label class="p-3 rounded-xl border text-center cursor-pointer transition-all flex flex-col items-center gap-1"
-                           :class="rule_type === 'lead_time' ? 'border-[#780000] bg-[#F8EAEA]/50 text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7]'">
+                           :class="rule_type === 'lead_time' ? 'border-[#780000] bg-white text-[#780000]' : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:bg-[#F2F2F7]'">
                         <input type="radio" name="rule_type" value="lead_time" x-model="rule_type" @change="condition_value = '3'; condition_operator = '<='" class="sr-only">
                         <span class="font-extrabold text-sm">Lead Time</span>
                         <span class="text-sm opacity-75">Days Before Dive Date</span>

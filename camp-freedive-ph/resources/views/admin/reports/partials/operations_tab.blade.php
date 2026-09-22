@@ -11,52 +11,68 @@
             
             <!-- Average Occupancy -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Average Occupancy</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Average Occupancy</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     {{ $op['avg_occupancy'] ?? 0 }}%
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $op['total_booked_pax'] ?? 0 }} of {{ $op['total_capacity_slots'] ?? 0 }} slots</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-bold text-[#780000] bg-[#F8EAEA] border border-[#F1D5D5] shrink-0">{{ $op['total_batches'] ?? 0 }} batches</span>
+                    <span class="px-1.5 py-0.5 rounded text-xs font-bold text-[#6E6E73] bg-[#F2F2F7] shrink-0">{{ $op['total_batches'] ?? 0 }} batches</span>
                 </div>
             </div>
 
             <!-- Weekend vs Weekday Utilization -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Weekend vs Weekday</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Weekend vs Weekday</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
-                    {{ $op['weekend_occupancy'] ?? 0 }}% <span class="text-sm font-semibold text-[#8E8E93]">Weekend</span>
+                    {{ $op['weekend_occupancy'] ?? 0 }}% <span class="text-xs sm:text-sm font-semibold text-[#8E8E93]">weekend</span>
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Weekday Avg: {{ $op['weekday_occupancy'] ?? 0 }}%</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-semibold text-emerald-700 bg-emerald-50 shrink-0">Peak Demand</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>Weekday avg: {{ $op['weekday_occupancy'] ?? 0 }}%</span>
+                    @php
+                        $diff = ($op['weekend_occupancy'] ?? 0) - ($op['weekday_occupancy'] ?? 0);
+                    @endphp
+                    @if($diff > 0)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 shrink-0">+{{ round($diff, 1) }}% Weekend Surge</span>
+                    @elseif($diff < 0)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-sky-700 bg-sky-50 border border-sky-200 shrink-0">Weekday Heavy</span>
+                    @else
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-[#6E6E73] bg-[#F2F2F7] shrink-0">Balanced</span>
+                    @endif
                 </div>
             </div>
 
             <!-- Staffing Fulfillment -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Staffing Fulfillment</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Staffing Fulfillment</span>
                 <div class="text-xl sm:text-2xl font-extrabold mt-0.5 break-words {{ ($op['safety_compliance_rate'] ?? 100) >= 95 ? 'text-emerald-700' : 'text-amber-600' }}">
                     {{ $op['safety_compliance_rate'] ?? 100 }}%
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $op['compliant_batches_count'] ?? 0 }} of {{ $op['total_batches'] ?? 0 }} batches</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-semibold text-emerald-700 bg-emerald-50 shrink-0">Staffed</span>
+                    @php
+                        $unstaffed = ($op['total_batches'] ?? 0) - ($op['compliant_batches_count'] ?? 0);
+                    @endphp
+                    @if($unstaffed <= 0)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Staffed</span>
+                    @else
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 shrink-0">{{ $unstaffed }} Unstaffed</span>
+                    @endif
                 </div>
             </div>
 
             <!-- Coach Roster Output -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Coach Roster Output</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Coach Roster Output</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#00C3D0] mt-0.5 break-words">
-                    {{ $co['total_assignments_period'] ?? 0 }} <span class="text-sm font-semibold text-[#8E8E93]">shifts</span>
+                    {{ $co['total_assignments_period'] ?? 0 }} <span class="text-xs sm:text-sm font-semibold text-[#8E8E93]">shifts</span>
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $co['total_active_coaches'] ?? 0 }} active coaches</span>
-                    <span class="text-sm font-semibold text-[#6E6E73] shrink-0">{{ ($co['total_assignments_period'] ?? 0) * 2 }} dive days</span>
+                    <span class="px-1.5 py-0.5 rounded text-xs font-bold text-[#00C3D0] bg-[#E0F7FA] shrink-0">{{ ($co['total_assignments_period'] ?? 0) * 2 }} dive days</span>
                 </div>
             </div>
 

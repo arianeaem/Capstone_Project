@@ -2,21 +2,19 @@
 
 @section('title', 'Batch Schedules & Coach Assignments | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('coaches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Coaches &amp; Schedules</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Batch Schedules</span>
+@endsection
+
 @section('content')
 <div class="space-y-6 text-sm" x-data="{ openBatchModal: false, selectedBatchId: null, openAssignModal: false, assignBatchCode: '', assignBatchDate: '' }">
     
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('admin.coaches.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Back to Coach Roster</span>
-                </a>
-                <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000]">Batch Schedules</span>
-            </div>
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">2D1N Batch Schedules & Coach Assignments</h1>
+            <h1 class="text-2xl font-extrabold text-[#1D1D1F]">2D1N Batch Schedules & Coach Assignments</h1>
             <p class="text-sm sm:text-sm text-[#6E6E73] mt-1">
                 Assign certified coaches to 2D1N dive schedules. Student capacity computes automatically as <strong>4 pax per coach</strong>.
             </p>

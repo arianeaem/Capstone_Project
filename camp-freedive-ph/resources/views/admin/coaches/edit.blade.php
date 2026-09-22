@@ -2,17 +2,21 @@
 
 @section('title', 'Edit Coach - ' . $coach->full_name . ' | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('coaches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Coaches &amp; Schedules</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <a href="{{ portal_route('coaches.show', $coach) }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">{{ $coach->full_name ?? $coach->name }}</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Edit Profile</span>
+@endsection
+
 @section('content')
 <div class="max-w-3xl mx-auto space-y-6 text-sm">
     
-    <!-- Top Breadcrumb & Header -->
-    <div class="flex items-center justify-between pb-4">
+    <!-- Top Header -->
+    <div class="flex items-center justify-between pb-2">
         <div>
-            <a href="{{ route('admin.coaches.show', $coach) }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back to {{ $coach->full_name }} Profile</span>
-            </a>
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Edit Coach Profile</h1>
+            <h1 class="text-2xl font-extrabold text-[#1D1D1F]">Edit Coach Profile</h1>
         </div>
     </div>
 

@@ -2,6 +2,12 @@
 
 @section('title', 'Manual Reservation Entry | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('bookings.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Bookings</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">New Booking</span>
+@endsection
+
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6 text-sm" 
      x-data="adminBookingCreate({
@@ -11,14 +17,10 @@
      })"
      x-init="initForm()">
     
-    <!-- Top Breadcrumb & Header -->
+    <!-- Top Header -->
     <div class="flex items-center justify-between pb-4">
         <div>
-            <a href="{{ route('admin.bookings.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back to Bookings</span>
-            </a>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Add Manual Reservation</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Add Manual Reservation</h1>
         </div>
     </div>
 

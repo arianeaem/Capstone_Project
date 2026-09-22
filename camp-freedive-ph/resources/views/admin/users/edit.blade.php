@@ -2,17 +2,14 @@
 
 @section('title', 'Edit Profile: ' . $user->name . ' | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('users.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">User Management</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Edit Staff Profile</span>
+@endsection
+
 @section('content')
 <div class="max-w-2xl mx-auto space-y-6 text-sm">
-    
-    <!-- Top Breadcrumb & Header -->
-    <div class="flex items-center justify-between">
-        <a href="{{ route('admin.users.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
-            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-            <span>Back to User Management</span>
-        </a>
-        <span class="text-sm text-[#8E8E93]">Admin/Owner Managed Profile</span>
-    </div>
 
     <!-- Edit User Profile Form -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-7 shadow-2xs space-y-5">

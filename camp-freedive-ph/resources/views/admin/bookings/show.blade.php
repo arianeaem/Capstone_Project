@@ -2,21 +2,18 @@
 
 @section('title', $booking->formatted_class_type . ' #' . $booking->booking_number . ' | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('bookings.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Bookings</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">{{ $booking->booking_number }}</span>
+@endsection
+
 @section('content')
 <div class="space-y-6 text-sm" x-data="{ openStatusModal: false }">
     
-    <!-- Top Breadcrumb & Booking Overview Banner Header -->
+    <!-- Top Header & Booking Overview Banner Header -->
     <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div class="space-y-1.5 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap text-sm">
-                <a href="{{ route('admin.bookings.index') }}" class="text-[#6E6E73] hover:text-[#1D1D1F] inline-flex items-center gap-1.5 font-medium transition-colors">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Back to All Bookings</span>
-                </a>
-                <span class="text-[#D1D1D6]">/</span>
-                <span class="font-mono font-bold text-[#780000]">{{ $booking->booking_number }}</span>
-            </div>
-
             <!-- Booking Overview Heading -->
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">{{ $booking->formatted_class_type }}</h1>

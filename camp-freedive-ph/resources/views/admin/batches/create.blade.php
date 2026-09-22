@@ -2,17 +2,19 @@
 
 @section('title', 'Create 2D1N Batch | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('batches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Batches</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Create Batch Schedule</span>
+@endsection
+
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6 text-sm" x-data="batchCreateForm()">
     
-    <!-- Top Breadcrumb & Header -->
+    <!-- Top Header -->
     <div class="flex items-center justify-between pb-4">
         <div>
-            <a href="{{ route('admin.batches.index') }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back to Batches</span>
-            </a>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Create Batch Schedule</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Batch Schedule</h1>
         </div>
     </div>
 

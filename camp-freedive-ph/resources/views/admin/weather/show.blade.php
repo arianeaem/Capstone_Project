@@ -2,6 +2,12 @@
 
 @section('title', $batch->display_name . ' - Weather Risk Assessment | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('weather.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Safety Monitoring</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">{{ $batch->batch_number }}</span>
+@endsection
+
 @section('content')
 <div class="space-y-6 text-sm" x-data="{
     openOverrideModal: false,
@@ -12,23 +18,16 @@
     <!-- Top Header Bar -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-            <!-- Breadcrumbs -->
-            <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.weather.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Weather &amp; Safety Roster</span>
-                </a>
+            <div class="flex items-center gap-2">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">
+                    {{ $batch->batch_number }}
+                </h1>
                 @if($batch->status === 'cancelled_by_camp')
-                    <span class="text-[#D1D1D6]">/</span>
                     <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
                         Cancelled by Camp
                     </span>
                 @endif
             </div>
-
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">
-                {{ $batch->batch_number }}
-            </h1>
             
             <div class="mt-1 text-sm text-[#6E6E73] space-y-1">
                 <div class="flex items-center gap-1 font-medium text-[#1D1D1F]">

@@ -2,20 +2,20 @@
 
 @section('title', 'Bookings Triggered by ' . $rule->name . ' | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('pricing.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Dynamic Pricing</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <a href="{{ portal_route('pricing.edit', $rule) }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">{{ $rule->name }}</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Triggered History</span>
+@endsection
+
 @section('content')
 <div class="space-y-6 text-sm">
 
-    <!-- Top Header & Breadcrumb -->
+    <!-- Top Header & Details -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-            <div class="flex items-center gap-2 mb-1.5">
-                <a href="{{ route('admin.pricing.index') }}" class="text-sm font-semibold text-[#6E6E73] hover:text-[#780000] transition-colors flex items-center gap-1.5">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Dynamic Pricing</span>
-                </a>
-                <span class="text-[#D1D1D6]">/</span>
-                <span class="font-bold text-[#780000] text-sm">Triggered Bookings Audit</span>
-            </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">
                 {{ $rule->name }}
             </h1>
@@ -33,13 +33,12 @@
         </div>
 
         <div class="flex items-center gap-2.5">
-            <a href="{{ route('admin.pricing.edit', $rule) }}" class="btn-primary px-4 py-2 text-sm font-bold shadow-2xs flex items-center gap-2">
+            <a href="{{ portal_route('pricing.edit', $rule) }}" class="btn-primary px-4 py-2 text-sm font-bold shadow-2xs flex items-center gap-2">
                 <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-5 h-5 object-contain inline-block shrink-0 brightness-0 invert">
                 <span>Edit Rule</span>
             </a>
-            <a href="{{ route('admin.pricing.index') }}" class="btn-secondary px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                <span>Back to Rules</span>
+            <a href="{{ portal_route('pricing.index') }}" class="btn-secondary px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5">
+                <span>View All Rules</span>
             </a>
         </div>
     </div>

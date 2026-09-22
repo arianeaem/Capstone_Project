@@ -2,6 +2,14 @@
 
 @section('title', 'Edit Booking #' . $booking->booking_number . ' | Camp FreedivePH')
 
+@section('breadcrumb')
+    <a href="{{ portal_route('bookings.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Bookings</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <a href="{{ portal_route('bookings.show', $booking) }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">{{ $booking->booking_number }}</a>
+    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Edit</span>
+@endsection
+
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6 text-sm"
      x-data="{
@@ -15,16 +23,10 @@
          pickupPoints: {{ json_encode($pickupPoints) }}
      }">
     
-    <!-- Top Breadcrumb -->
+    <!-- Top Header -->
     <div class="flex items-center justify-between pb-4">
         <div>
-            <div class="flex items-center gap-2">
-                <a href="{{ route('admin.bookings.show', $booking) }}" class="text-sm text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1.5 font-medium">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                    <span>Back to Booking #{{ $booking->booking_number }}</span>
-                </a>
-            </div>
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Edit Booking & Participant Details</h1>
+            <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Edit Booking &amp; Participant Details</h1>
         </div>
     </div>
 

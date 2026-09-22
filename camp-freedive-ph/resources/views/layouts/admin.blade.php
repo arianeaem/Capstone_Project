@@ -45,7 +45,7 @@
         str_starts_with($routeName, 'admin.batches') || str_starts_with($routeName, 'owner.batches') => 'Batches',
         str_starts_with($routeName, 'admin.weather') || str_starts_with($routeName, 'owner.weather') => 'Safety Monitoring',
         str_starts_with($routeName, 'admin.pricing') || str_starts_with($routeName, 'owner.pricing') => 'Dynamic Pricing',
-        str_starts_with($routeName, 'admin.payments') || str_starts_with($routeName, 'owner.payments') => 'Payments',
+        str_starts_with($routeName, 'admin.payments') || str_starts_with($routeName, 'owner.payments') => 'Payments & Refunds',
         str_starts_with($routeName, 'admin.coaches') || str_starts_with($routeName, 'owner.coaches') => 'Coaches & Schedules',
         str_starts_with($routeName, 'admin.reports') || str_starts_with($routeName, 'owner.reports') => 'Reports & Analytics',
         str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'owner.users') => 'User Management',
@@ -348,7 +348,7 @@
                     <div class="h-4 w-px bg-[#D1D1D6]"></div>
 
                     <!-- Breadcrumbs -->
-                    <div id="header-breadcrumbs" class="flex items-center gap-1.5 text-sm">
+                    <div id="header-breadcrumbs" class="flex items-center gap-1.5 text-xs sm:text-sm text-[#6E6E73] min-w-0">
                         @if(View::hasSection('breadcrumb'))
                             @yield('breadcrumb')
                         @else

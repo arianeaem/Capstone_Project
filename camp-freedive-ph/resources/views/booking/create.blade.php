@@ -38,7 +38,16 @@
                 <template x-for="(label, index) in shortStepTitles" :key="index">
                     <div class="flex items-center">
                         <!-- Step Item -->
-                        <div class="flex items-center gap-2">
+                        <button type="button"
+                                @click="goToStep(index + 1)"
+                                :disabled="currentStep <= (index + 1) || currentStep === 5"
+                                :aria-current="currentStep === (index + 1) ? 'step' : null"
+                                :aria-label="currentStep > (index + 1) ? ('Return to step ' + (index + 1) + ': ' + label) : ((index + 1) + '. ' + label)"
+                                class="flex items-center gap-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 rounded-full py-1 px-1.5 transition-all"
+                                :class="{
+                                    'cursor-pointer hover:opacity-80 active:scale-95': currentStep > (index + 1) && currentStep !== 5,
+                                    'cursor-default': currentStep <= (index + 1) || currentStep === 5
+                                }">
                             <!-- Circle Number -->
                             <span class="w-6 h-6 lg:w-7 lg:h-7 rounded-full flex items-center justify-center text-xs font-black transition-all duration-200 shrink-0"
                                   :class="{
@@ -62,7 +71,7 @@
                                   }"
                                   x-text="label">
                             </span>
-                        </div>
+                        </button>
 
                         <!-- Connecting Line (if not last step) -->
                         <div x-show="index < 4" class="w-3 lg:w-6 h-[1.5px] mx-1 lg:mx-2 transition-colors duration-200"
@@ -75,20 +84,31 @@
             <nav aria-label="Booking Progress" class="flex md:hidden items-center gap-1 shrink-0">
                 <template x-for="stepNum in [1, 2, 3, 4, 5]" :key="stepNum">
                     <div class="flex items-center">
-                        <!-- Circle Number -->
-                        <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-black transition-all duration-200 shrink-0"
-                              :class="{
-                                  'bg-[#780000] text-white shadow-xs scale-105': currentStep === stepNum,
-                                  'bg-[#780000]/15 text-[#780000] font-bold': currentStep > stepNum,
-                                  'bg-[#F2F2F7] text-[#8E8E93]': currentStep < stepNum
-                              }">
-                            <template x-if="currentStep > stepNum">
-                                <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
-                            </template>
-                            <template x-if="currentStep <= stepNum">
-                                <span x-text="stepNum"></span>
-                            </template>
-                        </span>
+                        <!-- Circle Number / Step Button -->
+                        <button type="button"
+                                @click="goToStep(stepNum)"
+                                :disabled="currentStep <= stepNum || currentStep === 5"
+                                :aria-current="currentStep === stepNum ? 'step' : null"
+                                :aria-label="currentStep > stepNum ? ('Return to step ' + stepNum + ': ' + shortStepTitles[stepNum - 1]) : ('Step ' + stepNum + ': ' + shortStepTitles[stepNum - 1])"
+                                class="p-1 min-w-[32px] min-h-[32px] flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] transition-all"
+                                :class="{
+                                    'cursor-pointer active:scale-90': currentStep > stepNum && currentStep !== 5,
+                                    'cursor-default': currentStep <= stepNum || currentStep === 5
+                                }">
+                            <span class="w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-black transition-all duration-200 shrink-0"
+                                  :class="{
+                                      'bg-[#780000] text-white shadow-xs scale-105': currentStep === stepNum,
+                                      'bg-[#780000]/15 text-[#780000] font-bold': currentStep > stepNum,
+                                      'bg-[#F2F2F7] text-[#8E8E93]': currentStep < stepNum
+                                  }">
+                                <template x-if="currentStep > stepNum">
+                                    <svg class="w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                                </template>
+                                <template x-if="currentStep <= stepNum">
+                                    <span x-text="stepNum"></span>
+                                </template>
+                            </span>
+                        </button>
 
                         <!-- Connecting Line -->
                         <div x-show="stepNum < 5" class="w-2 sm:w-3 h-[1.5px] mx-0.5 sm:mx-1 transition-colors duration-200"
@@ -114,23 +134,23 @@
         </div>
 
         <!-- Error Alert Banner -->
-        <div x-show="errorMessage" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#FEF2F2] text-[#991B1B] text-sm flex items-start justify-between gap-3 shadow-2xs">
-            <div class="flex items-center gap-2">
+        <div x-show="errorMessage" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#FEF2F2] text-[#991B1B] text-sm flex items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-2 min-w-0">
                 <span x-text="errorMessage"></span>
             </div>
-            <button @click="errorMessage = ''" aria-label="Dismiss error message" class="text-[#991B1B] font-bold text-sm">✕</button>
+            <button type="button" @click="errorMessage = ''" aria-label="Dismiss error message" class="w-11 h-11 -mr-2 -my-2 flex items-center justify-center text-[#991B1B] hover:bg-[#991B1B]/10 rounded-lg font-bold text-base transition-colors shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#991B1B]">✕</button>
         </div>
 
         <!-- Draft Restored Notification Banner -->
         <div x-show="draftRestored" x-cloak class="mb-6 p-3.5 sm:p-4 rounded-xl bg-[#F0FDF4] text-[#166534] text-sm flex items-center justify-between gap-3 shadow-2xs">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 min-w-0">
                 <span>Your saved booking progress has been automatically restored.</span>
             </div>
-            <div class="flex items-center gap-3 shrink-0">
-                <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-sm">
+            <div class="flex items-center gap-1 shrink-0 -mr-2">
+                <button type="button" @click="resetForm()" class="font-bold underline text-[#15803D] hover:text-[#166534] text-sm min-h-[44px] px-3 inline-flex items-center justify-center rounded-lg cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#15803D]">
                     Clear
                 </button>
-                <button type="button" @click="draftRestored = false" aria-label="Dismiss restored draft notification" class="text-[#166534] font-bold text-sm">✕</button>
+                <button type="button" @click="draftRestored = false" aria-label="Dismiss restored draft notification" class="w-11 h-11 flex items-center justify-center text-[#166534] hover:bg-[#166534]/10 rounded-lg font-bold text-base transition-colors shrink-0 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#166534]">✕</button>
             </div>
         </div>
 
@@ -165,7 +185,7 @@
                 </div>
 
                 <!-- 3 Packages Grid (items-start prevents other cards from extending on accordion toggle) -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start" role="radiogroup" aria-label="Freediving Packages">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
                     
                     <!-- 1. Discovery Package Card -->
                     <div id="package-discovery"
@@ -212,7 +232,7 @@
 
                             <button type="button"
                                     @click.stop="openDetails = !openDetails"
-                                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] py-2 px-1.5 transition-colors cursor-pointer shrink-0"
+                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                     :aria-expanded="openDetails"
                                     aria-controls="discovery-details"
                                     title="Toggle offer details">
@@ -278,7 +298,6 @@
                         <!-- Exclusions -->
                         <div class="pt-3 border-t border-[#E5E5EA]">
                             <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73] mb-2 flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#8E8E93]"></span>
                                 <span>Exclusions</span>
                             </h4>
                             <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
@@ -336,7 +355,7 @@
                                         @click.stop="form.class_type = 'fundive'; form.is_certified_diver = true; onFundiveOptionChanged()"
                                         class="w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer"
                                         :class="(form.is_certified_diver) 
-                                            ? 'border-[#780000] bg-white ring-1 ring-[#780000]' 
+                                            ? 'border-[#780000] bg-white' 
                                             : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6] hover:bg-[#FAFAFA]'">
                                     <div class="min-w-0">
                                         <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block truncate">Certified Diver</span>
@@ -352,7 +371,7 @@
                                         @click.stop="form.class_type = 'fundive'; form.is_certified_diver = false; onFundiveOptionChanged()"
                                         class="w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer"
                                         :class="(!form.is_certified_diver) 
-                                            ? 'border-[#780000] bg-white ring-1 ring-[#780000]' 
+                                            ? 'border-[#780000] bg-white' 
                                             : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6] hover:bg-[#FAFAFA]'">
                                     <div class="min-w-0">
                                         <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block truncate">Non-Certified Diver</span>
@@ -375,7 +394,7 @@
 
                             <button type="button"
                                     @click.stop="openDetails = !openDetails"
-                                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] py-2 px-1.5 transition-colors cursor-pointer shrink-0"
+                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                     :aria-expanded="openDetails"
                                     aria-controls="fundive-details"
                                     title="Toggle offer details">
@@ -441,7 +460,6 @@
                         <!-- Exclusions -->
                         <div class="pt-3 border-t border-[#E5E5EA]">
                             <h4 class="text-xs font-extrabold uppercase tracking-wider text-[#6E6E73] mb-2 flex items-center gap-1.5">
-                                <span class="w-1.5 h-1.5 rounded-full bg-[#8E8E93]"></span>
                                 <span>Exclusions</span>
                             </h4>
                             <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
@@ -507,7 +525,7 @@
 
                             <button type="button"
                                     @click.stop="openDetails = !openDetails"
-                                    class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] py-2 px-1.5 transition-colors cursor-pointer shrink-0"
+                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                     :aria-expanded="openDetails"
                                     aria-controls="refinement-details"
                                     title="Toggle offer details">
@@ -802,15 +820,32 @@
                             <div class="flex items-center gap-1.5 sm:gap-2">
                                 <h3 class="font-black text-sm sm:text-base text-[#1D1D1F]">Dive Safety Evaluation</h3>
                                 
-                                <!-- About Forecast Icon with Tooltip -->
-                                <div class="relative group inline-flex items-center">
-                                    <button type="button" aria-label="About Forecast" class="p-1 rounded-lg text-[#6E6E73] hover:text-[#1D1D1F] transition-colors focus:outline-none flex items-center justify-center cursor-pointer">
-                                        <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0 object-contain" alt="About Forecast">
+                                <!-- About Forecast Icon with Popover -->
+                                <div class="relative inline-flex items-center" x-data="{ showTip: false }">
+                                    <button type="button" 
+                                            @click="showTip = !showTip"
+                                            :aria-expanded="showTip"
+                                            aria-label="About Forecast" 
+                                            class="w-11 h-11 flex items-center justify-center rounded-lg text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] cursor-pointer"
+                                            :class="showTip ? 'bg-[#F2F2F7] text-[#1D1D1F]' : ''">
+                                        <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-5 h-5 shrink-0 object-contain" alt="">
                                     </button>
-                                    <div class="absolute left-0 top-full mt-2 w-64 sm:w-72 max-w-[calc(100vw-3rem)] p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 pointer-events-none space-y-1.5 leading-relaxed">
-                                        <div class="font-bold flex items-center gap-1.5 text-[#00C3D0]">
-                                            <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain brightness-0 invert" alt="Weather Note">
-                                            <span>Weather & Sea Conditions Note</span>
+                                    <div x-show="showTip"
+                                         @click.outside="showTip = false"
+                                         x-cloak
+                                         x-transition:enter="transition ease-out duration-200"
+                                         x-transition:enter-start="opacity-0 translate-y-1"
+                                         x-transition:enter-end="opacity-100 translate-y-0"
+                                         x-transition:leave="transition ease-in duration-150"
+                                         x-transition:leave-start="opacity-100 translate-y-0"
+                                         x-transition:leave-end="opacity-0 translate-y-1"
+                                         class="absolute left-0 top-full mt-1.5 w-64 sm:w-72 max-w-[calc(100vw-3rem)] p-3.5 bg-[#1D1D1F] text-white text-xs rounded-xl shadow-xl z-50 space-y-1.5 leading-relaxed border border-[#2C2C2E]">
+                                        <div class="font-bold flex items-center justify-between text-[#00C3D0]">
+                                            <div class="flex items-center gap-1.5">
+                                                <img src="{{ asset('icons/icons8-exclamation-mark-60.png') }}" class="w-4 h-4 shrink-0 object-contain brightness-0 invert" alt="" aria-hidden="true">
+                                                <span>Weather &amp; Sea Conditions</span>
+                                            </div>
+                                            <button type="button" @click="showTip = false" aria-label="Close note" class="text-[#8E8E93] hover:text-white font-bold p-1">✕</button>
                                         </div>
                                         <p class="text-xs text-gray-200">
                                             Safety ratings shown are automated predictions based on coastal forecast models. Actual water conditions can change naturally, and our safety team continuously checks the water before every dive.
@@ -831,10 +866,16 @@
                         <div x-show="weatherLoading" x-cloak class="space-y-4 py-2">
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between text-xs sm:text-sm">
-                                    <span class="font-semibold text-[#1D1D1F]">Checking weather & marine conditions...</span>
+                                    <span id="weather-eval-status" class="font-semibold text-[#1D1D1F]">Checking weather & marine conditions...</span>
                                     <span class="font-mono font-bold text-[#00C3D0]" x-text="weatherProgress + '%'"></span>
                                 </div>
-                                <div class="w-full bg-[#E5E5EA] h-1.5 rounded-full overflow-hidden">
+                                <div role="progressbar"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100"
+                                     :aria-valuenow="weatherProgress"
+                                     :aria-valuetext="weatherProgress + '%'"
+                                     aria-labelledby="weather-eval-status"
+                                     class="w-full bg-[#E5E5EA] h-1.5 rounded-full overflow-hidden">
                                     <div class="bg-gradient-to-r from-[#00C3D0] to-[#00C3D0] h-full transition-all duration-200 rounded-full"
                                          :style="'width: ' + weatherProgress + '%'"></div>
                                 </div>
@@ -923,7 +964,7 @@
                         <template x-if="form.start_date && !weatherLoading && (!forecast || forecast.is_benchmark)">
                             <div class="py-1 text-left">
                                 <p class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
-                                    Evaluation for this dates are not available but you can still proceed. The camp will just update you.
+                                    Marine condition evaluations are unavailable for dates beyond 16 days. You may still proceed with your reservation; our team will verify conditions prior to your camp.
                                 </p>
                             </div>
                         </template>
@@ -987,7 +1028,7 @@
                                         <button type="button" 
                                                 x-show="form.participants.length > 1" 
                                                 @click="removeParticipant(index)"
-                                                class="text-xs sm:text-sm font-semibold text-[#D70015] hover:underline cursor-pointer">
+                                                class="inline-flex items-center justify-center min-h-[44px] px-3 py-1.5 text-xs sm:text-sm font-semibold text-[#D70015] hover:bg-rose-50 rounded-lg transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D70015]">
                                             Remove
                                         </button>
                                     </div>
@@ -1001,6 +1042,8 @@
                                                    @input="participant.first_name = participant.first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = (participant.first_name + ' ' + (participant.last_name || '')).trim()"
                                                    placeholder="e.g. Maria" 
                                                    autocomplete="given-name"
+                                                   autocapitalize="words"
+                                                   spellcheck="false"
                                                    :aria-invalid="touchedStep3 && !validateName(participant.first_name)"
                                                    :aria-describedby="'err-participant-fn-' + index"
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
@@ -1017,6 +1060,8 @@
                                                    @input="participant.last_name = participant.last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = ((participant.first_name || '') + ' ' + participant.last_name).trim()"
                                                    placeholder="e.g. Santos" 
                                                    autocomplete="family-name"
+                                                   autocapitalize="words"
+                                                   spellcheck="false"
                                                    :aria-invalid="touchedStep3 && !validateName(participant.last_name)"
                                                    :aria-describedby="'err-participant-ln-' + index"
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
@@ -1084,6 +1129,8 @@
                                        @input="form.contact_first_name = form.contact_first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = (form.contact_first_name + ' ' + (form.contact_last_name || '')).trim()"
                                        placeholder="Juan" 
                                        autocomplete="given-name"
+                                       autocapitalize="words"
+                                       spellcheck="false"
                                        :aria-invalid="touchedStep3 && !validateName(form.contact_first_name)"
                                        aria-describedby="err-lead-fn"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
@@ -1100,6 +1147,8 @@
                                        @input="form.contact_last_name = form.contact_last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = ((form.contact_first_name || '') + ' ' + form.contact_last_name).trim()"
                                        placeholder="Dela Cruz" 
                                        autocomplete="family-name"
+                                       autocapitalize="words"
+                                       spellcheck="false"
                                        :aria-invalid="touchedStep3 && !validateName(form.contact_last_name)"
                                        aria-describedby="err-lead-ln"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
@@ -1116,6 +1165,8 @@
                                        placeholder="juan@example.com" 
                                        autocomplete="email"
                                        inputmode="email"
+                                       autocapitalize="none"
+                                       spellcheck="false"
                                        :aria-invalid="touchedStep3 && !validateEmail(form.contact_email)"
                                        aria-describedby="err-lead-email"
                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
@@ -1145,7 +1196,14 @@
 
                             <div class="sm:col-span-2">
                                 <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Facebook Profile Link (Optional)</label>
-                                <input type="text" x-model="form.contact_facebook" placeholder="facebook.com/juandelacruz" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                                <input type="url" 
+                                       x-model="form.contact_facebook" 
+                                       placeholder="facebook.com/juandelacruz" 
+                                       autocomplete="url"
+                                       inputmode="url"
+                                       autocapitalize="none"
+                                       spellcheck="false"
+                                       class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                             </div>
                         </div>
                     </div>
@@ -1163,7 +1221,7 @@
                                        @keydown.enter.prevent="form.pickup_option = 'carpool'"
                                        @keydown.space.prevent="form.pickup_option = 'carpool'"
                                        class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000]' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-white' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -1181,7 +1239,7 @@
                                        @keydown.enter.prevent="form.pickup_option = 'own'"
                                        @keydown.space.prevent="form.pickup_option = 'own'"
                                        class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                       :class="form.pickup_option === 'own' ? 'border-[#780000]' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       :class="form.pickup_option === 'own' ? 'border-[#780000] bg-white' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -1357,6 +1415,15 @@
         <div x-show="currentStep === 4" x-cloak class="space-y-6">
 
             <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Slot Hold Countdown Banner -->
+                <div class="p-3.5 sm:p-4 rounded-xl bg-amber-50 text-amber-900 text-xs sm:text-sm flex items-center justify-between gap-3 shadow-2xs">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <img src="{{ asset('icons/icons8-clock-60.png') }}" alt="" aria-hidden="true" class="w-4 h-4 sm:w-5 sm:h-5 shrink-0 object-contain">
+                        <span class="font-medium">Slots held for checkout:</span>
+                    </div>
+                    <span class="font-mono font-bold text-amber-950 px-2.5 py-0.5 rounded-lg bg-amber-100/80 tracking-wide shrink-0" x-text="timerDisplay"></span>
+                </div>
+
                 <!-- 2-Column Grid: Reservation Breakdown (Left) & Cancellation Policy (Right) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-start">
                     
@@ -1458,7 +1525,8 @@
 
                 <!-- Explicit Consent & Hosted Checkout Action Button (Full Width Bottom) -->
                 <div class="pt-4 space-y-4">
-                    <div class="p-3.5 sm:p-4 rounded-xl bg-[#F8EAEA] border border-[#F1D5D5] transition-all"
+                    <div id="terms-agreement-card"
+                         class="p-3.5 sm:p-4 rounded-xl bg-[#F8EAEA] border border-[#F1D5D5] transition-all scroll-mt-24"
                          :class="touchedStep4 && !form.hasAgreedToTerms ? 'border-2 border-[#D70015] bg-red-50/40 ring-2 ring-[#D70015]/20' : ''">
                         <label tabindex="0"
                                role="checkbox"
@@ -1468,7 +1536,8 @@
                                @keydown.enter.prevent="form.hasAgreedToTerms = !form.hasAgreedToTerms"
                                @keydown.space.prevent="form.hasAgreedToTerms = !form.hasAgreedToTerms"
                                class="flex items-start gap-2.5 cursor-pointer select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 rounded-lg">
-                            <input type="checkbox" 
+                            <input id="terms-checkbox"
+                                   type="checkbox" 
                                    x-model="form.hasAgreedToTerms" 
                                    class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0 cursor-pointer">
                             <span class="font-bold text-[#780000] text-xs sm:text-sm leading-relaxed">
@@ -1500,8 +1569,8 @@
 
                         <div class="flex flex-col items-stretch sm:items-end gap-1.5 text-right w-full sm:w-auto order-1 sm:order-2">
                             <button type="button" 
-                                    @click="if (!form.hasAgreedToTerms) { touchedStep4 = true; errorMessage = 'Please read and agree to the Terms & Conditions and Privacy Policy to proceed.'; window.scrollTo({ top: 0, behavior: 'smooth' }); return; } processPayment(false, true)" 
-                                    :disabled="submittingPayment || !form.hasAgreedToTerms"
+                                    @click="processPayment(false, true)" 
+                                    :disabled="submittingPayment"
                                     class="btn-primary w-full sm:w-auto px-6 sm:px-8 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold cursor-pointer active:scale-[0.99] transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                                 <span x-show="!submittingPayment" class="flex items-center justify-center gap-2">
                                     <span>Proceed to PayMongo Hosted Checkout</span>
@@ -1511,6 +1580,9 @@
                                     <span>Redirecting to PayMongo...</span>
                                 </span>
                             </button>
+                            <span x-show="touchedStep4 && !form.hasAgreedToTerms" class="text-xs text-[#D70015] font-semibold text-center sm:text-right">
+                                Please agree to the terms above to proceed.
+                            </span>
                             <span class="text-[11px] sm:text-xs text-[#6E6E73] leading-relaxed text-center sm:text-right">
                                 Encrypted &amp; securely processed by PayMongo. We never store card or wallet details.
                             </span>
@@ -1536,25 +1608,25 @@
                             </p>
                         </div>
 
-                        <!-- Booking Credentials Voucher -->
-                        <div class="p-4 sm:p-5 rounded-2xl bg-[#00C3D0] space-y-4">
+                        <!-- Booking Credentials Voucher (Apple-Style Dark Card) -->
+                        <div class="p-5 sm:p-6 rounded-2xl bg-[#1D1D1F] text-white space-y-4 shadow-md border border-[#2C2C2E]">
                             <div>
-                                <span class="text-xs uppercase tracking-wider text-[#FFFFFF] font-bold">Booking Reference Number</span>
-                                <div class="text-xl sm:text-2xl md:text-3xl font-mono font-extrabold text-[#FFFFFF] tracking-wider break-all" x-text="confirmedBooking.booking_number"></div>
+                                <span class="text-xs uppercase tracking-wider text-[#00C3D0] font-bold">Booking Reference Number</span>
+                                <div class="text-xl sm:text-2xl md:text-3xl font-mono font-black text-white tracking-wider break-all mt-0.5" x-text="confirmedBooking.booking_number"></div>
                             </div>
 
-                            <div class="pt-2 border-t border-[#FFFFFF]/30">
-                                <span class="text-xs uppercase tracking-wider text-[#FFFFFF] font-bold">4-Digit Security PIN</span>
-                                <div class="text-2xl font-mono font-bold text-[#FFFFFF] tracking-widest" x-text="confirmedBooking.pin"></div>
-                                <span class="text-xs text-[#FFFFFF] block mt-1">Keep this PIN safe to manage or update your booking anytime.</span>
+                            <div class="pt-3 border-t border-white/15">
+                                <span class="text-xs uppercase tracking-wider text-[#00C3D0] font-bold">4-Digit Security PIN</span>
+                                <div class="text-2xl font-mono font-bold text-white tracking-widest mt-0.5" x-text="confirmedBooking.pin"></div>
+                                <span class="text-xs text-[#A1A1A6] block mt-1">Keep this PIN safe to manage or update your booking anytime.</span>
                             </div>
 
                             <div class="pt-2">
                                 <button type="button" 
                                         @click="copyCredentials()" 
-                                        class="btn-secondary text-[#780000] border-[#780000]/30 hover:bg-[#F8EAEA] w-full sm:w-auto px-4 py-2.5 text-xs sm:text-sm font-bold shadow-2xs inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                                        class="w-full sm:w-auto px-5 py-2.5 min-h-[44px] text-xs sm:text-sm font-bold bg-white hover:bg-[#F2F2F7] active:bg-[#E5E5EA] text-[#1D1D1F] rounded-xl shadow-sm inline-flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1D1D1F] transition-all">
                                     <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copied">
-                                    <svg x-show="copied" x-cloak class="w-4.5 h-4.5 text-emerald-700 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <svg x-show="copied" x-cloak class="w-4.5 h-4.5 text-[#065F46] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
                                     <span x-text="copied ? 'Copied to Clipboard!' : 'Copy Booking # and PIN'"></span>
                                 </button>
                             </div>
@@ -1597,7 +1669,7 @@
                             </div>
                             <div class="flex justify-between items-center gap-2">
                                 <span class="text-[#6E6E73]">Downpayment Paid:</span>
-                                <span class="font-bold text-[#34C759]" x-text="'₱' + formatNumber(confirmedBooking.downpayment_paid)"></span>
+                                <span class="font-bold text-[#065F46]" x-text="'₱' + formatNumber(confirmedBooking.downpayment_paid)"></span>
                             </div>
                             <div class="flex justify-between items-center gap-2 text-[#780000] font-bold">
                                 <span>Balance Due at Camp:</span>
@@ -1612,14 +1684,14 @@
                                 <li>Swimming clothes (anything you’re comfortable wearing)</li>
                                 <li>Toiletries</li>
                                 <li>Personal things</li>
-                                <li>A pair of socks (in any kind) for fin fitting</li>
+                                <li>A pair of socks (any style) for fin fitting</li>
                             </ul>
 
                             <!-- Carpool Guidelines (if carpool availed) -->
                             <div x-show="form.pickup_option === 'carpool'" class="pt-2.5 border-t border-[#E5E5EA] space-y-1">
                                 <h4 class="font-bold text-[#1D1D1F]">Carpool Reminder:</h4>
                                 <p class="text-[#6E6E73] leading-relaxed">
-                                    Please arrive at your selected pickup location (<strong class="text-[#1D1D1F]" x-text="form.pickup_location"></strong>) before the designated departure time. A strict <strong>10-minute grace period</strong> will be provided before the van departs but we are kindly asking to not maximize it.
+                                    Please arrive at your selected pickup location (<strong class="text-[#1D1D1F]" x-text="form.pickup_location"></strong>) before the designated departure time. A 10-minute grace period applies before the van departs; please arrive promptly to avoid delays for other participants.
                                 </p>
                             </div>
                         </div>
@@ -1643,6 +1715,58 @@
         </div>
 
     </main>
+
+    <!-- Session Expired In-Page Modal Dialog -->
+    <div x-show="sessionExpired" 
+         x-cloak
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="session-expired-title"
+         aria-describedby="session-expired-desc"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-7 shadow-2xl text-center space-y-4 relative border border-[#E5E5EA]"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
+            
+            <!-- Warning Icon -->
+            <div class="w-14 h-14 mx-auto rounded-full bg-amber-50 flex items-center justify-center text-amber-600">
+                <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+            </div>
+
+            <!-- Title & Description -->
+            <div class="space-y-2">
+                <h3 id="session-expired-title" class="text-lg sm:text-xl font-black text-[#1D1D1F] tracking-tight">
+                    Session Expired
+                </h3>
+                <p id="session-expired-desc" class="text-xs sm:text-sm text-[#6E6E73] leading-relaxed">
+                    Your 15-minute reservation hold has expired. To maintain fair slot availability for all campers, your session needs to restart.
+                </p>
+            </div>
+
+            <!-- Action Button -->
+            <div class="pt-2">
+                <button type="button"
+                        @click="restartSession()"
+                        class="w-full min-h-[44px] py-3 px-5 rounded-xl font-extrabold text-sm text-center flex items-center justify-center bg-[#780000] hover:bg-[#5E0000] active:scale-[0.98] text-white shadow-sm transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2">
+                    Restart Session
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
 
@@ -1736,6 +1860,7 @@ function bookingForm(config) {
         },
         copied: false,
         draftRestored: false,
+        sessionExpired: false,
 
         selectAndScrollPackage(type) {
             this.form.class_type = type;
@@ -2399,6 +2524,15 @@ function bookingForm(config) {
             }
         },
 
+        goToStep(step) {
+            if (this.currentStep === 5) return;
+            if (step < this.currentStep && step >= 1) {
+                this.errorMessage = '';
+                this.currentStep = step;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        },
+
         startPaymentTimer() {
             if (this.timerInterval) clearInterval(this.timerInterval);
             this.timerSeconds = 15 * 60;
@@ -2410,17 +2544,29 @@ function bookingForm(config) {
 
                 if (this.timerSeconds <= 0) {
                     clearInterval(this.timerInterval);
-                    alert("Your 15-minute payment session has expired. To ensure slot fairness, your session will now restart.");
-                    window.location.reload();
+                    this.sessionExpired = true;
                 }
             }, 1000);
+        },
+
+        restartSession() {
+            if (this.timerInterval) clearInterval(this.timerInterval);
+            this.clearDraft();
+            window.location.reload();
         },
 
         async processPayment(instantSimulation = false, hostedCheckout = true) {
             if (!this.form.hasAgreedToTerms) {
                 this.touchedStep4 = true;
                 this.errorMessage = "Please read and agree to the Terms & Conditions and Privacy Policy to proceed.";
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                const termsCard = document.getElementById('terms-agreement-card');
+                if (termsCard) {
+                    termsCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const checkbox = document.getElementById('terms-checkbox');
+                    if (checkbox) checkbox.focus();
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
                 return;
             }
 

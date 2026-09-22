@@ -32,7 +32,8 @@
             </div>
 
             @if(session('error') || (isset($errors) && ($errors->has('email') || $errors->has('password'))))
-                <div class="mb-6 p-4 rounded-xl bg-[#FEF2F2] flex items-center gap-3">
+                <div role="alert" aria-live="polite" class="mb-6 p-4 rounded-xl bg-[#FEF2F2] flex items-start gap-3">
+                    <img src="{{ asset('icons/icons8-error-60.png') }}" alt="" class="w-5 h-5 shrink-0 object-contain mt-0.5" aria-hidden="true">
                     <div class="text-sm font-semibold text-[#991B1B] leading-relaxed">
                         {{ session('error') ?? ($errors->first('password') ?: $errors->first('email')) }}
                     </div>
@@ -40,26 +41,32 @@
             @endif
 
             @if(session('status') || session('success'))
-                <div class="mb-6 p-4 rounded-xl bg-[#ECFDF5] flex items-center gap-3">
+                <div role="status" aria-live="polite" class="mb-6 p-4 rounded-xl bg-[#ECFDF5] flex items-start gap-3">
+                    <img src="{{ asset('icons/icons8-checkmark-60.png') }}" alt="" class="w-5 h-5 shrink-0 object-contain mt-0.5" aria-hidden="true">
                     <div class="text-sm font-semibold text-[#065F46] leading-relaxed">
                         {{ session('status') ?? session('success') }}
                     </div>
                 </div>
             @endif
 
-            <form action="{{ route('login.post') }}" method="POST" class="space-y-5" data-no-spa data-native>
+            <form action="{{ route('login.post') }}" method="POST" class="space-y-5" data-no-spa data-native
+                  x-data="{ submitting: false }" @submit="submitting = true">
                 @csrf
 
                 <!-- Email Input -->
                 <div class="space-y-1.5">
-                    <label for="email" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
-                        Email Address <span class="text-[#780000]">*</span>
+                    <label for="email" class="block text-sm font-semibold text-[#1D1D1F]">
+                        Email Address
                     </label>
                     <input type="email" 
                            name="email" 
                            id="email" 
                            value="{{ old('email') }}" 
                            placeholder="name@example.com" 
+                           autocomplete="username"
+                           inputmode="email"
+                           autocapitalize="none"
+                           spellcheck="false"
                            required 
                            autofocus
                            class="w-full px-4 py-3 rounded-xl border {{ (isset($errors) && $errors->has('email') && !session('error')) ? 'border-[#FF3B3C] bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-all">
@@ -68,8 +75,8 @@
                 <!-- Password Input -->
                 <div class="space-y-1.5" x-data="{ show: false }">
                     <div class="flex items-center justify-between">
-                        <label for="password" class="block font-bold text-[#1D1D1F] text-sm uppercase tracking-wider">
-                            Password <span class="text-[#780000]">*</span>
+                        <label for="password" class="block text-sm font-semibold text-[#1D1D1F]">
+                            Password
                         </label>
                         <a href="{{ route('password.request') }}" class="text-sm font-semibold text-[#780000] hover:underline" data-no-spa>
                             Forgot password?
@@ -80,13 +87,18 @@
                                name="password" 
                                id="password" 
                                placeholder="••••••••" 
+                               autocomplete="current-password"
+                               autocapitalize="none"
+                               spellcheck="false"
                                required
-                               class="w-full px-4 py-3 rounded-xl border {{ (session('error') || (isset($errors) && $errors->has('password'))) ? 'border-[#FF3B3C] bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-all pr-11">
+                               class="w-full pl-4 pr-12 py-3 rounded-xl border {{ (session('error') || (isset($errors) && $errors->has('password'))) ? 'border-[#FF3B3C] bg-rose-50/10' : 'border-[#D1D1D6]' }} focus:border-[#780000] text-sm text-[#1D1D1F] bg-white transition-all">
                         <button type="button" 
                                 @click="show = !show" 
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8E8E93] hover:text-[#1D1D1F] p-1">
-                            <svg x-show="!show" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            <svg x-show="show" x-cloak class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                                :aria-label="show ? 'Hide password' : 'Show password'"
+                                :aria-pressed="show"
+                                class="absolute right-1 top-1/2 -translate-y-1/2 w-11 h-11 flex items-center justify-center text-[#636366] hover:text-[#1D1D1F] focus:outline-none focus:ring-2 focus:ring-[#780000] rounded-lg transition-colors">
+                            <svg x-show="!show" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            <svg x-show="show" x-cloak class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
                         </button>
                     </div>
                 </div>
@@ -94,14 +106,17 @@
                 <!-- Remember Me -->
                 <div class="flex items-center justify-between pt-1">
                     <label class="flex items-center gap-2.5 cursor-pointer">
-                        <input type="checkbox" name="remember" class="w-4 h-4 rounded text-[#780000] focus:ring-0 border-[#D1D1D6]">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded text-[#780000] focus:ring-2 focus:ring-[#780000] focus:ring-offset-2 border-[#D1D1D6]">
                         <span class="text-sm text-[#6E6E73] font-medium">Remember my session</span>
                     </label>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn-primary w-full py-3.5 text-sm font-bold shadow-md hover:bg-[#5E0000] transition-all cursor-pointer">
-                    Sign In
+                <button type="submit" 
+                        :disabled="submitting"
+                        class="btn-primary w-full py-3.5 min-h-[44px] text-sm font-bold shadow-md hover:bg-[#5E0000] focus:outline-none focus:ring-2 focus:ring-[#780000] focus:ring-offset-2 transition-all cursor-pointer flex items-center justify-center gap-2 disabled:opacity-75 disabled:cursor-not-allowed">
+                    <svg x-show="submitting" x-cloak class="animate-spin w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke-opacity="0.25"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="1"></path></svg>
+                    <span x-text="submitting ? 'Signing in…' : 'Sign In'">Sign In</span>
                 </button>
             </form>
         </div>

@@ -12,13 +12,13 @@
             
             <!-- Total Bookings -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Bookings</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Bookings</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     {{ number_format($b['total_bookings'] ?? 0) }}
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Confirmed: {{ $b['confirmed_bookings'] ?? 0 }}</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-bold shrink-0 {{ ($b['booking_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>{{ $b['confirmed_bookings'] ?? 0 }} confirmed{{ ($b['pending_bookings'] ?? 0) > 0 ? ' · ' . ($b['pending_bookings'] ?? 0) . ' pending' : '' }}</span>
+                    <span class="px-1.5 py-0.5 rounded text-xs font-bold shrink-0 {{ ($b['booking_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
                         {{ ($b['booking_delta'] ?? 0) >= 0 ? '+' : '' }}{{ $b['booking_delta'] ?? 0 }}%
                     </span>
                 </div>
@@ -27,39 +27,51 @@
             <!-- Total Participants (Headcount) -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Participants (Headcount)</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Participants (Headcount)</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     {{ number_format($b['total_participants'] ?? 0) }} pax
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Confirmed: {{ $b['confirmed_participants'] ?? 0 }}</span>
-                    <span>Avg {{ $totalBookings > 0 ? round(($b['total_participants'] ?? 0) / $totalBookings, 1) : 0 }}/bk</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>{{ $b['confirmed_participants'] ?? 0 }} confirmed guests</span>
+                    <span class="text-xs font-medium text-[#6E6E73] shrink-0">Avg {{ $totalBookings > 0 ? round(($b['total_participants'] ?? 0) / $totalBookings, 1) : 0 }}/bk</span>
                 </div>
             </div>
 
-            <!-- Conversion Rate -->
+            <!-- Deposit Conversion -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Deposit Conversion</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Deposit Conversion</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-emerald-700 mt-0.5 break-words">
                     {{ $b['conversion_rate'] ?? 0 }}%
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
                     <span>{{ $b['confirmed_bookings'] ?? 0 }} of {{ $b['total_bookings'] ?? 0 }} paid</span>
-                    <span class="px-1.5 py-0.5 rounded text-sm font-bold text-emerald-700 bg-emerald-50 shrink-0">Healthy</span>
+                    @if(($b['conversion_rate'] ?? 0) >= 60)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Healthy</span>
+                    @elseif(($b['conversion_rate'] ?? 0) >= 30)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 shrink-0">Moderate</span>
+                    @else
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 shrink-0">Follow-up</span>
+                    @endif
                 </div>
             </div>
 
-            <!-- Churn Rate -->
+            <!-- Cancellations & Reschedules -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Drop-off & Churn</span>
-                <div class="text-xl sm:text-2xl font-extrabold text-rose-700 mt-0.5 break-words">
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Cancellations & Reschedules</span>
+                <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     {{ $b['cancellation_rate'] ?? 0 }}%
                 </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>{{ $b['cancellation_count'] ?? 0 }} Cancelled</span>
-                    <span>{{ $b['reschedule_count'] ?? 0 }} Resched</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                    <span>{{ $b['cancellation_count'] ?? 0 }} Cancelled · {{ $b['reschedule_count'] ?? 0 }} Resched</span>
+                    @if(($b['cancellation_rate'] ?? 0) == 0 && ($b['reschedule_count'] ?? 0) == 0)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 shrink-0">Optimal</span>
+                    @elseif(($b['cancellation_rate'] ?? 0) <= 8)
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-[#6E6E73] bg-[#F2F2F7] shrink-0">Normal</span>
+                    @else
+                        <span class="px-1.5 py-0.5 rounded text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 shrink-0">Attention</span>
+                    @endif
                 </div>
             </div>
 
@@ -136,36 +148,162 @@
             </div>
         </div>
 
-        <!-- Right 1 Col: Booking Lead Time Distribution -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <div class="border-b border-[#E5E5EA] pb-3">
-                <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Booking Lead Times</h3>
-                <p class="text-sm text-[#6E6E73]">How far in advance guests book reservations.</p>
-            </div>
+        <!-- Right 1 Col: Booking Lead Time Semi-Circle Gauge -->
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs flex flex-col justify-between">
+            <div>
+                <div class="pb-1">
+                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Booking Lead Times</h3>
+                    <p class="text-xs text-[#6E6E73]">How far in advance guests book reservations.</p>
+                </div>
 
-            <div class="space-y-3 text-sm">
                 @php
-                    $leads = [
-                        ['label' => 'Last-minute (< 3 days)', 'count' => $b['lead_times']['under_3_days'] ?? 0, 'color' => 'bg-rose-600'],
-                        ['label' => '4 to 7 Days before trip', 'count' => $b['lead_times']['4_to_7_days'] ?? 0, 'color' => 'bg-[#780000]'],
-                        ['label' => '8 to 14 Days before trip', 'count' => $b['lead_times']['8_to_14_days'] ?? 0, 'color' => 'bg-[#00C3D0]'],
-                        ['label' => '15 to 30 Days in advance', 'count' => $b['lead_times']['15_to_30_days'] ?? 0, 'color' => 'bg-indigo-600'],
-                        ['label' => 'Over 30 Days in advance', 'count' => $b['lead_times']['over_30_days'] ?? 0, 'color' => 'bg-emerald-600'],
+                    $under4 = (int)($b['lead_times']['under_3_days'] ?? 0);
+                    $days4to7 = (int)($b['lead_times']['4_to_7_days'] ?? 0);
+                    $days8to14 = (int)($b['lead_times']['8_to_14_days'] ?? 0);
+                    $days15plus = (int)(($b['lead_times']['15_to_30_days'] ?? 0) + ($b['lead_times']['over_30_days'] ?? 0));
+                    $totalLeadCount = $under4 + $days4to7 + $days8to14 + $days15plus;
+                    
+                    // Brand colors for the 4 categories
+                    $leadCategories = [
+                        [
+                            'key' => 'under_4',
+                            'label' => '< 4 Days',
+                            'sub' => 'Last-minute',
+                            'count' => $under4,
+                            'color' => '#780000', // Brand Deep Crimson
+                        ],
+                        [
+                            'key' => '4_to_7',
+                            'label' => '4–7 Days',
+                            'sub' => 'Week-of',
+                            'count' => $days4to7,
+                            'color' => '#D45D5D', // Coral Rose
+                        ],
+                        [
+                            'key' => '8_to_14',
+                            'label' => '8–14 Days',
+                            'sub' => '1–2 Weeks',
+                            'count' => $days8to14,
+                            'color' => '#00C3D0', // Turquoise Aqua
+                        ],
+                        [
+                            'key' => '15_plus',
+                            'label' => '15+ Days',
+                            'sub' => 'Advance',
+                            'count' => $days15plus,
+                            'color' => '#F59E0B', // Sun Amber
+                        ],
                     ];
+
+                    // Calculate average lead days from bookings_list
+                    $leadDaysSum = 0;
+                    $leadDaysCount = 0;
+                    foreach ($b['bookings_list'] ?? [] as $bkItem) {
+                        if ($bkItem->start_date && $bkItem->created_at) {
+                            $diff = $bkItem->created_at->diffInDays($bkItem->start_date, false);
+                            if ($diff >= 0) {
+                                $leadDaysSum += $diff;
+                                $leadDaysCount++;
+                            }
+                        }
+                    }
+                    $avgLeadDays = $leadDaysCount > 0 ? round($leadDaysSum / $leadDaysCount, 1) : 0;
+
+                    // SVG Gauge metrics: R = 108, Center = (145, 128)
+                    // Semi-circle length S = pi * 108 ~= 339.29
+                    // Full circumference C = 2 * pi * 108 ~= 678.58
+                    $radius = 108;
+                    $pi = 3.14159265;
+                    $circumference = 2 * $pi * $radius;
+                    $semiCircumference = $pi * $radius;
+                    
+                    $activeCategoriesCount = collect($leadCategories)->where('count', '>', 0)->count();
+                    $gap = $activeCategoriesCount > 1 ? 3.5 : 0;
                 @endphp
 
-                @foreach($leads as $l)
-                    @php $pct = round(($l['count'] / $totalBookings) * 100, 1); @endphp
-                    <div class="space-y-1">
-                        <div class="flex items-center justify-between font-semibold">
-                            <span class="text-[#1D1D1F]">{{ $l['label'] }}</span>
-                            <span class="text-[#6E6E73]">{{ $l['count'] }} ({{ $pct }}%)</span>
+                <!-- 4 Top Stat Columns with colored vertical left bar -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 pt-3 pb-2">
+                    @foreach($leadCategories as $cat)
+                        <div class="border-l-[3px] pl-2.5 sm:pl-3" style="border-color: {{ $cat['color'] }};">
+                            <div class="text-lg sm:text-xl font-extrabold text-[#1D1D1F] leading-tight">
+                                {{ number_format($cat['count']) }}
+                            </div>
+                            <div class="text-xs font-semibold text-[#6E6E73] truncate mt-0.5">
+                                {{ $cat['label'] }}
+                            </div>
                         </div>
-                        <div class="w-full h-2 rounded-full bg-[#E5E5EA] overflow-hidden">
-                            <div class="h-full {{ $l['color'] }} transition-all" style="width: {{ $pct }}%;"></div>
-                        </div>
+                    @endforeach
+                </div>
+
+                <!-- Semi-Circle Gauge Chart matching the design (Enlarged) -->
+                <div class="relative flex items-center justify-center pt-3 pb-1">
+                    <svg viewBox="0 0 290 148" class="w-full max-w-[320px] sm:max-w-[350px] overflow-visible">
+                        <!-- Background track arc -->
+                        <circle cx="145" cy="128" r="{{ $radius }}"
+                                fill="none"
+                                stroke="#F2F2F7"
+                                stroke-width="24"
+                                stroke-dasharray="{{ round($semiCircumference, 2) }} {{ round($circumference, 2) }}"
+                                stroke-dashoffset="0"
+                                transform="rotate(180 145 128)" />
+
+                        @if($totalLeadCount > 0)
+                            @php
+                                $accumulatedOffset = 0;
+                            @endphp
+                            @foreach($leadCategories as $cat)
+                                @if($cat['count'] > 0)
+                                    @php
+                                        $fraction = $cat['count'] / $totalLeadCount;
+                                        $segmentRawLen = $fraction * $semiCircumference;
+                                        $visibleLen = max(1, $segmentRawLen - $gap);
+                                        $pct = round($fraction * 100, 1);
+                                    @endphp
+                                    <!-- Segment: {{ $cat['label'] }} -->
+                                    <circle cx="145" cy="128" r="{{ $radius }}"
+                                            fill="none"
+                                            stroke="{{ $cat['color'] }}"
+                                            stroke-width="24"
+                                            stroke-dasharray="{{ round($visibleLen, 2) }} {{ round($circumference, 2) }}"
+                                            stroke-dashoffset="{{ round(-$accumulatedOffset, 2) }}"
+                                            transform="rotate(180 145 128)"
+                                            class="transition-all duration-500 ease-out hover:opacity-85 cursor-pointer">
+                                        <title>{{ $cat['label'] }} ({{ $cat['sub'] }}): {{ $cat['count'] }} bookings ({{ $pct }}%)</title>
+                                    </circle>
+                                    @php
+                                        $accumulatedOffset += $segmentRawLen;
+                                    @endphp
+                                @endif
+                            @endforeach
+                        @endif
+                    </svg>
+
+                    <!-- Center KPI in the Semi-Circle Gauge -->
+                    <div class="absolute inset-x-0 bottom-2 flex flex-col items-center justify-center text-center pointer-events-none">
+                        <span class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight leading-none">
+                            {{ number_format($totalLeadCount) }}
+                        </span>
+                        <span class="text-xs sm:text-sm font-bold text-[#8E8E93] uppercase tracking-wider mt-1">
+                            Total Bookings
+                        </span>
                     </div>
-                @endforeach
+                </div>
+            </div>
+
+            <!-- Bottom Insight Pill -->
+            <div class="mt-3 pt-2.5 border-t border-[#F2F2F7] flex items-center justify-between text-xs text-[#6E6E73]">
+                <span class="flex items-center gap-1 font-medium">
+                    Avg Lead Time: <strong class="text-[#1D1D1F] font-bold">{{ $avgLeadDays }} days</strong>
+                </span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-[#F2F2F7] text-[#1D1D1F]">
+                    @if($avgLeadDays >= 14)
+                        Early Bookers
+                    @elseif($avgLeadDays >= 7)
+                        Moderate
+                    @else
+                        Spontaneous
+                    @endif
+                </span>
             </div>
         </div>
 

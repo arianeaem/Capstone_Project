@@ -33,7 +33,7 @@
                 <span>Downpayment Required</span>
             </div>
             <p class="text-sm text-[#78350F] leading-relaxed">
-                Your reservation has not gone through the system yet because the required reservation downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> is unpaid. Please complete your payment via PayMongo to confirm your slots.
+                Your reservation is unconfirmed because the required downpayment of <strong>₱{{ number_format($booking->downpayment_amount, 2) }}</strong> remains unpaid. Complete payment via PayMongo to secure your slots.
             </p>
         </div>
         <form action="{{ route('paymongo.checkout', ['booking' => $booking->id]) }}" method="POST" class="shrink-0">
@@ -49,29 +49,29 @@
     <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 mb-6 sm:mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 mb-6">
             <div>
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <h1 class="text-xl sm:text-3xl font-extrabold text-[#1D1D1F] font-mono tracking-wide">
-                        Reservation {{ $booking->booking_number }}
-                    </h1>
-                    <span class="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-sm font-bold {{ $booking->status_badge['bg'] }}">
+                <h1 class="text-xl sm:text-3xl font-extrabold text-[#1D1D1F] font-mono tracking-wide">
+                    Reservation {{ $booking->booking_number }}
+                </h1>
+                <div class="mt-2">
+                    <span class="inline-flex items-center px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-sm font-bold {{ $booking->status_badge['bg'] }}">
                         {{ $booking->status_badge['label'] }}
                     </span>
                 </div>
             </div>
 
             <!-- Security PIN -->
-            <div class="bg-[#00C3D0] rounded-xl p-3 sm:p-3.5 flex sm:flex-col items-center sm:items-end justify-between gap-2 shrink-0">
-                <div>
-                    <span class="text-xs font-bold text-[#FFFFFF] block">Security PIN</span>
-                    <span class="text-base sm:text-lg font-mono font-extrabold text-[#FFFFFF] tracking-widest">{{ $booking->pin }}</span>
+            <div class="bg-[#1D1D1F] border border-[#2C2C2E] rounded-xl p-3.5 sm:p-4 flex sm:flex-col items-center sm:items-end justify-between gap-2.5 shrink-0 shadow-sm">
+                <div class="text-left sm:text-right">
+                    <span class="text-xs font-bold text-[#00C3D0] uppercase tracking-wider block">Security PIN</span>
+                    <span class="text-lg sm:text-xl font-mono font-black text-white tracking-widest mt-0.5 block">{{ $booking->pin }}</span>
                 </div>
                 <button type="button" 
                         @click="navigator.clipboard.writeText('{{ $booking->pin }}'); copiedPin = true; setTimeout(() => copiedPin = false, 2000)"
                         aria-label="Copy Security PIN"
-                        class="min-h-[34px] px-2.5 py-1.5 rounded-lg bg-white/90 hover:bg-white text-xs font-bold text-[#1D1D1F] shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
-                    <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4.5 h-4.5 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copiedPin">
-                    <svg x-show="copiedPin" x-cloak class="w-4.5 h-4.5 text-[#1D1D1F] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-                    <span x-text="copiedPin ? 'Copied' : 'Copy'"></span>
+                        class="min-h-[44px] px-3.5 py-2 rounded-xl bg-white hover:bg-[#F2F2F7] active:bg-[#E5E5EA] text-xs font-bold text-[#1D1D1F] shadow-xs flex items-center gap-1.5 transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1D1D1F]">
+                    <img src="{{ asset('icons/icons8-copy-60.png') }}" class="w-4 h-4 object-contain shrink-0" alt="" aria-hidden="true" x-show="!copiedPin">
+                    <svg x-show="copiedPin" x-cloak class="w-4 h-4 text-[#065F46] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span x-text="copiedPin ? 'Copied' : 'Copy PIN'"></span>
                 </button>
             </div>
         </div>
@@ -110,7 +110,7 @@
                     <strong class="text-sm text-amber-700 block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Unpaid</strong>
                     <span class="text-sm text-[#D70015] font-bold">Unconfirmed Reservation</span>
                 @else
-                    <strong class="text-sm text-[#34C759] block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Paid</strong>
+                    <strong class="text-sm text-[#065F46] block">₱{{ number_format($booking->downpayment_amount, 2) }} Downpayment Paid</strong>
                     <span class="text-sm text-[#780000] font-bold">₱{{ number_format($booking->balance_amount, 2) }} balance due at camp</span>
                 @endif
             </div>
@@ -185,7 +185,7 @@
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F]">Transportation & Add-ons</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA]">
+                    <div class="space-y-1">
                         <span class="text-sm text-[#6E6E73] block mb-1">Transportation:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->pickup_option === 'carpool' ? 'Manila Carpool Service' : 'Own Transportation' }}
@@ -195,7 +195,7 @@
                         @endif
                     </div>
 
-                    <div class="p-4 rounded-xl bg-[#F2F2F7] border border-[#E5E5EA]">
+                    <div class="space-y-1">
                         <span class="text-sm text-[#6E6E73] block mb-1">Boat Dive:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->boat_dive ? 'Included (+₱600 / person)' : 'Not Included' }}
@@ -208,7 +208,7 @@
                 <div class="p-4 rounded-xl bg-[#F8EAEA] border border-[#F1D5D5] text-xs sm:text-sm">
                     <strong class="font-bold text-[#780000] block mb-1">Carpool Arrival & Grace Period Notice:</strong>
                     <p class="text-[#4A4A4F] leading-relaxed">
-                        Please arrive at your pickup location (<strong>{{ $booking->pickup_location }}</strong>) before the designated departure time. A strict <strong>30-minute grace period</strong> will be provided before the van departs but we are kindly asking to not maximize it.
+                        Please arrive at your pickup location (<strong>{{ $booking->pickup_location }}</strong>) before the designated departure time. A 30-minute grace period applies before the van departs; please arrive promptly to avoid delays for other participants.
                     </p>
                 </div>
                 @endif
@@ -221,7 +221,7 @@
                     <li>Swimming clothes (anything you’re comfortable wearing)</li>
                     <li>Toiletries</li>
                     <li>Personal things</li>
-                    <li>A pair of socks (in any kind) for fin fitting</li>
+                    <li>A pair of socks (any style) for fin fitting</li>
                 </ul>
             </div>
 
@@ -380,8 +380,21 @@
          aria-modal="true" 
          aria-labelledby="reschedule-modal-title" 
          @keydown.escape.window="openRescheduleModal = false" 
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openRescheduleModal = false">
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" 
+             @click.outside="openRescheduleModal = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
             <div class="flex items-center justify-between pb-4">
                 <div>
                     <h3 id="reschedule-modal-title" class="text-lg font-bold text-[#1D1D1F]">Reschedule Dive Dates</h3>
@@ -397,14 +410,15 @@
                 </button>
             </div>
 
-            <form action="{{ route('manage.reschedule', $booking->booking_number) }}" method="POST" class="space-y-4 text-sm">
+            <form action="{{ route('manage.reschedule', $booking->booking_number) }}" method="POST" @submit="submittingReschedule = true" class="space-y-4 text-sm">
                 @csrf
                 <input type="hidden" name="pin" value="{{ $booking->pin }}">
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-2">New Start Date <span class="text-[#D70015]">*</span></label>
+                        <label for="reschedule-start-date" class="block font-bold text-[#1D1D1F] mb-2">New Start Date <span class="text-[#D70015]">*</span></label>
                         <input type="date" 
+                               id="reschedule-start-date"
                                name="requested_start_date" 
                                x-model="rescheduleStartDate" 
                                @change="onRescheduleDateChange()"
@@ -413,8 +427,9 @@
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm font-medium text-[#1D1D1F] bg-white transition-colors">
                     </div>
                     <div>
-                        <label class="block font-bold text-[#6E6E73] mb-1">New End Date (Auto)</label>
+                        <label for="reschedule-end-date" class="block font-bold text-[#6E6E73] mb-1">New End Date (Auto)</label>
                         <input type="date" 
+                               id="reschedule-end-date"
                                name="requested_end_date" 
                                x-model="rescheduleEndDate" 
                                readonly
@@ -424,13 +439,13 @@
                 </div>
 
                 <!-- Weather Loading State -->
-                <div x-show="weatherLoading" x-cloak class="p-3.5 rounded-xl bg-[#F2F2F7] text-xs sm:text-sm text-[#1D1D1F] flex items-center gap-2">
+                <div x-show="weatherLoading" x-cloak role="status" aria-live="polite" class="p-3.5 rounded-xl bg-[#F2F2F7] text-xs sm:text-sm text-[#1D1D1F] flex items-center gap-2">
                     <svg class="animate-spin h-4 w-4 text-[#00C3D0] shrink-0" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
                     <span class="font-medium text-[#1D1D1F]">Checking sea safety &amp; weather conditions for selected dates...</span>
                 </div>
 
                 <!-- Weather Forecast Check -->
-                <div x-show="rescheduleForecast && !weatherLoading" x-cloak class="p-3.5 rounded-xl text-sm space-y-1.5"
+                <div x-show="rescheduleForecast && !weatherLoading" x-cloak role="status" aria-live="polite" class="p-3.5 rounded-xl text-sm space-y-1.5"
                      :style="'background-color: ' + (rescheduleForecast?.bg_color || '#F2F2F7') + '; color: ' + (rescheduleForecast?.text_color || '#1D1D1F')">
                     <div class="font-bold flex items-center justify-between">
                         <span x-text="'Safety: ' + (rescheduleForecast?.title || '')"></span>
@@ -440,8 +455,8 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-2">Reason for Rescheduling (Optional)</label>
-                    <textarea name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
+                    <label for="reschedule-reason" class="block font-bold text-[#1D1D1F] mb-2">Reason for Rescheduling (Optional)</label>
+                    <textarea id="reschedule-reason" name="reason" rows="2" placeholder="e.g. Work schedule change" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
                 </div>
 
                 <div class="p-3.5 bg-[#FFFBEB] rounded-xl text-sm text-[#92400E]">
@@ -451,9 +466,13 @@
                 <div class="flex items-center justify-end gap-3 pt-3">
                     <button type="button" @click="openRescheduleModal = false" class="btn-secondary min-h-[44px] px-4 py-2.5 text-sm font-semibold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">Cancel</button>
                     <button type="submit" 
-                            :disabled="weatherLoading || (rescheduleForecast && !rescheduleForecast.is_bookable)" 
-                            class="btn-primary min-h-[44px] px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
-                        Submit Reschedule Request
+                            :disabled="weatherLoading || (rescheduleForecast && !rescheduleForecast.is_bookable) || submittingReschedule" 
+                            class="btn-primary min-h-[44px] px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <span x-show="!submittingReschedule">Submit Reschedule Request</span>
+                        <span x-show="submittingReschedule" x-cloak class="inline-flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span>Submitting...</span>
+                        </span>
                     </button>
                 </div>
             </form>
@@ -467,8 +486,21 @@
          aria-modal="true" 
          aria-labelledby="cancel-modal-title" 
          @keydown.escape.window="openCancelModal = false" 
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-3 sm:p-4">
-        <div class="bg-white rounded-xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" @click.outside="openCancelModal = false">
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-[#E5E5EA]" 
+             @click.outside="openCancelModal = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
             <div class="flex items-center justify-between pb-4">
                 <div>
                     <h3 id="cancel-modal-title" class="text-lg font-bold text-[#1D1D1F]">Request Booking Cancellation</h3>
@@ -484,12 +516,12 @@
                 </button>
             </div>
 
-            <form action="{{ route('manage.cancel', $booking->booking_number) }}" method="POST" class="space-y-4 text-sm">
+            <form action="{{ route('manage.cancel', $booking->booking_number) }}" method="POST" @submit="submittingCancel = true" class="space-y-4 text-sm">
                 @csrf
                 <input type="hidden" name="pin" value="{{ $booking->pin }}">
 
                 <!-- Refund Calculation Breakdown -->
-                <div class="p-4 rounded-xl bg-[#F2F2F7] space-y-2 text-sm shadow-2xs">
+                <div class="space-y-2 text-sm">
                     <div class="flex justify-between">
                         <span class="text-[#6E6E73]">Downpayment Paid:</span>
                         <span class="font-bold text-[#1D1D1F]">₱{{ number_format($booking->downpayment_amount, 2) }}</span>
@@ -506,23 +538,18 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-sm mb-1.5">Reason for Cancellation</label>
-                    <textarea name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
+                    <label for="cancel-reason" class="block font-bold text-[#1D1D1F] text-sm mb-1.5">Reason for Cancellation</label>
+                    <textarea id="cancel-reason" name="reason" rows="2" placeholder="Please let us know why you need to cancel" class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] focus:outline-none text-sm text-[#1D1D1F] bg-white transition-colors"></textarea>
                 </div>
 
                 <!-- Cancellation Confirmation Checkbox -->
                 <div class="pt-1">
-                    <label tabindex="0"
-                           role="checkbox"
-                           aria-checked="false"
-                           @keydown.space.prevent="$refs.cancelCheck.click()" 
-                           @keydown.enter.prevent="$refs.cancelCheck.click()" 
-                           class="flex items-start gap-2.5 cursor-pointer p-1 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2 select-none">
+                    <label class="flex items-start gap-3 cursor-pointer p-2.5 min-h-[44px] rounded-xl hover:bg-[#F2F2F7] transition-colors select-none">
                         <input type="checkbox" 
                                x-ref="cancelCheck" 
                                name="confirm_cancel_ack" 
                                required 
-                               class="w-4 h-4 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0">
+                               class="w-4.5 h-4.5 rounded text-[#780000] focus:ring-[#780000] mt-0.5 shrink-0 cursor-pointer">
                         <span class="text-sm text-[#1D1D1F] leading-relaxed">
                             I confirm that I want to cancel this booking and understand the refund amount will be reviewed by the camp. <span class="text-[#D70015]">*</span>
                         </span>
@@ -531,8 +558,14 @@
 
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <button type="button" @click="openCancelModal = false" class="btn-secondary min-h-[44px] px-4 py-2.5 text-sm font-semibold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">Keep My Booking</button>
-                    <button type="submit" class="btn-danger min-h-[44px] px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D70015] focus-visible:ring-offset-2">
-                        Confirm Cancellation Request
+                    <button type="submit" 
+                            :disabled="submittingCancel"
+                            class="btn-danger min-h-[44px] px-5 py-2.5 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D70015] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                        <span x-show="!submittingCancel">Confirm Cancellation Request</span>
+                        <span x-show="submittingCancel" x-cloak class="inline-flex items-center gap-2">
+                            <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            <span>Cancelling...</span>
+                        </span>
                     </button>
                 </div>
             </form>
@@ -548,6 +581,8 @@ function manageBooking(config) {
     return {
         openRescheduleModal: false,
         openCancelModal: false,
+        submittingReschedule: false,
+        submittingCancel: false,
         rescheduleStartDate: '',
         rescheduleEndDate: '',
         rescheduleForecast: null,
