@@ -63,11 +63,12 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
+        $coachRatio = (int) (app(\App\Services\SystemSettingService::class)->get('camp_operations.coach_student_ratio', 4) ?? 4);
         $understaffedBatches = Batch::where('start_date', '>=', $today)
             ->whereIn('status', ['confirmed', 'open'])
             ->with(['bookings' => fn($q) => $q->where('status', '!=', 'pending_downpayment')->with('participants'), 'coachAssignments.coach'])
             ->get()
-            ->filter(fn($b) => $b->is_coach_pending || ($b->total_participants_count > 0 && $b->assigned_coaches_count < ceil($b->total_participants_count / 4)))
+            ->filter(fn($b) => $b->is_coach_pending || ($b->total_participants_count > 0 && $b->assigned_coaches_count < ceil($b->total_participants_count / $coachRatio)))
             ->values();
 
         $weatherAlerts = Batch::where('start_date', '>=', $today)

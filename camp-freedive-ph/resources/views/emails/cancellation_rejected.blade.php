@@ -56,7 +56,7 @@
             <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; border: none !important;">
                 <tr style="border: none !important; border-bottom: none !important;">
                     <td style="padding: 10px 0; color: #6E6E73; border: none !important; border-bottom: none !important;">Confirmed Dates:</td>
-                    <td style="padding: 10px 0; font-weight: 700; color: #780000; border: none !important; border-bottom: none !important;">{{ $booking->start_date ? $booking->start_date->format('M d, Y') : '' }} to {{ $booking->end_date ? $booking->end_date->format('M d, Y') : '' }}</td>
+                    <td style="padding: 10px 0; font-weight: 700; color: #780000; border: none !important; border-bottom: none !important;">{{ $booking->start_date ? $booking->start_date->format('M d, Y') : '' }} - {{ $booking->end_date ? $booking->end_date->format('M d, Y') : '' }}</td>
                 </tr>
                 <tr style="border: none !important; border-bottom: none !important;">
                     <td style="padding: 10px 0; color: #6E6E73; border: none !important; border-bottom: none !important;">Booking Reference:</td>

@@ -109,7 +109,84 @@ class BookingController extends Controller
             }
         }
 
-        $pickupPoints = [
+        $settingService = app(\App\Services\SystemSettingService::class);
+
+        $discPrice = (float) ($settingService->get('program_pricing.base_price_discovery', 4250) ?? 4250);
+        $funCertPrice = (float) ($settingService->get('program_pricing.base_price_fundive_cert', 2500) ?? 2500);
+        $funNonCertPrice = (float) ($settingService->get('program_pricing.base_price_fundive_noncert', 3300) ?? 3300);
+        $refPrice = (float) ($settingService->get('program_pricing.base_price_refinement', 4100) ?? 4100);
+
+        $packagesData = [
+            'discovery' => [
+                'price' => $discPrice,
+                'inclusions' => (array) $settingService->get('program_pricing.discovery_inclusions', [
+                    '2 open water dives (2-3 hrs per session)',
+                    '1 pool session (10 ft deep pool access)',
+                    '2D1N shared AC room accommodation',
+                    'Lesson fee and coach fee',
+                    'Safety buoy set up',
+                    '3 full board meals',
+                    'Photos and videos',
+                    'Gears (mask, snorkel, fins, weight belt)',
+                ]),
+                'exclusions' => (array) $settingService->get('program_pricing.discovery_exclusions', [
+                    'Transportation (We arrange carpool)',
+                    'Boat dive (optional sanctuary trip +₱600/pax)',
+                    'Mabini LGU municipal environmental fee & dive pass',
+                ]),
+            ],
+            'fundive' => [
+                'price_certified' => $funCertPrice,
+                'price_non_certified' => $funNonCertPrice,
+                'inclusions' => (array) $settingService->get('program_pricing.fundive_inclusions', [
+                    '2 open water dives (2-3 hrs per session)',
+                    '1 pool session (10 ft deep pool access)',
+                    '2D1N shared AC room accommodation',
+                    'Safety coach fee (for non-certified option)',
+                    'Safety buoy set up',
+                    '3 full board meals',
+                    'Photos and videos',
+                    'Gears (mask, snorkel, fins, weight belt)',
+                ]),
+                'exclusions' => (array) $settingService->get('program_pricing.fundive_exclusions', [
+                    'Transportation (We arrange carpool)',
+                    'Boat dive (optional sanctuary trip +₱600/pax)',
+                    'Mabini LGU municipal environmental fee & dive pass',
+                ]),
+            ],
+            'refinement' => [
+                'price' => $refPrice,
+                'inclusions' => (array) $settingService->get('program_pricing.refinement_inclusions', [
+                    '2 open water dives (2-3 hrs per session)',
+                    '1 pool session (10 ft deep pool access)',
+                    '2D1N shared AC room accommodation',
+                    'Coach fee and depth coaching',
+                    'Safety buoy set up',
+                    '3 full board meals',
+                    'Photos and videos',
+                    'Gears (mask, snorkel, fins, weight belt)',
+                ]),
+                'exclusions' => (array) $settingService->get('program_pricing.refinement_exclusions', [
+                    'Transportation (We arrange carpool)',
+                    'Boat dive (optional sanctuary trip +₱600/pax)',
+                    'Mabini LGU municipal environmental fee & dive pass',
+                ]),
+            ],
+        ];
+
+        $feesData = [
+            'carpool' => (float) ($settingService->get('addons.carpool_fee_per_head', 1200.00) ?? 1200.00),
+            'boat_dive' => (float) ($settingService->get('addons.boat_dive_fee_per_head', 600.00) ?? 600.00),
+            'lgu_pass' => (float) ($settingService->get('addons.lgu_tourism_pass_fee', 300.00) ?? 300.00),
+            'environmental' => (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00),
+        ];
+
+        $downpaymentsData = [
+            'carpool' => (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00),
+            'own_transpo' => (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00),
+        ];
+
+        $pickupPoints = $settingService->get('addons.pickup_locations', [
             [
                 'id' => 'monumento',
                 'name' => 'Monumento Hypermarket - 2:30 AM',
@@ -140,9 +217,17 @@ class BookingController extends Controller
                 'time' => '5:30 AM',
                 'address' => 'Sto. Tomas SLEX / STAR Tollway Exit, Batangas',
             ],
-        ];
+        ]);
 
-        return view('booking.create', compact('selectedClass', 'pickupPoints', 'confirmedBookingData', 'initialStep'));
+        return view('booking.create', compact(
+            'selectedClass',
+            'pickupPoints',
+            'confirmedBookingData',
+            'initialStep',
+            'packagesData',
+            'feesData',
+            'downpaymentsData'
+        ));
     }
 
     /**
@@ -283,19 +368,24 @@ class BookingController extends Controller
                 $subtotal = $quote['subtotal'];
 
                 // Regulatory & Logistics Fees:
-                // ₱300 LGU Tourism Pass + ₱50 Mabini Marine Sanctuary Ecological Fee per participant.
-                // Carpool (₱1,200/head roundtrip) and Boat Dive (₱600/head private banca) are optional add-ons.
-                $lguFee = 300.00 * $paxCount;
-                $envFee = 50.00 * $paxCount;
-                $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1200.00 * $paxCount) : 0.00;
-                $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? (600.00 * $paxCount) : 0.00;
+                $settingService = app(\App\Services\SystemSettingService::class);
+                $lguFeeRate = (float) ($settingService->get('addons.lgu_tourism_pass_fee', 300.00) ?? 300.00);
+                $envFeeRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
+                $carpoolFeeRate = (float) ($settingService->get('addons.carpool_fee_per_head', 1200.00) ?? 1200.00);
+                $boatDiveFeeRate = (float) ($settingService->get('addons.boat_dive_fee_per_head', 600.00) ?? 600.00);
+
+                $lguFee = $lguFeeRate * $paxCount;
+                $envFee = $envFeeRate * $paxCount;
+                $carpoolFee = ($validated['pickup_option'] === 'carpool') ? ($carpoolFeeRate * $paxCount) : 0.00;
+                $boatDiveFee = (!empty($validated['boat_dive']) && $validated['boat_dive']) ? ($boatDiveFeeRate * $paxCount) : 0.00;
 
                 $totalAmount = $subtotal + $lguFee + $envFee + $carpoolFee + $boatDiveFee;
                 
-                // Deposit Policy:
-                // If carpool is selected: ₱3,000/head. If own transportation: ₱2,000/head.
-                // The remaining balance is collected at camp on Day 1 upon physical check-in.
-                $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? 3000.00 : 2000.00;
+                // Deposit Policy (Carpool: ₱3,000/head, Own Transpo: ₱2,000/head by default):
+                $dpCarpool = (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00);
+                $dpOwn = (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00);
+
+                $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? $dpCarpool : $dpOwn;
                 $downpaymentAmount = min($totalAmount, $downpaymentPerHead * $paxCount);
                 $balanceAmount = max(0, $totalAmount - $downpaymentAmount);
 

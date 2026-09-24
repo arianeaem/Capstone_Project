@@ -30,7 +30,7 @@ class PricingRuleEngine
     public const ADJUSTMENT_PERCENTAGE_CAP = 0.30;
 
     /**
-     * Standard Base Prices per class type.
+     * Standard Base Prices per class type (fallback defaults).
      */
     public const BASE_PRICES = [
         'discovery' => 4250.00,
@@ -40,9 +40,11 @@ class PricingRuleEngine
     ];
 
     public function __construct(
-        protected ?DemandForecastService $demandForecastService = null
+        protected ?DemandForecastService $demandForecastService = null,
+        protected ?SystemSettingService $settingService = null
     ) {
         $this->demandForecastService ??= app(DemandForecastService::class);
+        $this->settingService ??= app(SystemSettingService::class);
     }
 
     /**
@@ -52,9 +54,38 @@ class PricingRuleEngine
     {
         $classKey = strtolower($classType);
         if ($classKey === 'fundive') {
-            return $isCertified ? self::BASE_PRICES['fundive_certified'] : self::BASE_PRICES['fundive_non_certified'];
+            return $isCertified
+                ? (float) ($this->settingService?->get('program_pricing.base_price_fundive_cert', self::BASE_PRICES['fundive_certified']) ?? self::BASE_PRICES['fundive_certified'])
+                : (float) ($this->settingService?->get('program_pricing.base_price_fundive_noncert', self::BASE_PRICES['fundive_non_certified']) ?? self::BASE_PRICES['fundive_non_certified']);
         }
+
+        $settingKey = match ($classKey) {
+            'discovery' => 'program_pricing.base_price_discovery',
+            'refinement' => 'program_pricing.base_price_refinement',
+            default => null,
+        };
+
+        if ($settingKey) {
+            $val = $this->settingService?->get($settingKey);
+            if ($val !== null) {
+                return (float) $val;
+            }
+        }
+
         return self::BASE_PRICES[$classKey] ?? self::BASE_PRICES['discovery'];
+    }
+
+    /**
+     * Get dynamic pricing cap as a decimal float (e.g. 0.30 for 30%).
+     */
+    public function getAdjustmentCap(): float
+    {
+        $capPercent = $this->settingService?->get('program_pricing.dynamic_pricing_cap_percent');
+        if ($capPercent !== null && is_numeric($capPercent)) {
+            return (float) $capPercent / 100.0;
+        }
+
+        return self::ADJUSTMENT_PERCENTAGE_CAP;
     }
 
     /**
@@ -232,9 +263,10 @@ class PricingRuleEngine
             }
         }
 
-        // Apply clamping cap (+/- 30% of base price)
-        $maxAdjustment = $basePrice * self::ADJUSTMENT_PERCENTAGE_CAP;
-        $minAdjustment = -$basePrice * self::ADJUSTMENT_PERCENTAGE_CAP;
+        // Apply clamping cap (+/- max cap % of base price)
+        $cap = $this->getAdjustmentCap();
+        $maxAdjustment = $basePrice * $cap;
+        $minAdjustment = -$basePrice * $cap;
 
         $clampedDelta = max($minAdjustment, min($maxAdjustment, $rawTotalDelta));
         $wasClamped = ($clampedDelta !== $rawTotalDelta);

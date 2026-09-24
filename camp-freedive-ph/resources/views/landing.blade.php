@@ -86,28 +86,28 @@
                                         <div>
                                             <span class="text-sm font-semibold text-[#6E6E73] block">Certified freedivers:</span>
                                             <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
-                                                ₱2,500
+                                                ₱{{ number_format($c['price_certified'] ?? 2500) }}
                                             </div>
                                             <span class="text-sm text-[#636366] italic block mt-0.5">(safety coach not included)</span>
                                         </div>
                                         <div class="pt-2 border-t border-[#F1D5D5]/80">
                                             <span class="text-sm font-semibold text-[#6E6E73] block">Non certified freedivers:</span>
                                             <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
-                                                ₱3,300
+                                                ₱{{ number_format($c['price_non_certified'] ?? 3300) }}
                                             </div>
                                         </div>
                                     </div>
                                 @elseif($c['id'] === 'discovery')
                                     <div>
                                         <div class="text-4xl sm:text-5xl font-black text-[#1D1D1F] tracking-tight">
-                                            ₱4,250
+                                            ₱{{ number_format($c['price'] ?? 4250) }}
                                         </div>
                                         <span class="text-sm text-[#6E6E73] font-medium block mt-1">per person</span>
                                     </div>
                                 @else
                                     <div>
                                         <div class="text-4xl sm:text-5xl font-black text-[#1D1D1F] tracking-tight">
-                                            ₱4,100
+                                            ₱{{ number_format($c['price'] ?? 4100) }}
                                         </div>
                                         <span class="text-sm text-[#6E6E73] font-medium block mt-1">per person</span>
                                     </div>

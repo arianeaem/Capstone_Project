@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Coach;
 use App\Http\Controllers\Controller;
 use App\Models\CoachOpening;
 use App\Models\CoachRequest;
+use App\Models\ParticipantAssignment;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,10 +23,28 @@ class RequestController extends Controller
         $today = Carbon::today();
         $activeTab = $request->input('tab', 'open_slots');
 
+        // Exclude batches that this coach is already assigned to or approved for
+        $assignedBatchIds = ParticipantAssignment::where('coach_id', $coach->id)
+            ->where('status', 'assigned')
+            ->pluck('batch_id')
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $approvedBatchIds = CoachRequest::where('coach_id', $coach->id)
+            ->where('status', 'approved')
+            ->pluck('batch_id')
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $excludeBatchIds = array_unique(array_merge($assignedBatchIds, $approvedBatchIds));
+
         // 1. Open Camp Slots (Where camp is short-staffed and looking for volunteer coaches)
         $openings = CoachOpening::with(['batch.riskAssessments', 'postedByUser', 'requests'])
             ->where('status', 'open')
             ->whereDate('dive_date', '>=', $today)
+            ->whereNotIn('batch_id', $excludeBatchIds)
             ->orderBy('dive_date', 'asc')
             ->get();
 
@@ -61,6 +80,16 @@ class RequestController extends Controller
         // Check if dive date is past
         if ($opening->dive_date->isPast() && !$opening->dive_date->isToday()) {
             return back()->with('error', 'Cannot request past dive dates.');
+        }
+
+        // Check if coach is already assigned to this batch
+        $isAlreadyAssigned = ParticipantAssignment::where('coach_id', $coach->id)
+            ->where('batch_id', $opening->batch_id)
+            ->where('status', 'assigned')
+            ->exists();
+
+        if ($isAlreadyAssigned) {
+            return back()->with('error', 'You are already assigned to this dive batch.');
         }
 
         // Check if coach already has a pending or approved request for this opening

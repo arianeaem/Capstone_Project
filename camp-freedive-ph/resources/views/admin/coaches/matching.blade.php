@@ -58,10 +58,10 @@
                 $isStaffed = $assignedCount >= $neededCoaches;
                 $mlRec = $group['ml_recommendation'] ?? null;
             @endphp
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4 shadow-2xs flex flex-col justify-between" x-data="{ selectedCoaches: [] }">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-5 sm:p-6 space-y-4 shadow-2xs flex flex-col justify-between" x-data="{ isOpen: false, selectedCoaches: [] }">
                 
                 <!-- Group Header -->
-                <div class="space-y-3 border-b border-[#E5E5EA] pb-4">
+                <div class="space-y-3" :class="isOpen ? 'border-b border-[#E5E5EA] pb-4' : ''">
                     <div class="flex items-start justify-between gap-3">
                         <div>
                             <h2 class="font-extrabold text-base sm:text-lg text-[#1D1D1F]">
@@ -69,13 +69,13 @@
                             </h2>
                             <div class="space-y-0.5 text-sm text-[#6E6E73] mt-1.5">
                                 <div>
-                                    <span class="font-bold text-[#1D1D1F]">{{ $batch->start_date->format('M d') }} to {{ $batch->end_date->format('M d, Y') }}</span>
+                                    <span class="font-bold text-[#1D1D1F]">{{ $batch->formatted_date_range }}</span>
                                 </div>
                                 <div class="text-[#6E6E73] mt-0.5 space-y-0.5">
                                     <div>Participants: <strong class="text-[#1D1D1F]">{{ $totalPax }}</strong></div>
                                     <div>
                                         @if($totalPax > 0)
-                                            Required: <strong class="text-[#1D1D1F]">{{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }} (1:4 ratio)</strong>
+                                            Required: <strong class="text-[#1D1D1F]">{{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }} (1:{{ app(\App\Services\SystemSettingService::class)->get('camp_operations.coach_student_ratio', 4) }} ratio)</strong>
                                         @else
                                             Required: <span class="text-[#8E8E93]">No participants</span>
                                         @endif
@@ -84,108 +84,117 @@
                             </div>
                         </div>
 
-                        <!-- Right Column: Coaches to fill badge on top of Share to Coaches -->
+                        <!-- Right Column: Coaches to fill badge on top, Share to Coaches, and Toggle Button at the bottom -->
                         <div class="flex flex-col items-end gap-2 shrink-0">
                             <!-- Coaches to Fill Badge -->
-                            @if($totalPax > 0)
-                                <span class="px-3 py-0.5 rounded-full text-sm font-black bg-[#F8EAEA] text-[#780000] inline-flex items-center justify-center whitespace-nowrap shadow-2xs">
-                                    {{ $assignedCount }} / {{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }}
-                                </span>
-                            @else
-                                <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-[#F2F2F7] text-[#6E6E73] inline-flex items-center justify-center whitespace-nowrap shadow-2xs">
-                                    0 Needed
-                                </span>
-                            @endif
+                            <span class="px-3 py-0.5 rounded-full text-sm font-black bg-[#F8EAEA] text-[#780000] inline-flex items-center justify-center whitespace-nowrap shadow-2xs">
+                                {{ $assignedCount }} / {{ $neededCoaches }} {{ Str::plural('Coach', $neededCoaches) }}
+                            </span>
 
                             <!-- Broadcast Slot Button -->
                             @if($group['open_broadcast'])
                                 <span class="px-2.5 py-1 rounded-lg text-sm font-bold bg-emerald-50 text-emerald-800 inline-flex items-center whitespace-nowrap">
                                     Shared
                                 </span>
-                            @elseif($totalPax > 0)
+                            @else
                                 <button type="button" 
                                         @click="shareBatchId = {{ $batch->id }}; shareBatchNumber = '{{ addslashes($batch->batch_number) }}'; shareActionUrl = '{{ auth()->user()->isOwner() ? route('owner.coaches.matching.broadcast') : route('admin.coaches.matching.broadcast') }}'; shareModalOpen = true"
                                         class="btn-secondary px-3 py-1.5 text-sm font-semibold whitespace-nowrap cursor-pointer">
                                     <span>Share to Coaches</span>
                                 </button>
                             @endif
+
+                            <!-- Toggle Coaches Button (placed at the bottom of Share to Coaches) -->
+                            <button type="button" 
+                                    @click="isOpen = !isOpen"
+                                    class="btn-secondary px-3 py-1.5 text-sm font-semibold inline-flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                                <span x-text="isOpen ? 'Hide Coaches' : 'Assign Coaches'"></span>
+                                <svg class="w-4 h-4 text-[#6E6E73] transition-transform duration-200" 
+                                     :class="isOpen ? 'rotate-180' : ''" 
+                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>
 
                 @if($totalPax > 0)
-                    <!-- Assigned Coaches Section -->
-                    <div class="space-y-2.5">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-bold text-[#1D1D1F] uppercase tracking-wider flex items-center gap-1.5">
-                                <span>Assigned Coaches</span>
-                                <span class="px-2 py-0.5 rounded-full text-sm font-extrabold bg-[#F2F2F7] text-[#1D1D1F]">
-                                    {{ $assignedCount }}
-                                </span>
-                            </h3>
-                        </div>
+                    <!-- Toggleable Assigned & Available Coaches Section -->
+                    <div x-show="isOpen" x-cloak class="space-y-4 pt-1">
+                        <!-- Assigned Coaches Section -->
+                        <div class="space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-sm font-bold text-[#1D1D1F] uppercase tracking-wider flex items-center gap-1.5">
+                                    <span>Assigned Coaches</span>
+                                    <span class="px-2 py-0.5 rounded-full text-sm font-extrabold bg-[#F2F2F7] text-[#1D1D1F]">
+                                        {{ $assignedCount }}
+                                    </span>
+                                </h3>
+                            </div>
 
-                        @if($assignedCount > 0)
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                @foreach($assignedCoaches as $assignedCoach)
-                                    <div class="p-2.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between gap-2">
-                                        <div class="flex items-center gap-2 min-w-0">
-                                            <div class="w-6 h-6 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-sm flex items-center justify-center shrink-0">
-                                                {{ strtoupper(substr($assignedCoach->name, 0, 1)) }}
+                            @if($assignedCount > 0)
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    @foreach($assignedCoaches as $assignedCoach)
+                                        <div class="p-2.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between gap-2">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <div class="w-6 h-6 rounded-full bg-[#F8EAEA] text-[#780000] font-bold text-sm flex items-center justify-center shrink-0">
+                                                    {{ strtoupper(substr($assignedCoach->name, 0, 1)) }}
+                                                </div>
+                                                <span class="font-bold text-sm text-[#1D1D1F] truncate">{{ $assignedCoach->name }}</span>
                                             </div>
-                                            <span class="font-bold text-sm text-[#1D1D1F] truncate">{{ $assignedCoach->name }}</span>
+
+                                            <button type="button" 
+                                                    @click="unassignBatchId = {{ $batch->id }}; unassignCoachId = {{ $assignedCoach->id }}; unassignCoachName = '{{ addslashes($assignedCoach->name) }}'; unassignBatchNumber = '{{ addslashes($batch->batch_number) }}'; unassignActionUrl = '{{ auth()->user()->isOwner() ? route('owner.coaches.matching.unassign') : route('admin.coaches.matching.unassign') }}'; unassignModalOpen = true"
+                                                    class="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-1.5 py-0.5 rounded transition-colors shrink-0 cursor-pointer">
+                                                Remove
+                                            </button>
                                         </div>
-
-                                        <button type="button" 
-                                                @click="unassignBatchId = {{ $batch->id }}; unassignCoachId = {{ $assignedCoach->id }}; unassignCoachName = '{{ addslashes($assignedCoach->name) }}'; unassignBatchNumber = '{{ addslashes($batch->batch_number) }}'; unassignActionUrl = '{{ auth()->user()->isOwner() ? route('owner.coaches.matching.unassign') : route('admin.coaches.matching.unassign') }}'; unassignModalOpen = true"
-                                                class="text-sm font-bold text-rose-600 hover:text-rose-800 hover:bg-rose-50 px-1.5 py-0.5 rounded transition-colors shrink-0 cursor-pointer">
-                                            Remove
-                                        </button>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="p-3 rounded-xl text-center text-sm text-[#8E8E93] bg-[#F2F2F7] border border-dashed border-[#E5E5EA]">
-                                No coaches assigned yet. Select available coaches below.
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Available Coaches Section -->
-                    <div class="space-y-2.5 pt-2">
-                        <div class="flex items-center justify-between flex-wrap gap-2">
-                            <h3 class="text-sm font-bold text-[#1D1D1F] uppercase tracking-wider">
-                                Available Coaches
-                            </h3>
-
-                            <!-- Bulk Assign Action -->
-                            <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.assign') : route('admin.coaches.matching.assign') }}" method="POST" x-show="selectedCoaches.length > 0" x-cloak>
-                                @csrf
-                                <input type="hidden" name="batch_id" value="{{ $batch->id }}">
-                                <template x-for="cId in selectedCoaches" :key="cId">
-                                    <input type="hidden" name="coach_ids[]" :value="cId">
-                                </template>
-                                <button type="submit" class="btn-primary px-3 py-1 text-sm font-bold shadow-2xs flex items-center gap-1">
-                                    <span>Assign Selected (<span x-text="selectedCoaches.length"></span>)</span>
-                                </button>
-                            </form>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="p-3 rounded-xl text-center text-sm text-[#8E8E93] bg-[#F2F2F7] border border-dashed border-[#E5E5EA]">
+                                    No coaches assigned yet. Select available coaches below.
+                                </div>
+                            @endif
                         </div>
 
-                        <!-- Available Coach Selection Grid -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            @forelse($availableCoaches as $coachItem)
-                                <label class="p-2.5 rounded-xl bg-[#F2F2F7] hover:bg-white hover:shadow-2xs  flex items-center gap-2 transition-all cursor-pointer select-none">
-                                    <input type="checkbox" 
-                                           :value="{{ $coachItem['id'] }}" 
-                                           x-model="selectedCoaches"
-                                           class="rounded text-[#780000] focus:ring-[#780000] w-4 h-4 cursor-pointer shrink-0">
-                                    <span class="font-semibold text-sm text-[#1D1D1F] truncate">{{ $coachItem['name'] }}</span>
-                                </label>
-                            @empty
-                                <div class="col-span-full p-3 rounded-xl text-center text-sm text-[#8E8E93] bg-[#F2F2F7]">
-                                    No other available coaches on this schedule.
-                                </div>
-                            @endforelse
+                        <!-- Available Coaches Section -->
+                        <div class="space-y-2.5 pt-2">
+                            <div class="flex items-center justify-between flex-wrap gap-2">
+                                <h3 class="text-sm font-bold text-[#1D1D1F] uppercase tracking-wider">
+                                    Available Coaches
+                                </h3>
+
+                                <!-- Bulk Assign Action -->
+                                <form action="{{ auth()->user()->isOwner() ? route('owner.coaches.matching.assign') : route('admin.coaches.matching.assign') }}" method="POST" x-show="selectedCoaches.length > 0" x-cloak>
+                                    @csrf
+                                    <input type="hidden" name="batch_id" value="{{ $batch->id }}">
+                                    <template x-for="cId in selectedCoaches" :key="cId">
+                                        <input type="hidden" name="coach_ids[]" :value="cId">
+                                    </template>
+                                    <button type="submit" class="btn-primary px-3 py-1 text-sm font-bold shadow-2xs flex items-center gap-1">
+                                        <span>Assign Selected (<span x-text="selectedCoaches.length"></span>)</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Available Coach Selection Grid -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                @forelse($availableCoaches as $coachItem)
+                                    <label class="p-2.5 rounded-xl bg-[#F2F2F7] hover:bg-white hover:shadow-2xs flex items-center gap-2 transition-all cursor-pointer select-none">
+                                        <input type="checkbox" 
+                                               :value="{{ $coachItem['id'] }}" 
+                                               x-model="selectedCoaches"
+                                               class="rounded text-[#780000] focus:ring-[#780000] w-4 h-4 cursor-pointer shrink-0">
+                                        <span class="font-semibold text-sm text-[#1D1D1F] truncate">{{ $coachItem['name'] }}</span>
+                                    </label>
+                                @empty
+                                    <div class="col-span-full p-3 rounded-xl text-center text-sm text-[#8E8E93] bg-[#F2F2F7]">
+                                        No other available coaches on this schedule.
+                                    </div>
+                                @endforelse
+                            </div>
                         </div>
                     </div>
                 @else

@@ -80,6 +80,7 @@ class DatabaseSeeder extends Seeder
             'hourly_assessments',
             'manual_overrides',
             'notification_logs',
+            'system_settings',
         ];
 
         foreach ($tables as $table) {
@@ -1351,14 +1352,8 @@ class DatabaseSeeder extends Seeder
         }
 
         // =========================================================================
-        // 7. SEED LIVE WEATHER RISK ASSESSMENTS FOR ACTIVE BATCHES
+        // 8. SEED SYSTEM SETTINGS
         // =========================================================================
-        try {
-            $forecastService = app(\App\Services\WeatherForecastService::class);
-            $forecastService->assessBatch($batch5, null, $admin);
-            $forecastService->assessBatch($batch6, null, $admin);
-        } catch (\Exception $e) {
-            // Service fallback
-        }
+        $this->call(SystemSettingsSeeder::class);
     }
 }

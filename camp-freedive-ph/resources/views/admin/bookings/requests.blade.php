@@ -31,9 +31,6 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold">
-                <span>View Pending Refunds</span>
-            </a>
             <a href="{{ route('admin.bookings.index') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold">
                 View All Bookings
             </a>
@@ -46,61 +43,70 @@
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
                 <span>Reschedule Requests</span>
                 @if(count($pendingReschedules) > 0)
-                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-amber-50 text-amber-800 border border-amber-300">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-800">
                         {{ count($pendingReschedules) }} Pending
                     </span>
                 @endif
             </h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             @forelse($pendingReschedules as $req)
             @php
                 $booking = $req->booking;
                 $resPolicy = $reschedulePolicies[$req->id] ?? null;
+                $studentNames = $booking->participants->pluck('name')->filter()->values();
+                $studentsDisplay = $studentNames->isNotEmpty() ? $studentNames->implode(', ') : $booking->contact_name;
             @endphp
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:border-[#D1D1D6] transition-all gap-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
                 <!-- Request Header -->
                 <div>
-                    <div class="flex items-start justify-between gap-2 border-b border-[#E5E5EA] pb-3">
-                        <div class="min-w-0">
-                            <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-sm text-[#780000] hover:underline block truncate">
-                                {{ $booking->booking_number }}
-                            </a>
-                            <div class="text-sm font-bold text-[#1D1D1F] mt-0.5 truncate">{{ $booking->contact_name }}</div>
-                            <div class="text-sm text-[#6E6E73] truncate">{{ $booking->contact_phone }}</div>
+                    <div class="border-b border-[#F2F2F7] pb-3 space-y-1">
+                        <!-- Booking Number -->
+                        <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-black text-xl sm:text-2xl text-[#780000] hover:underline block leading-tight tracking-tight">
+                            {{ $booking->booking_number }}
+                        </a>
+                        <div class="text-xs font-bold text-[#1D1D1F]">
+                            {{ $booking->formatted_class_type }}
                         </div>
-                        <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
-                            Reschedule
+                        <div class="text-xs text-[#8E8E93] font-medium">
+                            Requested on <strong class="text-[#1D1D1F] font-semibold">{{ $req->requested_at ? $req->requested_at->format('M d, Y') : $req->created_at->format('M d, Y') }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Students Connected to Booking -->
+                    <div class="mt-3">
+                        <span class="font-extrabold text-sm text-[#1D1D1F] leading-snug block">
+                            {{ $studentsDisplay }}
                         </span>
                     </div>
 
-                    <!-- Date Shift Details -->
-                    <div class="mt-3 space-y-2 p-3 rounded-lg bg-[#F2F2F7] border border-[#E5E5EA] text-sm">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[#6E6E73] text-sm">Current:</span>
-                            <strong class="text-[#1D1D1F] font-semibold text-right">{{ $booking->start_date->format('M d') }} to {{ $booking->end_date->format('M d, Y') }}</strong>
+                    <!-- Key Details Grid (2x2) -->
+                    <div class="mt-3 grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">CURRENT DATES</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block mt-0.5 leading-snug">
+                                {{ $booking->formatted_date_range }}
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between gap-2 border-t border-[#E5E5EA] pt-2">
-                            <span class="text-[#1D1D1F] font-semibold text-sm">Requested:</span>
-                            <strong class="text-emerald-700 font-bold text-right">{{ $req->requested_start_date->format('M d') }} to {{ $req->requested_end_date->format('M d, Y') }}</strong>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">REQUESTED DATES</span>
+                            <span class="text-xs sm:text-sm font-bold text-emerald-700 block mt-0.5 leading-snug">
+                                {{ $req->requested_start_date->year === $req->requested_end_date->year ? $req->requested_start_date->format('M d') . ' - ' . $req->requested_end_date->format('M d, Y') : $req->requested_start_date->format('M d, Y') . ' - ' . $req->requested_end_date->format('M d, Y') }}
+                            </span>
                         </div>
-
-                        @if($req->reason)
-                            <div class="border-t border-[#E5E5EA] pt-2 text-sm text-[#6E6E73]">
-                                <strong class="text-[#1D1D1F] text-sm">Guest Reason:</strong>
-                                <span class="italic text-sm block mt-0.5">"{{ $req->reason }}"</span>
-                            </div>
-                        @endif
                     </div>
 
-                    <div class="mt-2.5 text-sm text-[#8E8E93]">
-                        Submitted: {{ $req->requested_at ? $req->requested_at->format('M d, Y g:i A') : $req->created_at->format('M d, Y') }}
-                    </div>
+                    @if($req->reason)
+                        <div class="mt-3 space-y-0.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">GUEST REASON</span>
+                            <p class="text-xs text-[#6E6E73] italic">"{{ $req->reason }}"</p>
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Reschedule Actions -->
-                <div class="flex items-center gap-2 pt-3 border-t border-[#E5E5EA]">
+                <div class="flex items-center gap-2">
                     <button type="button" 
                             @click="openRejectModal('{{ route('admin.bookings.requests.reschedule.reject', $req) }}', '{{ $booking->booking_number }}', 'Reschedule')"
                             class="btn-secondary flex-1 py-2 text-sm font-semibold text-center">
@@ -125,135 +131,151 @@
         </div>
     </div>
 
-    <!-- Pending Cancellation Requests -->
+    <!-- Cancellation Requests (Direct 1-Step Cancellation & Refund Execution) -->
     <div class="space-y-3.5 pt-4">
         <div class="flex items-center justify-between">
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
                 <span>Cancellation Requests</span>
                 @if(count($pendingCancellations) > 0)
-                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#780000] text-white">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#780000] text-white">
                         {{ count($pendingCancellations) }} Pending
                     </span>
                 @endif
             </h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-5">
             @forelse($pendingCancellations as $req)
             @php
                 $booking = $req->booking;
+                $payment = $booking->payments->first();
                 $policy = $cancellationPolicies[$req->id] ?? null;
-                $isFullRefund = ($policy && ($policy['refund_percentage'] ?? 0) === 100);
+                $isEligible = ($policy && ($policy['refund_percentage'] ?? 0) > 0);
                 $recRefund = $policy['calculated_refund'] ?? $req->calculated_refund_amount;
+                $claimAmount = $booking->paid_amount ?: ($payment->amount ?? 0);
+                $studentNames = $booking->participants->pluck('name')->filter()->values();
+                $studentsDisplay = $studentNames->isNotEmpty() ? $studentNames->implode(', ') : $booking->contact_name;
             @endphp
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between shadow-2xs hover:border-[#D1D1D6] transition-all gap-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
                 <!-- Request Header -->
                 <div>
-                    <div class="flex items-start justify-between gap-2 border-b border-[#E5E5EA] pb-3">
-                        <div class="min-w-0">
-                            <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-sm text-[#780000] hover:underline block truncate">
-                                {{ $booking->booking_number }}
-                            </a>
-                            <div class="text-sm font-bold text-[#1D1D1F] mt-0.5 truncate">{{ $booking->contact_name }}</div>
-                            <div class="text-sm text-[#6E6E73] truncate">{{ $booking->contact_email }}</div>
+                    <div class="border-b border-[#F2F2F7] pb-3 space-y-1">
+                        <!-- Booking Number -->
+                        <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-black text-xl sm:text-2xl text-[#780000] hover:underline block leading-tight tracking-tight">
+                            {{ $booking->booking_number }}
+                        </a>
+                        <div class="text-xs font-bold text-[#1D1D1F]">
+                            {{ $booking->formatted_class_type }}
                         </div>
-                        <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
-                            Cancel Claim
+                        <div class="text-xs text-[#8E8E93] font-medium">
+                            Requested on <strong class="text-[#1D1D1F] font-semibold">{{ $req->requested_at ? $req->requested_at->format('M d, Y') : $req->created_at->format('M d, Y') }}</strong>
+                        </div>
+                    </div>
+
+                    <!-- Students Connected to Booking -->
+                    <div class="mt-3">
+                        <span class="font-extrabold text-sm text-[#1D1D1F] leading-snug block">
+                            {{ $studentsDisplay }}
                         </span>
                     </div>
 
-                    <!-- Cancellation Policy & Breakdown -->
-                    <div class="mt-3 p-3 rounded-lg bg-[#F2F2F7] border border-[#E5E5EA] space-y-2 text-sm">
-                        <div class="flex items-center justify-between gap-2">
-                            <span class="text-[#6E6E73]">Trip Dates:</span>
-                            <strong class="text-[#1D1D1F] font-semibold text-right">{{ $booking->start_date->format('M d') }} to {{ $booking->end_date->format('M d, Y') }}</strong>
+                    <!-- Key Details Grid (2x2) -->
+                    <div class="mt-3 grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">DIVE DATE</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block mt-0.5 leading-snug">
+                                {{ $booking->formatted_date_range }}
+                            </span>
                         </div>
-                        <div class="flex items-center justify-between gap-2 border-t border-[#E5E5EA] pt-2">
-                            <span class="text-[#6E6E73]">Total Paid:</span>
-                            <strong class="text-[#1D1D1F] font-bold text-right">₱{{ number_format($booking->paid_amount, 2) }}</strong>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">TOTAL PAID</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block mt-0.5 leading-snug">
+                                ₱{{ number_format($claimAmount, 2) }}
+                            </span>
                         </div>
-
-                        @if($policy)
-                            <div class="border-t border-[#E5E5EA] pt-2 space-y-1">
-                                <div class="flex items-center justify-between font-bold text-sm">
-                                    <div class="flex items-center gap-1.5 {{ $isFullRefund ? 'text-emerald-800' : 'text-amber-900' }}">
-                                        <span>Policy Recommendation:</span>
-                                    </div>
-                                    <span class="{{ $isFullRefund ? 'text-emerald-700 font-extrabold' : 'text-amber-800 font-extrabold' }}">
-                                        {{ $isFullRefund ? '100% Refund (₱' . number_format($recRefund, 2) . ')' : '0% Refund (Forfeited)' }}
-                                    </span>
-                                </div>
-                                <p class="text-sm text-[#6E6E73] leading-relaxed">
-                                    {{ $policy['cancel_message'] ?? 'Cancellation evaluated under standard policy.' }}
-                                </p>
-                            </div>
-                        @endif
-
-                        @if($req->reason)
-                            <div class="border-t border-[#E5E5EA] pt-2 text-sm text-[#6E6E73]">
-                                <strong class="text-[#1D1D1F] text-sm">Guest Reason:</strong>
-                                <span class="italic text-sm block mt-0.5">"{{ $req->reason }}"</span>
-                            </div>
-                        @endif
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">METHOD</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] uppercase block mt-0.5 leading-snug">
+                                {{ $payment->payment_method ?? 'GCash' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">TYPE</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] capitalize block mt-0.5 leading-snug">
+                                {{ $payment->payment_type ?? 'Downpayment' }}
+                            </span>
+                        </div>
                     </div>
 
-                    <div class="mt-2.5 text-sm text-[#8E8E93]">
-                        Submitted: {{ $req->requested_at ? $req->requested_at->format('M d, Y g:i A') : $req->created_at->format('M d, Y') }}
+                    <!-- Policy Status / Message -->
+                    <div class="mt-3 space-y-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">POLICY STATUS</span>
+                        <div class="flex items-center gap-1.5 font-bold text-xs {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
+                            @if($isEligible)
+                                <span>100% Refund Eligible (₱{{ number_format($recRefund, 2) }})</span>
+                            @else
+                                <span>0% Refund (Downpayment Forfeited per Policy)</span>
+                            @endif
+                        </div>
+                        <p class="text-xs text-[#6E6E73] leading-relaxed">
+                            {{ $policy['cancel_message'] ?? 'Cancellation evaluated under standard policy.' }}
+                        </p>
                     </div>
+
+                    @if($req->reason)
+                        <div class="mt-3 space-y-0.5">
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">GUEST REASON</span>
+                            <p class="text-xs text-[#6E6E73] italic">"{{ $req->reason }}"</p>
+                        </div>
+                    @endif
                 </div>
 
-                <!-- Cancellation Resolution Actions -->
-                <div class="space-y-2 pt-3 border-t border-[#E5E5EA]">
-                    @if($isFullRefund)
-                        <!-- Full Refund Actions -->
-                        <div class="flex items-center gap-2">
-                            <button type="button" 
-                                    @click="openRejectModal('{{ route('admin.bookings.requests.cancellation.reject', $req) }}', '{{ $booking->booking_number }}', 'Cancellation')"
-                                    class="btn-secondary py-2 px-3 text-sm font-semibold text-center shrink-0">
-                                Reject
-                            </button>
+                <!-- Direct 1-Step Resolution Actions -->
+                <div class="space-y-2">
+                    <div class="flex items-center gap-2">
+                        <!-- Reject Action -->
+                        <button type="button" 
+                                @click="openRejectModal('{{ route('admin.bookings.requests.cancellation.reject', $req) }}', '{{ $booking->booking_number }}', 'Cancellation')"
+                                class="btn-secondary py-2 px-3 text-sm font-semibold text-center shrink-0">
+                            Reject
+                        </button>
 
+                        @if(!$isEligible)
+                            <!-- Forfeit Deposit Action (Direct 1-Step) -->
+                            <form action="{{ route('admin.bookings.requests.cancellation.approve', $req) }}" method="POST" class="flex-1">
+                                @csrf
+                                <input type="hidden" name="action_type" value="forfeit">
+                                <button type="submit" 
+                                        onclick="return confirm('Approve cancellation with downpayment FORFEITED (₱0 refund) for {{ $booking->booking_number }} as per policy?')"
+                                        class="btn-secondary w-full py-2 text-sm font-bold text-center">
+                                    Forfeit Deposit (₱0)
+                                </button>
+                            </form>
+                        @else
+                            <!-- Approve & Execute Refund Action (Direct 1-Step) -->
                             <form action="{{ route('admin.bookings.requests.cancellation.approve', $req) }}" method="POST" class="flex-1">
                                 @csrf
                                 <input type="hidden" name="action_type" value="policy_refund">
                                 <button type="submit" 
-                                        onclick="return confirm('Approve cancellation & queue full refund of ₱{{ number_format($recRefund, 2) }} for {{ $booking->booking_number }}?')"
+                                        onclick="return confirm('Approve cancellation & process PayMongo refund of ₱{{ number_format($recRefund, 2) }} for {{ $booking->booking_number }}?')"
                                         class="btn-primary w-full py-2 text-sm font-bold shadow-2xs text-center">
-                                    Approve & Queue Refund (₱{{ number_format($recRefund, 2) }})
+                                    Approve & Refund (₱{{ number_format($recRefund, 2) }})
                                 </button>
                             </form>
-                        </div>
-                    @else
-                        <!-- Forfeiture or Override Actions -->
-                        <div class="space-y-2">
-                            <div class="flex items-center gap-2">
-                                <button type="button" 
-                                        @click="openRejectModal('{{ route('admin.bookings.requests.cancellation.reject', $req) }}', '{{ $booking->booking_number }}', 'Cancellation')"
-                                        class="btn-secondary py-2 px-3 text-sm font-semibold text-center shrink-0">
-                                    Reject
-                                </button>
+                        @endif
+                    </div>
 
-                                <form action="{{ route('admin.bookings.requests.cancellation.approve', $req) }}" method="POST" class="flex-1">
-                                    @csrf
-                                    <input type="hidden" name="action_type" value="forfeit">
-                                    <button type="submit" 
-                                            onclick="return confirm('Approve cancellation with downpayment FORFEITED (₱0 refund) for {{ $booking->booking_number }} as per policy?')"
-                                            class="btn-secondary w-full py-2 text-sm font-bold text-center">
-                                        Approve & Forfeit (₱0 Refund)
-                                    </button>
-                                </form>
-                            </div>
-
-                            <form action="{{ route('admin.bookings.requests.cancellation.approve', $req) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="action_type" value="full_refund">
-                                <button type="submit" 
-                                        onclick="return confirm('Override policy and approve 100% REFUND (₱{{ number_format($booking->paid_amount, 2) }}) for {{ $booking->booking_number }}?')"
-                                        class="btn-danger w-full py-1.5 text-sm font-bold text-center">
-                                    Override Policy: Approve 100% Refund (₱{{ number_format($booking->paid_amount, 2) }})
-                                </button>
-                            </form>
-                        </div>
+                    @if(!$isEligible)
+                        <!-- Policy Override Direct Refund Action -->
+                        <form action="{{ route('admin.bookings.requests.cancellation.approve', $req) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="action_type" value="full_refund">
+                            <button type="submit" 
+                                    onclick="return confirm('Override policy and execute full 100% refund of ₱{{ number_format($claimAmount, 2) }} for {{ $booking->booking_number }}?')"
+                                    class="btn-danger w-full py-1.5 text-sm font-bold text-center">
+                                Override Policy: Approve 100% Refund (₱{{ number_format($claimAmount, 2) }})
+                            </button>
+                        </form>
                     @endif
                 </div>
             </div>

@@ -246,10 +246,33 @@ class Booking extends Model
         return $this->formatted_class_type;
     }
 
+    /**
+     * Standardized date range format:
+     * - Same year: Oct 12 - Oct 13, 2026
+     * - Cross year: Dec 31, 2026 - Jan 1, 2027
+     * - Single date: Oct 12, 2026
+     */
+    public function getFormattedDateRangeAttribute(): string
+    {
+        if (!$this->start_date) {
+            return 'N/A';
+        }
+
+        if (!$this->end_date || $this->start_date->eq($this->end_date)) {
+            return $this->start_date->format('M d, Y');
+        }
+
+        if ($this->start_date->year === $this->end_date->year) {
+            return $this->start_date->format('M d') . ' - ' . $this->end_date->format('M d, Y');
+        }
+
+        return $this->start_date->format('M d, Y') . ' - ' . $this->end_date->format('M d, Y');
+    }
+
     public function getBatchDatesFormattedAttribute(): string
     {
-        if ($this->start_date && $this->end_date) {
-            return $this->start_date->format('M d') . ' - ' . $this->end_date->format('M d, Y');
+        if ($this->start_date) {
+            return $this->formatted_date_range;
         }
         return '2D1N Freediving Camp';
     }

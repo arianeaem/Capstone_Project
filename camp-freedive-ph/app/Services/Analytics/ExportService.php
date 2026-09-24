@@ -107,37 +107,40 @@ class ExportService
     protected function exportBatchesCsv($handle, Carbon $start, Carbon $end): void
     {
         fputcsv($handle, [
-            'Batch ID',
-            'Class Type',
+            'Batch Reference',
+            'Course Package',
             'Start Date',
             'End Date',
             'Status',
-            'Total Booked Divers',
-            'Max Capacity',
-            'Occupancy (%)',
+            'Total Booked Guests',
+            'Max Slot Capacity',
+            'Fill Rate (%)',
             'Assigned Coaches',
             'Coaches Count',
             'Recommended Coaches',
-            'Staffing Met',
-            'Risk Rating',
+            'Coach Safety Ratio Compliance',
+            'Weather & Safety Risk',
         ]);
 
         $batches = Batch::whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
-            ->with(['bookings' => fn($q) => $q->where('status', '!=', 'pending_downpayment')->with('participants'), 'coachAssignments.coach', 'riskAssessment'])
+            ->with(['bookings' => fn($q) => $q->where('status', '!=', 'pending_downpayment')->with('participants.assignment.coach'), 'riskAssessment'])
             ->orderBy('start_date', 'asc')
             ->get();
 
+        $coachRatio = (int) (app(\App\Services\SystemSettingService::class)->get('camp_operations.coach_student_ratio', 4) ?? 4);
+
         foreach ($batches as $b) {
             $paxCount = $b->total_participants_count;
-            $coachesCount = $b->assigned_coaches_count;
+            $distinctCoaches = $b->assigned_coaches;
+            $coachesCount = $distinctCoaches->count();
             $maxCap = $b->max_capacity ?: 20;
             $occupancy = $maxCap > 0 ? round(($paxCount / $maxCap) * 100, 1) : 0;
-            $coachNames = $b->coachAssignments->map(fn($ca) => $ca->coach?->name)->filter()->implode(', ') ?: 'None';
-            $requiredCoaches = $paxCount > 0 ? (int) ceil($paxCount / 4) : 0;
-            $isCompliant = ($paxCount === 0 || $coachesCount >= $requiredCoaches) ? 'YES' : 'NO';
+            $coachNames = $distinctCoaches->pluck('name')->implode('; ') ?: 'None';
+            $requiredCoaches = $paxCount > 0 ? (int) ceil($paxCount / $coachRatio) : 0;
+            $isCompliant = ($paxCount === 0 || $coachesCount >= $requiredCoaches) ? 'COMPLIANT' : 'NEEDS_COACHES';
 
             fputcsv($handle, [
-                $b->id,
+                $b->display_name ?? ('Batch #' . $b->id),
                 ucfirst($b->class_type ?? 'Discovery'),
                 $b->start_date ? Carbon::parse($b->start_date)->format('Y-m-d') : 'N/A',
                 $b->end_date ? Carbon::parse($b->end_date)->format('Y-m-d') : 'N/A',
@@ -162,16 +165,21 @@ class ExportService
         fputcsv($handle, [
             'Participant ID',
             'Booking Reference',
-            'Participant Name',
+            'Guest Name',
+            'Lead Contact Name',
+            'Contact Email',
+            'Contact Phone',
             'Age',
             'Swimming Ability',
             'Medical Conditions / Notes',
-            'Class Package',
-            'Dive Start Date',
+            'Course Package',
+            'Camp Start Date',
+            'Camp End Date',
             'Pickup Option',
             'Pickup Hub / Location',
-            'Boat Dive (Optional)',
+            'Boat Dive (Add-on)',
             'Booking Status',
+            'Payment Status',
         ]);
 
         $participants = BookingParticipant::whereHas('booking', function ($q) use ($start, $end) {
@@ -184,15 +192,20 @@ class ExportService
                 $part->id,
                 $b?->booking_number ?? ('#' . $part->booking_id),
                 $part->name ?? ($part->first_name . ' ' . $part->last_name),
+                $b?->contact_name ?? 'N/A',
+                $b?->contact_email ?? 'N/A',
+                $b?->contact_phone ?? 'N/A',
                 $part->age ?? 'N/A',
                 ucwords(str_replace('_', ' ', $part->swimmer_status ?? 'N/A')),
                 $part->health_condition ?: 'None',
                 ucfirst($b?->class_type ?? 'N/A'),
                 $b?->start_date ? Carbon::parse($b->start_date)->format('Y-m-d') : 'N/A',
+                $b?->end_date ? Carbon::parse($b->end_date)->format('Y-m-d') : 'N/A',
                 ucwords(str_replace('_', ' ', $b?->pickup_option ?? 'N/A')),
                 $b?->pickup_location ?: 'N/A',
                 $b?->boat_dive ? 'Yes (+₱600)' : 'No',
                 ucwords(str_replace('_', ' ', $b?->status ?? 'N/A')),
+                ucwords(str_replace('_', ' ', $b?->payment_status ?? 'N/A')),
             ]);
         }
     }

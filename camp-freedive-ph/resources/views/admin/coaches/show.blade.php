@@ -37,7 +37,6 @@
 
         <div class="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto shrink-0">
             <a href="{{ route('admin.users.edit', $coach) }}" class="btn-secondary px-3.5 sm:px-4 py-2 text-sm font-semibold flex items-center justify-center gap-2 flex-1 sm:flex-initial">
-                <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-5 h-5 object-contain inline-block shrink-0">
                 <span>Edit Account</span>
             </a>
 
@@ -57,7 +56,7 @@
             <div class="space-y-4">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
                     <div>
-                        <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Students & Participants</h3>
+                        <h3 class="text-base font-bold text-[#1D1D1F]">Assigned Students</h3>
                     </div>
 
                     <span class="text-xs sm:text-sm text-[#6E6E73] font-medium sm:text-right">
@@ -89,20 +88,35 @@
                             'fit and ready', 'ready', 'none declared / fit for diving'
                         ];
                         $isNoMedical = empty($rawCondition) || in_array($cleanCondition, $nonMedicalEntries);
+
+                        $startDate = $assignment->batch?->start_date ?? $p->booking?->start_date ?? $assignment->dive_date;
+                        $endDate = $assignment->batch?->end_date ?? $p->booking?->end_date ?? $assignment->dive_date;
+                        $formattedDiveDate = 'N/A';
+                        if ($startDate && $endDate) {
+                            if ($startDate->eq($endDate)) {
+                                $formattedDiveDate = $startDate->format('M d, Y');
+                            } elseif ($startDate->year === $endDate->year) {
+                                $formattedDiveDate = $startDate->format('M d') . ' - ' . $endDate->format('M d, Y');
+                            } else {
+                                $formattedDiveDate = $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y');
+                            }
+                        } elseif ($startDate) {
+                            $formattedDiveDate = $startDate->format('M d, Y');
+                        }
                     @endphp
-                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-2xs hover:border-[#780000] transition-all">
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-2xs">
                         <div class="space-y-3">
-                            <!-- Student Header: Name, Age • Swimmer & Class Badge -->
-                            <div>
-                                <h4 class="font-extrabold text-base text-[#1D1D1F] leading-tight">{{ $p->name }}</h4>
-                                <div class="flex items-center gap-2 mt-1.5 flex-wrap">
-                                    <span class="text-sm text-[#6E6E73] font-medium">
+                            <!-- Student Header: Name, Age • Swimmer on Left, Class Badge on Right -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-extrabold text-base text-[#1D1D1F] leading-tight truncate">{{ $p->name }}</h4>
+                                    <p class="text-sm text-[#6E6E73] font-medium mt-1">
                                         Age {{ $p->age }} <span class="text-[#AEAEB2] mx-1">•</span> {{ $swimmerLabel }}
-                                    </span>
-                                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E5E5EA] text-[#1D1D1F] shrink-0">
-                                        {{ $p->booking?->class_type === 'discovery' ? 'Discovery' : ($p->booking?->class_type === 'fundive' ? 'Fundive' : 'Refinement') }}
-                                    </span>
+                                    </p>
                                 </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E5E5EA] text-[#1D1D1F] shrink-0">
+                                    {{ $p->booking?->class_type === 'discovery' ? 'Discovery' : ($p->booking?->class_type === 'fundive' ? 'Fundive' : 'Refinement') }}
+                                </span>
                             </div>
 
                             @if($assignment->is_ratio_override)
@@ -144,7 +158,7 @@
                                 <div>
                                     <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">DIVE DATE</span>
                                     <span class="text-sm font-semibold text-[#1D1D1F] block mt-0.5">
-                                        {{ $assignment->dive_date ? $assignment->dive_date->format('M d, Y') : 'N/A' }}
+                                        {{ $formattedDiveDate }}
                                     </span>
                                 </div>
                             </div>
@@ -169,29 +183,87 @@
                 </div>
             </div>
 
-            <!-- Past Completed History -->
-            <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 sm:p-6 shadow-2xs space-y-4">
-                <div class="flex items-center justify-between">
-                    <h3 class="text-base font-bold text-[#1D1D1F]">Completed Dive History</h3>
-                    <span class="text-xs sm:text-sm text-[#6E6E73]">{{ $pastAssignments->count() }} past assignment(s)</span>
+            <!-- Completed Dive History Section -->
+            <div class="space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1">
+                    <div>
+                        <h3 class="text-base font-bold text-[#1D1D1F]">Completed Dive History</h3>
+                    </div>
+
+                    <span class="text-xs sm:text-sm text-[#6E6E73] font-medium sm:text-right">
+                        {{ $pastBatches->count() }} Completed Batch(es) · {{ $pastAssignments->count() }} Past Student(s)
+                    </span>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    @forelse($pastAssignments as $past)
-                    <div class="p-3.5 rounded-xl bg-[#F2F2F7] flex items-center justify-between text-sm shadow-2xs">
-                        <div class="space-y-0.5">
-                            <strong class="text-[#1D1D1F] block text-sm">{{ $past->participant->name }}</strong>
-                            <div class="text-xs text-[#6E6E73] space-y-0.5 mt-0.5">
-                                <span class="block font-medium text-xs text-[#1D1D1F]">Batch {{ $past->batch?->batch_code }}</span>
-                                <span class="block text-xs">{{ $past->dive_date->format('M d, Y') }}</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @forelse($pastBatches as $batchKey => $assignmentsInBatch)
+                    @php
+                        $firstAssignment = $assignmentsInBatch->first();
+                        $batch = $firstAssignment->batch;
+                        $startDate = $batch?->start_date ?? $firstAssignment->dive_date;
+                        $endDate = $batch?->end_date ?? $firstAssignment->dive_date;
+                        $dateStr = 'N/A';
+                        if ($startDate && $endDate) {
+                            if ($startDate->eq($endDate)) {
+                                $dateStr = $startDate->format('M d, Y');
+                            } elseif ($startDate->year === $endDate->year) {
+                                $dateStr = $startDate->format('M d') . ' - ' . $endDate->format('M d, Y');
+                            } else {
+                                $dateStr = $startDate->format('M d, Y') . ' - ' . $endDate->format('M d, Y');
+                            }
+                        } elseif ($startDate) {
+                            $dateStr = $startDate->format('M d, Y');
+                        }
+                    @endphp
+                    <div class="bg-white rounded-2xl border border-[#E5E5EA] p-4 sm:p-5 flex flex-col justify-between space-y-4 shadow-2xs">
+                        <div class="space-y-3">
+                            <!-- Batch Header: Name, Dive Date & Status -->
+                            <div class="flex items-start justify-between gap-2">
+                                <div class="min-w-0 flex-1">
+                                    <h4 class="font-extrabold text-base text-[#1D1D1F] leading-tight truncate">
+                                        {{ $batch?->batch_number ?? ($batch?->batch_code ?? 'Batch Schedule') }}
+                                    </h4>
+                                    <p class="text-sm text-[#6E6E73] font-medium mt-1">
+                                        {{ $dateStr }}
+                                    </p>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8F5E9] text-[#1B5E20] shrink-0">
+                                    {{ ucfirst(str_replace('_', ' ', $batch?->status ?? 'completed')) }}
+                                </span>
+                            </div>
+
+                            <!-- Student List & Booking Link -->
+                            <div class="space-y-1.5 pt-1">
+                                <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">COACHED STUDENTS</span>
+                                <div class="divide-y divide-[#E5E5EA] border border-[#E5E5EA] rounded-xl px-3 bg-[#F2F2F7]">
+                                    @foreach($assignmentsInBatch as $assignment)
+                                        @php
+                                            $student = $assignment->participant;
+                                            $booking = $student?->booking;
+                                        @endphp
+                                        <div class="py-2.5 first:pt-2.5 last:pb-2.5 flex items-center justify-between text-sm gap-2">
+                                            <span class="font-bold text-[#1D1D1F] truncate">{{ $student?->name ?? 'Participant' }}</span>
+                                            @if($booking)
+                                                <a href="{{ route('admin.bookings.show', $booking) }}" 
+                                                   class="font-mono text-sm font-bold text-[#780000] hover:underline shrink-0"
+                                                   title="View Booking Details">
+                                                    {{ $booking->booking_number }}
+                                                </a>
+                                            @else
+                                                <span class="text-sm text-[#8E8E93] shrink-0">—</span>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
-                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#E8F5E9] text-[#1B5E20]">
-                            Completed
-                        </span>
                     </div>
                     @empty
-                    <p class="col-span-full text-sm text-[#6E6E73] py-4 text-center">No past dive records logged yet.</p>
+                    <div class="col-span-full py-8 text-center bg-[#F2F2F7] rounded-xl">
+                        <p class="text-sm text-[#6E6E73]">
+                            No past completed dive history found for this coach.
+                        </p>
+                    </div>
                     @endforelse
                 </div>
             </div>

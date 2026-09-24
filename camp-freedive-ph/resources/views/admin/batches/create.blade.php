@@ -4,7 +4,7 @@
 
 @section('breadcrumb')
     <a href="{{ portal_route('batches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Batches</a>
-    <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
     <span class="font-bold text-[#1D1D1F]">Create Batch Schedule</span>
 @endsection
 
@@ -12,15 +12,15 @@
 <div class="max-w-4xl mx-auto space-y-6 text-sm" x-data="batchCreateForm()">
     
     <!-- Top Header -->
-    <div class="flex items-center justify-between pb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Batch Schedule</h1>
         </div>
     </div>
 
     <!-- Create Batch Form -->
-    <div class="bg-white rounded-xl border border-[#D1D1D6] p-6 sm:p-8">
-        <form action="{{ route('admin.batches.store') }}" method="POST" class="space-y-6">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-2xs">
+        <form action="{{ route('admin.batches.store') }}" method="POST" class="space-y-8">
             @csrf
 
             <!-- Batch Dates and Identification -->
@@ -40,7 +40,12 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('start_date')
-                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#D70015] font-semibold mt-1.5 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 shrink-0 text-[#D70015]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                <span>{{ $message }}</span>
+                            </span>
                         @enderror
                     </div>
 
@@ -55,7 +60,12 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('end_date')
-                            <span class="text-sm text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#D70015] font-semibold mt-1.5 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 shrink-0 text-[#D70015]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                <span>{{ $message }}</span>
+                            </span>
                         @enderror
                     </div>
                 </div>
@@ -64,12 +74,15 @@
                 <template x-if="duplicateBatches.length > 0">
                     <div class="p-4 rounded-xl bg-[#FFFBEB] text-[#92400E] space-y-3">
                         <div class="flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-2 font-extrabold text-sm text-[#B45309]">
+                            <div class="flex items-center gap-2 font-extrabold text-sm text-[#78350F]">
+                                <svg class="w-4 h-4 text-[#78350F] shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                </svg>
                                 <span>Batch Already Exists for this Date Range!</span>
                             </div>
                         </div>
                         
-                        <p class="text-sm text-[#A16207] leading-relaxed">
+                        <p class="text-sm text-[#92400E] leading-relaxed">
                             To avoid double-scheduling the same weekend, an active batch is already handling <strong x-text="startDate"></strong>. Open the existing batch to manage participants and coaches instead of creating a duplicate:
                         </p>
                         
@@ -85,7 +98,7 @@
                                             <span class="block" x-text="(dup.coaches_count || 0) + ' Coach(es) staffed'"></span>
                                         </div>
                                     </div>
-                                    <a :href="'/admin/batches/' + dup.id" class="btn-primary px-4 py-2 text-sm font-bold shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                    <a :href="'/admin/batches/' + dup.id" class="btn-primary min-h-[44px] px-4 py-2.5 text-sm font-bold shrink-0 inline-flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
                                         <span>Open Existing Batch</span>
                                     </a>
                                 </div>
@@ -96,7 +109,7 @@
 
                 <div>
                     <label for="batch_number_digits" class="block font-bold text-[#1D1D1F] text-sm mb-2">
-                        Batch Identifier <span class="text-[#780000]">*</span>
+                        Batch Number<span class="text-[#780000]">*</span>
                     </label>
                     <div class="relative flex items-center rounded-xl border border-[#D1D1D6] bg-white overflow-hidden focus-within:border-[#780000] focus-within:ring-2 focus-within:ring-[#780000]/20 max-w-xs">
                         <span class="px-4 py-2.5 bg-[#F2F2F7] border-r border-[#D1D1D6] text-sm font-extrabold text-[#1D1D1F] select-none shrink-0">
@@ -141,25 +154,34 @@
                     <table class="w-full text-left text-sm">
                         <thead class="bg-[#F2F2F7] border-b border-[#D1D1D6] text-[#6E6E73] font-bold">
                             <tr>
-                                <th class="py-2.5 px-3 w-8">
-                                    <input type="checkbox" @change="toggleAll($event.target.checked)" checked class="w-3.5 h-3.5 rounded text-[#780000] focus:ring-[#780000]">
+                                <th scope="col" class="py-1 px-1 w-12 text-center">
+                                    <label class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center cursor-pointer m-0">
+                                        <input type="checkbox" 
+                                               @change="toggleAll($event.target.checked)" 
+                                               checked 
+                                               aria-label="Select all unbatched bookings"
+                                               class="w-4.5 h-4.5 rounded-md text-[#780000] focus:ring-[#780000]">
+                                    </label>
                                 </th>
-                                <th class="py-2.5 px-3">Booking #</th>
-                                <th class="py-2.5 px-3">Lead Contact</th>
-                                <th class="py-2.5 px-3">Class</th>
-                                <th class="py-2.5 px-3 text-center">Pax</th>
-                                <th class="py-2.5 px-3 text-right">Total</th>
+                                <th scope="col" class="py-2.5 px-3">Booking #</th>
+                                <th scope="col" class="py-2.5 px-3">Lead Contact</th>
+                                <th scope="col" class="py-2.5 px-3">Class</th>
+                                <th scope="col" class="py-2.5 px-3 text-center">Pax</th>
+                                <th scope="col" class="py-2.5 px-3 text-right">Total</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-[#D1D1D6]">
                             <template x-for="b in paginatedBookings" :key="b.id">
                                 <tr class="hover:bg-[#F2F2F7]">
-                                    <td class="py-2.5 px-3">
-                                        <input type="checkbox" 
-                                               name="booking_ids[]" 
-                                               :value="b.id" 
-                                               x-model="selectedBookingIds"
-                                               class="w-3.5 h-3.5 rounded text-[#780000] focus:ring-[#780000]">
+                                    <td class="py-1 px-1 text-center">
+                                        <label class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center cursor-pointer m-0">
+                                            <input type="checkbox" 
+                                                   name="booking_ids[]" 
+                                                   :value="b.id" 
+                                                   x-model="selectedBookingIds"
+                                                   :aria-label="'Select booking ' + b.booking_number"
+                                                   class="w-4.5 h-4.5 rounded-md text-[#780000] focus:ring-[#780000]">
+                                        </label>
                                     </td>
                                     <td class="py-2.5 px-3 font-mono font-bold text-[#780000]" x-text="b.booking_number"></td>
                                     <td class="py-2.5 px-3 text-[#1D1D1F]" x-text="b.contact_name"></td>
@@ -180,22 +202,24 @@
                             <span class="font-medium text-[#6E6E73]">
                                 Page <span class="font-bold text-[#1D1D1F]" x-text="currentPage"></span> of <span class="font-bold text-[#1D1D1F]" x-text="totalPages"></span>
                             </span>
-                            <div class="inline-flex items-center gap-1">
+                            <div class="inline-flex items-center gap-1.5">
                                 <button type="button" 
                                         @click="currentPage--" 
                                         :disabled="currentPage <= 1"
-                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all">
-                                    <svg class="w-3.5 h-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                        aria-label="Previous page"
+                                        class="inline-flex items-center justify-center px-3.5 py-2 min-h-[44px] rounded-xl bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#6E6E73] active:bg-[#E5E5EA] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#6E6E73] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                                    <svg class="w-4 h-4 mr-1.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
                                     </svg>
-                                    Prev
+                                    <span>Prev</span>
                                 </button>
                                 <button type="button" 
                                         @click="currentPage++" 
                                         :disabled="currentPage >= totalPages"
-                                        class="inline-flex items-center px-2.5 py-1 min-h-[30px] rounded-lg bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#8E8E93] active:bg-[#E5E5EA] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#8E8E93] transition-all">
-                                    Next
-                                    <svg class="w-3.5 h-3.5 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                                        aria-label="Next page"
+                                        class="inline-flex items-center justify-center px-3.5 py-2 min-h-[44px] rounded-xl bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#6E6E73] active:bg-[#E5E5EA] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#6E6E73] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                                    <span>Next</span>
+                                    <svg class="w-4 h-4 ml-1.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
@@ -204,7 +228,7 @@
                     </div>
                 </div>
 
-                <div x-show="!loadingBookings && unbatchedBookings.length === 0" class="py-6 text-center text-sm text-[#8E8E93] bg-[#F2F2F7] rounded-xl border border-dashed border-[#D1D1D6]">
+                <div x-show="!loadingBookings && unbatchedBookings.length === 0" class="py-8 px-4 text-center text-sm text-[#6E6E73] bg-[#F2F2F7] rounded-xl">
                     No unbatched confirmed bookings found for this start date. You can add bookings later from the batch dashboard.
                 </div>
             </div>
@@ -237,9 +261,9 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4">
-                <a href="{{ route('admin.batches.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
-                <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold">
+            <div class="flex items-center justify-end gap-3 pt-6 border-t border-[#E5E5EA]">
+                <a href="{{ route('admin.batches.index') }}" class="btn-secondary min-h-[44px] px-6 py-2.5 text-sm font-bold inline-flex items-center justify-center active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">Cancel</a>
+                <button type="submit" class="btn-primary min-h-[44px] px-8 py-2.5 text-sm font-bold inline-flex items-center justify-center active:scale-[0.99] transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-[#780000]">
                     Create & Confirm Batch
                 </button>
             </div>

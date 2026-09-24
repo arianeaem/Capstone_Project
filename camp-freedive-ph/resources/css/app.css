@@ -129,7 +129,7 @@
     select:focus, .form-select:focus {
         outline: none !important;
         border-color: #780000 !important;
-        box-shadow: none !important;
+        box-shadow: 0 0 0 1px #780000 !important;
     }
 
     select:disabled, .form-select:disabled {
@@ -139,11 +139,11 @@
         cursor: not-allowed;
     }
 
-    /* Clean input focus to eliminate double borders / double rings */
+    /* Clean input focus to ensure 2px #780000 selected state */
     input:focus, textarea:focus, .form-input:focus {
         outline: none !important;
         border-color: #780000 !important;
-        box-shadow: none !important;
+        box-shadow: 0 0 0 1px #780000 !important;
     }
 }
 
@@ -230,7 +230,7 @@
 .form-input:focus, .form-select:focus, .form-textarea:focus {
     border-color: #780000 !important;
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(120, 0, 0, 0.12) !important;
+    box-shadow: 0 0 0 1px #780000 !important;
 }
 
 .form-hint {

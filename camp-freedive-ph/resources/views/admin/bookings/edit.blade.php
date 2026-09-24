@@ -24,9 +24,9 @@
      }">
     
     <!-- Top Header -->
-    <div class="flex items-center justify-between pb-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F] mt-1">Edit Booking &amp; Participant Details</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Edit Booking &amp; Participant Details</h1>
         </div>
     </div>
 

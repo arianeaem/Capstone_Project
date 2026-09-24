@@ -179,7 +179,7 @@ class BookingController extends Controller
             'pickup_option' => 'required|in:none,own,carpool',
             'pickup_location' => 'nullable|string|max:255',
             'boat_dive' => 'boolean',
-            'payment_method' => 'required|in:gcash,bpi_bank_transfer',
+            'payment_method' => 'required|in:gcash,bpi_bank_transfer,maya,bdo,unionbank,cash,other',
             'payment_stage' => 'required|in:downpayment,full',
             'payment_reference' => 'nullable|string|max:100',
             'admin_notes' => 'nullable|string|max:1000',
@@ -202,27 +202,34 @@ class BookingController extends Controller
             ->get()
             ->sum('participants_count');
 
-        $maxCapacity = 45;
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $maxCapacity = (int) ($settingService->get('camp_operations.max_batch_capacity', 45) ?? 45);
         if (($existingPax + $participantCount) > $maxCapacity) {
             $remaining = max(0, $maxCapacity - $existingPax);
             return back()->withInput()->with('error', "Cannot create booking: Batch capacity ceiling of {$maxCapacity} pax reached for {$startDate} (Only {$remaining} slots available).");
         }
 
-        $pricePerPerson = match ($validated['class_type']) {
-            'discovery' => 4250.00,
-            'fundive' => ($validated['is_certified_diver'] ?? false) ? 2500.00 : 3300.00,
-            'refinement' => 4100.00,
-        };
+        $pricePerPerson = app(\App\Services\PricingRuleEngine::class)->getBasePrice(
+            $validated['class_type'], 
+            $validated['is_certified_diver'] ?? false
+        );
+
+        $carpoolRate = (float) ($settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
+        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
+        $lguRate = (float) ($settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
+        $envRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
 
         $subtotal = $pricePerPerson * $participantCount;
-        $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1200.00 * $participantCount) : 0.00;
-        $boatDiveFee = ($validated['boat_dive'] ?? false) ? (600.00 * $participantCount) : 0.00;
-        $lguFee = 300.00 * $participantCount;
-        $environmentalFee = 50.00 * $participantCount;
+        $carpoolFee = ($validated['pickup_option'] === 'carpool') ? ($carpoolRate * $participantCount) : 0.00;
+        $boatDiveFee = ($validated['boat_dive'] ?? false) ? ($boatDiveRate * $participantCount) : 0.00;
+        $lguFee = $lguRate * $participantCount;
+        $environmentalFee = $envRate * $participantCount;
         $totalAmount = $subtotal + $carpoolFee + $boatDiveFee + $lguFee + $environmentalFee;
 
         // Downpayment rule
-        $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? 3000.00 : 2000.00;
+        $carpoolDp = (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00);
+        $ownTranspoDp = (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00);
+        $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? $carpoolDp : $ownTranspoDp;
         $downpaymentAmount = min($downpaymentPerHead * $participantCount, $totalAmount);
 
         $paidAmount = ($validated['payment_stage'] === 'full') ? $totalAmount : $downpaymentAmount;
@@ -404,20 +411,27 @@ class BookingController extends Controller
         $pickupLocation = ($pickupOption === 'carpool') ? ($validated['pickup_location'] ?? $booking->pickup_location) : null;
         $boatDive = (bool)$booking->boat_dive;
 
-        $pricePerPerson = match ($booking->class_type) {
-            'discovery' => 4250.00,
-            'fundive' => $booking->is_certified_diver ? 2500.00 : 3300.00,
-            'refinement' => 4100.00,
-        };
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $pricePerPerson = app(\App\Services\PricingRuleEngine::class)->getBasePrice(
+            $booking->class_type,
+            (bool)$booking->is_certified_diver
+        );
+
+        $carpoolRate = (float) ($settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
+        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
+        $lguRate = (float) ($settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
+        $envRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
 
         $subtotal = $pricePerPerson * $participantCount;
-        $carpoolFee = ($pickupOption === 'carpool') ? (1200.00 * $participantCount) : 0.00;
-        $boatDiveFee = $boatDive ? (600.00 * $participantCount) : 0.00;
-        $lguFee = 300.00 * $participantCount;
-        $environmentalFee = 50.00 * $participantCount;
+        $carpoolFee = ($pickupOption === 'carpool') ? ($carpoolRate * $participantCount) : 0.00;
+        $boatDiveFee = $boatDive ? ($boatDiveRate * $participantCount) : 0.00;
+        $lguFee = $lguRate * $participantCount;
+        $environmentalFee = $envRate * $participantCount;
         $totalAmount = $subtotal + $carpoolFee + $boatDiveFee + $lguFee + $environmentalFee;
 
-        $downpaymentPerHead = ($pickupOption === 'carpool') ? 3000.00 : 2000.00;
+        $carpoolDp = (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00);
+        $ownTranspoDp = (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00);
+        $downpaymentPerHead = ($pickupOption === 'carpool') ? $carpoolDp : $ownTranspoDp;
         $downpaymentAmount = min($downpaymentPerHead * $participantCount, $totalAmount);
         $balanceAmount = $totalAmount - $booking->payments()->whereIn('status', ['completed', 'paid'])->sum('amount');
 

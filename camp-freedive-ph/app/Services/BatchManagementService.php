@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Mail\BatchRescheduledMail;
+use App\Mail\BatchWeatherCancellationMail;
 use App\Models\Batch;
 use App\Models\BatchStatusLog;
 use App\Models\Booking;
 use App\Models\BookingStatusLog;
+use App\Models\NotificationLog;
 use App\Models\RefundRequest;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -13,6 +16,8 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Core Logistics & Batch Lifecycle Domain Service.
@@ -256,7 +261,7 @@ class BatchManagementService
 
         DB::transaction(function () use ($batch, $newStatus, $changer, $note) {
             $oldStatus = $batch->status;
-            if ($oldStatus === $newStatus) {
+            if ($oldStatus === $newStatus && empty($note)) {
                 return;
             }
 
@@ -323,6 +328,28 @@ class BatchManagementService
                         'note' => "Whole-batch cancellation: {$batch->name}. Full refund eligibility triggered. Custom email alert sent to {$booking->contact_email}.",
                     ]);
 
+                    if (!empty($booking->contact_email)) {
+                        try {
+                            Mail::to($booking->contact_email)->send(
+                                new BatchWeatherCancellationMail($booking, $batch, $note ?: 'Cancelled by Camp due to weather or operational advisory.')
+                            );
+
+                            NotificationLog::create([
+                                'batch_id' => $batch->id,
+                                'booking_id' => $booking->id,
+                                'recipient_email' => $booking->contact_email,
+                                'recipient_name' => $booking->contact_name,
+                                'subject' => "Camp Cancellation Notice - Booking #{$booking->booking_number}",
+                                'message_body' => $note ?: 'Cancelled by Camp due to weather or operational advisory.',
+                                'channel' => 'email',
+                                'sent_by' => $changer->id,
+                                'sent_at' => now(),
+                            ]);
+                        } catch (\Throwable $e) {
+                            Log::warning("Failed to dispatch batch cancellation email to {$booking->contact_email} for booking #{$booking->booking_number}: " . $e->getMessage());
+                        }
+                    }
+
                 } elseif ($newStatus === 'completed') {
                     $booking->update(['status' => 'completed']);
 
@@ -342,8 +369,30 @@ class BatchManagementService
                         'old_status' => $bookingOldStatus,
                         'new_status' => 'rescheduled',
                         'changed_by' => $changer->id,
-                        'note' => "Batch {$batch->name} was rescheduled by camp. Customer notified via email to select their new preferred date via Manage Booking portal.",
+                        'note' => "Batch {$batch->name} was rescheduled by camp. Customer notified via email to select their new preferred date via Manage Booking portal." . ($note ? " Note: {$note}" : ""),
                     ]);
+
+                    if (!empty($booking->contact_email)) {
+                        try {
+                            Mail::to($booking->contact_email)->send(
+                                new BatchRescheduledMail($booking, $batch, $note)
+                            );
+
+                            NotificationLog::create([
+                                'batch_id' => $batch->id,
+                                'booking_id' => $booking->id,
+                                'recipient_email' => $booking->contact_email,
+                                'recipient_name' => $booking->contact_name,
+                                'subject' => "Camp Schedule Rescheduled - Booking #{$booking->booking_number}",
+                                'message_body' => $note ?: "Batch {$batch->name} was rescheduled by camp.",
+                                'channel' => 'email',
+                                'sent_by' => $changer->id,
+                                'sent_at' => now(),
+                            ]);
+                        } catch (\Throwable $e) {
+                            Log::warning("Failed to dispatch batch rescheduled email to {$booking->contact_email} for booking #{$booking->booking_number}: " . $e->getMessage());
+                        }
+                    }
                 }
             }
 

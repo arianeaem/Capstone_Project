@@ -10,6 +10,52 @@
 @endphp
 <div class="space-y-6" x-data="coachAvailabilityCalendar({{ json_encode($selectableDates) }})">
     
+    <!-- Toast Notification Banner -->
+    <div x-show="showToast" 
+         x-cloak
+         role="status"
+         aria-live="polite"
+         x-transition:enter="transition ease-out duration-250"
+         x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+         x-transition:leave-end="opacity-0 -translate-y-4 scale-95"
+         class="fixed top-5 right-4 sm:right-6 z-50 max-w-sm w-full shadow-2xl rounded-2xl p-4 flex items-start gap-3 border backdrop-blur-md transition-all"
+         :class="toastType === 'error' 
+             ? 'bg-rose-50/95 border-rose-200 text-rose-900 shadow-rose-950/10' 
+             : 'bg-emerald-50/95 border-emerald-200 text-emerald-900 shadow-emerald-950/10'">
+        
+        <!-- Status Icon -->
+        <div class="shrink-0 mt-0.5">
+            <template x-if="toastType === 'error'">
+                <svg class="w-5 h-5 text-rose-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+            </template>
+            <template x-if="toastType !== 'error'">
+                <svg class="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <path d="M20 6L9 17l-5-5"></path>
+                </svg>
+            </template>
+        </div>
+
+        <div class="flex-1 min-w-0">
+            <p class="text-sm font-bold leading-snug" x-text="toastMessage"></p>
+        </div>
+
+        <button type="button" 
+                @click="showToast = false" 
+                aria-label="Dismiss notification"
+                class="shrink-0 -mr-1 -mt-1 w-8 h-8 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-700 hover:bg-black/5 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+    
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         <!-- Availability Calendar -->
@@ -18,24 +64,29 @@
             <div class="bg-white rounded-2xl border border-[#E5E5EA] overflow-hidden">
                 
                 <!-- Calendar Controls -->
-                <div class="p-4 sm:p-5 border-b border-[#E5E5EA] flex flex-wrap items-center justify-between gap-4 bg-[#F2F2F7]">
-                    <!-- Month Navigator -->
-                    <div class="flex items-center gap-2">
-                        <div class="flex items-center bg-white rounded-xl border border-[#E5E5EA] p-1">
+                <!-- Calendar Controls -->
+                <div class="p-3 sm:p-5 border-b border-[#E5E5EA] flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 bg-white">
+                    <!-- Month Navigator & Today Button Group -->
+                    <div class="flex items-center gap-2 w-full sm:w-auto">
+                        <div class="flex items-center justify-between bg-white rounded-xl border border-[#E5E5EA] p-0.5 sm:p-1 shadow-xs flex-1 sm:flex-initial min-w-0">
                             <a href="{{ route('coach.availability.index', ['year' => $prevMonth->year, 'month' => $prevMonth->month]) }}" 
-                               class="p-2 rounded-lg hover:bg-[#F2F2F7] text-[#1D1D1F] transition-colors" title="Previous Month">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                               class="w-10 h-10 sm:w-11 sm:h-11 min-h-[40px] sm:min-h-[44px] min-w-[40px] sm:min-w-[44px] rounded-lg hover:bg-[#F2F2F7] text-[#1D1D1F] flex items-center justify-center transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]" 
+                               title="Previous Month"
+                               aria-label="Previous Month">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="15 18 9 12 15 6"></polyline></svg>
                             </a>
-                            <span class="px-4 text-sm sm:text-sm font-extrabold text-[#1D1D1F] min-w-[130px] sm:min-w-[150px] text-center">
+                            <span class="px-2 sm:px-4 text-xs sm:text-base font-extrabold text-[#1D1D1F] text-center select-none truncate sm:min-w-[140px]">
                                 {{ $currentMonth->format('F Y') }}
                             </span>
                             <a href="{{ route('coach.availability.index', ['year' => $nextMonth->year, 'month' => $nextMonth->month]) }}" 
-                               class="p-2 rounded-lg hover:bg-[#F2F2F7] text-[#1D1D1F] transition-colors" title="Next Month">
-                                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                               class="w-10 h-10 sm:w-11 sm:h-11 min-h-[40px] sm:min-h-[44px] min-w-[40px] sm:min-w-[44px] rounded-lg hover:bg-[#F2F2F7] text-[#1D1D1F] flex items-center justify-center transition-colors shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]" 
+                               title="Next Month"
+                               aria-label="Next Month">
+                                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
                             </a>
                         </div>
                         <a href="{{ route('coach.availability.index') }}" 
-                           class="text-sm font-bold px-3 py-2 rounded-xl bg-white border border-[#E5E5EA] text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all">
+                           class="min-h-[40px] sm:min-h-[44px] px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-white border border-[#E5E5EA] text-[#1D1D1F] hover:bg-[#F2F2F7] text-xs sm:text-sm font-bold inline-flex items-center justify-center shrink-0 transition-all shadow-xs active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
                             Today
                         </a>
                     </div>
@@ -44,7 +95,7 @@
                     <button type="button" 
                             @click="toggleBulkMode()"
                             :class="bulkMode ? 'bg-[#780000] text-white border-[#780000]' : 'bg-white text-[#1D1D1F] border-[#E5E5EA] hover:bg-[#F2F2F7]'"
-                            class="px-4 py-2 rounded-xl border text-sm font-bold transition-all flex items-center gap-2 cursor-pointer">
+                            class="w-full sm:w-auto min-h-[44px] px-4 py-2.5 rounded-xl border text-sm font-bold transition-all flex items-center justify-center sm:justify-start gap-2 cursor-pointer shadow-xs active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
                         <img src="{{ asset('icons/icons8-edit-60.png') }}" alt="Edit" class="w-5 h-5 object-contain inline-block shrink-0" :class="bulkMode ? 'brightness-0 invert' : ''">
                         <span x-text="bulkMode ? 'Exit Bulk Mode' : 'Bulk Edit Mode'"></span>
                     </button>
@@ -56,7 +107,7 @@
                      @touchmove="if (Math.abs($event.touches[0].clientX - touchStartX) > 10 || Math.abs($event.touches[0].clientY - touchStartY) > 10) { touchMoved = true; }">
                     <div class="min-w-[620px] sm:min-w-0">
                         <!-- Day of Week Header -->
-                        <div class="grid grid-cols-7 border-b border-[#E5E5EA] bg-[#F2F2F7] text-center text-sm font-bold text-[#8E8E93] py-3">
+                        <div class="grid grid-cols-7 border-b border-[#E5E5EA] bg-white text-center text-sm font-bold text-[#8E8E93] py-3">
                             <span class="text-rose-600">Sun</span>
                             <span>Mon</span>
                             <span>Tue</span>
@@ -83,13 +134,19 @@
                                         if ($assignedDayNumber === 1) {
                                             $cellBg = 'bg-[#780000] text-white border-transparent';
                                             $numColor = 'text-white';
+                                            $assignedTextColor = 'text-white';
+                                            $assignedSubtextColor = 'text-white/90 font-semibold';
+                                            $releaseLinkColor = 'text-white/90 hover:text-white';
                                             $statusTitle = 'Day 1 Assigned';
                                             $hoverEffect = 'hover:brightness-110';
                                         } else {
-                                            $cellBg = 'bg-[#00C3D0] text-white border-transparent';
-                                            $numColor = 'text-white';
+                                            $cellBg = 'bg-[#00C3D0] text-[#0A3538] border-transparent';
+                                            $numColor = 'text-[#0A3538]';
+                                            $assignedTextColor = 'text-[#0A3538]';
+                                            $assignedSubtextColor = 'text-[#0A3538]/85 font-semibold';
+                                            $releaseLinkColor = 'text-[#0A3538] hover:text-[#06282B] font-extrabold';
                                             $statusTitle = 'Day 2 Assigned';
-                                            $hoverEffect = 'hover:brightness-105';
+                                            $hoverEffect = 'hover:brightness-95';
                                         }
                                     } elseif ($status === 'available') {
                                         $cellBg = 'bg-emerald-600 text-white border-transparent';
@@ -104,7 +161,7 @@
                                     }
                                 @endphp
 
-                                <div class="min-h-[100px] sm:min-h-[130px] p-2.5 sm:p-3.5 flex flex-col justify-between transition-all relative group select-none
+                                <div class="min-h-[100px] sm:min-h-[130px] p-1.5 sm:p-3.5 flex flex-col justify-between transition-all relative group select-none
                                             {{ $cellBg }}
                                             {{ $isOtherMonth ? 'opacity-30 pointer-events-none' : '' }}
                                             {{ $isPast ? 'opacity-55 cursor-not-allowed' : '' }}
@@ -114,21 +171,27 @@
                                          '{{ $hoverEffect }} cursor-pointer': !{{ $isPast ? 'true' : 'false' }} && !bulkMode,
                                          'cursor-pointer': bulkMode && !{{ $isPast ? 'true' : 'false' }} && !{{ $isAssigned ? 'true' : 'false' }}
                                      }"
+                                     role="checkbox"
+                                     :aria-checked="isSelectedInBulk('{{ $dateStr }}') ? 'true' : 'false'"
+                                     :aria-label="'Select ' + '{{ $dateStr }}' + ' for bulk editing'"
+                                     tabindex="{{ ($isPast || $isOtherMonth) ? '-1' : '0' }}"
+                                     @keydown.enter.prevent="handleDayClick('{{ $dateStr }}', {{ $isAssigned ? 'true' : 'false' }}, {{ $isPast ? 'true' : 'false' }}, {{ json_encode($day) }})"
+                                     @keydown.space.prevent="handleDayClick('{{ $dateStr }}', {{ $isAssigned ? 'true' : 'false' }}, {{ $isPast ? 'true' : 'false' }}, {{ json_encode($day) }})"
                                      @click="handleDayClick('{{ $dateStr }}', {{ $isAssigned ? 'true' : 'false' }}, {{ $isPast ? 'true' : 'false' }}, {{ json_encode($day) }})">
                                     
                                     <!-- Day Number & Header Indicators -->
-                                    <div class="flex items-start justify-between gap-1">
-                                        <span class="font-black text-sm sm:text-base {{ $numColor }} shrink-0">
+                                    <div class="flex items-center justify-between gap-1 w-full min-w-0">
+                                        <span class="font-black text-xs sm:text-base {{ $numColor }} shrink-0 leading-none">
                                             {{ $day['day_number'] }}
                                         </span>
 
-                                        <div class="flex items-center gap-1 shrink-0">
+                                        <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">
                                             @if($day['is_today'])
-                                                <span class="text-sm sm:text-sm font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 uppercase tracking-wider whitespace-nowrap shrink-0">Today</span>
+                                                <span class="text-[9px] sm:text-[11px] font-black px-1 sm:px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 uppercase tracking-tight leading-none whitespace-nowrap shrink-0">Today</span>
                                             @endif
 
                                             @if($hasRelease)
-                                                <span class="text-sm sm:text-sm font-black px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 shadow-2xs whitespace-nowrap shrink-0" title="Release request pending">
+                                                <span class="text-[9px] sm:text-[11px] font-black px-1 sm:px-1.5 py-0.5 rounded bg-amber-400 text-amber-950 shadow-2xs whitespace-nowrap leading-none shrink-0" title="Release request pending">
                                                     Pending
                                                 </span>
                                             @endif
@@ -136,7 +199,8 @@
                                             <!-- Bulk Mode Selection Indicator -->
                                             <template x-if="bulkMode && !{{ $isPast ? 'true' : 'false' }} && !{{ $isAssigned ? 'true' : 'false' }}">
                                                 <div class="w-4 h-4 rounded border border-current flex items-center justify-center pointer-events-none transition-colors"
-                                                     :class="isSelectedInBulk('{{ $dateStr }}') ? 'bg-amber-400 border-amber-400 text-black' : 'bg-transparent border-white/60 text-transparent'">
+                                                     :class="isSelectedInBulk('{{ $dateStr }}') ? 'bg-amber-400 border-amber-400 text-black' : 'bg-transparent border-white/60 text-transparent'"
+                                                     aria-hidden="true">
                                                     <svg x-show="isSelectedInBulk('{{ $dateStr }}')" class="w-3 h-3 text-black stroke-[3]" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                                 </div>
                                             </template>
@@ -147,10 +211,10 @@
                                     <div class="my-auto py-1">
                                         @if($isAssigned)
                                             <div class="space-y-0.5">
-                                                <div class="font-black text-sm sm:text-sm text-white tracking-wide leading-tight whitespace-nowrap truncate">
+                                                <div class="font-black text-sm sm:text-sm {{ $assignedTextColor }} tracking-wide leading-tight whitespace-nowrap truncate">
                                                     {{ $statusTitle }}
                                                 </div>
-                                                <div class="text-sm sm:text-sm text-white/90 truncate font-semibold leading-tight whitespace-nowrap">
+                                                <div class="text-sm sm:text-sm {{ $assignedSubtextColor }} truncate leading-tight whitespace-nowrap">
                                                     {{ $day['batch']?->batch_number ?? 'Dive Batch' }}
                                                     @if($day['students_count'] > 0)
                                                         ({{ $day['students_count'] }} pax)
@@ -169,7 +233,7 @@
                                         @if($isAssigned && !$isPast)
                                             <button type="button" 
                                                     @click.stop="openReleaseModal({{ json_encode($day) }})"
-                                                    class="text-sm font-bold text-white/90 hover:text-white underline transition-colors whitespace-nowrap">
+                                                    class="text-sm font-bold {{ $releaseLinkColor }} underline transition-colors whitespace-nowrap">
                                                 Release Request
                                             </button>
                                         @elseif(!$isPast && !$isOtherMonth)
@@ -249,46 +313,35 @@
          class="fixed bottom-4 sm:bottom-6 inset-x-3 sm:inset-x-4 max-w-2xl mx-auto z-40 bg-[#1D1D1F] text-white p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-3">
         <div class="flex items-center justify-between w-full sm:w-auto gap-3">
             <div>
-                <div class="font-bold text-sm sm:text-sm text-white flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <div class="font-bold text-sm text-white flex items-center gap-1.5">
                     <span>Bulk Edit Mode Active</span>
                 </div>
-                <div class="text-sm sm:text-sm text-gray-300">
+                <div class="text-sm text-gray-300">
                     <span x-text="selectedDates.length" class="font-black text-amber-300"></span> date(s) selected
                 </div>
             </div>
-            <button type="button" 
-                    @click="toggleSelectAllMonth()"
-                    class="text-sm font-bold text-[#00C3D0] hover:underline sm:hidden cursor-pointer">
-                <span x-text="allSelectableDates.length > 0 && allSelectableDates.every(d => selectedDates.includes(d)) ? 'Deselect All' : 'Select All Month'"></span>
-            </button>
         </div>
 
         <div class="flex items-center gap-2 w-full sm:w-auto">
             <button type="button" 
-                    @click="toggleSelectAllMonth()"
-                    class="hidden sm:inline-flex px-3 py-2 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white font-bold text-sm transition-all cursor-pointer border border-[#3A3A3C]">
-                <span x-text="allSelectableDates.length > 0 && allSelectableDates.every(d => selectedDates.includes(d)) ? 'Deselect All' : 'Select All Month'"></span>
-            </button>
-            <button type="button" 
                     @click="applyBulk('available')"
                     :disabled="selectedDates.length === 0 || bulkSubmitting"
-                    class="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    class="flex-1 sm:flex-none min-h-[44px] px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]">
                 <span x-show="!bulkSubmitting">Mark Available</span>
-                <span x-show="bulkSubmitting" class="flex items-center gap-1">
-                    <svg class="animate-spin w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor"></path></svg>
+                <span x-show="bulkSubmitting" class="flex items-center gap-1.5">
+                    <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25"></circle><path d="M4 12a8 8 0 018-8" stroke="currentColor"></path></svg>
                     <span>Saving...</span>
                 </span>
             </button>
             <button type="button" 
                     @click="applyBulk('remove')"
                     :disabled="selectedDates.length === 0 || bulkSubmitting"
-                    class="flex-1 sm:flex-none px-3.5 sm:px-4 py-2 rounded-xl bg-rose-700 hover:bg-rose-600 disabled:opacity-40 text-white font-bold text-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                    class="flex-1 sm:flex-none min-h-[44px] px-4 py-2.5 rounded-xl bg-rose-700 hover:bg-rose-600 disabled:opacity-40 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]">
                 <span>Remove</span>
             </button>
             <button type="button" 
                     @click="clearBulkSelection()"
-                    class="px-2.5 sm:px-3 py-2 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white font-bold text-sm transition-all cursor-pointer border border-[#3A3A3C]">
+                    class="min-h-[44px] px-3.5 py-2.5 rounded-xl bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white font-bold text-sm transition-all cursor-pointer border border-[#3A3A3C] inline-flex items-center justify-center active:scale-[0.98]">
                 Clear
             </button>
         </div>
@@ -297,15 +350,39 @@
     <!-- Emergency Release Request Modal -->
     <div x-show="releaseModalOpen" 
          x-cloak 
-         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-[#E5E5EA] space-y-6 relative" @click.away="releaseModalOpen = false">
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="availability-release-modal-title"
+         @keydown.escape.window="releaseModalOpen = false"
+         class="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl border border-[#E5E5EA] space-y-6 relative" 
+             @click.outside="releaseModalOpen = false"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95">
             
             <div class="flex items-start justify-between border-b border-[#E5E5EA] pb-4">
                 <div>
-                    <h3 class="text-lg font-black text-[#1D1D1F]">Request Assignment Release</h3>
+                    <h3 id="availability-release-modal-title" class="text-lg font-black text-[#1D1D1F]">Request Assignment Release</h3>
                     <p class="text-sm font-semibold text-rose-600 mt-0.5">Emergency Staffing Request</p>
                 </div>
-                <button type="button" @click="releaseModalOpen = false" aria-label="Close release modal" class="text-gray-400 hover:text-gray-600 text-lg font-bold">✕</button>
+                <button type="button" 
+                        @click="releaseModalOpen = false" 
+                        aria-label="Close release modal" 
+                        class="w-11 h-11 min-h-[44px] min-w-[44px] -mr-2 -mt-1 rounded-full flex items-center justify-center text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
             <template x-if="selectedAssignedDay">
@@ -338,16 +415,17 @@
 
                     <!-- Emergency Release Form -->
                     <template x-if="selectedAssignedDay.can_request_release">
-                        <form action="{{ route('coach.availability.release') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('coach.availability.release') }}" method="POST" @submit="submittingRelease = true" class="space-y-4">
                             @csrf
                             <input type="hidden" name="batch_id" :value="selectedAssignedDay.batch?.id">
                             <input type="hidden" name="dive_date" :value="selectedAssignedDay.date_str">
 
                             <div class="space-y-1.5">
-                                <label class="block text-sm font-bold text-[#1D1D1F]">
+                                <label for="emergency-release-reason" class="block text-sm font-bold text-[#1D1D1F]">
                                     Reason for Emergency Release <span class="text-rose-500">*</span>
                                 </label>
-                                <textarea name="reason" 
+                                <textarea id="emergency-release-reason"
+                                          name="reason" 
                                           rows="4" 
                                           required 
                                           placeholder="Please explain the emergency, illness, or unavoidable circumstance requiring reassignment..."
@@ -355,12 +433,20 @@
                                 <span class="text-sm text-[#8E8E93]">Your request will be submitted to Camp Admin for review and student reassignment.</span>
                             </div>
 
-                            <div class="flex items-center justify-end gap-2 pt-2">
-                                <button type="button" @click="releaseModalOpen = false" class="btn-secondary px-4 py-2 text-sm">
+                            <div class="flex items-center justify-end gap-2.5 pt-2">
+                                <button type="button" 
+                                        @click="releaseModalOpen = false" 
+                                        class="btn-secondary min-h-[44px] px-4 py-2 text-sm font-semibold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
                                     Cancel
                                 </button>
-                                <button type="submit" class="btn-danger px-5 py-2 text-sm font-bold">
-                                    Submit Release Request
+                                <button type="submit" 
+                                        :disabled="submittingRelease" 
+                                        class="btn-danger min-h-[44px] px-5 py-2 text-sm font-bold rounded-xl cursor-pointer transition-all active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D70015] focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                    <span x-show="!submittingRelease">Submit Release Request</span>
+                                    <span x-show="submittingRelease" x-cloak class="inline-flex items-center gap-2">
+                                        <svg class="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                                        <span>Submitting...</span>
+                                    </span>
                                 </button>
                             </div>
                         </form>
@@ -381,6 +467,7 @@ function coachAvailabilityCalendar(selectableDates = []) {
         selectedDates: [],
         allSelectableDates: selectableDates,
         bulkSubmitting: false,
+        submittingRelease: false,
         isToggling: false,
         togglingDate: null,
         releaseModalOpen: false,
@@ -388,6 +475,20 @@ function coachAvailabilityCalendar(selectableDates = []) {
         touchStartX: 0,
         touchStartY: 0,
         touchMoved: false,
+        toastMessage: '',
+        toastType: 'error',
+        showToast: false,
+        toastTimeout: null,
+
+        notify(message, type = 'error') {
+            this.toastMessage = message;
+            this.toastType = type;
+            this.showToast = true;
+            if (this.toastTimeout) clearTimeout(this.toastTimeout);
+            this.toastTimeout = setTimeout(() => {
+                this.showToast = false;
+            }, 4500);
+        },
 
         toggleBulkMode() {
             this.bulkMode = !this.bulkMode;
@@ -455,15 +556,6 @@ function coachAvailabilityCalendar(selectableDates = []) {
             this.executeToggle(dateStr);
         },
 
-        toggleSelectAllMonth() {
-            const allSelected = this.allSelectableDates.length > 0 && this.allSelectableDates.every(d => this.selectedDates.includes(d));
-            if (allSelected) {
-                this.selectedDates = [];
-            } else {
-                this.selectedDates = [...this.allSelectableDates];
-            }
-        },
-
         async executeToggle(dateStr) {
             if (this.isToggling) return;
             this.isToggling = true;
@@ -484,13 +576,15 @@ function coachAvailabilityCalendar(selectableDates = []) {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    alert(data.message || 'Failed to update availability.');
+                    this.notify(data.message || 'Failed to update availability.', 'error');
                     this.isToggling = false;
                     this.togglingDate = null;
                 }
             } catch (err) {
                 console.error(err);
-                window.location.reload();
+                this.notify('Network connection error. Could not update availability.', 'error');
+                this.isToggling = false;
+                this.togglingDate = null;
             }
         },
 
@@ -516,12 +610,13 @@ function coachAvailabilityCalendar(selectableDates = []) {
                 if (data.success) {
                     window.location.reload();
                 } else {
-                    alert(data.message || 'Failed to apply bulk update.');
+                    this.notify(data.message || 'Failed to apply bulk update.', 'error');
                     this.bulkSubmitting = false;
                 }
             } catch (err) {
                 console.error(err);
-                window.location.reload();
+                this.notify('Network connection error. Could not apply bulk update.', 'error');
+                this.bulkSubmitting = false;
             }
         },
 
@@ -531,6 +626,7 @@ function coachAvailabilityCalendar(selectableDates = []) {
 
         openReleaseModal(dayData) {
             this.selectedAssignedDay = dayData;
+            this.submittingRelease = false;
             this.releaseModalOpen = true;
         }
     };

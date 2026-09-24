@@ -14,7 +14,7 @@
 <div class="space-y-6 text-sm">
 
     <!-- Top Header & Details -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">
                 {{ $rule->name }}
@@ -44,27 +44,28 @@
     </div>
 
     <!-- Pricing Trigger Metrics -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] shadow-2xs space-y-0.5">
-            <div class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider">Bookings Triggered</div>
-            <div class="text-2xl font-extrabold text-[#780000]">{{ number_format($totalCount) }}</div>
-            <div class="text-sm text-[#6E6E73]">Total reservations evaluated with this rule</div>
-        </div>
-
-        <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] shadow-2xs space-y-0.5">
-            <div class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider">Total Rule Price Impact</div>
-            <div class="text-2xl font-extrabold {{ $totalImpact >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
-                {{ $totalImpact >= 0 ? '+' : '−' }}₱{{ number_format(abs($totalImpact), 2) }}
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
+        <div class="grid grid-cols-1 sm:grid-cols-3 items-center gap-y-4">
+            <div class="px-4 py-1">
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Bookings Triggered</span>
+                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">{{ number_format($totalCount) }}</div>
             </div>
-            <div class="text-sm text-[#6E6E73]">Cumulative discount or surcharge volume</div>
-        </div>
 
-        <div class="p-4 rounded-xl bg-white border border-[#E5E5EA] shadow-2xs space-y-0.5">
-            <div class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider">Rule Status</div>
-            <div class="text-2xl font-extrabold flex items-center gap-1.5 mt-0.5">
-                <span class="{{ $rule->status === 'active' ? 'text-emerald-700' : 'text-gray-600' }} text-xl">{{ ucfirst($rule->status) }}</span>
+            <div class="relative px-4 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Total Rule Price Impact</span>
+                <div class="text-2xl font-extrabold mt-0.5 {{ $totalImpact >= 0 ? 'text-rose-700' : 'text-emerald-700' }}">
+                    {{ $totalImpact >= 0 ? '+' : '−' }}₱{{ number_format(abs($totalImpact), 2) }}
+                </div>
             </div>
-            <div class="text-sm text-[#6E6E73]">{{ $rule->status === 'active' ? 'Currently evaluating live customer bookings' : 'Rule paused (not active)' }}</div>
+
+            <div class="relative px-4 py-1">
+                <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
+                <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Rule Status</span>
+                <div class="text-2xl font-extrabold mt-0.5 {{ $rule->status === 'active' ? 'text-emerald-700' : 'text-gray-600' }}">
+                    {{ ucfirst($rule->status) }}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -99,16 +100,16 @@
     <!-- Triggered Bookings Table -->
     <div class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs">
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+            <table class="w-full text-left min-w-[900px]">
+                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-bold text-[#6E6E73]">
                     <tr>
-                        <th class="py-3 px-4 text-left">Booking Number</th>
-                        <th class="py-3 px-4 text-left">Customer Name</th>
-                        <th class="py-3 px-4 text-left">Dive Date</th>
-                        <th class="py-3 px-4 text-left">Class</th>
-                        <th class="py-3 px-4 text-left">Base Adjusted Rate</th>
-                        <th class="py-3 px-4 text-left">Rule Delta (Per Pax)</th>
-                        <th class="py-3 px-4 text-left pr-6">Date Booked</th>
+                        <th class="p-4 pl-6 text-left">Booking Number</th>
+                        <th class="p-4 text-left">Customer Name</th>
+                        <th class="p-4 text-left">Dive Date</th>
+                        <th class="p-4 text-left">Class</th>
+                        <th class="p-4 text-left">Base Adjusted Rate</th>
+                        <th class="p-4 text-left">Rule Delta (Per Pax)</th>
+                        <th class="p-4 pr-6 text-left">Date Booked</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
@@ -116,30 +117,30 @@
                     @php
                         $booking = $adj->booking;
                     @endphp
-                    <tr @if($booking) onclick="window.location='{{ route('admin.bookings.show', $booking) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors group" @else class="hover:bg-[#F2F2F7] transition-colors" @endif>
+                    <tr @if($booking) onclick="window.location='{{ route('admin.bookings.show', $booking) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors text-sm group" @else class="hover:bg-[#F2F2F7] transition-colors text-sm" @endif>
                         <!-- Booking Number -->
-                        <td class="py-3.5 px-4 text-left font-mono font-bold text-[#780000] group-hover:underline">
+                        <td class="p-4 pl-6 text-left font-mono font-bold text-[#780000] group-hover:underline">
                             {{ $booking ? $booking->booking_number : '-' }}
                         </td>
 
                         <!-- Customer Name -->
-                        <td class="py-3.5 px-4 text-left">
+                        <td class="p-4 text-left">
                             <div class="font-bold text-[#1D1D1F]">{{ $booking ? $booking->contact_name : 'Unknown Guest' }}</div>
                             <div class="text-sm text-[#6E6E73]">{{ $booking ? $booking->contact_phone : '' }}</div>
                         </td>
 
                         <!-- Dive Date -->
-                        <td class="py-3.5 px-4 text-left font-medium text-[#1D1D1F]">
+                        <td class="p-4 text-left font-medium text-[#1D1D1F]">
                             {{ $booking ? $booking->start_date->format('M d, Y') : '-' }}
                         </td>
 
                         <!-- Class -->
-                        <td class="py-3.5 px-4 text-left capitalize font-semibold text-[#1D1D1F]">
+                        <td class="p-4 text-left capitalize font-semibold text-[#1D1D1F]">
                             {{ $booking ? $booking->class_type : '-' }}
                         </td>
 
                         <!-- Base -> Adjusted Rate -->
-                        <td class="py-3.5 px-4 text-left">
+                        <td class="p-4 text-left">
                             <div class="flex items-center gap-1.5 text-sm">
                                 <span class="line-through text-[#8E8E93]">₱{{ number_format($adj->base_price, 2) }}</span>
                                 <span class="text-[#8E8E93]">→</span>
@@ -148,14 +149,14 @@
                         </td>
 
                         <!-- Rule Delta -->
-                        <td class="py-3.5 px-4 text-left">
+                        <td class="p-4 text-left">
                             <span class="inline-flex items-center px-2 py-0.5 rounded-md text-sm font-bold {{ $adj->adjustment_amount >= 0 ? 'bg-rose-50 text-rose-700' : 'bg-emerald-50 text-emerald-700' }}">
                                 {{ $adj->adjustment_amount >= 0 ? '+' : '−' }}₱{{ number_format(abs($adj->adjustment_amount), 2) }}
                             </span>
                         </td>
 
                         <!-- Date Booked -->
-                        <td class="py-3.5 px-4 text-left pr-6 text-sm text-[#6E6E73]">
+                        <td class="p-4 pr-6 text-left text-sm text-[#6E6E73]">
                             {{ $adj->created_at->format('M d, Y h:i A') }}
                         </td>
                     </tr>

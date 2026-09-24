@@ -92,7 +92,7 @@
 
             <div class="p-3.5 sm:p-4 rounded-xl ">
                 <span class="text-sm text-[#6E6E73] block mb-1">Trip Dates:</span>
-                <strong class="text-sm text-[#1D1D1F] block">{{ $booking->start_date->format('M d, Y') }} - {{ $booking->end_date->format('M d, Y') }}</strong>
+                <strong class="text-sm text-[#1D1D1F] block">{{ $booking->formatted_date_range }}</strong>
                 <span class="text-sm text-[#780000] font-semibold">
                     @if($policy['days_until_dive'] > 0)
                         {{ $policy['days_until_dive'] }} days until dive trip
@@ -236,7 +236,7 @@
                         <span>Reschedule Request ({{ $req->created_at->format('M d, Y') }})</span>
                         <span class="uppercase tracking-wider px-2 py-0.5 rounded bg-white text-sm font-bold">{{ $req->status }}</span>
                     </div>
-                    <p>Requested Move: {{ $req->requested_start_date->format('M d, Y') }} - {{ $req->requested_end_date->format('M d, Y') }}</p>
+                    <p>Requested Move: {{ $req->requested_start_date->year === $req->requested_end_date->year ? $req->requested_start_date->format('M d') . ' - ' . $req->requested_end_date->format('M d, Y') : $req->requested_start_date->format('M d, Y') . ' - ' . $req->requested_end_date->format('M d, Y') }}</p>
                     @if($req->reason)
                         <p class="text-sm text-[#78350F]">Reason: {{ $req->reason }}</p>
                     @endif

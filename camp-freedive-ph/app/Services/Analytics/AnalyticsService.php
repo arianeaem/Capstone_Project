@@ -18,6 +18,7 @@ use App\Services\DemandForecastService;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class AnalyticsService
 {
@@ -113,7 +114,7 @@ class AnalyticsService
                 $diffDays = max(1, $start->diffInDays($end));
                 $priorStart = $start->copy()->subDays($diffDays)->startOfDay();
                 $priorEnd = $start->copy()->subSecond();
-                $label = $start->format('M d, Y') . ' to ' . $end->format('M d, Y');
+                $label = $start->format('M d, Y') . ' - ' . $end->format('M d, Y');
                 break;
 
             default:
@@ -273,6 +274,9 @@ class AnalyticsService
         }
 
         // Add-ons Breakdown (Carpool & Boat Dive)
+        $carpoolFee = (float) (app(\App\Services\SystemSettingService::class)->get('addons.carpool_fee_per_head', app(\App\Services\SystemSettingService::class)->get('addons.carpool_roundtrip_fee', 1200)) ?? 1200);
+        $boatFee = (float) (app(\App\Services\SystemSettingService::class)->get('addons.boat_dive_fee_per_head', app(\App\Services\SystemSettingService::class)->get('addons.boat_dive_fee', 600)) ?? 600);
+
         $carpoolBookings = Booking::where('status', '!=', 'pending_downpayment')
             ->whereBetween('created_at', [$start, $end])
             ->where('pickup_option', 'carpool')
@@ -282,7 +286,7 @@ class AnalyticsService
               ->whereBetween('created_at', [$start, $end])
               ->where('pickup_option', 'carpool');
         })->count();
-        $carpoolRevenue = $carpoolPax * 1200;
+        $carpoolRevenue = $carpoolPax * $carpoolFee;
 
         $boatDiveBookings = Booking::where('status', '!=', 'pending_downpayment')
             ->whereBetween('created_at', [$start, $end])
@@ -293,7 +297,7 @@ class AnalyticsService
               ->whereBetween('created_at', [$start, $end])
               ->where('boat_dive', true);
         })->count();
-        $boatDiveRevenue = $boatDivePax * 600;
+        $boatDiveRevenue = $boatDivePax * $boatFee;
 
         // Dynamic Pricing Lift
         $positiveYield = (float) BookingPriceAdjustment::whereBetween('created_at', [$start, $end])
@@ -459,7 +463,7 @@ class AnalyticsService
     protected function getOperationsMetrics(Carbon $start, Carbon $end, Carbon $priorStart, Carbon $priorEnd): array
     {
         $batches = Batch::whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
-            ->with(['bookings' => fn($q) => $q->where('status', '!=', 'pending_downpayment')->with('participants'), 'coachAssignments.coach', 'riskAssessment'])
+            ->with(['bookings' => fn($q) => $q->where('status', '!=', 'pending_downpayment')->with('participants'), 'participantAssignments.coach', 'riskAssessment'])
             ->get();
 
         $totalBatches = $batches->count();
@@ -486,11 +490,12 @@ class AnalyticsService
         // Batches reaching full capacity (>= 90%)
         $fullCapacityBatches = $batches->filter(fn($b) => ($b->occupancy_percentage ?? 0) >= 90)->count();
 
-        // Safety Ratio Adherence (1 Coach : 4 Students)
-        $compliantBatches = $batches->filter(function ($b) {
+        // Safety Ratio Adherence
+        $coachRatio = (int) (app(\App\Services\SystemSettingService::class)->get('camp_operations.coach_student_ratio', 4) ?? 4);
+        $compliantBatches = $batches->filter(function ($b) use ($coachRatio) {
             $pax = $b->total_participants_count;
             if ($pax === 0) return true;
-            $requiredCoaches = (int) ceil($pax / 4);
+            $requiredCoaches = (int) ceil($pax / $coachRatio);
             return $b->assigned_coaches_count >= $requiredCoaches;
         })->count();
 
@@ -519,32 +524,37 @@ class AnalyticsService
     protected function getCoachMetrics(Carbon $start, Carbon $end): array
     {
         $coaches = User::where('role', 'coach')->get();
+        $batches = Batch::whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+            ->with(['activeParticipantAssignments.coach'])
+            ->get();
 
         $coachData = [];
         $totalAssignments = 0;
 
         foreach ($coaches as $coach) {
-            $assignments = CoachAssignment::where('coach_id', $coach->id)
-                ->whereHas('batch', function ($q) use ($start, $end) {
-                    $q->whereBetween('start_date', [$start->toDateString(), $end->toDateString()]);
-                })
-                ->count();
+            // Count distinct batches in range where this coach is assigned
+            $assignedBatchesCount = $batches->filter(function ($b) use ($coach) {
+                return $b->assigned_coaches->pluck('id')->contains($coach->id);
+            })->count();
 
-            $totalAssignments += $assignments;
+            $totalAssignments += $assignedBatchesCount;
 
-            $releases = DB::table('assignment_release_requests')
-                ->where('coach_id', $coach->id)
-                ->whereBetween('created_at', [$start, $end])
-                ->count();
+            $releases = 0;
+            if (Schema::hasTable('assignment_release_requests')) {
+                $releases = DB::table('assignment_release_requests')
+                    ->where('coach_id', $coach->id)
+                    ->whereBetween('created_at', [$start, $end])
+                    ->count();
+            }
 
             $coachData[] = [
                 'id' => $coach->id,
                 'name' => $coach->name,
                 'email' => $coach->email,
                 'status' => $coach->status,
-                'assignments_count' => $assignments,
+                'assignments_count' => $assignedBatchesCount,
                 'releases_count' => $releases,
-                'estimated_dive_days' => $assignments * 2, // 2-day batch format
+                'estimated_dive_days' => $assignedBatchesCount * 2, // 2-day weekend camp format
             ];
         }
 

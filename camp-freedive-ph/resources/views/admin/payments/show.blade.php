@@ -123,7 +123,7 @@
 
                     <div>
                         <span class="text-[#6E6E73] block">Dive Dates:</span>
-                        <span class="text-[#1D1D1F] font-medium">{{ $payment->booking->start_date->format('M d, Y') }} - {{ $payment->booking->end_date->format('M d, Y') }}</span>
+                        <span class="text-[#1D1D1F] font-medium">{{ $payment->booking->formatted_date_range }}</span>
                     </div>
 
                     <div>

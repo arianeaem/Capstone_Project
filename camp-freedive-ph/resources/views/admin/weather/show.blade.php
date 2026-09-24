@@ -12,18 +12,19 @@
 <div class="space-y-6 text-sm" x-data="{
     openOverrideModal: false,
     openCancelModal: false,
+    openActionsMenu: false,
     cancelReason: '{{ $overallClassification === 'Critical Risk' ? 'Critical Risk' : 'Elevated Marine Conditions (Moderate/High Risk)' }}'
 }">
     
     <!-- Top Header Bar -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2">
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">
                     {{ $batch->batch_number }}
                 </h1>
                 @if($batch->status === 'cancelled_by_camp')
-                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FEF2F2] text-[#DC2626] border border-[#FECACA]">
+                    <span class="px-2 py-0.5 rounded-md text-xs font-bold bg-[#FEF2F2] text-[#DC2626]">
                         Cancelled by Camp
                     </span>
                 @endif
@@ -31,12 +32,12 @@
             
             <div class="mt-1 text-sm text-[#6E6E73] space-y-1">
                 <div class="flex items-center gap-1 font-medium text-[#1D1D1F]">
-                    <span>{{ $batch->start_date->format('F d, Y (l)') }} to {{ $batch->end_date->format('F d, Y (l)') }}</span>
+                    <span>{{ $batch->start_date->format('F d, Y (l)') }} - {{ $batch->end_date->format('F d, Y (l)') }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- Action Controls -->
+        <!-- Action Controls: Primary Button + 3-Dot More Actions Menu -->
         <div class="flex items-center gap-2.5 flex-wrap">
             @php
                 $cbState = $circuitStatus['state'] ?? 'CLOSED';
@@ -53,31 +54,83 @@
                 </div>
             @endif
 
-            <!-- Refresh / Run Live Assessment -->
+            <!-- Primary Action: Run Live Assessment -->
             @if(!$isConcluded)
-            <form action="{{ route('admin.weather.assess', $batch) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn-secondary px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
-                    <svg class="w-4 h-4 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                    <span>Run Live Assessment</span>
-                </button>
-            </form>
+                <form action="{{ route('admin.weather.assess', $batch) }}" method="POST" class="inline">
+                    @csrf
+                    <button type="submit" class="btn-primary min-h-[44px] px-4 py-2.5 text-sm font-bold shadow-2xs inline-flex items-center justify-center gap-2 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                        <svg class="w-4 h-4 text-white shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
+                        <span>Run Live Assessment</span>
+                    </button>
+                </form>
             @endif
 
-            <!-- Direct View Batch Profile Button -->
-            <a href="{{ route('admin.batches.show', $batch) }}" class="btn-secondary px-3.5 py-2 text-sm font-semibold flex items-center gap-1.5 shadow-2xs">
-                <svg class="w-4 h-4 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                <span>View Batch Profile</span>
-            </a>
-
-            <!-- Risk-Based / Override Cancellation Trigger -->
-            @if($batch->status !== 'cancelled_by_camp')
+            <!-- 3-Dot More Actions Menu (Secondary & Destructive Actions) -->
+            <div class="relative inline-block text-left" @click.outside="openActionsMenu = false">
                 <button type="button" 
-                        @click="openCancelModal = true"
-                        class="btn-danger px-3.5 py-2 text-sm font-bold flex items-center gap-1.5">
-                    <span>Cancel Batch</span>
+                        @click="openActionsMenu = !openActionsMenu"
+                        :aria-expanded="openActionsMenu"
+                        aria-haspopup="true"
+                        aria-label="More batch safety actions"
+                        class="min-h-[44px] min-w-[44px] w-11 h-11 inline-flex items-center justify-center rounded-xl bg-white border border-[#E5E5EA] text-[#1D1D1F] hover:bg-[#F2F2F7] hover:border-[#D1D1D6] active:scale-[0.97] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000] cursor-pointer shadow-2xs">
+                    <svg class="w-5 h-5 text-[#1D1D1F]" viewBox="0 0 24 24" fill="currentColor">
+                        <circle cx="12" cy="12" r="1.75"/>
+                        <circle cx="19" cy="12" r="1.75"/>
+                        <circle cx="5" cy="12" r="1.75"/>
+                    </svg>
                 </button>
-            @endif
+
+                <!-- Contextual Menu Dropdown -->
+                <div x-show="openActionsMenu" 
+                     x-cloak
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="transform opacity-0 scale-95"
+                     x-transition:enter-end="transform opacity-100 scale-100"
+                     x-transition:leave="transition ease-in duration-75"
+                     x-transition:leave-start="transform opacity-100 scale-100"
+                     x-transition:leave-end="transform opacity-0 scale-95"
+                     class="absolute right-0 mt-2 w-60 rounded-2xl bg-white shadow-xl border border-[#E5E5EA] p-1.5 z-50 focus:outline-none text-sm">
+                    
+                    <!-- 1. Manual PAGASA Override -->
+                    @if(!$isConcluded)
+                        <button type="button"
+                                @click="openActionsMenu = false; openOverrideModal = true"
+                                class="w-full min-h-[40px] px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-xl flex items-center gap-2.5 transition-colors cursor-pointer text-left">
+                            <svg class="w-4 h-4 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                            </svg>
+                            <span>Apply Manual Override</span>
+                        </button>
+                    @endif
+
+                    <!-- 2. View Batch Profile -->
+                    <a href="{{ route('admin.batches.show', $batch) }}" 
+                       class="w-full min-h-[40px] px-3 py-2 text-sm font-semibold text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-xl flex items-center gap-2.5 transition-colors cursor-pointer text-left">
+                        <svg class="w-4 h-4 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                            <polyline points="15 3 21 3 21 9"></polyline>
+                            <line x1="10" y1="14" x2="21" y2="3"></line>
+                        </svg>
+                        <span>View Batch Profile</span>
+                    </a>
+
+                    <!-- 3. Destructive: Cancel Batch Trigger -->
+                    @if($batch->status !== 'cancelled_by_camp' && !$isConcluded)
+                        <div class="h-px bg-[#F2F2F7] my-1"></div>
+
+                        <button type="button"
+                                @click="openActionsMenu = false; openCancelModal = true"
+                                class="w-full min-h-[40px] px-3 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-50 rounded-xl flex items-center gap-2.5 transition-colors cursor-pointer text-left">
+                            <svg class="w-4 h-4 text-rose-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="15" y1="9" x2="9" y2="15"/>
+                                <line x1="9" y1="9" x2="15" y2="15"/>
+                            </svg>
+                            <span>Cancel Batch (Weather Risk)</span>
+                        </button>
+                    @endif
+                </div>
+            </div>
 
         </div>
     </div>
@@ -129,30 +182,18 @@
                 </div>
             </div>
 
-            <!-- Override Status & Manual Override Action -->
-            <div class="flex flex-col sm:flex-row sm:items-end md:items-center gap-3 md:justify-end shrink-0">
-                <div class="space-y-1 md:text-right">
-                    <span class="text-[10px] uppercase font-extrabold tracking-wider text-[#6E6E73] block">Override Advisory Status</span>
-                    @if($latestOverride && count($latestOverride->active_advisories) > 0)
-                        <span class="text-xs font-bold text-white bg-rose-600 px-3 py-1 rounded-full inline-flex items-center gap-1.5 shadow-2xs">
-                            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                            <span>Active: {{ implode(', ', $latestOverride->active_advisories) }}</span>
-                        </span>
-                    @else
-                        <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1 rounded-full inline-flex items-center gap-1.5">
-                            <svg class="w-3.5 h-3.5 text-[#065F46] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                            <span>NOT OVERRIDDEN</span>
-                        </span>
-                    @endif
-                </div>
-
-                <!-- Manual Override Button inside Banner -->
-                <button type="button" 
-                        @click="openOverrideModal = true"
-                        class="btn-secondary px-3.5 py-2 text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs shrink-0 cursor-pointer h-fit">
-                    <svg class="w-3.5 h-3.5 text-[#780000] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    <span class="whitespace-nowrap">Manual Override</span>
-                </button>
+            <!-- Override Status -->
+            <div class="space-y-1 md:text-right shrink-0">
+                <span class="text-[10px] uppercase font-extrabold tracking-wider text-[#6E6E73] block">Override Advisory Status</span>
+                @if($latestOverride && count($latestOverride->active_advisories) > 0)
+                    <span class="text-xs font-bold text-white bg-rose-600 px-3 py-1 rounded-full inline-block shadow-2xs">
+                        Active: {{ implode(', ', $latestOverride->active_advisories) }}
+                    </span>
+                @else
+                    <span class="text-xs font-bold text-[#065F46] bg-[#ECFDF5] px-3 py-1 rounded-full inline-block">
+                        NOT OVERRIDDEN
+                    </span>
+                @endif
             </div>
         </div>
 
@@ -236,7 +277,7 @@
                         <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                     </button>
                     @else
-                    <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded-md border border-[#E5E5EA]">
+                    <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded-md">
                         Active Dive Window Hours (AM &amp; PM)
                     </span>
                     @endif
@@ -389,7 +430,7 @@
                         <svg class="w-3.5 h-3.5 transition-transform" :class="showAllHours ? 'rotate-180' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
                     </button>
                     @else
-                    <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded-md border border-[#E5E5EA]">
+                    <span class="text-xs text-[#8E8E93] font-semibold bg-[#F2F2F7] px-2 py-0.5 rounded-md">
                         Active Dive Window Hours (AM &amp; PM)
                     </span>
                     @endif
@@ -482,7 +523,7 @@
                 class="w-full p-5 sm:p-6 flex items-center justify-between text-left hover:bg-[#F2F2F7] transition-colors cursor-pointer select-none">
             <div class="flex items-center gap-3">
                 <span class="text-base font-extrabold text-[#1D1D1F]">Assessment Audit Trail &amp; History</span>
-                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73] border border-[#E5E5EA]">
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F2F2F7] text-[#6E6E73]">
                     {{ count($assessmentRuns) }} run(s)
                 </span>
             </div>
@@ -674,7 +715,7 @@
                 <div class="space-y-1.5">
                     <span class="block font-bold text-[#6E6E73] text-xs uppercase tracking-wider">Outbound Email Notification Preview</span>
                     <div class="p-4 bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] font-sans text-xs text-[#1D1D1F] whitespace-pre-line leading-relaxed">
-Good day, <strong class="text-[#780000]">[Customer Name]</strong>. Your scheduled date for <strong class="text-[#780000]">{{ $batch->start_date->format('M d') }} to {{ $batch->end_date->format('M d, Y') }}</strong> will be canceled due to:
+Good day, <strong class="text-[#780000]">[Customer Name]</strong>. Your scheduled date for <strong class="text-[#780000]">{{ $batch->formatted_date_range }}</strong> will be canceled due to:
 
 - <span x-text="cancelReason" class="font-bold"></span>
 

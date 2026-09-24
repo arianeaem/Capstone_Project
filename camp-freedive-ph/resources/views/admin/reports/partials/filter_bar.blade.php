@@ -7,7 +7,7 @@
             <span class="text-sm font-bold uppercase tracking-wider text-[#6E6E73]">Reporting Period</span>
             <div class="flex items-baseline gap-2 flex-wrap">
                 <span class="text-base sm:text-xl font-black text-[#1D1D1F]">{{ $range['label'] }}</span>
-                <span class="text-sm sm:text-sm font-semibold text-[#8E8E93]">({{ $range['start']->format('M d, Y') }} to {{ $range['end']->format('M d, Y') }})</span>
+                <span class="text-sm sm:text-sm font-semibold text-[#8E8E93]">({{ $range['start']->year === $range['end']->year ? $range['start']->format('M d') . ' - ' . $range['end']->format('M d, Y') : $range['start']->format('M d, Y') . ' - ' . $range['end']->format('M d, Y') }})</span>
             </div>
         </div>
 

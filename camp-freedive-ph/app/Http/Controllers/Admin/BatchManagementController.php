@@ -136,14 +136,14 @@ class BatchManagementController extends Controller
      */
     public function create(Request $request): View
     {
-        $defaultDate = $request->input('date') ? Carbon::parse($request->input('date')) : Carbon::now()->next(Carbon::SATURDAY);
-        $defaultEndDate = $defaultDate->copy()->addDay();
-        $defaultStartDateStr = $defaultDate->format('Y-m-d');
-        $defaultEndDateStr = $defaultEndDate->format('Y-m-d');
-        $suggestedNum = $this->batchService->getNextBatchNumber($defaultDate);
+        $defaultDate = $request->filled('date') ? Carbon::parse($request->input('date')) : null;
+        $defaultEndDate = $defaultDate ? $defaultDate->copy()->addDay() : null;
+        $defaultStartDateStr = $defaultDate ? $defaultDate->format('Y-m-d') : '';
+        $defaultEndDateStr = $defaultEndDate ? $defaultEndDate->format('Y-m-d') : '';
+        $suggestedNum = $defaultDate ? $this->batchService->getNextBatchNumber($defaultDate) : $this->batchService->getNextBatchNumber();
         $defaultBatchNumber = 'Batch ' . $suggestedNum;
 
-        $unbatchedBookings = $this->batchService->getUnbatchedBookingsForDate($defaultDate);
+        $unbatchedBookings = $defaultDate ? $this->batchService->getUnbatchedBookingsForDate($defaultDate) : collect();
 
         $initialBookings = $unbatchedBookings->map(function ($b) {
             return [
@@ -157,7 +157,7 @@ class BatchManagementController extends Controller
         })->values()->all();
 
         $selectedIds = $unbatchedBookings->pluck('id')->values()->all();
-        $initialStaffingRec = $this->forecastService->getStaffingRecommendationForDate($defaultDate);
+        $initialStaffingRec = $defaultDate ? $this->forecastService->getStaffingRecommendationForDate($defaultDate) : null;
 
         $existingBatches = Batch::all()->map(function ($b) {
             return [

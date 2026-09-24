@@ -105,24 +105,30 @@ class CoachRosterController extends Controller
             'assignedParticipants' => fn($q) => $q->with(['participant.booking', 'batch'])->orderBy('dive_date', 'desc'),
         ]);
 
-        // 1. Assigned Students list (Active)
+        // 1. Assigned Students list (Active / Upcoming only)
         $activeAssignments = $coach->assignedParticipants()
             ->where('status', 'assigned')
+            ->where('dive_date', '>=', Carbon::today())
             ->with(['participant.booking', 'batch'])
             ->orderBy('dive_date', 'asc')
             ->get();
 
         // 2. Upcoming Schedule (Chronological future dive dates)
-        $upcomingAssignments = $activeAssignments->filter(function ($assignment) {
-            return $assignment->dive_date >= Carbon::today();
-        });
+        $upcomingAssignments = $activeAssignments;
 
-        // 3. Past Completed Dives History
+        // 3. Past Completed Dives History (Grouped by batch)
         $pastAssignments = $coach->assignedParticipants()
-            ->where('dive_date', '<', Carbon::today())
+            ->where(function ($q) {
+                $q->where('dive_date', '<', Carbon::today())
+                  ->orWhere('status', 'completed');
+            })
             ->with(['participant.booking', 'batch'])
             ->orderBy('dive_date', 'desc')
             ->get();
+
+        $pastBatches = $pastAssignments->groupBy(function ($assignment) {
+            return $assignment->batch_id ? 'batch_' . $assignment->batch_id : 'date_' . $assignment->dive_date->format('Y-m-d');
+        });
 
         // Available active coaches for student reassignment modal
         $otherCoaches = User::where('role', 'coach')
@@ -135,6 +141,7 @@ class CoachRosterController extends Controller
             'activeAssignments',
             'upcomingAssignments',
             'pastAssignments',
+            'pastBatches',
             'otherCoaches'
         ));
     }

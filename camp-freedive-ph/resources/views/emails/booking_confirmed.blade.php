@@ -63,7 +63,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 24px;">
-                    <a href="{{ url('/manage-booking/' . $booking->booking_number) }}" class="btn">Manage Your Booking Online</a>
+                    <a href="{{ route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]) }}" class="btn">Manage Your Booking Online</a>
                 </div>
 
                 <!-- Booking Summary Table -->

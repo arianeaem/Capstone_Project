@@ -12,15 +12,6 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="{{ route('admin.payments.refunds') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-2">
-                <span>Pending Refunds</span>
-                @if(isset($stats['pending_refunds']) && $stats['pending_refunds'] > 0)
-                    <span class="px-2 py-0.2 rounded-full text-sm font-bold bg-[#780000] text-white">
-                        {{ $stats['pending_refunds'] }}
-                    </span>
-                @endif
-            </a>
-
             <a href="{{ route('admin.payments.create') }}" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold shadow-2xs flex items-center gap-1.5">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
                 <span>Record Payment</span>

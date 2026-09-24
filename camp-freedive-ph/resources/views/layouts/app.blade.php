@@ -102,6 +102,12 @@
             </div>
         @endif
 
+        @if(session('info'))
+            <div class="bg-sky-50 border-b border-sky-200 text-sky-900 py-3.5 px-4 text-sm sm:text-base text-center font-medium flex items-center justify-center gap-2">
+                <span>{{ session('info') }}</span>
+            </div>
+        @endif
+
         @if(session('error'))
             <div class="bg-[#FEF2F2] border-b border-[#FECACA] text-[#991B1B] py-3.5 px-4 text-sm sm:text-base text-center font-medium flex items-center justify-center gap-2">
                 <span>{{ session('error') }}</span>

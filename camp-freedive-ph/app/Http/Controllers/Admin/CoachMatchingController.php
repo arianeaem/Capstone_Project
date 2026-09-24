@@ -30,7 +30,7 @@ class CoachMatchingController extends Controller
     {
         $today = Carbon::today();
 
-        // 1. Fetch upcoming active batches, excluding batches that are already done and have no participants
+        // 1. Fetch upcoming active batches with registered participants
         $batches = Batch::with(['bookings.participants', 'activeParticipantAssignments.coach'])
             ->whereNotIn('status', ['completed', 'cancelled_by_camp'])
             ->orderBy('start_date', 'asc')
@@ -40,10 +40,8 @@ class CoachMatchingController extends Controller
                     || ($batch->start_date && !$batch->end_date && $batch->start_date->lt($today))
                     || in_array($batch->status, ['completed', 'cancelled_by_camp']);
 
-                $hasNoParticipants = ($batch->total_participants_count === 0);
-
-                // Hide batches that are already done AND have no participants
-                return !($isDone && $hasNoParticipants);
+                // Only include active batches that have at least 1 participant
+                return !$isDone && ($batch->total_participants_count > 0);
             })
             ->values();
 
@@ -54,10 +52,13 @@ class CoachMatchingController extends Controller
             ->orderBy('name', 'asc')
             ->get();
 
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $coachRatio = (int) ($settingService->get('camp_operations.coach_student_ratio', 4) ?? 4);
+
         // 3. Build simplified batch staffing data
-        $batchData = $batches->map(function ($batch) use ($activeCoaches) {
+        $batchData = $batches->map(function ($batch) use ($activeCoaches, $coachRatio) {
             $totalParticipants = (int) $batch->total_participants_count;
-            $neededCoaches = $totalParticipants > 0 ? (int) ceil($totalParticipants / 4) : 0;
+            $neededCoaches = $totalParticipants > 0 ? (int) ceil($totalParticipants / $coachRatio) : 0;
             $assignedCoaches = $batch->assigned_coaches;
             $assignedCoachIds = $assignedCoaches->pluck('id')->toArray();
 

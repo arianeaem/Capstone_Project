@@ -48,7 +48,7 @@
 
             <div class="status-box">
                 <strong>Your New Dive Dates are Confirmed</strong><br>
-                <span>{{ $booking->start_date ? $booking->start_date->format('F d, Y (l)') : '' }} to {{ $booking->end_date ? $booking->end_date->format('F d, Y (l)') : '' }}</span>
+                <span>{{ $booking->start_date ? $booking->start_date->format('F d, Y (l)') : '' }} - {{ $booking->end_date ? $booking->end_date->format('F d, Y (l)') : '' }}</span>
             </div>
 
             <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; border: none !important;">
@@ -84,7 +84,7 @@
             <p style="font-size: 13px; color: #6E6E73;">You can view and manage your reservation details anytime using your booking number and PIN.</p>
             
             <div style="text-align: center; margin-top: 24px;">
-                <a href="{{ url('/manage-booking/' . $booking->booking_number) }}" class="btn">View Updated Booking</a>
+                <a href="{{ route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]) }}" class="btn">View Updated Booking</a>
             </div>
         </div>
 

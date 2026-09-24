@@ -42,10 +42,10 @@ class RefundController extends Controller
             ->withQueryString();
 
 
-        // Calculate live policy snapshot for each pending request
+        // Calculate live policy snapshot for each pending request based on when it was submitted
         $policies = [];
         foreach ($pendingRefunds as $req) {
-            $policies[$req->id] = $this->policyEngine->evaluate($req->booking);
+            $policies[$req->id] = $this->policyEngine->evaluate($req->booking, $req->requested_at ?? $req->created_at);
         }
 
         return view('admin.payments.refunds', compact('pendingRefunds', 'processedRefunds', 'policies'));

@@ -44,7 +44,7 @@
             <div class="hero-box">
                 <h1 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 800; color: #1D1D1F; letter-spacing: -0.2px;">Camp Cancellation Notice</h1>
                 <p style="margin: 0 auto; font-size: 14px; color: #4A4A4F; line-height: 1.6; max-width: 480px;">
-                    Hi <strong>{{ $booking->contact_name }}</strong>, we regret to inform you that your upcoming 2D1N freediving camp scheduled for <strong>{{ $booking->start_date ? $booking->start_date->format('M d, Y') : '' }} to {{ $booking->end_date ? $booking->end_date->format('M d, Y') : '' }}</strong> has been officially cancelled due to severe weather/marine safety advisories.
+                    Hi <strong>{{ $booking->contact_name }}</strong>, we regret to inform you that your upcoming 2D1N freediving camp scheduled for <strong>{{ $booking->start_date ? $booking->start_date->format('M d, Y') : '' }} - {{ $booking->end_date ? $booking->end_date->format('M d, Y') : '' }}</strong> has been officially cancelled due to severe weather/marine safety advisories.
                 </p>
             </div>
 
@@ -82,7 +82,7 @@
             </table>
 
             <div style="text-align: center; margin-top: 24px;">
-                <a href="{{ url('/manage-booking/' . $booking->booking_number) }}" class="btn">Reschedule or Manage Booking</a>
+                <a href="{{ route('manage.show', ['booking_number' => $booking->booking_number, 'pin' => $booking->pin]) }}" class="btn">Reschedule or Manage Booking</a>
             </div>
         </div>
 

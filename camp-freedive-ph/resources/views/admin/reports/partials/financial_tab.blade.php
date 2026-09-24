@@ -10,7 +10,7 @@
             
             <!-- Net Collections -->
             <div class="px-2 sm:px-4 py-1">
-                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Net Collections</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Net Revenue Collected</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#780000] mt-0.5 break-words">
                     ₱{{ number_format($fin['net_revenue'] ?? 0, 2) }}
                 </div>
@@ -18,7 +18,7 @@
                     @if(($fin['refunds_processed'] ?? 0) > 0)
                         <span>Gross: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }} (₱{{ number_format($fin['refunds_processed'] ?? 0, 2) }} refunded)</span>
                     @else
-                        <span>From confirmed bookings</span>
+                        <span>Total payments collected</span>
                     @endif
                     <span class="px-1.5 py-0.5 rounded text-xs font-bold shrink-0 {{ ($fin['revenue_delta'] ?? 0) >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
                         {{ ($fin['revenue_delta'] ?? 0) >= 0 ? '+' : '' }}{{ $fin['revenue_delta'] ?? 0 }}%
@@ -29,56 +29,51 @@
             <!-- Downpayments Collected -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Downpayments Collected</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Reservation Deposits</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5 break-words">
                     ₱{{ number_format($fin['downpayment_revenue'] ?? 0, 2) }}
                 </div>
                 <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>{{ ($fin['gross_revenue'] ?? 0) > 0 ? round((($fin['downpayment_revenue'] ?? 0) / $fin['gross_revenue']) * 100, 1) : 0 }}% of collections</span>
-                    <span>Settled: ₱{{ number_format($fin['balance_revenue'] ?? 0, 2) }}</span>
+                    <span>{{ ($fin['gross_revenue'] ?? 0) > 0 ? round((($fin['downpayment_revenue'] ?? 0) / $fin['gross_revenue']) * 100, 1) : 0 }}% of total</span>
+                    <span>Remaining paid: ₱{{ number_format($fin['balance_revenue'] ?? 0, 2) }}</span>
                 </div>
             </div>
 
             <!-- Remaining Receivables -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Remaining Receivables</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Outstanding Balance to Collect</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#92400E] mt-0.5 break-words">
                     ₱{{ number_format($fin['outstanding_receivables'] ?? 0, 2) }}
                 </div>
-                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
-                    <span>Due on check-in arrival</span>
-                    <span class="px-1.5 py-0.5 rounded text-xs font-bold text-[#92400E] bg-amber-50 border border-amber-200 shrink-0">Pending</span>
+                <div class="text-xs sm:text-sm text-[#8E8E93] mt-1">
+                    <span>Due upon camp arrival</span>
                 </div>
             </div>
 
             <!-- Average Revenue Per Participant -->
             <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Avg Revenue / Participant</span>
+                <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Average Spending per Guest</span>
                 <div class="text-xl sm:text-2xl font-extrabold text-[#00C3D0] mt-0.5 break-words">
                     ₱{{ number_format($fin['arpd'] ?? 0, 2) }}
                 </div>
-                <div class="text-xs sm:text-sm text-[#8E8E93] flex items-center justify-between gap-2 mt-1">
+                <div class="text-xs sm:text-sm text-[#8E8E93] mt-1">
                     <span>Avg per booking: ₱{{ number_format($fin['arpb'] ?? 0, 2) }}</span>
-                    <span class="text-xs font-semibold text-[#6E6E73] shrink-0">Per Capita</span>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <!-- Middle: Class Package Mix & Revenue Breakdown -->
+    <!-- Middle: Course Package Mix & Revenue Breakdown -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         <!-- Left 2 Cols: Package Revenue Breakdown (Pie Chart + Details) -->
         <div class="lg:col-span-2 bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-6 shadow-2xs space-y-4">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 sm:gap-4">
-                <div>
-                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue by Class Package</h3>
-                    <p class="text-sm text-[#6E6E73]">Revenue share, bookings, and participant distribution per course.</p>
-                </div>
-                <span class="text-sm font-bold text-[#780000] self-start sm:self-auto">Total: ₱{{ number_format($fin['gross_revenue'] ?? 0, 2) }}</span>
+            <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue by Course Package</h3>
+                <p class="text-sm text-[#6E6E73]">Breakdown of income, number of bookings, and guest count for each course.</p>
             </div>
 
             @php
@@ -122,7 +117,7 @@
                         
                         <!-- Inner Hole for Donut Style -->
                         <div class="w-34 h-34 sm:w-44 sm:h-44 lg:w-48 lg:h-48 bg-white rounded-full shadow-sm flex flex-col items-center justify-center text-center p-3 sm:p-4">
-                            <span class="text-sm sm:text-sm font-bold text-[#8E8E93] uppercase tracking-wider">Gross Total</span>
+                            <span class="text-sm sm:text-sm font-bold text-[#8E8E93] uppercase tracking-wider">Total Revenue</span>
                             <span class="text-sm sm:text-xl lg:text-2xl font-black text-[#1D1D1F] tracking-tight truncate max-w-full px-1 mt-0.5 sm:mt-1">
                                 ₱{{ number_format($fin['gross_revenue'] ?? 0) }}
                             </span>
@@ -133,12 +128,12 @@
                     </div>
                 </div>
 
-                <!-- Right: Package Details Breakdown -->
+                <!-- Right: Package Details Breakdown (Vertical Accent Line Indicators) -->
                 <div class="flex-1 w-full space-y-2.5 sm:space-y-3">
                     @foreach($fin['packages'] ?? [] as $pKey => $pData)
                         @php
                             $share = $pData['share_percentage'] ?? $pData['share'] ?? 0;
-                            $dotClass = $pData['dot_class'] ?? match($pKey) {
+                            $lineClass = $pData['dot_class'] ?? match($pKey) {
                                 'discovery' => 'bg-[#780000]',
                                 'fundive' => 'bg-[#A82020]',
                                 'refinement' => 'bg-[#D45D5D]',
@@ -151,23 +146,26 @@
                                 default => 'text-[#780000]'
                             };
                         @endphp
-                        <div class="p-3 sm:p-4 rounded-xl flex items-center justify-between gap-3 sm:gap-4  transition-all">
-                            <div class="space-y-0.5 min-w-0 flex-1">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full {{ $dotClass }} shrink-0"></span>
-                                    <span class="font-extrabold text-sm sm:text-base text-[#1D1D1F] truncate">{{ $pData['name'] }}</span>
-                                </div>
-                                <div class="text-sm sm:text-sm text-[#6E6E73] flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2 pl-4.5">
-                                    <span class="font-semibold text-[#1D1D1F] whitespace-nowrap">{{ $pData['bookings_count'] }} {{ Str::plural('booking', $pData['bookings_count']) }}</span>
-                                    <span class="whitespace-nowrap">{{ $pData['pax_count'] }} {{ Str::plural('participant', $pData['pax_count']) }}</span>
+                        <div class="py-3 sm:py-3.5 flex items-center justify-between gap-3 sm:gap-4 border-b border-[#F2F2F7] last:border-b-0">
+                            <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                                <!-- Vertical Accent Line -->
+                                <span class="w-1.5 self-stretch rounded-full {{ $lineClass }} shrink-0"></span>
+                                
+                                <div class="space-y-0.5 min-w-0 flex-1">
+                                    <span class="font-extrabold text-sm sm:text-base text-[#1D1D1F] truncate block">{{ $pData['name'] }}</span>
+                                    <div class="text-xs sm:text-sm text-[#6E6E73] flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-2">
+                                        <span class="font-semibold text-[#1D1D1F] whitespace-nowrap">{{ $pData['bookings_count'] }} {{ Str::plural('booking', $pData['bookings_count']) }}</span>
+                                        <span class="text-[#8E8E93] hidden sm:inline">&bull;</span>
+                                        <span class="whitespace-nowrap">{{ $pData['pax_count'] }} {{ Str::plural('guest', $pData['pax_count']) }}</span>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="text-right shrink-0">
-                                <div class="text-sm sm:text-base font-black text-[#1D1D1F] whitespace-nowrap">
+                                <div class="text-xl sm:text-2xl lg:text-3xl font-black text-[#1D1D1F] tracking-tight whitespace-nowrap">
                                     ₱{{ number_format($pData['revenue'], 2) }}
                                 </div>
-                                <div class="text-sm sm:text-sm font-bold {{ $textColor }} mt-0.5 whitespace-nowrap">
+                                <div class="text-xs sm:text-sm font-bold {{ $textColor }} mt-0.5 whitespace-nowrap">
                                     {{ $share }}% share
                                 </div>
                             </div>
@@ -178,52 +176,55 @@
             </div>
         </div>
 
-        <!-- Right 1 Col: Add-ons & Ancillary Revenue -->
-        <div class="bg-white rounded-xl border border-[#E5E5EA] p-3.5 sm:p-5 shadow-2xs space-y-4">
-            <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Add-ons & Logistics</h3>
+        <!-- Right 1 Col: Add-ons & Extra Revenue Services -->
+        <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4">
+            <div>
+                <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Add-on Services</h3>
+                <p class="text-xs sm:text-sm text-[#6E6E73]">Extra income and pricing adjustments</p>
+            </div>
             
-            <!-- Manila Carpool Van -->
-            <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-sm text-[#1D1D1F]">Manila Carpool Van</span>
-                    <span class="px-2 py-0.5 rounded text-sm font-extrabold bg-[#780000] text-white">₱1,200 / pax</span>
+            <div class="space-y-1 divide-y divide-[#F2F2F7]">
+                <!-- Manila Carpool Van -->
+                <div class="py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                    <div class="space-y-0.5 min-w-0 flex-1">
+                        <span class="font-bold text-sm sm:text-base text-[#1D1D1F] truncate block">Manila Carpool Van</span>
+                        <span class="text-xs sm:text-sm text-[#6E6E73] block">{{ $fin['carpool']['pax_count'] ?? 0 }} passengers</span>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight whitespace-nowrap">
+                            ₱{{ number_format($fin['carpool']['estimated_revenue'] ?? 0, 2) }}
+                        </div>
+                    </div>
                 </div>
-                <div class="text-xl font-black text-[#780000]">
-                    ₱{{ number_format($fin['carpool']['estimated_revenue'] ?? 0, 2) }}
-                </div>
-                <div class="text-sm text-[#6E6E73] flex items-center justify-between">
-                    <span>{{ $fin['carpool']['pax_count'] ?? 0 }} participants transported</span>
-                    <span>{{ $fin['carpool']['bookings_count'] ?? 0 }} bookings</span>
-                </div>
-            </div>
 
-            <!-- Boat Dive Optional -->
-            <div class="p-3.5 rounded-xl bg-[#F2F2F7] space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-sm text-[#1D1D1F]">Boat Dive Add-on</span>
-                    <span class="px-2 py-0.5 rounded text-sm font-extrabold bg-[#00C3D0] text-white">₱600 / pax</span>
+                <!-- Boat Dive Optional -->
+                <div class="py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                    <div class="space-y-0.5 min-w-0 flex-1">
+                        <span class="font-bold text-sm sm:text-base text-[#1D1D1F] truncate block">Boat Dive Add-on</span>
+                        <span class="text-xs sm:text-sm text-[#6E6E73] block">{{ $fin['boat_dive']['pax_count'] ?? 0 }} divers joined</span>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-xl sm:text-2xl font-black text-[#1D1D1F] tracking-tight whitespace-nowrap">
+                            ₱{{ number_format($fin['boat_dive']['estimated_revenue'] ?? 0, 2) }}
+                        </div>
+                    </div>
                 </div>
-                <div class="text-xl font-black text-[#00C3D0]">
-                    ₱{{ number_format($fin['boat_dive']['estimated_revenue'] ?? 0, 2) }}
-                </div>
-                <div class="text-sm text-[#6E6E73] flex items-center justify-between">
-                    <span>{{ $fin['boat_dive']['pax_count'] ?? 0 }} participants enrolled</span>
-                    <span>{{ $fin['boat_dive']['bookings_count'] ?? 0 }} bookings</span>
-                </div>
-            </div>
 
-            <!-- Dynamic Pricing Lift -->
-            <div class="p-3.5 rounded-xl bg-[#D4A5A5] space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="font-bold text-sm text-[#780000]">Dynamic Pricing Net Lift</span>
-                    <span class="text-sm font-bold text-[#780000]">{{ $fin['dynamic_pricing']['adjustments_count'] ?? 0 }} rules</span>
-                </div>
-                <div class="text-xl font-black text-[#780000]">
-                    ₱{{ number_format($fin['dynamic_pricing']['net_lift'] ?? 0, 2) }}
-                </div>
-                <div class="text-sm text-[#8E8E93] flex items-center justify-between">
-                    <span>Yield: +₱{{ number_format($fin['dynamic_pricing']['positive_yield'] ?? 0, 2) }}</span>
-                    <span>Discount: -₱{{ number_format($fin['dynamic_pricing']['discounts_given'] ?? 0, 2) }}</span>
+                <!-- Pricing Adjustments (Dynamic Pricing) -->
+                @php
+                    $netLift = (float)($fin['dynamic_pricing']['net_lift'] ?? 0);
+                    $formattedNetLift = ($netLift < 0 ? '-₱' . number_format(abs($netLift), 2) : '+₱' . number_format($netLift, 2));
+                @endphp
+                <div class="py-3 sm:py-3.5 flex items-center justify-between gap-3">
+                    <div class="space-y-0.5 min-w-0 flex-1">
+                        <span class="font-bold text-sm sm:text-base text-[#1D1D1F] truncate block">Pricing Adjustments</span>
+                        <span class="text-xs sm:text-sm text-[#8E8E93] block">Surges & discounts impact</span>
+                    </div>
+                    <div class="text-right shrink-0">
+                        <div class="text-xl sm:text-2xl font-black tracking-tight whitespace-nowrap {{ $netLift >= 0 ? 'text-emerald-700' : 'text-[#780000]' }}">
+                            {{ $formattedNetLift }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

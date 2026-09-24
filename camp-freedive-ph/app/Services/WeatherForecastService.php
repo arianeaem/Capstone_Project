@@ -471,18 +471,22 @@ class WeatherForecastService
             } catch (\Throwable $e) {}
         }
 
+        // Live ML Safety Evaluation across training hours
+        $mlAssessment = !$overrideTriggered ? $this->assessMLSafetyForDate($date->format('Y-m-d'), '08:00', '18:00', $overrides) : null;
+        $mlRank = $mlAssessment ? (self::RISK_RANK[$mlAssessment['overall_recommendation'] ?? 'Safe'] ?? 1) : 1;
+
         $amRank = self::RISK_RANK[$amData['classification']] ?? 1;
         $pmRank = self::RISK_RANK[$pmData['classification']] ?? 1;
         $daytimeRank = self::RISK_RANK[$cachedDay['daytime_classification'] ?? 'Safe'] ?? 1;
 
-        if ($overrideTriggered || $amRank === 5 || $pmRank === 5 || $daytimeRank === 5) {
+        if ($overrideTriggered || $amRank === 5 || $pmRank === 5 || $daytimeRank === 5 || $mlRank === 5) {
             $dayClassification = 'Critical Risk';
             $weightedScorePct = 100.0;
             $worstWindow = ($pmRank >= $amRank) ? '15:30-17:30' : '09:30-12:00';
             $worstHour = ($pmRank >= $amRank) ? $pmData['worst_hour'] : $amData['worst_hour'];
             $recommendedAction = self::MEANING_MAP['Critical Risk'];
         } else {
-            $dayRank = max($amRank, $pmRank, $daytimeRank);
+            $dayRank = max($amRank, $pmRank, $daytimeRank, $mlRank);
             $dayClassification = array_search($dayRank, self::RISK_RANK) ?: 'Safe';
             $weightedScorePct = max($amData['weighted_score_pct'] ?? 0, $pmData['weighted_score_pct'] ?? 0, $cachedDay['daytime_score_pct'] ?? 0);
             $worstWindow = ($pmRank >= $amRank) ? '15:30-17:30' : '09:30-12:00';
@@ -880,7 +884,7 @@ class WeatherForecastService
             }
 
             // Generate Templated Guest Cancellation & Safety Notification Message
-            $scheduledDateStr = $booking->start_date->format('M d, Y') . ' to ' . $booking->end_date->format('M d, Y');
+            $scheduledDateStr = $booking->start_date->format('M d, Y') . ' - ' . $booking->end_date->format('M d, Y');
             $messageBody = "Good day, {$booking->contact_name}. Your scheduled date for {$scheduledDateStr} will be canceled due to:\n\n- {$cancellationReason}\n\nThere will be options for this cancelled schedule:\n- Full refund\n- Reschedule\n\nYou can select your preferred option by entering your booking number ({$booking->booking_number}) and PIN in Manage Booking.";
 
             NotificationLog::create([

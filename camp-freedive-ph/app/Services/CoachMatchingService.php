@@ -16,6 +16,11 @@ use Illuminate\Support\Facades\DB;
 
 class CoachMatchingService
 {
+    public function getCoachStudentRatio(): int
+    {
+        return (int) (app(\App\Services\SystemSettingService::class)->get('camp_operations.coach_student_ratio', 4) ?? 4);
+    }
+
     /**
      * Assign one or multiple coaches to a batch.
      * Maps batch participants across the assigned coaching team.
@@ -54,9 +59,10 @@ class CoachMatchingService
                 $chunkSize = (int) ceil($totalParticipants / $coachCount);
                 $chunks = $participants->chunk($chunkSize);
 
+                $ratio = $this->getCoachStudentRatio();
                 foreach ($allCoachIds as $idx => $cId) {
                     $pChunk = $chunks->get($idx) ?? collect();
-                    $isRatioOverride = $pChunk->count() > 4;
+                    $isRatioOverride = $pChunk->count() > $ratio;
 
                     foreach ($pChunk as $p) {
                         ParticipantAssignment::create([
@@ -159,9 +165,10 @@ class CoachMatchingService
                 $chunkSize = (int) ceil($participants->count() / $remainingCoaches->count());
                 $chunks = $participants->chunk($chunkSize);
 
+                $ratio = $this->getCoachStudentRatio();
                 foreach ($remainingCoaches->values() as $idx => $remCoach) {
                     $pChunk = $chunks->get($idx) ?? collect();
-                    $isRatioOverride = $pChunk->count() > 4;
+                    $isRatioOverride = $pChunk->count() > $ratio;
 
                     foreach ($pChunk as $p) {
                         ParticipantAssignment::create([
@@ -212,7 +219,7 @@ class CoachMatchingService
 
             $currentLoad = $coach->assignedCountForDate($batch->start_date);
             $newTotal = $currentLoad + $participants->count();
-            $isRatioOverride = $newTotal > 4;
+            $isRatioOverride = $newTotal > $this->getCoachStudentRatio();
 
             $assignedList = [];
 
@@ -288,8 +295,9 @@ class CoachMatchingService
         $options = [];
         $maxCoaches = max(1, min($availableCoachCount, $studentCount));
 
-        // Option 1: Standard ~4:1 guideline (Ceiling of studentCount / 4)
-        $opt1Count = (int) ceil($studentCount / 4);
+        $ratio = $this->getCoachStudentRatio();
+        // Option 1: Standard ~ratio:1 guideline (Ceiling of studentCount / ratio)
+        $opt1Count = (int) ceil($studentCount / $ratio);
         $opt1Count = max(1, min($opt1Count, $maxCoaches));
 
         $opt1Split = $this->calculateTargetSplit($studentCount, $opt1Count);
@@ -297,7 +305,7 @@ class CoachMatchingService
             'id' => 'standard',
             'label' => "Option A: {$opt1Count} Coach" . ($opt1Count > 1 ? 'es' : ''),
             'coach_count' => $opt1Count,
-            'description' => "Standard ~4:1 ratio (" . implode(' + ', $opt1Split) . " students)",
+            'description' => "Standard ~{$ratio}:1 ratio (" . implode(' + ', $opt1Split) . " students)",
             'split' => $opt1Split,
             'is_recommended' => true,
         ];
@@ -316,9 +324,9 @@ class CoachMatchingService
             ];
         }
 
-        // Option 3: Leaner split (-1 coach if viable and <= 4 per coach)
+        // Option 3: Leaner split (-1 coach if viable and <= ratio per coach)
         $opt3Count = $opt1Count - 1;
-        if ($opt3Count >= 1 && ($studentCount / $opt3Count) <= 4.0) {
+        if ($opt3Count >= 1 && ($studentCount / $opt3Count) <= (float) $ratio) {
             $opt3Split = $this->calculateTargetSplit($studentCount, $opt3Count);
             $options[] = [
                 'id' => 'lean',
@@ -441,7 +449,7 @@ class CoachMatchingService
                 $currentLoad = $coach->assignedCountForDate($batch->start_date);
                 $newStudentsCount = count($participantIds);
                 $totalLoad = $currentLoad + $newStudentsCount;
-                $isRatioOverride = $totalLoad > 4;
+                $isRatioOverride = $totalLoad > $this->getCoachStudentRatio();
 
                 $headcounts[] = $totalLoad;
                 $assignedCoaches[] = $coach;
@@ -561,7 +569,7 @@ class CoachMatchingService
             ]);
 
             $currentLoad = $newCoach->assignedCountForDate($diveDate);
-            $isOverride = ($currentLoad + 1) > 4;
+            $isOverride = ($currentLoad + 1) > $this->getCoachStudentRatio();
 
             $newAssignment = ParticipantAssignment::create([
                 'participant_id' => $participant->id,
@@ -607,7 +615,7 @@ class CoachMatchingService
         $opening = CoachOpening::create([
             'batch_id' => $batch->id,
             'dive_date' => $diveDate,
-            'needed_students_count' => (int) $batch->total_participants_count ?: 4,
+            'needed_students_count' => (int) $batch->total_participants_count ?: $this->getCoachStudentRatio(),
             'status' => 'open',
             'posted_by' => $postedBy->id,
             'notes' => $notes ?: "Open slot for {$batch->batch_code} ({$diveDate->format('M d, Y')})",
@@ -636,6 +644,15 @@ class CoachMatchingService
                 'reviewed_by' => $reviewer->id,
                 'reviewed_at' => now(),
             ]);
+
+            // Mark the opening as filled so it no longer shows as open
+            if ($request->opening_id) {
+                $request->opening?->update(['status' => 'filled']);
+            } elseif ($request->batch_id) {
+                CoachOpening::where('batch_id', $request->batch_id)
+                    ->where('status', 'open')
+                    ->update(['status' => 'filled']);
+            }
 
             // Mark other pending requests for the same opening as not_selected
             if ($request->opening_id) {

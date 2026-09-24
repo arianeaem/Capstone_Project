@@ -263,8 +263,8 @@
 
                     <!-- Trip Dates -->
                     <td class="p-4 whitespace-nowrap">
-                        <strong class="text-[#1D1D1F] block">{{ $b->start_date->format('M d, Y') }}</strong>
-                        <span class="text-sm text-[#8E8E93]">to {{ $b->end_date->format('M d, Y') }}</span>
+                        <strong class="text-[#1D1D1F] block">{{ $b->start_date->format('M d') }} - {{ $b->end_date->format('M d, Y') }}</strong>
+                        <span class="text-xs text-[#8E8E93] block mt-0.5">{{ $b->start_date->format('D') }} - {{ $b->end_date->format('D') }}</span>
                     </td>
 
                     <!-- Batch Assignment -->

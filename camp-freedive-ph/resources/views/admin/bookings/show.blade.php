@@ -18,7 +18,7 @@
             <div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">{{ $booking->formatted_class_type }}</h1>
                 <div class="flex items-center gap-2 flex-wrap text-sm text-[#6E6E73] mt-1.5">
-                    <span><strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> to <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong></span>
+                    <span><strong class="text-[#1D1D1F]">{{ $booking->start_date->format('F d, Y') }}</strong> - <strong class="text-[#1D1D1F]">{{ $booking->end_date->format('F d, Y') }}</strong></span>
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-bold {{ $booking->status_badge['bg'] }}">
                         {{ $booking->status_badge['label'] }}
                     </span>

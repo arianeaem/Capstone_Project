@@ -27,10 +27,14 @@ class BookingPolicyEngine
 {
     /**
      * @param WeatherSafetyService $weatherService Maritime safety evaluation service for storm signal checks
+     * @param SystemSettingService|null $settingService Centralized system settings service
      */
     public function __construct(
-        protected WeatherSafetyService $weatherService
-    ) {}
+        protected WeatherSafetyService $weatherService,
+        protected ?SystemSettingService $settingService = null
+    ) {
+        $this->settingService ??= app(SystemSettingService::class);
+    }
 
     /**
      * Evaluates live reschedule eligibility, refund percentage, and customer-facing advisories for a booking.
@@ -51,11 +55,14 @@ class BookingPolicyEngine
      *     is_cancelled: bool
      * } Structured evaluation result
      */
-    public function evaluate(Booking $booking): array
+    public function evaluate(Booking $booking, \Carbon\Carbon|\DateTimeInterface|string|null $asOfDate = null): array
     {
-        $now = Carbon::now()->startOfDay();
+        $now = $asOfDate ? Carbon::parse($asOfDate)->startOfDay() : Carbon::now()->startOfDay();
         $diveDate = Carbon::parse($booking->start_date)->startOfDay();
         $daysUntilDive = (int) $now->diffInDays($diveDate, false);
+
+        $fullRefundDays = (int) ($this->settingService?->get('booking_cancellation.full_refund_threshold_days', 14) ?? 14);
+        $rescheduleOnlyDays = (int) ($this->settingService?->get('booking_cancellation.reschedule_only_threshold_days', 7) ?? 7);
 
         // Check if there is an active storm / typhoon warning for that dive date in Mabini, Batangas
         $isForceMajeure = $this->weatherService->isStormSignalActive($booking->start_date);
@@ -70,33 +77,33 @@ class BookingPolicyEngine
             $cancelAllowed = true;
             $rescheduleMessage = 'Storm/Typhoon Warning Active: Free reschedule granted due to marine safety advisory.';
             $cancelMessage = 'Storm/Typhoon Warning Active: 100% full refund available due to force majeure.';
-        } elseif ($daysUntilDive > 14) {
+        } elseif ($daysUntilDive > $fullRefundDays) {
             // Ample notice window: full refund or free reschedule as logistics can be rebooked
             $policyTier = 'more_than_two_weeks';
             $refundPercentage = 100;
             $calculatedRefund = (float) $booking->downpayment_amount;
             $rescheduleAllowed = true;
             $cancelAllowed = true;
-            $rescheduleMessage = 'Allowed: More than 14 days before dive date. Free reschedule to any available safe batch.';
+            $rescheduleMessage = "Allowed: More than {$fullRefundDays} days before dive date. Free reschedule to any available safe batch.";
             $cancelMessage = 'Eligible for 100% Full Downpayment Refund (₱' . number_format($booking->downpayment_amount, 2) . ') or Free Reschedule.';
-        } elseif ($daysUntilDive >= 7 && $daysUntilDive <= 14) {
+        } elseif ($daysUntilDive >= $rescheduleOnlyDays && $daysUntilDive <= $fullRefundDays) {
             // Mid-range window: free reschedule allowed to retain customer; cancellation forfeits downpayment
             $policyTier = 'within_two_weeks';
             $refundPercentage = 0;
             $calculatedRefund = 0.00;
             $rescheduleAllowed = true;
             $cancelAllowed = true;
-            $rescheduleMessage = 'Allowed: Within 7 to 14 days window. Free reschedule to another available date.';
-            $cancelMessage = '0% Refund (Downpayment Forfeited): Cancellations made within 7 to 14 days forfeit downpayment (free reschedule is permitted).';
+            $rescheduleMessage = "Allowed: Within {$rescheduleOnlyDays} to {$fullRefundDays} days window. Free reschedule to another available date.";
+            $cancelMessage = "0% Refund (Downpayment Forfeited): Cancellations made within {$rescheduleOnlyDays} to {$fullRefundDays} days forfeit downpayment (free reschedule is permitted).";
         } else {
-            // < 7 days: strict lockout because coach staffing, resort rooms, and boat charter deposits are locked
+            // < rescheduleOnlyDays: strict lockout because coach staffing, resort rooms, and boat charter deposits are locked
             $policyTier = 'within_one_week';
             $refundPercentage = 0;
             $calculatedRefund = 0.00;
             $rescheduleAllowed = false;
             $cancelAllowed = true;
-            $rescheduleMessage = 'Not Allowed: Rescheduling closes 7 days before the dive date as coach, boat, and resort commitments are locked in.';
-            $cancelMessage = 'Non-Refundable & Non-Reschedulable: Cancellations within 7 days forfeit downpayment unless an official Typhoon/Coast Guard Gale warning is active.';
+            $rescheduleMessage = "Not Allowed: Rescheduling closes {$rescheduleOnlyDays} days before the dive date as coach, boat, and resort commitments are locked in.";
+            $cancelMessage = "Non-Refundable & Non-Reschedulable: Cancellations within {$rescheduleOnlyDays} days forfeit downpayment unless an official Typhoon/Coast Guard Gale warning is active.";
         }
 
         // Status-specific overrides for self-service submission limits to prevent duplicate processing

@@ -220,7 +220,17 @@ class WeatherSafetyController extends Controller
     {
         try {
             $result = $this->forecastService->updateAllForecasts(16);
-            return back()->with('success', "Successfully synced 24-hour continuous weather & marine forecast cache for the next {$result['days_cached']} days from Open-Meteo.");
+
+            // Auto-sync all active batches so risk assessments and audit trails match latest telemetry
+            $today = Carbon::today(WeatherForecastService::TIMEZONE);
+            $activeBatches = Batch::whereNotIn('status', ['completed', 'cancelled', 'cancelled_by_camp'])
+                ->where('end_date', '>=', $today->toDateString())
+                ->get();
+            foreach ($activeBatches as $b) {
+                $this->forecastService->assessBatch($b, null, auth()->user());
+            }
+
+            return back()->with('success', "Successfully synced 24-hour continuous weather & marine forecast cache and updated assessments for {$activeBatches->count()} active batch(es).");
         } catch (Exception $e) {
             return back()->with('error', "Forecast cache sync failed: " . $e->getMessage());
         }
@@ -243,9 +253,22 @@ class WeatherSafetyController extends Controller
         $day2Assessment = $batch->latestDay2Assessment;
         $latestOverride = $batch->latestManualOverride;
 
-        // Auto-run assessment if not yet assessed
-        if (!$day1Assessment || !$day2Assessment) {
-            $result = $this->forecastService->assessBatch($batch, null, auth()->user());
+        $horizonInfo = WeatherForecastService::getOperationalHorizon($batch);
+        $isConcluded = ($horizonInfo['status'] === 'CONCLUDED') || ($batch->end_date && $batch->end_date->isPast()) || in_array($batch->status, ['completed', 'cancelled_by_camp']);
+
+        // Auto-run assessment if not yet assessed or if active batch is behind latest forecast cache update
+        $lastForecastUpdate = Cache::get('forecast:last_updated_at');
+        $needsSync = !$day1Assessment || !$day2Assessment;
+
+        if (!$needsSync && !$isConcluded && $lastForecastUpdate) {
+            $lastAssessed = $day1Assessment->assessed_at ?? $day1Assessment->created_at;
+            if ($lastAssessed && Carbon::parse($lastForecastUpdate)->greaterThan($lastAssessed)) {
+                $needsSync = true;
+            }
+        }
+
+        if ($needsSync) {
+            $this->forecastService->assessBatch($batch, null, auth()->user());
             $batch->refresh();
             $day1Assessment = $batch->latestDay1Assessment;
             $day2Assessment = $batch->latestDay2Assessment;

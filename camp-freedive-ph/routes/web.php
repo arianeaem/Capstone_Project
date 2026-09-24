@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\DeactivationController;
 use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\RefundController as AdminRefundController;
 use App\Http\Controllers\Admin\ReportsController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Auth\ForcePasswordChangeController;
 use App\Http\Controllers\Auth\LoginController;
@@ -201,14 +202,36 @@ $registerBackofficeRoutes = function (string $portalRole) {
     Route::patch('/settings/users/{user}/toggle-status', [UserManagementController::class, 'toggleStatus'])->name('users.toggle_status');
     Route::delete('/settings/users/{user}', [UserManagementController::class, 'destroy'])->name('users.destroy');
 
-    // Audit Logs (Owner Exclusive)
+    // Audit Logs & System Settings (Owner Exclusive)
     if ($portalRole === 'owner') {
         Route::get('/audit-logs', [AuditLogController::class, 'index']);
         Route::get('/settings/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
+        Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+        Route::get('/settings/programs', [SettingsController::class, 'editPrograms'])->name('settings.programs');
+        Route::put('/settings/programs', [SettingsController::class, 'updatePrograms'])->name('settings.programs.update');
+        Route::get('/settings/deposits', [SettingsController::class, 'editDeposits'])->name('settings.deposits');
+        Route::put('/settings/deposits', [SettingsController::class, 'updateDeposits'])->name('settings.deposits.update');
+        Route::get('/settings/addons', [SettingsController::class, 'editAddons'])->name('settings.addons');
+        Route::put('/settings/addons', [SettingsController::class, 'updateAddons'])->name('settings.addons.update');
+        Route::get('/settings/operations', [SettingsController::class, 'editOperations'])->name('settings.operations');
+        Route::put('/settings/operations', [SettingsController::class, 'updateOperations'])->name('settings.operations.update');
+        Route::get('/settings/cancellation', [SettingsController::class, 'editCancellation'])->name('settings.cancellation');
+        Route::put('/settings/cancellation', [SettingsController::class, 'updateCancellation'])->name('settings.cancellation.update');
     } else {
         Route::middleware('role:owner')->group(function () {
             Route::get('/audit-logs', [AuditLogController::class, 'index']);
             Route::get('/settings/audit-logs', [AuditLogController::class, 'index'])->name('audit_logs.index');
+            Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+            Route::get('/settings/programs', [SettingsController::class, 'editPrograms'])->name('settings.programs');
+            Route::put('/settings/programs', [SettingsController::class, 'updatePrograms'])->name('settings.programs.update');
+            Route::get('/settings/deposits', [SettingsController::class, 'editDeposits'])->name('settings.deposits');
+            Route::put('/settings/deposits', [SettingsController::class, 'updateDeposits'])->name('settings.deposits.update');
+            Route::get('/settings/addons', [SettingsController::class, 'editAddons'])->name('settings.addons');
+            Route::put('/settings/addons', [SettingsController::class, 'updateAddons'])->name('settings.addons.update');
+            Route::get('/settings/operations', [SettingsController::class, 'editOperations'])->name('settings.operations');
+            Route::put('/settings/operations', [SettingsController::class, 'updateOperations'])->name('settings.operations.update');
+            Route::get('/settings/cancellation', [SettingsController::class, 'editCancellation'])->name('settings.cancellation');
+            Route::put('/settings/cancellation', [SettingsController::class, 'updateCancellation'])->name('settings.cancellation.update');
         });
     }
 };

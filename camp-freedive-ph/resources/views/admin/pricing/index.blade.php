@@ -1,17 +1,17 @@
 @extends('layouts.admin')
 
-@section('title', 'Dynamic Pricing Rules | Camp FreedivePH')
+@section('title', 'Dynamic Pricing | Camp FreedivePH')
 
 @section('content')
 <div class="space-y-6 text-sm" x-data="{ deleteModal: false, deleteUrl: '', ruleName: '', triggeredCount: 0 }">
     
     <!-- Top Header & Actions -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Dynamic Pricing Management</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Dynamic Pricing</h1>
         </div>
 
-        <div class="flex items-center gap-2.5">
+        <div class="flex items-center gap-2.5 flex-wrap">
             <a href="{{ route('admin.pricing.create') }}" 
                class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
@@ -21,39 +21,35 @@
     </div>
 
     <!-- Pricing Metrics Summary -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-2.5 sm:p-4 shadow-2xs">
-        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-2 sm:gap-4">
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 shadow-2xs">
+        <div class="grid grid-cols-2 lg:grid-cols-4 items-center gap-y-4">
             <!-- Total Rules -->
-            <div class="px-2 sm:px-4 py-1">
-                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Total Rules</span>
-                <div class="text-lg sm:text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ number_format($totalRules) }}</div>
-                <div class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Configured pricing rules</div>
+            <div class="px-4 py-1">
+                <span class="text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Total Rules</span>
+                <div class="text-2xl font-extrabold text-[#1D1D1F] mt-0.5">{{ number_format($totalRules) }}</div>
             </div>
 
             <!-- Active Rules -->
-            <div class="relative px-2 sm:px-4 py-1 border-l border-[#E5E5EA] sm:border-l-0">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Active Rules</span>
-                <div class="text-lg sm:text-2xl font-extrabold text-emerald-700 mt-0.5">{{ number_format($activeRules) }}</div>
-                <div class="text-sm text-emerald-600 hidden sm:block mt-0.5 font-medium">Active on reservation pricing</div>
+                <span class="text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Active Rules</span>
+                <div class="text-2xl font-extrabold text-emerald-700 mt-0.5">{{ number_format($activeRules) }}</div>
             </div>
 
             <!-- Bookings Triggered -->
-            <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-[#E5E5EA]">
+            <div class="relative px-4 py-1">
                 <div class="hidden lg:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Triggered</span>
-                <div class="text-lg sm:text-2xl font-extrabold text-[#780000] mt-0.5">{{ number_format($totalTriggered) }}</div>
-                <div class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Reservations affected</div>
+                <span class="text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Triggered</span>
+                <div class="text-2xl font-extrabold text-[#780000] mt-0.5">{{ number_format($totalTriggered) }}</div>
             </div>
 
             <!-- Net Price Delta -->
-            <div class="relative px-2 sm:px-4 py-1 pt-2 sm:pt-1 border-t lg:border-t-0 border-l border-[#E5E5EA] sm:border-l-0">
+            <div class="relative px-4 py-1">
                 <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
-                <span class="text-sm sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block truncate">Net Delta</span>
-                <div class="text-lg sm:text-2xl font-extrabold mt-0.5 {{ $netRevenueImpact >= 0 ? 'text-[#1D1D1F]' : 'text-rose-700' }}">
+                <span class="text-sm text-[#6E6E73] font-bold uppercase tracking-wider block truncate">Net Delta</span>
+                <div class="text-2xl font-extrabold mt-0.5 {{ $netRevenueImpact >= 0 ? 'text-[#1D1D1F]' : 'text-rose-700' }}">
                     {{ $netRevenueImpact >= 0 ? '+' : '−' }}₱{{ number_format(abs($netRevenueImpact), 2) }}
                 </div>
-                <div class="text-sm text-[#8E8E93] hidden sm:block mt-0.5">Discount/surge volume</div>
             </div>
         </div>
     </div>
@@ -152,32 +148,32 @@
         </div>
 
         <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+            <table class="w-full text-left min-w-[900px]">
+                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-sm uppercase font-bold text-[#6E6E73]">
                     <tr>
-                        <th class="py-3 px-4 text-left">Priority</th>
-                        <th class="py-3 px-4 text-left">Rule Name</th>
-                        <th class="py-3 px-4 text-left">Type</th>
-                        <th class="py-3 px-4 text-left">Trigger Condition</th>
-                        <th class="py-3 px-4 text-left">Price Adjustment</th>
-                        <th class="py-3 px-4 text-left">Class Package</th>
-                        <th class="py-3 px-4 text-left">Status</th>
-                        <th class="py-3 px-4 text-left">Triggered</th>
-                        <th class="py-3 px-4 text-right pr-6">Actions</th>
+                        <th class="p-4 pl-6 text-left">Priority</th>
+                        <th class="p-4 text-left">Rule Name</th>
+                        <th class="p-4 text-left">Type</th>
+                        <th class="p-4 text-left">Trigger Condition</th>
+                        <th class="p-4 text-left">Price Adjustment</th>
+                        <th class="p-4 text-left">Class Package</th>
+                        <th class="p-4 text-left">Status</th>
+                        <th class="p-4 text-left">Triggered</th>
+                        <th class="p-4 pr-6 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
                     @forelse($rules as $rule)
                     <tr onclick="window.location='{{ route('admin.pricing.edit', $rule) }}'" 
-                        class="hover:bg-[#F2F2F7] transition-colors cursor-pointer group">
+                        class="hover:bg-[#F2F2F7] cursor-pointer transition-colors text-sm group">
                         
                         <!-- Priority Order -->
-                        <td class="py-3.5 px-4 text-left font-mono font-bold text-sm text-[#6E6E73]">
+                        <td class="p-4 pl-6 text-left font-mono font-bold text-sm text-[#6E6E73]">
                             #{{ $rule->priority }}
                         </td>
 
                         <!-- Rule Name & Description -->
-                        <td class="py-3.5 px-4 text-left">
+                        <td class="p-4 text-left">
                             <div class="font-bold text-sm text-[#1D1D1F] group-hover:text-[#780000] transition-colors">
                                 {{ $rule->name }}
                             </div>
@@ -189,45 +185,45 @@
                         </td>
 
                         <!-- Rule Type Badge -->
-                        <td class="py-3.5 px-4 text-left">
-                            <span class="px-2 py-0.5 rounded-md text-sm font-bold inline-block {{ $rule->type_badge['class'] }}">
+                        <td class="p-4 text-left">
+                            <span class="px-2.5 py-1 rounded-md text-xs font-bold inline-block {{ $rule->type_badge['class'] }}">
                                 {{ $rule->type_badge['label'] }}
                             </span>
                         </td>
 
                         <!-- Condition -->
-                        <td class="py-3.5 px-4 text-left font-mono text-sm text-[#1D1D1F]">
+                        <td class="p-4 text-left font-mono text-sm text-[#1D1D1F]">
                             {{ $rule->condition_summary }}
                         </td>
 
                         <!-- Adjustment Value -->
-                        <td class="py-3.5 px-4 text-left font-bold text-sm whitespace-nowrap">
+                        <td class="p-4 text-left font-bold text-sm whitespace-nowrap">
                             <span class="{{ $rule->adjustment_type === 'increase' ? 'text-emerald-700' : 'text-rose-700' }}">
                                 {{ $rule->formatted_adjustment }}
                             </span>
                         </td>
 
                         <!-- Applies To -->
-                        <td class="py-3.5 px-4 text-left text-sm font-semibold text-[#6E6E73] capitalize">
+                        <td class="p-4 text-left text-sm font-semibold text-[#6E6E73] capitalize">
                             {{ $rule->formatted_applies_to }}
                         </td>
 
                         <!-- Status Toggle (AJAX) -->
-                        <td class="py-3.5 px-4 text-left" onclick="event.stopPropagation()">
+                        <td class="p-4 text-left" onclick="event.stopPropagation()">
                             <form action="{{ route('admin.pricing.toggle_status', $rule) }}" method="POST">
                                 @csrf
                                 @method('PATCH')
                                 <button type="submit" 
-                                        class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-sm font-bold transition-colors cursor-pointer {{ $rule->status === 'active' ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold transition-colors cursor-pointer {{ $rule->status === 'active' ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
                                     <span>{{ ucfirst($rule->status) }}</span>
                                 </button>
                             </form>
                         </td>
 
                         <!-- Bookings Triggered Count -->
-                        <td class="py-3.5 px-4 text-left" onclick="event.stopPropagation()">
+                        <td class="p-4 text-left" onclick="event.stopPropagation()">
                             <a href="{{ route('admin.pricing.triggered', $rule) }}" 
-                               class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-[#F2F2F7] hover:bg-[#F2F2F7] border border-[#E5E5EA] text-[#780000] font-bold text-sm transition-colors"
+                               class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#F2F2F7] hover:bg-[#E5E5EA] border border-[#E5E5EA] text-[#780000] font-bold text-xs transition-colors"
                                 title="Click to view triggered bookings">
                                 <span>{{ number_format($rule->adjustments_count) }}</span>
                                 <svg class="w-3 h-3 opacity-70" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
@@ -235,7 +231,7 @@
                         </td>
 
                         <!-- 3-Dots Action Menu -->
-                        <td class="py-3.5 px-4 text-right pr-6" onclick="event.stopPropagation()">
+                        <td class="p-4 pr-6 text-right" onclick="event.stopPropagation()">
                             <div class="relative inline-block text-left" x-data="{ openMenu: false }">
                                 <button type="button" 
                                         @click="openMenu = !openMenu" 

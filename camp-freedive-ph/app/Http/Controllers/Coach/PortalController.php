@@ -144,8 +144,26 @@ class PortalController extends Controller
             ->filter(fn($b) => $b->assigned_coaches->pluck('id')->contains($coach->id))
             ->count();
 
+        // Exclude batches that this coach is already assigned to or approved for
+        $assignedBatchIds = ParticipantAssignment::where('coach_id', $coach->id)
+            ->where('status', 'assigned')
+            ->pluck('batch_id')
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $approvedBatchIds = CoachRequest::where('coach_id', $coach->id)
+            ->where('status', 'approved')
+            ->pluck('batch_id')
+            ->filter()
+            ->unique()
+            ->toArray();
+
+        $excludeBatchIds = array_unique(array_merge($assignedBatchIds, $approvedBatchIds));
+
         $activeOpeningsCount = CoachOpening::where('status', 'open')
             ->whereDate('dive_date', '>=', $today)
+            ->whereNotIn('batch_id', $excludeBatchIds)
             ->count();
 
         $totalStudentsMentored = ParticipantAssignment::where('coach_id', $coach->id)
@@ -163,9 +181,10 @@ class PortalController extends Controller
             ->groupBy('batch_id')
             ->take(3);
 
-        // 4. Open Broadcast Volunteer Openings
+        // 4. Open Broadcast Volunteer Openings (Exclude batches already assigned/approved)
         $openCoachOpenings = CoachOpening::where('status', 'open')
             ->whereDate('dive_date', '>=', $today)
+            ->whereNotIn('batch_id', $excludeBatchIds)
             ->with(['batch', 'requests' => fn($q) => $q->where('coach_id', $coach->id)])
             ->orderBy('dive_date', 'asc')
             ->take(3)

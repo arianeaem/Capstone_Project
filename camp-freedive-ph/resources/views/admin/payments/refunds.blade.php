@@ -31,9 +31,8 @@
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-[#6E6E73]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                <span>Reschedule/Cancel Requests</span>
+            <a href="{{ route('admin.bookings.requests') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold">
+                Reschedule/Cancel Requests
             </a>
             <a href="{{ route('admin.payments.index') }}" class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold">
                 Payments Ledger
@@ -47,7 +46,7 @@
             <h2 class="font-bold text-base text-[#1D1D1F] flex items-center gap-2">
                 <span>Pending Refund Approvals</span>
                 @if(count($pendingRefunds) > 0)
-                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-[#780000] text-white">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#780000] text-white">
                         {{ count($pendingRefunds) }} Action Required
                     </span>
                 @endif
@@ -64,85 +63,92 @@
                 $isEligible = ($policy && ($policy['refund_percentage'] ?? 0) > 0);
                 $claimAmount = $payment->amount ?? 0;
             @endphp
-            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs hover:border-[#D1D1D6] transition-all flex flex-col justify-between space-y-4">
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs flex flex-col justify-between space-y-4">
                 
                 <!-- Request Header -->
                 <div>
-                    <div class="flex items-start justify-between gap-3 border-b border-[#E5E5EA] pb-3">
-                        <div class="space-y-1 min-w-0">
-                            <div class="flex items-center gap-2 flex-wrap">
-                                <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-extrabold text-sm text-[#780000] hover:underline">
-                                    {{ $booking->booking_number }}
-                                </a>
-                                <span class="text-sm font-bold px-2 py-0.5 rounded-md bg-[#F2F2F7] border border-[#E5E5EA] text-[#3A3A3C] truncate">
-                                    {{ $booking->formatted_class_type }}
-                                </span>
-                            </div>
-                            <div class="text-sm text-[#8E8E93]">
-                                Requested {{ $req->requested_at ? $req->requested_at->diffForHumans() : $req->created_at->diffForHumans() }}
-                            </div>
+                    <div class="border-b border-[#F2F2F7] pb-3 space-y-2.5">
+                        <!-- Top Row: Class Badge & Pending Status beside each other -->
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#F2F2F7] text-[#3A3A3C]">
+                                {{ $booking->formatted_class_type }}
+                            </span>
+
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-50 text-amber-800 shrink-0">
+                                Pending
+                            </span>
                         </div>
 
-                        <span class="px-2 py-0.5 rounded-md text-sm font-bold uppercase tracking-wider bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA] shrink-0">
-                            Pending
+                        <!-- Booking Number (Bigger Font) & Requested Date Below It -->
+                        <div>
+                            <a href="{{ route('admin.bookings.show', $booking) }}" class="font-mono font-black text-xl sm:text-2xl text-[#780000] hover:underline block leading-tight tracking-tight">
+                                {{ $booking->booking_number }}
+                            </a>
+                            <div class="text-xs text-[#8E8E93] mt-1 font-medium">
+                                Requested on <strong class="text-[#1D1D1F] font-semibold">{{ $req->requested_at ? $req->requested_at->format('M d, Y') : $req->created_at->format('M d, Y') }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Students Connected to Booking (All Students Listed, No Count) -->
+                    @php
+                        $studentNames = $booking->participants->pluck('name')->filter()->values();
+                        $studentsDisplay = $studentNames->isNotEmpty() ? $studentNames->implode(', ') : $booking->contact_name;
+                    @endphp
+                    <div class="mt-3">
+                        <span class="font-extrabold text-sm text-[#1D1D1F] leading-snug block">
+                            {{ $studentsDisplay }}
                         </span>
                     </div>
 
-                    <!-- Guest and Trip Details -->
-                    <div class="mt-3 space-y-1 text-sm">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-sm text-[#1D1D1F]">{{ $booking->contact_name }}</span>
-                            <span class="text-sm text-[#6E6E73] font-medium">{{ $booking->participants->count() }} Student{{ $booking->participants->count() > 1 ? 's' : '' }}</span>
+                    <!-- Key Details Grid (2x2) Matching Reference Style -->
+                    <div class="mt-3 grid grid-cols-2 gap-3">
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">DIVE DATE</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block mt-0.5 leading-snug">
+                                {{ $booking->formatted_date_range }}
+                            </span>
                         </div>
-                        <div class="text-xs text-[#6E6E73] space-y-0.5">
-                            <div>{{ $booking->contact_email }}</div>
-                            <div>{{ $booking->contact_phone }}</div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">REFUND CLAIM AMOUNT</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block mt-0.5 leading-snug">
+                                ₱{{ number_format($claimAmount, 2) }}
+                            </span>
                         </div>
-                        <div class="text-sm text-[#6E6E73] pt-0.5">
-                            Dive Date: <strong class="text-[#1D1D1F]">{{ $booking->start_date->format('M d, Y') }}</strong>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">METHOD</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] uppercase block mt-0.5 leading-snug">
+                                {{ $payment->payment_method ?? 'GCash' }}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">TYPE</span>
+                            <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] capitalize block mt-0.5 leading-snug">
+                                {{ $payment->payment_type ?? 'Downpayment' }}
+                            </span>
                         </div>
                     </div>
 
-                    <!-- Refund Claim Details -->
-                    <div class="mt-3 p-3 rounded-lg bg-[#F2F2F7] border border-[#E5E5EA] space-y-2 text-sm">
-                        <div class="flex items-baseline justify-between">
-                            <span class="text-sm text-[#6E6E73] font-medium">Refund Claim Amount:</span>
-                            <div class="text-base font-extrabold text-[#1D1D1F]">
-                                ₱{{ number_format($claimAmount, 2) }}
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between text-sm text-[#6E6E73] pt-1.5 border-t border-[#E5E5EA]">
-                            <span>Method: <strong class="text-[#1D1D1F] uppercase">{{ $payment->payment_method ?? 'GCash' }}</strong></span>
-                            <span>Type: <strong class="text-[#1D1D1F] capitalize">{{ $payment->payment_type ?? 'downpayment' }}</strong></span>
-                        </div>
-
-                        <div class="pt-1.5 border-t border-[#E5E5EA] space-y-1">
-                            <div class="flex items-center gap-1.5 font-bold text-sm {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
-                                @if($isEligible)
-                                    <span>Eligible for 100% Full Refund</span>
-                                @else
-                                    <span>Non-Refundable Policy Window</span>
-                                @endif
-                            </div>
-                            <p class="text-sm text-[#6E6E73] leading-relaxed">
-                                @if($isEligible)
-                                    Cancellation filed 14+ days before dive date. Qualified for online gateway reversal.
-                                @else
-                                    Cancellation filed less than 14 days before dive date. Standard policy prescribes deposit forfeiture.
-                                @endif
-                            </p>
-                            @if($req->notes)
-                                <div class="text-sm text-[#6E6E73] italic pt-0.5">
-                                    Note: "{{ $req->notes }}"
-                                </div>
+                    <!-- Policy Status / Notes -->
+                    <div class="mt-3 space-y-1">
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-[#8E8E93] block">POLICY STATUS</span>
+                        <div class="flex items-center gap-1.5 font-bold text-xs {{ $isEligible ? 'text-emerald-800' : 'text-amber-900' }}">
+                            @if($isEligible)
+                                <span>Eligible for Full Refund</span>
+                            @else
+                                <span>Refund Not Available Under Policy</span>
                             @endif
                         </div>
+                        @if($req->notes)
+                            <p class="text-xs text-[#6E6E73] italic pt-0.5">
+                                Note: "{{ $req->notes }}"
+                            </p>
+                        @endif
                     </div>
                 </div>
 
                 <!-- Request Actions -->
-                <div class="pt-3 border-t border-[#E5E5EA] space-y-2">
+                <div class="space-y-2">
                     <div class="flex items-center gap-2">
                         <!-- Reject Action -->
                         <button type="button" 

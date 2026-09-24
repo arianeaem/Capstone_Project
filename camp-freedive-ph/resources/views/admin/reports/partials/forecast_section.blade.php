@@ -147,14 +147,14 @@
                     <h2 class="text-base sm:text-lg font-extrabold text-[#1D1D1F]">Demand & Revenue Forecasting</h2>
                 </div>
                 <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
-                    Machine learning rolling predictions dynamically grouped by month across operating horizons.
+                    Estimated guest demand, bookings, and projected revenue for upcoming months to help plan camp schedules and staffing.
                 </p>
             </div>
 
             <!-- Controls: Period Selector & Sync Indicator -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
                 @if($syncedAt)
-                    <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#6E6E73] bg-[#F2F2F7] px-2.5 py-1.5 rounded-lg border border-[#E5E5EA] self-start sm:self-auto">
+                    <div class="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-[#6E6E73] bg-[#F2F2F7] px-2.5 py-1.5 rounded-lg self-start sm:self-auto">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span>Synced {{ \Carbon\Carbon::parse($syncedAt)->diffForHumans() }}</span>
                     </div>
@@ -196,67 +196,71 @@
                 <span class="text-xs sm:text-sm font-black uppercase tracking-wider text-[#6E6E73]">
                     Projected Months (<span x-text="currentCards.length"></span>)
                 </span>
-                <span class="text-xs sm:text-sm font-semibold text-[#8E8E93]" x-text="'Showing ' + selectedHorizon + '-Day Operational Horizon'"></span>
+                <span class="text-xs sm:text-sm font-semibold text-[#8E8E93]" x-text="'Forecast for the next ' + selectedHorizon + ' days'"></span>
             </div>
 
             <!-- Month Cards Container -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 
                 <template x-for="(card, index) in currentCards" :key="card.month_key || index">
-                    <div class="p-4 sm:p-5 rounded-xl bg-gradient-to-br from-white via-white to-[#F8F8FA] border border-[#E5E5EA] hover:border-[#780000]/30 transition-all duration-200 shadow-2xs space-y-3.5 relative group">
+                    <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-[#780000]/[0.04] via-white to-white border border-[#E5E5EA] shadow-2xs space-y-3.5 relative overflow-hidden">
                         
+                        <!-- Ambient Flowing Glows (Fintech Glassmorphism Feel) -->
+                        <div class="absolute -top-10 -right-10 w-36 h-36 bg-gradient-to-br from-[#780000]/20 via-[#9E2A2B]/12 to-transparent rounded-full blur-2xl pointer-events-none"></div>
+                        <div class="absolute -top-8 left-1/4 w-32 h-20 bg-gradient-to-b from-[#780000]/10 to-transparent rounded-full blur-xl pointer-events-none"></div>
+
                         <!-- Top Header: Month Name on left, Demand & Season stacked on right -->
-                        <div class="flex items-start justify-between gap-3">
-                            <h4 class="text-base font-black text-[#1D1D1F] group-hover:text-[#780000] transition-colors pt-0.5" x-text="card.month_name"></h4>
+                        <div class="relative z-10 flex items-start justify-between gap-3">
+                            <h4 class="text-base font-black text-[#1D1D1F] pt-0.5" x-text="card.month_name"></h4>
                             
                             <!-- Badges Column: Demand on top, Season at the bottom of demand -->
                             <div class="flex flex-col items-end gap-1.5 shrink-0">
-                                <!-- Demand Classification Badge -->
-                                <span class="text-[11px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border whitespace-nowrap"
+                                <!-- Demand Classification Badge (No border) -->
+                                <span class="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap"
                                       :class="{
-                                          'bg-amber-50 text-amber-800 border-amber-200': card.demand_classification === 'High',
-                                          'bg-emerald-50 text-emerald-800 border-emerald-200': card.demand_classification === 'Medium',
-                                          'bg-slate-100 text-slate-700 border-slate-200': card.demand_classification === 'Low'
+                                          'bg-amber-50 text-amber-800': card.demand_classification === 'High',
+                                          'bg-emerald-50 text-emerald-800': card.demand_classification === 'Medium',
+                                          'bg-slate-100 text-slate-700': card.demand_classification === 'Low'
                                       }"
                                       x-text="card.demand_classification + ' Demand'">
                                 </span>
 
-                                <!-- Season Classification Badge (At the bottom of Demand Classification) -->
-                                <span class="text-xs font-bold px-2 py-0.5 rounded-md border whitespace-nowrap inline-flex items-center"
+                                <!-- Season Classification Badge (No border) -->
+                                <span class="text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap inline-flex items-center"
                                       :class="{
-                                          'bg-rose-50 text-[#780000] border-rose-200': card.peak_classification.includes('Peak') && !card.peak_classification.includes('Off'),
-                                          'bg-teal-50 text-teal-800 border-teal-200': card.peak_classification.includes('Shoulder'),
-                                          'bg-slate-50 text-slate-700 border-slate-200': card.peak_classification.includes('Off')
+                                          'bg-rose-50 text-[#780000]': card.peak_classification.includes('Peak') && !card.peak_classification.includes('Off'),
+                                          'bg-teal-50 text-teal-800': card.peak_classification.includes('Shoulder'),
+                                          'bg-slate-100 text-slate-700': card.peak_classification.includes('Off')
                                       }"
                                       x-text="card.peak_classification">
                                 </span>
                             </div>
                         </div>
 
-                        <!-- Projected Revenue (Primary Metric) -->
-                        <div class="pt-0.5">
-                            <span class="text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider block">Projected Revenue</span>
+                        <!-- Estimated Revenue (Primary Metric) -->
+                        <div class="relative z-10 pt-0.5">
+                            <span class="text-[11px] font-bold text-[#6E6E73] uppercase tracking-wider block">Estimated Revenue</span>
                             <div class="text-lg sm:text-xl font-black text-[#780000] tracking-tight mt-0.5 truncate" x-text="formatCurrency(card.projected_revenue)"></div>
                         </div>
 
-                        <!-- Secondary Metrics Grid (No Emojis) -->
-                        <div class="pt-2 border-t border-[#F2F2F7] space-y-1.5 text-xs sm:text-sm text-[#6E6E73]">
+                        <!-- Secondary Metrics Grid (Easy to Understand) -->
+                        <div class="relative z-10 pt-2 border-t border-[#F2F2F7] space-y-1.5 text-xs sm:text-sm text-[#6E6E73]">
                             
-                            <!-- Participant Volume -->
+                            <!-- Expected Guests -->
                             <div class="flex items-center justify-between">
-                                <span>Participant Volume:</span>
-                                <strong class="text-[#1D1D1F] font-extrabold" x-text="card.diver_volume + ' Participants'"></strong>
+                                <span>Expected Guests:</span>
+                                <strong class="text-[#1D1D1F] font-extrabold" x-text="card.diver_volume + ' Guests'"></strong>
                             </div>
 
-                            <!-- Estimated Bookings -->
+                            <!-- Expected Bookings -->
                             <div class="flex items-center justify-between">
-                                <span>Est. Bookings:</span>
+                                <span>Expected Bookings:</span>
                                 <strong class="text-[#1D1D1F] font-extrabold" x-text="card.estimated_bookings + ' Bookings'"></strong>
                             </div>
 
-                            <!-- Batches Count -->
+                            <!-- Planned Batches -->
                             <div class="flex items-center justify-between">
-                                <span>Dive Batches:</span>
+                                <span>Planned Batches:</span>
                                 <span class="font-bold text-[#1D1D1F]" x-text="card.batches_count + ' ' + (card.batches_count === 1 ? 'Batch' : 'Batches')"></span>
                             </div>
 
@@ -273,7 +277,7 @@
 
                 <!-- Empty State if no cards for selected period -->
                 <div x-show="currentCards.length === 0" class="col-span-full p-8 text-center bg-[#F2F2F7] rounded-xl border border-dashed border-[#E5E5EA] text-sm text-[#8E8E93]">
-                    No projected months available for the selected horizon period.
+                    No forecast data available for the selected period.
                 </div>
 
             </div>
@@ -284,28 +288,28 @@
     <!-- 4 Separate Visual Cards: Divers, Bookings, Revenue, Coaches (2x2 Grid) -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
-        <!-- Visual Card 1: Participant Volume Trend -->
+        <!-- Visual Card 1: Guest Turnout & Demand Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Participant Volume Trend</h3>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical turnout vs. AI projected participant count by month</p>
+                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Guest Turnout & Demand</h3>
+                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Past attendance compared with projected number of guests each month</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs sm:text-sm shrink-0 self-start sm:self-auto">
                     <div class="flex items-center gap-1.5">
                         <span class="w-3 h-3 rounded-sm bg-[#780000]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Actuals</span>
+                        <span class="font-bold text-[#1D1D1F]">Actual (Past)</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-sm bg-[#003049]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Forecast</span>
+                        <span class="w-3 h-3 rounded-sm bg-[#00C3D0]"></span>
+                        <span class="font-bold text-[#1D1D1F]">Forecast (Expected)</span>
                     </div>
                 </div>
             </div>
 
             <!-- Chart Container -->
             <div class="pt-2">
-                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4 border-b border-[#E5E5EA] bg-[#F2F2F7]/50 rounded-t-xl relative overflow-visible">
+                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4  relative overflow-visible">
                     
                     <!-- Horizontal Background Grid Lines -->
                     <div class="absolute inset-0 flex flex-col justify-between pt-8 pb-2 px-2 pointer-events-none z-0">
@@ -332,7 +336,7 @@
                                                 <span class="font-bold text-xs text-[#F1D5D5] break-words" x-text="group.actual.display_title"></span>
                                                 <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#780000] text-white">Actual</span>
                                             </div>
-                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.actual.participants + ' Participants'"></div>
+                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.actual.participants + ' Guests'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
                                                 <span>Demand:</span>
                                                 <span class="font-bold text-white" x-text="group.actual.demand_level"></span>
@@ -363,7 +367,7 @@
                                                 <span class="font-bold text-xs text-sky-200 break-words" x-text="group.forecast.display_title"></span>
                                                 <span class="text-[10px] uppercase px-1.5 py-0.5 rounded font-black shrink-0 tracking-wider bg-[#003049] text-white">Forecast</span>
                                             </div>
-                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.forecast.participants + ' Participants'"></div>
+                                            <div class="text-white font-black text-xs sm:text-sm" x-text="group.forecast.participants + ' Guests'"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
                                                 <span>Demand:</span>
                                                 <span class="font-bold text-white" x-text="group.forecast.demand_level"></span>
@@ -376,7 +380,7 @@
                                         </span>
 
                                         <!-- Bar (Solid Ocean Navy, Wider Desktop Profile) -->
-                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#003049]"
+                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#00C3D0]"
                                              :style="'height: ' + getBarHeight(group.forecast, 'divers') + '%;'">
                                         </div>
 
@@ -400,28 +404,28 @@
             </div>
         </div>
 
-        <!-- Visual Card 2: Bookings Trend -->
+        <!-- Visual Card 2: Monthly Bookings Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Bookings Volume Trend</h3>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical realized vs. projected booking groups by month</p>
+                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Monthly Bookings</h3>
+                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Completed bookings compared with expected future reservation groups</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs sm:text-sm shrink-0 self-start sm:self-auto">
                     <div class="flex items-center gap-1.5">
                         <span class="w-3 h-3 rounded-sm bg-[#780000]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Actuals</span>
+                        <span class="font-bold text-[#1D1D1F]">Actual (Past)</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-sm bg-[#003049]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Forecast</span>
+                        <span class="w-3 h-3 rounded-sm bg-[#00C3D0]"></span>
+                        <span class="font-bold text-[#1D1D1F]">Forecast (Expected)</span>
                     </div>
                 </div>
             </div>
 
             <!-- Chart Container -->
             <div class="pt-2">
-                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4 border-b border-[#E5E5EA] bg-[#F2F2F7]/50 rounded-t-xl relative overflow-visible">
+                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4  relative overflow-visible">
                     
                     <!-- Horizontal Background Grid Lines -->
                     <div class="absolute inset-0 flex flex-col justify-between pt-8 pb-2 px-2 pointer-events-none z-0">
@@ -492,7 +496,7 @@
                                         </span>
 
                                         <!-- Bar (Solid Ocean Navy, Wider Desktop Profile) -->
-                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#003049]"
+                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#00C3D0]"
                                              :style="'height: ' + getBarHeight(group.forecast, 'bookings') + '%;'">
                                         </div>
 
@@ -516,28 +520,28 @@
             </div>
         </div>
 
-        <!-- Visual Card 3: Revenue Trend -->
+        <!-- Visual Card 3: Monthly Revenue Trend -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Revenue Projections & Actuals</h3>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Realized trip payments vs. forecasted gross revenue (PHP)</p>
+                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Monthly Revenue</h3>
+                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Collected revenue compared with estimated future course earnings</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs sm:text-sm shrink-0 self-start sm:self-auto">
                     <div class="flex items-center gap-1.5">
                         <span class="w-3 h-3 rounded-sm bg-[#780000]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Actuals</span>
+                        <span class="font-bold text-[#1D1D1F]">Actual (Past)</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-sm bg-[#003049]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Forecast</span>
+                        <span class="w-3 h-3 rounded-sm bg-[#00C3D0]"></span>
+                        <span class="font-bold text-[#1D1D1F]">Forecast (Expected)</span>
                     </div>
                 </div>
             </div>
 
             <!-- Chart Container -->
             <div class="pt-2">
-                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4 border-b border-[#E5E5EA] bg-[#F2F2F7]/50 rounded-t-xl relative overflow-visible">
+                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4  relative overflow-visible">
                     
                     <!-- Horizontal Background Grid Lines -->
                     <div class="absolute inset-0 flex flex-col justify-between pt-8 pb-2 px-2 pointer-events-none z-0">
@@ -566,7 +570,7 @@
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="formatCurrency(group.actual.revenue_php)"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
-                                                <span>Participants:</span>
+                                                <span>Guests:</span>
                                                 <span class="font-bold text-white" x-text="group.actual.participants"></span>
                                             </div>
                                         </div>
@@ -597,7 +601,7 @@
                                             </div>
                                             <div class="text-white font-black text-xs sm:text-sm" x-text="formatCurrency(group.forecast.revenue_php)"></div>
                                             <div class="text-gray-300 text-xs flex items-center justify-between">
-                                                <span>Participants:</span>
+                                                <span>Guests:</span>
                                                 <span class="font-bold text-white" x-text="group.forecast.participants"></span>
                                             </div>
                                         </div>
@@ -608,7 +612,7 @@
                                         </span>
 
                                         <!-- Bar (Solid Ocean Navy, Wider Desktop Profile) -->
-                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#003049]"
+                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#00C3D0]"
                                              :style="'height: ' + getBarHeight(group.forecast, 'revenue') + '%;'">
                                         </div>
 
@@ -632,28 +636,28 @@
             </div>
         </div>
 
-        <!-- Visual Card 4: Coach Staffing Trend -->
+        <!-- Visual Card 4: Recommended Coaches per Trip -->
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 shadow-2xs space-y-4 flex flex-col justify-between">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
-                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Coach Staffing Requirements</h3>
-                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Historical assigned coaches vs. model recommended staffing per batch</p>
+                    <h3 class="text-sm sm:text-base font-extrabold text-[#1D1D1F]">Recommended Coaches per Trip</h3>
+                    <p class="text-xs sm:text-sm text-[#6E6E73] mt-0.5">Coaches needed per batch to maintain safety ratios for expected guest turnout</p>
                 </div>
                 <div class="flex items-center gap-3 text-xs sm:text-sm shrink-0 self-start sm:self-auto">
                     <div class="flex items-center gap-1.5">
                         <span class="w-3 h-3 rounded-sm bg-[#780000]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Actuals</span>
+                        <span class="font-bold text-[#1D1D1F]">Actual (Past)</span>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <span class="w-3 h-3 rounded-sm bg-[#003049]"></span>
-                        <span class="font-bold text-[#1D1D1F]">Forecast</span>
+                        <span class="w-3 h-3 rounded-sm bg-[#00C3D0]"></span>
+                        <span class="font-bold text-[#1D1D1F]">Forecast (Expected)</span>
                     </div>
                 </div>
             </div>
 
             <!-- Chart Container -->
             <div class="pt-2">
-                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4 border-b border-[#E5E5EA] bg-[#F2F2F7]/50 rounded-t-xl relative overflow-visible">
+                <div class="flex items-end justify-around gap-2 sm:gap-4 h-52 pt-8 pb-2 px-2 sm:px-4  relative overflow-visible">
                     
                     <!-- Horizontal Background Grid Lines -->
                     <div class="absolute inset-0 flex flex-col justify-between pt-8 pb-2 px-2 pointer-events-none z-0">
@@ -724,7 +728,7 @@
                                         </span>
 
                                         <!-- Bar (Solid Ocean Navy, Wider Desktop Profile) -->
-                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#003049]"
+                                        <div class="w-full rounded-t-md transition-all duration-200 group-hover:opacity-90 origin-bottom relative cursor-pointer bg-[#00C3D0]"
                                              :style="'height: ' + getBarHeight(group.forecast, 'coaches') + '%;'">
                                         </div>
 

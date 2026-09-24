@@ -12,9 +12,9 @@
 <div class="max-w-3xl mx-auto space-y-6 text-sm">
     
     <!-- Top Header -->
-    <div class="flex items-center justify-between pb-2">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-extrabold text-[#1D1D1F]">Add Freediving Coach</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Add Freediving Coach</h1>
         </div>
     </div>
 
@@ -175,7 +175,7 @@
             </div>
 
             <!-- Form Actions -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E5EA]">
+            <div class="flex items-center justify-end gap-3">
                 <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
                 <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold shadow-md">
                     Add Coach to Roster

@@ -50,6 +50,7 @@
         str_starts_with($routeName, 'admin.reports') || str_starts_with($routeName, 'owner.reports') => 'Reports & Analytics',
         str_starts_with($routeName, 'admin.users') || str_starts_with($routeName, 'owner.users') => 'User Management',
         str_starts_with($routeName, 'admin.audit_logs') || str_starts_with($routeName, 'owner.audit_logs') => 'Audit Logs',
+        str_starts_with($routeName, 'admin.settings') || str_starts_with($routeName, 'owner.settings') => 'System Settings',
         str_starts_with($routeName, 'coach.dashboard') => 'Dashboard',
         str_starts_with($routeName, 'coach.availability') => 'Availability Calendar',
         str_starts_with($routeName, 'coach.schedule') => 'My Schedule & History',
@@ -164,23 +165,14 @@
                         <span x-show="!sidebarCollapsed" class="truncate">Reports & Analytics</span>
                     </a>
 
-                    <!-- User Management -->
-                    <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" 
-                       title="User Management"
-                       class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.users.*', 'owner.users.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
-                       :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
-                        <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
-                        <span x-show="!sidebarCollapsed" class="truncate">User Management</span>
-                    </a>
-
-                    <!-- Audit Logs (Owner Only) -->
+                    <!-- Settings (Owner Only) -->
                     @if(auth()->user()->isOwner())
-                        <a href="{{ route('owner.audit_logs.index') }}" 
-                           title="Audit Logs"
-                           class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.audit_logs.*', 'owner.audit_logs.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
+                        <a href="{{ route('owner.settings.index') }}" 
+                           title="Settings"
+                           class="flex items-center rounded-xl font-semibold transition-all {{ request()->routeIs(['admin.settings.*', 'owner.settings.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold shadow-2xs' : 'text-[#3A3A3C] hover:bg-[#F2F2F7] hover:text-[#780000]' }}"
                            :class="sidebarCollapsed ? 'justify-center p-2.5' : 'gap-3 px-3.5 py-2.5'">
-                            <img src="{{ asset('icons/icons8-audit-60.png') }}" class="w-5 h-5 shrink-0" alt="Audit">
-                            <span x-show="!sidebarCollapsed" class="truncate">Audit Logs</span>
+                            <img src="{{ asset('icons/icons8-settings-60.png') }}" class="w-6 h-6 shrink-0" alt="Settings">
+                            <span x-show="!sidebarCollapsed" class="truncate">Settings</span>
                         </a>
                     @endif
                 @else
@@ -286,14 +278,10 @@
                         <img src="{{ asset('icons/icons8-analytics-60.png') }}" class="w-5 h-5 shrink-0" alt="Reports">
                         <span>Reports & Analytics</span>
                     </a>
-                    <a href="{{ auth()->user()->isOwner() ? route('owner.users.index') : route('admin.users.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.users.*', 'owner.users.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                        <img src="{{ asset('icons/icons8-user-account-60.png') }}" class="w-5 h-5 shrink-0" alt="User">
-                        <span>User Management</span>
-                    </a>
                     @if(auth()->user()->isOwner())
-                        <a href="{{ route('owner.audit_logs.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.audit_logs.*', 'owner.audit_logs.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
-                            <img src="{{ asset('icons/icons8-audit-60.png') }}" class="w-5 h-5 shrink-0" alt="Audit">
-                            <span>Audit Logs</span>
+                        <a href="{{ route('owner.settings.index') }}" class="flex items-center gap-3 px-3.5 py-2 rounded-xl font-semibold {{ request()->routeIs(['admin.settings.*', 'owner.settings.*']) ? 'bg-[#780000]/10 text-[#780000] font-bold' : 'text-[#3A3A3C] hover:bg-[#F2F2F7]' }}">
+                            <img src="{{ asset('icons/icons8-settings-60.png') }}" class="w-6 h-6 shrink-0" alt="Settings">
+                            <span>Settings</span>
                         </a>
                     @endif
                 @else
@@ -366,7 +354,7 @@
                             aria-label="User account settings and menu">
                         
                         <!-- User Avatar -->
-                        <div class="w-9 h-9 rounded-full bg-[#F8EAEA] text-[#780000] flex items-center justify-center font-bold text-sm shrink-0 transition-all">
+                        <div class="w-9 h-9 rounded-full bg-[#F8EAEA] border-2 border-[#780000] text-[#780000] flex items-center justify-center font-bold text-sm shrink-0 transition-all">
                             {{ $userInitials }}
                         </div>
                     </button>
@@ -384,15 +372,12 @@
                         
                         <!-- User Information -->
                         <div class="flex items-center gap-3 pb-3 border-b border-[#E5E5EA]">
-                            <div class="w-10 h-10 rounded-full bg-[#F8EAEA] text-[#780000] border border-[#780000] flex items-center justify-center font-bold text-sm shrink-0 shadow-2xs">
-                                {{ $userInitials }}
-                            </div>
                             <div class="min-w-0 flex-1">
-                                <div class="font-bold text-sm text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
-                                <div class="text-sm text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
-                                <span class="inline-block mt-1 px-2.5 py-0.5 rounded-md text-sm font-bold bg-[#F8EAEA] text-[#780000] border border-[#F1D5D5]">
+                                <span class="inline-block mt-1 px-2.5 py-0.5 rounded-md text-sm font-bold bg-[#F8EAEA] text-[#780000]">
                                     {{ auth()->user()->role_label ?? ucfirst(auth()->user()->role) }}
                                 </span>
+                                <div class="font-bold text-sm text-[#1D1D1F] truncate">{{ auth()->user()->name }}</div>
+                                <div class="text-sm text-[#6E6E73] truncate mt-0.5">{{ auth()->user()->email }}</div>
                             </div>
                         </div>
 
@@ -414,9 +399,8 @@
             <!-- Global Flash Messages -->
             <div id="flash-messages-container" class="px-4 sm:px-8 pt-4">
                 @if(session('success'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] text-[#065F46] flex items-center justify-between text-sm font-medium">
+                    <div class="p-4 mb-4 rounded-xl bg-[#ECFDF5] text-[#065F46] flex items-center justify-between text-sm font-medium shadow-2xs">
                         <div class="flex items-center gap-2.5">
-                            <span class="w-2 h-2 rounded-full bg-[#34C759]"></span>
                             <span>{{ session('success') }}</span>
                         </div>
                         <button type="button" @click="$el.parentElement.remove()" class="text-sm font-bold text-[#065F46]/60 hover:text-[#065F46]" aria-label="Dismiss success notification">✕</button>
@@ -424,7 +408,7 @@
                 @endif
 
                 @if(session('error'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#FEF2F2] border border-[#FECACA] text-[#991B1B] flex items-center justify-between text-sm font-medium">
+                    <div class="p-4 mb-4 rounded-xl bg-[#FEF2F2] text-[#991B1B] flex items-center justify-between text-sm font-medium shadow-2xs">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#FF3B3C]"></span>
                             <span>{{ session('error') }}</span>
@@ -434,7 +418,7 @@
                 @endif
 
                 @if(session('info'))
-                    <div class="p-4 mb-4 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] text-[#1E40AF] flex items-center justify-between text-sm font-medium">
+                    <div class="p-4 mb-4 rounded-xl bg-[#EFF6FF] text-[#1E40AF] flex items-center justify-between text-sm font-medium shadow-2xs">
                         <div class="flex items-center gap-2.5">
                             <span class="w-2 h-2 rounded-full bg-[#0088FF]"></span>
                             <span>{{ session('info') }}</span>

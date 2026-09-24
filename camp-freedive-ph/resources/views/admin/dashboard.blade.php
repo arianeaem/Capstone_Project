@@ -6,12 +6,12 @@
 <div class="space-y-6">
 
     <!-- Top Command Header -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 py-1">
-        <div class="space-y-1">
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1D1D1F]">
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#63a5c4] via-[#164B60] to-[#2e80a3]">Welcome back, {{ $user->name }}</span>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#1B6B8A] via-[#164B60] to-[#2e80a3]">Welcome back, {{ $user->name }}</span>
             </h1>
-            <p class="text-sm sm:text-sm text-[#6E6E73]">
+            <p class="text-sm text-[#6E6E73] mt-1">
                 <span>It's {{ now('Asia/Manila')->format('l, F d, Y') }}</span>
             </p>
         </div>
@@ -19,19 +19,24 @@
         <div class="flex items-center gap-2.5 flex-wrap">
             @if($isOwner)
                 <!-- Owner View Switcher -->
-                <div class="inline-flex p-1 rounded-lg bg-white border border-[#E5E5EA] text-sm font-bold shadow-2xs">
+                <div role="tablist" aria-label="Dashboard view" class="inline-flex p-1 rounded-xl bg-white border border-[#E5E5EA] text-sm font-bold shadow-2xs">
                     <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard') : route('admin.dashboard') }}" 
-                       class="px-3 py-1.5 rounded-md transition-all {{ $activeView === 'executive' ? 'bg-[#780000] text-white shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]' }}">
+                       role="tab"
+                       aria-selected="{{ $activeView === 'executive' ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#780000] {{ $activeView === 'executive' ? 'bg-[#780000] text-white shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]' }}">
                         Executive Analytics
                     </a>
                     <a href="{{ auth()->user()->isOwner() ? route('owner.dashboard', ['view' => 'operations']) : route('admin.dashboard', ['view' => 'operations']) }}" 
-                       class="px-3 py-1.5 rounded-md transition-all {{ $activeView === 'operations' ? 'bg-[#780000] text-white shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]' }}">
+                       role="tab"
+                       aria-selected="{{ $activeView === 'operations' ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-[#780000] {{ $activeView === 'operations' ? 'bg-[#780000] text-white shadow-2xs' : 'text-[#6E6E73] hover:text-[#1D1D1F]' }}">
                         Operations View
                     </a>
                 </div>
             @endif
 
-            <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.create') : route('admin.bookings.create') }}" class="px-4 py-2 rounded-lg text-sm font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] active:bg-[#009da7] text-[#1D1D1F] transition-all hover:-translate-y-px active:translate-y-0 shadow-2xs hover:shadow-xs flex items-center gap-1.5">
+            <a href="{{ auth()->user()->isOwner() ? route('owner.bookings.create') : route('admin.bookings.create') }}" class="min-h-[44px] px-4 py-2 rounded-xl text-sm font-extrabold bg-[#00c3d0] hover:bg-[#00abb7] active:bg-[#009da7] active:scale-[0.98] text-[#1D1D1F] transition-all hover:-translate-y-px active:translate-y-0 shadow-2xs hover:shadow-xs inline-flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-[#00c3d0] focus:ring-offset-2">
+                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                 <span>Walk-in Booking</span>
             </a>
         </div>
@@ -70,8 +75,22 @@
                 <div class="relative px-2 sm:px-4 pt-3 sm:pt-1 py-1">
                     <div class="hidden sm:block absolute left-0 top-2 bottom-2 w-px bg-[#E5E5EA]"></div>
                     <span class="text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">Unmatched Students</span>
-                    <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold mt-0.5 break-words {{ $operationalStats['unmatched_students_count'] > 0 ? 'text-amber-700' : 'text-emerald-700' }}">
-                        {{ $operationalStats['unmatched_students_count'] }}
+                    <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                        <div class="text-2xl sm:text-2xl lg:text-3xl font-extrabold break-words {{ $operationalStats['unmatched_students_count'] > 0 ? 'text-amber-700' : 'text-emerald-700' }}">
+                            {{ $operationalStats['unmatched_students_count'] }}
+                        </div>
+                        @if($operationalStats['unmatched_students_count'] > 0)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-amber-50 text-amber-800" 
+                                  aria-label="{{ $operationalStats['unmatched_students_count'] }} unmatched students requiring instructor matching">
+                                <span>Needs Coach</span>
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold bg-emerald-50 text-emerald-800" 
+                                  aria-label="All students matched to instructors">
+                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span>All Matched</span>
+                            </span>
+                        @endif
                     </div>
                 </div>
 
@@ -92,7 +111,7 @@
                     <div class="flex-1 flex flex-col justify-between gap-3">
                         <!-- Reschedules -->
                         @if($actionInbox['reschedules']->count() > 0)
-                            <a href="{{ route('admin.bookings.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEF3C7] hover:bg-[#FDE68A]/70 flex items-center justify-between gap-3 group shadow-2xs transition-all">
+                            <a href="{{ route('admin.bookings.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEF3C7] hover:bg-[#FDE68A]/70 active:scale-[0.99] active:brightness-95 flex items-center justify-between gap-3 group shadow-2xs transition-all">
                                 <div class="space-y-1">
                                     <span class="text-sm font-extrabold text-amber-950 block">Pending Reschedules</span>
                                     <p class="text-sm text-amber-800 font-medium">{{ $actionInbox['reschedules']->count() }} guest request(s)</p>
@@ -103,7 +122,7 @@
 
                         <!-- Cancellations -->
                         @if($actionInbox['cancellations']->count() > 0)
-                            <a href="{{ route('admin.bookings.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEE2E2] hover:bg-[#FECDD3]/70 flex items-center justify-between gap-3 group shadow-2xs transition-all">
+                            <a href="{{ route('admin.bookings.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEE2E2] hover:bg-[#FECDD3]/70 active:scale-[0.99] active:brightness-95 flex items-center justify-between gap-3 group shadow-2xs transition-all">
                                 <div class="space-y-1">
                                     <span class="text-sm font-extrabold text-rose-950 block">Cancellation Requests</span>
                                     <p class="text-sm text-rose-800 font-medium">{{ $actionInbox['cancellations']->count() }} pending cancellation(s)</p>
@@ -114,7 +133,7 @@
 
                         <!-- Coach Releases -->
                         @if($actionInbox['releases']->count() > 0)
-                            <a href="{{ route('admin.coaches.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#DBEAFE] hover:bg-[#BFDBFE]/70 flex items-center justify-between gap-3 group shadow-2xs transition-all">
+                            <a href="{{ route('admin.coaches.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#DBEAFE] hover:bg-[#BFDBFE]/70 active:scale-[0.99] active:brightness-95 flex items-center justify-between gap-3 group shadow-2xs transition-all">
                                 <div class="space-y-1">
                                     <span class="text-sm font-extrabold text-blue-950 block">Coach Release Requests</span>
                                     <p class="text-sm text-blue-800 font-medium">{{ $actionInbox['releases']->count() }} instructor release(s)</p>
@@ -125,10 +144,10 @@
 
                         <!-- Pending Refunds -->
                         @if($actionInbox['refunds']->count() > 0)
-                            <a href="{{ route('admin.payments.refunds') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#F3E8FF] hover:bg-[#E9D5FF]/70 flex items-center justify-between gap-3 group shadow-2xs transition-all">
+                            <a href="{{ route('admin.bookings.requests') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#F3E8FF] hover:bg-[#E9D5FF]/70 active:scale-[0.99] active:brightness-95 flex items-center justify-between gap-3 group shadow-2xs transition-all">
                                 <div class="space-y-1">
-                                    <span class="text-sm font-extrabold text-purple-950 block">Pending Refunds</span>
-                                    <p class="text-sm text-purple-800 font-medium">{{ $actionInbox['refunds']->count() }} refund(s) to process</p>
+                                    <span class="text-sm font-extrabold text-purple-950 block">Guest Cancellation Claims</span>
+                                    <p class="text-sm text-purple-800 font-medium">{{ $actionInbox['refunds']->count() }} cancellation claim(s) to process</p>
                                 </div>
                                 <span class="text-sm font-bold text-purple-950 group-hover:underline shrink-0">Process</span>
                             </a>
@@ -136,7 +155,7 @@
 
                         <!-- Understaffed Batches -->
                         @if($actionInbox['understaffed']->count() > 0)
-                            <a href="{{ route('admin.coaches.matching') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEF3C7] hover:bg-[#FDE68A]/70 flex items-center justify-between gap-3 group shadow-2xs transition-all">
+                            <a href="{{ route('admin.coaches.matching') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEF3C7] hover:bg-[#FDE68A]/70 active:scale-[0.99] active:brightness-95 flex items-center justify-between gap-3 group shadow-2xs transition-all">
                                 <div class="space-y-1">
                                     <span class="text-sm font-extrabold text-amber-950 block">Under-staffed Batches</span>
                                     <p class="text-sm text-amber-800 font-medium">{{ $actionInbox['understaffed']->count() }} batch(es) need instructors</p>
@@ -147,7 +166,7 @@
 
                         <!-- Marine Weather Warnings -->
                         @if($actionInbox['weather_alerts']->count() > 0)
-                            <a href="{{ route('admin.weather.index') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEE2E2] hover:bg-[#FECDD3]/70 flex items-center justify-between gap-3 group shadow-2xs transition-all">
+                            <a href="{{ route('admin.weather.index') }}" class="flex-1 min-h-[85px] p-4 sm:p-5 rounded-xl bg-[#FEE2E2] hover:bg-[#FECDD3]/70 active:scale-[0.99] active:brightness-95 flex items-center justify-between gap-3 group shadow-2xs transition-all">
                                 <div class="space-y-1">
                                     <span class="text-sm font-extrabold text-red-950 block">Marine Weather Warning</span>
                                     <p class="text-sm text-red-800 font-medium">{{ $actionInbox['weather_alerts']->count() }} batch(es) under advisory</p>
@@ -164,8 +183,9 @@
                         <div>
                             <h2 class="text-base font-bold text-[#1D1D1F]">Upcoming Weekend Batches</h2>
                         </div>
-                        <a href="{{ route('admin.batches.index') }}" class="text-sm font-bold text-[#780000] hover:underline inline-flex items-center gap-0.5">
+                        <a href="{{ route('admin.batches.index') }}" class="min-h-[44px] px-3 py-1.5 rounded-lg text-sm font-bold text-[#780000] hover:bg-[#F2F2F7] transition-colors inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[#780000]">
                             <span>View All Batches</span>
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </a>
                     </div>
 
@@ -187,13 +207,13 @@
 
                                     <div>
                                         <p class="text-sm text-[#6E6E73]">
-                                             {{ $batch->start_date->format('M d, Y') }} - {{ $batch->end_date->format('M d, Y') }}
+                                            {{ $batch->formatted_date_range }}
                                             <span class="text-[#780000] font-semibold">({{ $batch->start_date->diffForHumans() }})</span>
                                         </p>
                                     </div>
 
                                     <!-- Participants Count -->
-                                    <div class="flex items-center justify-between pt-1 border-t border-[#F2F2F7] text-sm">
+                                    <div class="flex items-center justify-between pt-1 text-sm">
                                         <span class="text-[#6E6E73] font-medium">Participants:</span>
                                         <span class="font-bold text-[#1D1D1F]">{{ $pax }} {{ Str::plural('participant', $pax) }}</span>
                                     </div>
@@ -202,7 +222,7 @@
                                     <div class="flex items-center justify-between text-sm">
                                         <span class="text-[#6E6E73] font-medium">Coaches:</span>
                                         @if($pax === 0)
-                                            <span class="text-[#8E8E93] font-medium">
+                                            <span class="text-[#6E6E73] font-medium">
                                                 {{ $coachesAssigned }} Assigned (0 Needed)
                                             </span>
                                         @elseif($coachesAssigned >= $coachesNeeded)
@@ -232,8 +252,9 @@
                         <div>
                             <h2 class="text-base font-bold text-[#1D1D1F]">Upcoming Weekend Batches</h2>
                         </div>
-                        <a href="{{ route('admin.batches.index') }}" class="text-sm font-bold text-[#780000] hover:underline inline-flex items-center gap-0.5">
+                        <a href="{{ route('admin.batches.index') }}" class="min-h-[44px] px-3 py-1.5 rounded-lg text-sm font-bold text-[#780000] hover:bg-[#F2F2F7] transition-colors inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[#780000]">
                             <span>View All Batches</span>
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </a>
                     </div>
 
@@ -255,13 +276,13 @@
 
                                     <div>
                                         <p class="text-sm text-[#6E6E73]">
-                                            {{ $batch->start_date->format('M d, Y') }} - {{ $batch->end_date->format('M d, Y') }}
+                                            {{ $batch->formatted_date_range }}
                                             <span class="text-[#780000] font-semibold">({{ $batch->start_date->diffForHumans() }})</span>
                                         </p>
                                     </div>
 
                                     <!-- Participants Count -->
-                                    <div class="flex items-center justify-between pt-1 border-t border-[#F2F2F7] text-sm">
+                                    <div class="flex items-center justify-between pt-1 text-sm">
                                         <span class="text-[#6E6E73] font-medium">Participants:</span>
                                         <span class="font-bold text-[#1D1D1F]">{{ $pax }} {{ Str::plural('participant', $pax) }}</span>
                                     </div>
@@ -270,7 +291,7 @@
                                     <div class="flex items-center justify-between text-sm">
                                         <span class="text-[#6E6E73] font-medium">Coaches:</span>
                                         @if($pax === 0)
-                                            <span class="text-[#8E8E93] font-medium">
+                                            <span class="text-[#6E6E73] font-medium">
                                                 {{ $coachesAssigned }} Assigned (0 Needed)
                                             </span>
                                         @elseif($coachesAssigned >= $coachesNeeded)
@@ -304,8 +325,9 @@
                     <h2 class="text-sm sm:text-base font-bold text-[#1D1D1F]">Recent Confirmed Reservations</h2>
                     <p class="text-sm text-[#6E6E73]">Real-time incoming bookings with paid downpayments.</p>
                 </div>
-                <a href="{{ route('admin.bookings.index') }}" class="text-sm font-bold text-[#780000] hover:underline inline-flex items-center gap-0.5">
+                <a href="{{ route('admin.bookings.index') }}" class="min-h-[44px] px-3 py-1.5 rounded-lg text-sm font-bold text-[#780000] hover:bg-[#F2F2F7] transition-colors inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[#780000]">
                     <span>All Bookings ({{ $operationalStats['total_active_batches'] }} Batches)</span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </a>
             </div>
 
@@ -323,15 +345,20 @@
                     </thead>
                     <tbody class="divide-y divide-[#E5E5EA]">
                         @forelse($recentBookings as $b)
-                            <tr onclick="window.location='{{ route('admin.bookings.show', $b) }}'" class="hover:bg-[#F2F2F7] cursor-pointer transition-colors group">
-                                <td class="py-3 px-4 font-mono font-bold text-[#780000] group-hover:underline">
+                            <tr tabindex="0"
+                                role="link"
+                                onclick="window.location='{{ route('admin.bookings.show', $b) }}'"
+                                onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location='{{ route('admin.bookings.show', $b) }}';}"
+                                aria-label="View booking {{ $b->booking_number }} for {{ $b->contact_name }}"
+                                class="hover:bg-[#F2F2F7] focus:bg-[#F2F2F7] focus:outline-none focus:ring-2 focus:ring-[#780000] focus:ring-inset cursor-pointer transition-colors group">
+                                <td class="py-3 px-4 font-mono font-bold text-[#780000] group-hover:underline group-focus:underline">
                                     {{ $b->booking_number }}
                                 </td>
                                 <td class="py-3 px-4 font-semibold text-[#1D1D1F]">
                                     {{ $b->contact_name }}
                                 </td>
                                 <td class="py-3 px-4">
-                                    <span class="px-2 py-0.5 rounded-md font-bold bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
+                                    <span class="px-2 py-0.5 rounded-md font-bold bg-[#F2F2F7] text-[#1D1D1F]">
                                         {{ $b->formatted_class_type }}
                                     </span>
                                 </td>
@@ -408,10 +435,12 @@
 
                 <!-- Package Revenue Share -->
                 <div class="space-y-2">
-                    <div class="w-full bg-[#E5E5EA] h-6 sm:h-7 rounded-xl overflow-hidden flex shadow-inner">
+                    <div role="img" 
+                         aria-label="Package revenue share: {{ collect($packageAnalytics)->filter(fn($p) => ($p['share_percentage'] ?? 0) > 0)->map(fn($p) => $p['name'] . ' ' . $p['share_percentage'] . '% (' . $p['bookings_count'] . ' bookings)')->implode(', ') }}"
+                         class="w-full bg-[#E5E5EA] h-6 sm:h-7 rounded-xl overflow-hidden flex shadow-inner">
                         @foreach($packageAnalytics as $pKey => $pData)
                             @if($pData['share_percentage'] > 0)
-                                <div class="{{ $pData['bg_color'] }} transition-all flex items-center justify-center text-white text-sm sm:text-sm font-bold px-1 truncate"
+                                <div class="{{ $pData['bg_color'] }} transition-all flex items-center justify-center text-white text-sm font-bold px-1 truncate"
                                      style="width: {{ $pData['share_percentage'] }}%"
                                      title="{{ $pData['name'] }}: {{ $pData['share_percentage'] }}% ({{ $pData['bookings_count'] }} bookings)">
                                     @if($pData['share_percentage'] >= 10)
@@ -423,7 +452,7 @@
                     </div>
                     
                     <!-- Progress Bar 0% and 100% Labels -->
-                    <div class="flex justify-between items-center text-sm font-bold text-[#8E8E93] px-0.5">
+                    <div class="flex justify-between items-center text-sm font-bold text-[#6E6E73] px-0.5">
                         <span>0%</span>
                         <span>100%</span>
                     </div>
@@ -434,9 +463,9 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 divide-y sm:divide-y-0 sm:divide-x divide-[#E5E5EA]">
                         @foreach($packageAnalytics as $pKey => $pData)
                             <div class="space-y-2 {{ !$loop->first ? 'pt-3 sm:pt-0 sm:pl-4 lg:pl-6' : '' }}">
-                                <!-- Dot Indicator & Package Name -->
+                                <!-- Line Indicator & Package Name -->
                                 <div class="flex items-center gap-2">
-                                    <span class="w-2.5 h-2.5 rounded-full {{ $pData['dot_class'] }} shrink-0"></span>
+                                    <span class="w-1.5 h-4 rounded-full {{ $pData['dot_class'] }} shrink-0"></span>
                                     <span class="font-extrabold text-sm text-[#1D1D1F]">{{ $pData['name'] }}</span>
                                 </div>
 
@@ -466,8 +495,9 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between">
                         <h2 class="text-base font-bold text-[#1D1D1F]">Net Dynamic Yield</h2>
-                        <a href="{{ route('admin.pricing.index') }}" class="text-sm font-bold text-[#780000] hover:underline">
-                            Rules
+                        <a href="{{ route('admin.pricing.index') }}" class="min-h-[44px] px-3 py-1.5 rounded-lg text-sm font-bold text-[#780000] hover:bg-[#F2F2F7] transition-colors inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                            <span>Rules</span>
+                            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </a>
                     </div>
 
@@ -505,8 +535,9 @@
                     <h2 class="text-base font-bold text-[#1D1D1F]">Audit Trail & System Activity</h2>
                     <p class="text-sm text-[#6E6E73]">Immutable records of administrative decisions, price changes, and refunds.</p>
                 </div>
-                <a href="{{ route('admin.audit_logs.index') }}" class="text-sm font-bold text-[#780000] hover:underline">
-                    Full Audit Log
+                <a href="{{ route('admin.audit_logs.index') }}" class="min-h-[44px] px-3 py-1.5 rounded-lg text-sm font-bold text-[#780000] hover:bg-[#F2F2F7] transition-colors inline-flex items-center gap-1 focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                    <span>Full Audit Log</span>
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
                 </a>
             </div>
 
@@ -516,13 +547,13 @@
                         <div class="space-y-0.5">
                             <div class="flex items-center gap-2">
                                 <span class="font-bold text-[#1D1D1F]">{{ $log->user?->name ?? 'System' }}</span>
-                                <span class="px-2 py-0.5 rounded-md font-bold bg-[#F2F2F7] text-[#780000] border border-[#E5E5EA] font-mono text-sm">
+                                <span class="px-2 py-0.5 rounded-md font-bold bg-[#F2F2F7] text-[#780000] font-mono text-sm">
                                     {{ $log->action }}
                                 </span>
                             </div>
                             <p class="text-[#6E6E73]">{{ $log->description ?? $log->details }}</p>
                         </div>
-                        <span class="text-[#8E8E93] text-sm shrink-0">
+                        <span class="text-[#6E6E73] text-sm shrink-0">
                             {{ $log->created_at->diffForHumans() }}
                         </span>
                     </div>

@@ -1,15 +1,14 @@
 @extends('layouts.admin')
 
-@section('title', 'Weather & Marine Safety Monitoring | Camp FreedivePH')
+@section('title', 'Safety Monitoring | Camp FreedivePH')
 
 @section('content')
 <div class="space-y-6 text-sm">
     
     <!-- Top Header & Actions -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Weather &amp; Marine Safety Monitoring</h1>
-            <p class="text-sm text-[#6E6E73] mt-1">Monitor sea weather conditions and safety ratings for all scheduled freediving batches.</p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Safety Monitoring</h1>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
@@ -184,8 +183,11 @@
                 };
             @endphp
             
-            <div onclick="window.location='{{ route('admin.weather.show', $batch) }}'" 
-                 class="rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:border-[#780000] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group bg-white">
+            <div tabindex="0" 
+                 role="link" 
+                 onclick="window.location='{{ route('admin.weather.show', $batch) }}'" 
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location='{{ route('admin.weather.show', $batch) }}';}" 
+                 class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:ring-1 hover:ring-[#780000] focus:outline-none focus:ring-2 focus:ring-[#780000] active:scale-[0.99] cursor-pointer transition-all flex flex-col justify-between space-y-3 shadow-2xs group">
                 
                 <!-- Batch Information -->
                 <div>
@@ -195,7 +197,7 @@
                                 {{ $batch->batch_number }}
                             </span>
                             <div class="text-xs text-[#6E6E73] mt-0.5 font-medium">
-                                {{ $batch->start_date->format('M d') }} to {{ $batch->end_date->format('M d, Y') }}
+                                {{ $batch->formatted_date_range }}
                             </div>
                         </div>
                         <div class="text-right shrink-0 space-y-0.5">

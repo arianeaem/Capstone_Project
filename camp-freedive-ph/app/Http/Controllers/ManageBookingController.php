@@ -95,16 +95,33 @@ class ManageBookingController extends Controller
      */
     public function show(Request $request, string $booking_number): View|RedirectResponse
     {
-        $pin = $request->query('pin', session('auth_booking_pin'));
-
         $booking = Booking::where('booking_number', strtoupper(trim($booking_number)))
             ->with(['participants', 'payments', 'rescheduleRequests' => fn($q) => $q->latest(), 'cancellationRequests' => fn($q) => $q->latest()])
             ->first();
 
-        if (!$booking || ($booking->pin !== $pin && session('auth_booking_id') !== $booking->id)) {
+        if (!$booking) {
             return redirect()->route('manage.index')
                 ->with('error', 'Booking not found - please check your details.');
         }
+
+        $pin = $request->query('pin', session('auth_booking_pin'));
+
+        $isAuthenticated = (session('auth_booking_id') === $booking->id)
+            || ($pin !== null && $pin !== '' && (string) $booking->pin === (string) $pin);
+
+        if (!$isAuthenticated) {
+            $msg = $request->has('pin')
+                ? 'Invalid PIN. Please enter your 4-digit Security PIN.'
+                : 'Please enter your 4-digit Security PIN to access your booking.';
+
+            return redirect()->route('manage.index', ['number' => $booking->booking_number])
+                ->with('info', $msg);
+        }
+
+        session([
+            'auth_booking_id' => $booking->id,
+            'auth_booking_pin' => $booking->pin,
+        ]);
 
         // Live evaluation of the cancellation/reschedule policy engine
         $policy = $this->policyEngine->evaluate($booking);

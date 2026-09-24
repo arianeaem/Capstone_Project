@@ -69,12 +69,12 @@ class WeatherSafetyService
                     [
                         'start_date' => $nextSat->format('Y-m-d'),
                         'end_date' => $nextSat->copy()->addDay()->format('Y-m-d'),
-                        'label' => $nextSat->format('M d') . ' to ' . $nextSat->copy()->addDay()->format('M d, Y') . ' (Next Weekend - Safe)',
+                        'label' => $nextSat->format('M d') . ' - ' . $nextSat->copy()->addDay()->format('M d, Y') . ' (Next Weekend - Safe)',
                     ],
                     [
                         'start_date' => $nextSat->copy()->addWeeks(1)->format('Y-m-d'),
                         'end_date' => $nextSat->copy()->addWeeks(1)->addDay()->format('Y-m-d'),
-                        'label' => $nextSat->copy()->addWeeks(1)->format('M d') . ' to ' . $nextSat->copy()->addWeeks(1)->addDay()->format('M d, Y') . ' (2 Weeks Out - Very Safe)',
+                        'label' => $nextSat->copy()->addWeeks(1)->format('M d') . ' - ' . $nextSat->copy()->addWeeks(1)->addDay()->format('M d, Y') . ' (2 Weeks Out - Very Safe)',
                     ]
                 ];
             }

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 class SlotReservationService
 {
     /**
-     * Maximum participant capacity per weekend batch.
+     * Maximum participant capacity per weekend batch (fallback default).
      */
     public const MAX_CAPACITY = 45;
 
@@ -26,6 +26,20 @@ class SlotReservationService
      * Default duration to hold temporary slots during checkout step 4 (15 minutes).
      */
     public const DEFAULT_HOLD_TTL_SECONDS = 900;
+
+    public function __construct(
+        protected ?SystemSettingService $settingService = null
+    ) {
+        $this->settingService ??= app(SystemSettingService::class);
+    }
+
+    /**
+     * Get maximum participant capacity per weekend batch.
+     */
+    public function getMaxCapacity(): int
+    {
+        return (int) ($this->settingService?->get('camp_operations.max_batch_capacity', self::MAX_CAPACITY) ?? self::MAX_CAPACITY);
+    }
 
     /**
      * Executes a callback within an atomic distributed lock for a specific dive date.
@@ -114,7 +128,7 @@ class SlotReservationService
      */
     public function getAvailableSlots(string $startDate): int
     {
-        return max(0, self::MAX_CAPACITY - $this->getEffectiveCommittedPax($startDate));
+        return max(0, $this->getMaxCapacity() - $this->getEffectiveCommittedPax($startDate));
     }
 
     /**
@@ -132,7 +146,7 @@ class SlotReservationService
         $date = Carbon::parse($startDate)->format('Y-m-d');
         $currentCommitted = $this->getEffectiveCommittedPax($date);
 
-        if (($currentCommitted + $paxCount) > self::MAX_CAPACITY) {
+        if (($currentCommitted + $paxCount) > $this->getMaxCapacity()) {
             return false;
         }
 

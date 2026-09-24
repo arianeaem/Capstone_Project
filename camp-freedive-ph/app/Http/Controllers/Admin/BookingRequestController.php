@@ -10,11 +10,14 @@ use App\Mail\RescheduleRejectedMail;
 use App\Models\Booking;
 use App\Models\BookingStatusLog;
 use App\Models\CancellationRequest;
+use App\Models\Payment;
+use App\Models\PaymentStatusLog;
 use App\Models\RefundRequest;
 use App\Models\RescheduleRequest;
 use App\Services\AuditLogger;
 use App\Services\BatchManagementService;
 use App\Services\BookingPolicyEngine;
+use App\Services\PayMongoService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,7 +31,8 @@ class BookingRequestController extends Controller
 {
     public function __construct(
         protected BookingPolicyEngine $policyEngine,
-        protected BatchManagementService $batchService
+        protected BatchManagementService $batchService,
+        protected PayMongoService $payMongoService
     ) {}
 
     /**
@@ -48,12 +52,12 @@ class BookingRequestController extends Controller
 
         $cancellationPolicies = [];
         foreach ($pendingCancellations as $req) {
-            $cancellationPolicies[$req->id] = $this->policyEngine->evaluate($req->booking);
+            $cancellationPolicies[$req->id] = $this->policyEngine->evaluate($req->booking, $req->requested_at ?? $req->created_at);
         }
 
         $reschedulePolicies = [];
         foreach ($pendingReschedules as $req) {
-            $reschedulePolicies[$req->id] = $this->policyEngine->evaluate($req->booking);
+            $reschedulePolicies[$req->id] = $this->policyEngine->evaluate($req->booking, $req->requested_at ?? $req->created_at);
         }
 
         $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
@@ -240,7 +244,36 @@ class BookingRequestController extends Controller
             $isForfeited = ($refundAmount <= 0);
         }
 
-        DB::transaction(function () use ($cancellationRequest, $booking, $adminNotes, $currentUser, $policy, $refundAmount, $refundPercentage, $isForfeited) {
+        // Process PayMongo refund directly if eligible
+        $paymongoRefundId = null;
+        if (!$isForfeited && $refundAmount > 0) {
+            $completedPayments = $booking->payments()->whereIn('status', ['completed', 'paid'])->get();
+            foreach ($completedPayments as $payment) {
+                $paymongoPaymentId = $payment->paymongo_payment_id;
+                if ((empty($paymongoPaymentId) || !str_starts_with($paymongoPaymentId, 'pay_')) && !empty($payment->paymongo_resource_id)) {
+                    $session = $this->payMongoService->getCheckoutSession($payment->paymongo_resource_id);
+                    $sessPayments = $session['data']['attributes']['payments'] ?? [];
+                    if (!empty($sessPayments[0]['id'])) {
+                        $paymongoPaymentId = $sessPayments[0]['id'];
+                        $payment->update(['paymongo_payment_id' => $paymongoPaymentId]);
+                    }
+                }
+                if (empty($paymongoPaymentId)) {
+                    $paymongoPaymentId = $payment->transaction_id ?: 'offline';
+                }
+
+                $refundResult = $this->payMongoService->refund(
+                    $paymongoPaymentId,
+                    $refundAmount,
+                    'requested_by_customer',
+                    $adminNotes ?? 'Camp FreedivePH Approved Cancellation Refund'
+                );
+
+                $paymongoRefundId = $refundResult['refund_id'] ?? ('ref_' . bin2hex(random_bytes(8)));
+            }
+        }
+
+        DB::transaction(function () use ($cancellationRequest, $booking, $adminNotes, $currentUser, $policy, $refundAmount, $refundPercentage, $isForfeited, $paymongoRefundId) {
             $booking->update([
                 'status' => 'cancelled_by_guest',
                 'batch_id' => null,
@@ -249,14 +282,32 @@ class BookingRequestController extends Controller
             $cancellationRequest->update([
                 'status' => 'approved',
                 'calculated_refund_amount' => $refundAmount,
-                'admin_notes' => $adminNotes ?: ($isForfeited ? 'Cancellation approved (Downpayment forfeited per policy).' : 'Cancellation approved. Refund queued for processing.'),
+                'admin_notes' => $adminNotes ?: ($isForfeited ? 'Cancellation approved (Downpayment forfeited per policy).' : 'Cancellation and refund of ₱' . number_format($refundAmount, 2) . ' processed successfully.'),
                 'reviewed_by' => $currentUser->id,
                 'reviewed_at' => now(),
             ]);
 
-            // Create RefundRequest records for completed payments
-            $completedPayments = $booking->payments()->whereIn('status', ['completed', 'paid'])->get();
+            // Create/Update RefundRequest records and payment statuses
+            $completedPayments = $booking->payments()->whereIn('status', ['completed', 'paid', 'refunded'])->get();
             foreach ($completedPayments as $payment) {
+                if (!$isForfeited && $refundAmount > 0) {
+                    $payment->update([
+                        'status' => 'refunded',
+                        'paymongo_refund_id' => $paymongoRefundId,
+                        'amount_refunded' => $refundAmount,
+                        'refund_reason' => $adminNotes ?? 'Admin approved customer cancellation refund',
+                    ]);
+
+                    PaymentStatusLog::create([
+                        'payment_id' => $payment->id,
+                        'old_status' => 'completed',
+                        'new_status' => 'refunded',
+                        'changed_by' => $currentUser->id,
+                        'note' => "Direct 1-step refund of ₱" . number_format($refundAmount, 2) . " executed via PayMongo (Refund ID: {$paymongoRefundId})",
+                        'created_at' => now(),
+                    ]);
+                }
+
                 RefundRequest::create([
                     'payment_id' => $payment->id,
                     'booking_id' => $booking->id,
@@ -267,11 +318,14 @@ class BookingRequestController extends Controller
                         'eligible_for_refund' => !$isForfeited && ($refundAmount > 0),
                         'refund_percentage' => $refundPercentage,
                         'window_label' => $policy['policy_tier'] ?? 'Standard Policy',
-                        'policy_action_text' => $isForfeited ? 'Cancellation within forfeiture window.' : "Approved refund of ₱" . number_format($refundAmount, 2),
+                        'policy_action_text' => $isForfeited ? 'Cancellation within forfeiture window.' : "Approved & processed refund of ₱" . number_format($refundAmount, 2),
                     ],
-                    'status' => $isForfeited ? 'forfeited' : 'pending',
+                    'status' => $isForfeited ? 'forfeited' : 'approved',
+                    'paymongo_refund_id' => $paymongoRefundId,
                     'forfeit_reason' => $isForfeited ? 'cancellation_outside_policy_window' : null,
-                    'notes' => "Approved from Guest Cancellation Request. " . ($adminNotes ?? ''),
+                    'notes' => "Processed directly via Guest Cancellation Request. " . ($adminNotes ?? ''),
+                    'reviewed_by' => $currentUser->id,
+                    'reviewed_at' => now(),
                 ]);
             }
 
@@ -280,14 +334,14 @@ class BookingRequestController extends Controller
                 'old_status' => 'cancellation_requested',
                 'new_status' => 'cancelled_by_guest',
                 'changed_by' => $currentUser->id,
-                'note' => "Cancellation approved by {$currentUser->name} (" . ($isForfeited ? "Forfeited" : "Refund due: ₱" . number_format($refundAmount, 2)) . ")" . ($adminNotes ? " - {$adminNotes}" : ''),
+                'note' => "Cancellation approved by {$currentUser->name} (" . ($isForfeited ? "Forfeited" : "Refund processed: ₱" . number_format($refundAmount, 2)) . ")" . ($adminNotes ? " - {$adminNotes}" : ''),
                 'created_at' => now(),
             ]);
         });
 
         AuditLogger::log(
             'CANCELLATION_APPROVED',
-            "Cancellation request approved for Booking #{$booking->booking_number} by {$currentUser->name}. Refund amount: ₱{$refundAmount}",
+            "Cancellation request approved and processed for Booking #{$booking->booking_number} by {$currentUser->name}. Refund amount: ₱{$refundAmount}",
             $currentUser,
             $currentUser->name,
             $request
@@ -303,7 +357,7 @@ class BookingRequestController extends Controller
         }
 
         if (!$isForfeited && $refundAmount > 0) {
-            return redirect()->route('admin.payments.refunds')->with('success', "Cancellation for Booking #{$booking->booking_number} approved! Refund of ₱" . number_format($refundAmount, 2) . " is now queued below in Pending Refunds.");
+            return back()->with('success', "Cancellation for Booking #{$booking->booking_number} approved! Refund of ₱" . number_format($refundAmount, 2) . " has been executed directly via PayMongo.");
         }
 
         return back()->with('success', "Cancellation for Booking #{$booking->booking_number} has been approved (Downpayment forfeited per policy).");

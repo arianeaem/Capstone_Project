@@ -22,25 +22,35 @@
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 
                 <!-- Action Category Filters -->
-                <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                <div role="tablist" aria-label="Audit log event filters" class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
                     <a href="{{ request()->fullUrlWithQuery(['action' => '']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ !request('action') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       role="tab"
+                       aria-selected="{{ !request('action') ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-[#780000] {{ !request('action') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         All Events
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['action' => 'LOGIN_SUCCESS']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('action') === 'LOGIN_SUCCESS' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       role="tab"
+                       aria-selected="{{ request('action') === 'LOGIN_SUCCESS' ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-[#780000] {{ request('action') === 'LOGIN_SUCCESS' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Logins
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['action' => 'LOGIN_FAILED']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('action') === 'LOGIN_FAILED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       role="tab"
+                       aria-selected="{{ request('action') === 'LOGIN_FAILED' ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-[#780000] {{ request('action') === 'LOGIN_FAILED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Failed Logins
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['action' => 'USER_UPDATED']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('action') === 'USER_UPDATED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       role="tab"
+                       aria-selected="{{ request('action') === 'USER_UPDATED' ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-[#780000] {{ request('action') === 'USER_UPDATED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         User Updates
                     </a>
                     <a href="{{ request()->fullUrlWithQuery(['action' => 'USER_STATUS_TOGGLED']) }}" 
-                       class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('action') === 'USER_STATUS_TOGGLED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                       role="tab"
+                       aria-selected="{{ request('action') === 'USER_STATUS_TOGGLED' ? 'true' : 'false' }}"
+                       class="min-h-[44px] px-3.5 py-2 inline-flex items-center justify-center rounded-xl text-sm font-bold transition-all shrink-0 focus:outline-none focus:ring-2 focus:ring-[#780000] {{ request('action') === 'USER_STATUS_TOGGLED' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
                         Status Toggles
                     </a>
                 </div>
@@ -63,8 +73,9 @@
                                    name="search" 
                                    value="{{ request('search') }}" 
                                    placeholder="Search actor, details, IP..." 
-                                   class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-white focus:bg-white focus:border-[#780000]">
-                            <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                   aria-label="Search actor, details, or IP address"
+                                   class="w-full min-h-[44px] pl-9 pr-3 py-2 text-sm rounded-xl border border-[#D1D1D6] bg-white focus:bg-white focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none transition-all">
+                            <svg class="w-4 h-4 text-[#6E6E73] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
@@ -75,11 +86,14 @@
                     <div class="relative shrink-0">
                         <button type="button" 
                                 @click="openFilters = !openFilters" 
-                                class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer">
+                                :aria-expanded="openFilters ? 'true' : 'false'"
+                                aria-haspopup="true"
+                                class="btn-secondary min-h-[44px] flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer active:scale-[0.98] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
                             <img src="{{ asset('icons/icons8-filter-60.png') }}" alt="Filter" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
                             <span class="whitespace-nowrap">Filter</span>
                             @if(request()->anyFilled(['action', 'date_from', 'date_to']))
                                 <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
+                                <span class="sr-only">(Filters active)</span>
                             @endif
                         </button>
 
@@ -96,7 +110,7 @@
                              class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
                             <div class="flex items-center justify-between">
                                 <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Audit Logs</h4>
-                                <a href="{{ route('admin.audit_logs.index') }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
+                                <a href="{{ route('admin.audit_logs.index') }}" class="min-h-[44px] px-3 py-1.5 rounded-lg text-sm text-[#780000] hover:bg-[#F2F2F7] active:scale-[0.98] transition-all font-bold inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[#780000]">Reset</a>
                             </div>
 
                             <form method="GET" action="{{ route('admin.audit_logs.index') }}" class="space-y-3 text-sm">
@@ -105,8 +119,8 @@
                                 @endif
 
                                 <div>
-                                    <label class="block font-bold text-[#6E6E73] text-sm mb-1">Event Action</label>
-                                    <select name="action" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
+                                    <label for="filter-action" class="block font-bold text-[#6E6E73] text-sm mb-1">Event Action</label>
+                                    <select id="filter-action" name="action" class="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none transition-all">
                                         <option value="">All Actions</option>
                                         @foreach($actions as $act)
                                             <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>
@@ -118,23 +132,25 @@
 
                                 <div class="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label class="block font-bold text-[#6E6E73] text-sm mb-1">Date From</label>
+                                        <label for="filter-date-from" class="block font-bold text-[#6E6E73] text-sm mb-1">Date From</label>
                                         <input type="date" 
+                                               id="filter-date-from"
                                                name="date_from" 
                                                value="{{ request('date_from') }}" 
-                                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
+                                               class="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none transition-all">
                                     </div>
                                     <div>
-                                        <label class="block font-bold text-[#6E6E73] text-sm mb-1">Date To</label>
+                                        <label for="filter-date-to" class="block font-bold text-[#6E6E73] text-sm mb-1">Date To</label>
                                         <input type="date" 
+                                               id="filter-date-to"
                                                name="date_to" 
                                                value="{{ request('date_to') }}" 
-                                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
+                                               class="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium focus:border-[#780000] focus:ring-2 focus:ring-[#780000]/20 focus:outline-none transition-all">
                                     </div>
                                 </div>
 
                                 <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
-                                    <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
+                                    <button type="submit" class="btn-primary w-full min-h-[44px] py-2.5 rounded-xl text-sm font-bold shadow-2xs active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
                                         Apply Filter
                                     </button>
                                 </div>
@@ -147,13 +163,13 @@
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm">
-                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+                <thead class="bg-[#F2F2F7] border-b border-[#E5E5EA] text-[#6E6E73] font-bold text-xs uppercase tracking-wider">
                     <tr>
-                        <th class="py-3 px-4 text-left">Timestamp</th>
-                        <th class="py-3 px-4 text-left">Event Type</th>
-                        <th class="py-3 px-4 text-left">Actor</th>
-                        <th class="py-3 px-4 text-left">Details / Summary</th>
-                        <th class="py-3 px-4 text-left">IP Address</th>
+                        <th scope="col" class="py-3.5 px-4 text-left">Timestamp</th>
+                        <th scope="col" class="py-3.5 px-4 text-left">Event Type</th>
+                        <th scope="col" class="py-3.5 px-4 text-left">Actor</th>
+                        <th scope="col" class="py-3.5 px-4 text-left">Details / Summary</th>
+                        <th scope="col" class="py-3.5 px-4 text-left">IP Address</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-[#E5E5EA]">
@@ -191,7 +207,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="py-8 text-center text-sm text-[#8E8E93]">
+                        <td colspan="5" class="py-10 text-center text-sm text-[#6E6E73]">
                             No audit log events recorded yet.
                         </td>
                     </tr>

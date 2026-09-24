@@ -349,23 +349,26 @@
         {{ $users->links() }}
     </div>
 
-    <!-- Provision Account Modal -->
+    <!-- Create Staff Account Modal -->
     <div x-show="openAddModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto bg-black/50 flex items-center justify-center p-4">
         <div class="bg-white rounded-xl max-w-lg w-full p-6 sm:p-7 space-y-5 shadow-2xl border border-[#E5E5EA]" @click.outside="openAddModal = false">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h3 class="text-lg font-bold text-[#1D1D1F]">Provision Staff Account</h3>
-                    <p class="text-sm text-[#6E6E73] mt-0.5">Create login credentials for a new instructor or administrative team member.</p>
-                </div>
-                <button type="button" @click="openAddModal = false" aria-label="Close provision modal" class="text-lg font-bold text-[#8E8E93] hover:text-[#1D1D1F]">✕</button>
+            <div>
+                <h3 class="text-lg font-bold text-[#1D1D1F]">Create Staff Account</h3>
+                <p class="text-sm text-[#6E6E73] mt-0.5">Add a new coach or staff member and set up their login credentials.</p>
             </div>
 
             <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-3.5 text-sm">
                 @csrf
 
-                <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1.5">First & Last Name <span class="text-[#780000]">*</span></label>
-                    <input type="text" name="name" required placeholder="e.g. Maria Santos" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-[#1D1D1F] mb-1.5">First Name <span class="text-[#780000]">*</span></label>
+                        <input type="text" name="first_name" required placeholder="e.g. Maria" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-[#1D1D1F] mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
+                        <input type="text" name="last_name" required placeholder="e.g. Santos" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    </div>
                 </div>
 
                 <div>
@@ -374,8 +377,8 @@
                 </div>
 
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] mb-1.5">Mobile Phone Number</label>
-                    <input type="text" name="phone" placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] mb-1.5">Contact Phone Number <span class="text-[#780000]">*</span></label>
+                    <input type="tel" name="phone" required placeholder="0917 123 4567" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                 </div>
 
                 <div>
@@ -396,7 +399,7 @@
 
                 <div class="flex items-center justify-end gap-2 pt-3">
                     <button type="button" @click="openAddModal = false" class="btn-secondary px-3.5 py-1.5 text-sm">Cancel</button>
-                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">Provision Account</button>
+                    <button type="submit" class="btn-primary px-4 py-1.5 text-sm font-bold shadow-2xs">Create Staff Account</button>
                 </div>
             </form>
         </div>
@@ -444,7 +447,7 @@
                         <span class="text-sm text-[#6E6E73] block">Staff Name</span>
                         <strong class="text-sm font-bold text-[#1D1D1F]">{{ $creds['name'] }}</strong>
                     </div>
-                    <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-white border border-[#E5E5EA] text-[#1D1D1F]">
+                    <span class="px-2.5 py-0.5 rounded-full text-sm font-bold bg-[#F2F2F7] text-[#1D1D1F]">
                         {{ $creds['role_label'] }}
                     </span>
                 </div>

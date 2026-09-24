@@ -11,6 +11,24 @@
          initialStep: {{ $initialStep ?? 1 }},
          confirmedBookingData: {{ json_encode($confirmedBookingData ?? null) }},
          pickupPoints: {{ json_encode($pickupPoints) }},
+         pricingConfig: {
+             basePrices: {
+                 discovery: {{ $packagesData['discovery']['price'] ?? 4250 }},
+                 fundive_cert: {{ $packagesData['fundive']['price_certified'] ?? 2500 }},
+                 fundive_noncert: {{ $packagesData['fundive']['price_non_certified'] ?? 3300 }},
+                 refinement: {{ $packagesData['refinement']['price'] ?? 4100 }}
+             },
+             fees: {
+                 carpool: {{ $feesData['carpool'] ?? 1200 }},
+                 boat_dive: {{ $feesData['boat_dive'] ?? 600 }},
+                 lgu_pass: {{ $feesData['lgu_pass'] ?? 300 }},
+                 environmental: {{ $feesData['environmental'] ?? 50 }}
+             },
+             downpayments: {
+                 carpool: {{ $downpaymentsData['carpool'] ?? 3000 }},
+                 own_transpo: {{ $downpaymentsData['own_transpo'] ?? 2000 }}
+             }
+         },
          csrfToken: '{{ csrf_token() }}',
          checkWeatherUrl: '{{ route('api.weather.check') }}',
          pricingQuoteUrl: '{{ route('api.pricing.quote') }}',
@@ -209,7 +227,7 @@
                                 <!-- Pricing Display -->
                                 <div class="my-4">
                                     <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
-                                        ₱4,250
+                                        ₱{{ number_format($packagesData['discovery']['price'] ?? 4250) }}
                                     </div>
                                     <span class="text-xs sm:text-sm text-[#6E6E73] font-medium block mt-1">
                                         per person
@@ -232,12 +250,12 @@
 
                             <button type="button"
                                     @click.stop="openDetails = !openDetails"
-                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]"
                                     :aria-expanded="openDetails"
                                     aria-controls="discovery-details"
                                     title="Toggle offer details">
                                 <span x-text="openDetails ? 'Hide details' : 'See offer details'"></span>
-                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#780000]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#1D1D1F]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                             </button>
                         </div>
                     </div>
@@ -260,38 +278,12 @@
                                 <span>Inclusions</span>
                             </h4>
                             <ul class="space-y-2 text-xs sm:text-sm text-[#1D1D1F]">
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>2 open water dives (2-3 hrs per session)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>1 pool session (10 ft deep pool access)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>2D1N shared AC room accommodation</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Lesson fee and coach fee</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Safety buoy set up</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>3 full board meals</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Photos and videos</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Gears (mask, snorkel, fins, weight belt)</span>
-                                </li>
+                                @foreach($packagesData['discovery']['inclusions'] ?? [] as $inc)
+                                    <li class="flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span>{{ $inc }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
 
@@ -301,18 +293,12 @@
                                 <span>Exclusions</span>
                             </h4>
                             <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Transportation (We arrange carpool)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Boat dive (optional sanctuary trip +₱600/pax)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Mabini LGU municipal environmental fee & dive pass</span>
-                                </li>
+                                @foreach($packagesData['discovery']['exclusions'] ?? [] as $exc)
+                                    <li class="flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        <span>{{ $exc }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
@@ -353,32 +339,32 @@
                                 <!-- Option A: Certified Diver -->
                                 <button type="button"
                                         @click.stop="form.class_type = 'fundive'; form.is_certified_diver = true; onFundiveOptionChanged()"
-                                        class="w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer"
+                                        class="w-full p-2.5 sm:p-3 rounded-xl border border-transparent text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer bg-transparent hover:bg-transparent hover:ring-1 hover:ring-[#780000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                         :class="(form.is_certified_diver) 
-                                            ? 'border-[#780000] bg-white' 
-                                            : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6] hover:bg-[#FAFAFA]'">
+                                            ? 'ring-2 ring-[#780000]' 
+                                            : ''">
                                     <div class="min-w-0">
                                         <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block truncate">Certified Diver</span>
                                         <span class="text-[11px] text-[#6E6E73] block italic truncate">Safety coach not included</span>
                                     </div>
                                     <div class="text-right shrink-0">
-                                        <span class="text-sm sm:text-base font-black text-[#1D1D1F]">₱2,500</span>
+                                        <span class="text-sm sm:text-base font-black text-[#1D1D1F]">₱{{ number_format($packagesData['fundive']['price_certified'] ?? 2500) }}</span>
                                     </div>
                                 </button>
 
                                 <!-- Option B: Non-Certified Diver -->
                                 <button type="button"
                                         @click.stop="form.class_type = 'fundive'; form.is_certified_diver = false; onFundiveOptionChanged()"
-                                        class="w-full p-2.5 sm:p-3 rounded-xl border text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer"
+                                        class="w-full p-2.5 sm:p-3 rounded-xl border border-transparent text-left transition-all flex items-center justify-between gap-2.5 cursor-pointer bg-transparent hover:bg-transparent hover:ring-1 hover:ring-[#780000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
                                         :class="(!form.is_certified_diver) 
-                                            ? 'border-[#780000] bg-white' 
-                                            : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6] hover:bg-[#FAFAFA]'">
+                                            ? 'ring-2 ring-[#780000]' 
+                                            : ''">
                                     <div class="min-w-0">
                                         <span class="text-xs sm:text-sm font-bold text-[#1D1D1F] block truncate">Non-Certified Diver</span>
                                         <span class="text-[11px] text-[#6E6E73] block italic truncate">Includes dedicated coach</span>
                                     </div>
                                     <div class="text-right shrink-0">
-                                        <span class="text-sm sm:text-base font-black text-[#1D1D1F]">₱3,300</span>
+                                        <span class="text-sm sm:text-base font-black text-[#1D1D1F]">₱{{ number_format($packagesData['fundive']['price_non_certified'] ?? 3300) }}</span>
                                     </div>
                                 </button>
                             </div>
@@ -394,12 +380,12 @@
 
                             <button type="button"
                                     @click.stop="openDetails = !openDetails"
-                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]"
                                     :aria-expanded="openDetails"
                                     aria-controls="fundive-details"
                                     title="Toggle offer details">
                                 <span x-text="openDetails ? 'Hide details' : 'See offer details'"></span>
-                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#780000]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#1D1D1F]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                             </button>
                         </div>
                     </div>
@@ -422,38 +408,12 @@
                                 <span>Inclusions</span>
                             </h4>
                             <ul class="space-y-2 text-xs sm:text-sm text-[#1D1D1F]">
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>2 open water dives (2-3 hrs per session)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>1 pool session (10 ft deep pool access)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>2D1N shared AC room accommodation</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span x-text="form.is_certified_diver ? 'Safety buoy setup and dive buddy briefing' : 'Safety coach fee included'">Safety coach fee included</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Safety buoy set up</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>3 full board meals</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Photos and videos</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Gears (mask, snorkel, fins, weight belt)</span>
-                                </li>
+                                @foreach($packagesData['fundive']['inclusions'] ?? [] as $inc)
+                                    <li class="flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span>{{ $inc }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
 
@@ -463,18 +423,12 @@
                                 <span>Exclusions</span>
                             </h4>
                             <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Transportation (We arrange carpool)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Boat dive (optional sanctuary trip +₱600/pax)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Mabini LGU municipal environmental fee & dive pass</span>
-                                </li>
+                                @foreach($packagesData['fundive']['exclusions'] ?? [] as $exc)
+                                    <li class="flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        <span>{{ $exc }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
@@ -502,7 +456,7 @@
                             <!-- Pricing Display -->
                             <div class="my-4">
                                 <div class="text-3xl sm:text-4xl font-black text-[#1D1D1F] tracking-tight">
-                                    ₱4,100
+                                    ₱{{ number_format($packagesData['refinement']['price'] ?? 4100) }}
                                 </div>
                                 <span class="text-xs sm:text-sm text-[#6E6E73] font-medium block mt-1">
                                     per person
@@ -525,12 +479,12 @@
 
                             <button type="button"
                                     @click.stop="openDetails = !openDetails"
-                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#780000] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                    class="inline-flex items-center justify-center min-h-[44px] px-3 py-2 gap-1.5 text-xs sm:text-sm font-bold text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] rounded-xl transition-colors cursor-pointer shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1D1D1F]"
                                     :aria-expanded="openDetails"
                                     aria-controls="refinement-details"
                                     title="Toggle offer details">
                                 <span x-text="openDetails ? 'Hide details' : 'See offer details'"></span>
-                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#780000]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                                <svg class="w-4 h-4 transform transition-transform duration-200" :class="openDetails ? 'rotate-180 text-[#1D1D1F]' : 'text-[#6E6E73]'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
                             </button>
                         </div>
                     </div>
@@ -553,38 +507,12 @@
                                 <span>Inclusions</span>
                             </h4>
                             <ul class="space-y-2 text-xs sm:text-sm text-[#1D1D1F]">
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>2 open water dives (2-3 hrs per session)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>1 pool session (10 ft deep pool access)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>2D1N shared AC room accommodation</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Coach fee (skills drills and form correction)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Safety buoy set up</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>3 full board meals</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Photos and videos</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                    <span>Gears (mask, snorkel, fins, weight belt)</span>
-                                </li>
+                                @foreach($packagesData['refinement']['inclusions'] ?? [] as $inc)
+                                    <li class="flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-[#780000] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span>{{ $inc }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
 
@@ -594,18 +522,12 @@
                                 <span>Exclusions</span>
                             </h4>
                             <ul class="space-y-1.5 text-xs sm:text-sm text-[#636366]">
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Transportation (We arrange carpool)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Boat dive (optional sanctuary trip +₱600/pax)</span>
-                                </li>
-                                <li class="flex items-start gap-2.5">
-                                    <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                    <span>Mabini LGU municipal environmental fee & dive pass</span>
-                                </li>
+                                @foreach($packagesData['refinement']['exclusions'] ?? [] as $exc)
+                                    <li class="flex items-start gap-2.5">
+                                        <svg class="w-4 h-4 text-[#8E8E93] shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                        <span>{{ $exc }}</span>
+                                    </li>
+                                @endforeach
                             </ul>
                         </div>
                     </div>
@@ -1220,8 +1142,8 @@
                                        :aria-checked="form.pickup_option === 'carpool'"
                                        @keydown.enter.prevent="form.pickup_option = 'carpool'"
                                        @keydown.space.prevent="form.pickup_option = 'carpool'"
-                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                       :class="form.pickup_option === 'carpool' ? 'border-[#780000] bg-white' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       class="p-3.5 rounded-xl border border-transparent transition-all cursor-pointer flex flex-col justify-between select-none bg-transparent hover:bg-transparent hover:ring-1 hover:ring-[#780000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                       :class="form.pickup_option === 'carpool' ? 'ring-2 ring-[#780000]' : ''">
                                     <input type="radio" name="pickup_opt" value="carpool" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -1238,8 +1160,8 @@
                                        :aria-checked="form.pickup_option === 'own'"
                                        @keydown.enter.prevent="form.pickup_option = 'own'"
                                        @keydown.space.prevent="form.pickup_option = 'own'"
-                                       class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000] focus-visible:ring-offset-2"
-                                       :class="form.pickup_option === 'own' ? 'border-[#780000] bg-white' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
+                                       class="p-3.5 rounded-xl border border-transparent transition-all cursor-pointer flex flex-col justify-between select-none bg-transparent hover:bg-transparent hover:ring-1 hover:ring-[#780000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                       :class="form.pickup_option === 'own' ? 'ring-2 ring-[#780000]' : ''">
                                     <input type="radio" name="pickup_opt" value="own" x-model="form.pickup_option" class="hidden">
                                     <div class="space-y-1">
                                         <div class="flex items-center justify-between">
@@ -1258,11 +1180,11 @@
                                 <select x-model="form.pickup_location" 
                                         :aria-invalid="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location"
                                         aria-describedby="err-carpool-hub"
-                                        class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white font-medium transition-colors cursor-pointer focus:outline-none"
-                                        :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                    <option value="" disabled selected>-- Select Carpool Pickup Hub & Schedule --</option>
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-transparent text-sm text-[#1D1D1F] bg-transparent font-medium transition-all cursor-pointer hover:bg-transparent hover:ring-1 hover:ring-[#780000] focus:outline-none focus:ring-2 focus:ring-[#780000]"
+                                        :class="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location ? 'ring-2 ring-[#D70015] bg-red-50/20' : (form.pickup_location ? 'ring-2 ring-[#780000]' : '')">
+                                    <option value="" disabled selected class="bg-white text-[#1D1D1F]">-- Select Carpool Pickup Hub & Schedule --</option>
                                     <template x-for="p in pickupPoints" :key="p.id">
-                                        <option :value="p.name" x-text="p.name"></option>
+                                        <option :value="p.name" x-text="p.name" class="bg-white text-[#1D1D1F]"></option>
                                     </template>
                                 </select>
                                 <span id="err-carpool-hub" x-show="touchedStep3 && form.pickup_option === 'carpool' && !form.pickup_location" class="text-xs text-[#D70015] font-semibold mt-1 block">
@@ -1278,17 +1200,19 @@
                                    :aria-checked="form.boat_dive"
                                    @keydown.enter.prevent="form.boat_dive = !form.boat_dive"
                                    @keydown.space.prevent="form.boat_dive = !form.boat_dive"
-                                   class="p-3.5 rounded-xl border transition-all cursor-pointer flex items-start justify-between gap-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#00C3D0] focus-visible:ring-offset-2"
-                                   :class="form.boat_dive ? 'border-[#00C3D0] bg-[#E0F9FB]/30' : 'border-[#E5E5EA] bg-white hover:border-[#D1D1D6]'">
-                                <div class="flex items-start gap-2.5 min-w-0">
-                                    <input type="checkbox" x-model="form.boat_dive" class="w-4 h-4 rounded text-[#00C3D0] focus:ring-[#00C3D0] mt-0.5 shrink-0 cursor-pointer">
-                                    <div class="min-w-0">
+                                   @click="form.boat_dive = !form.boat_dive"
+                                   class="p-3.5 rounded-xl border border-transparent transition-all cursor-pointer flex items-start justify-between gap-3 select-none bg-transparent hover:bg-transparent hover:ring-1 hover:ring-[#780000] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]"
+                                   :class="form.boat_dive ? 'ring-2 ring-[#780000]' : ''">
+                                <input type="checkbox" x-model="form.boat_dive" class="hidden">
+                                <div class="min-w-0">
+                                    <div class="flex items-center gap-2">
                                         <span class="font-bold text-sm text-[#1D1D1F] block">Boat Dive (Optional)</span>
-                                        <span class="text-xs sm:text-sm text-[#6E6E73] block leading-snug">Boat ride to deeper marine sanctuaries.</span>
+                                        <span x-show="form.boat_dive" class="w-2.5 h-2.5 rounded-full bg-[#780000]"></span>
                                     </div>
+                                    <span class="text-xs sm:text-sm text-[#6E6E73] block leading-snug">Boat ride to deeper marine sanctuaries.</span>
                                 </div>
                                 <div class="text-right shrink-0">
-                                    <span class="font-extrabold text-[#00C3D0] text-xs sm:text-sm">+₱600</span>
+                                    <span class="font-extrabold text-[#780000] text-xs sm:text-sm">+₱{{ number_format($feesData['boat_dive'] ?? 600) }}</span>
                                     <span class="text-[11px] sm:text-xs text-[#6E6E73] block">/ person</span>
                                 </div>
                             </label>
@@ -1358,20 +1282,20 @@
                             </div>
 
                             <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
-                                <span>Boat Dive (₱600 × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(600 * form.participants.length)"></span>
+                                <span>Boat Dive (₱{{ number_format($feesData['boat_dive'] ?? 600) }} × <span x-text="form.participants.length"></span>)</span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber((config.pricingConfig?.fees?.boat_dive || 600) * form.participants.length)"></span>
                             </div>
 
                             <div class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Mabini LGU Pass &amp; Env. Fee</span>
-                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(350 * form.participants.length)"></span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(((config.pricingConfig?.fees?.lgu_pass || 300) + (config.pricingConfig?.fees?.environmental || 50)) * form.participants.length)"></span>
                             </div>
 
                             <!-- Downpayment Due Now (No background color) -->
                             <div class="pt-2.5 border-t border-[#E5E5EA] flex justify-between items-center gap-2">
                                 <div class="min-w-0">
                                     <span class="font-bold text-[#1D1D1F] block text-xs sm:text-sm leading-tight">Downpayment Due Now</span>
-                                    <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head)'"></span>
+                                    <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? ('₱' + formatNumber(config.pricingConfig?.downpayments?.carpool || 3000)) : ('₱' + formatNumber(config.pricingConfig?.downpayments?.own_transpo || 2000))) + ' / head)'"></span>
                                 </div>
                                 <span class="text-sm sm:text-base font-black text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
                             </div>
@@ -1445,7 +1369,7 @@
                             </div>
                             <div class="flex justify-between items-center text-sm text-[#6E6E73]" x-show="form.start_date && form.end_date">
                                 <span>Dive Dates</span>
-                                <span class="font-medium text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
+                                <span class="font-medium text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' - ' + formatDateDisplay(form.end_date)"></span>
                             </div>
                             <div class="flex justify-between items-center text-sm text-[#6E6E73]">
                                 <span>Total Trip Cost</span>
@@ -1460,7 +1384,7 @@
                             <div class="pt-3 flex justify-between items-center gap-2">
                                 <div>
                                     <span class="font-bold text-[#065F46] text-sm block">Downpayment Due Now:</span>
-                                    <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + form.participants.length + ' pax)'"></span>
+                                    <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? ('₱' + formatNumber(config.pricingConfig?.downpayments?.carpool || 3000)) : ('₱' + formatNumber(config.pricingConfig?.downpayments?.own_transpo || 2000))) + ' / head × ' + form.participants.length + ' pax)'"></span>
                                 </div>
                                 <strong class="text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
                             </div>
@@ -1643,7 +1567,7 @@
                             </div>
                             <div class="flex justify-between items-start gap-2">
                                 <span class="text-[#6E6E73] shrink-0">Trip Dates:</span>
-                                <span class="font-bold text-[#1D1D1F] text-right" x-text="formatDateDisplay(form.start_date) + ' to ' + formatDateDisplay(form.end_date)"></span>
+                                <span class="font-bold text-[#1D1D1F] text-right" x-text="formatDateDisplay(form.start_date) + ' - ' + formatDateDisplay(form.end_date)"></span>
                             </div>
                             <div class="flex justify-between items-start gap-2">
                                 <span class="text-[#6E6E73] shrink-0">Participants:</span>
@@ -2194,11 +2118,17 @@ function bookingForm(config) {
         },
 
         calculateBasePriceUnit() {
-            let price = 4250;
+            const basePrices = (config.pricingConfig && config.pricingConfig.basePrices) ? config.pricingConfig.basePrices : {
+                discovery: 4250,
+                fundive_cert: 2500,
+                fundive_noncert: 3300,
+                refinement: 4100
+            };
+            let price = basePrices.discovery || 4250;
             if (this.form.class_type === 'fundive') {
-                price = this.form.is_certified_diver ? 2500 : 3300;
+                price = this.form.is_certified_diver ? (basePrices.fundive_cert || 2500) : (basePrices.fundive_noncert || 3300);
             } else if (this.form.class_type === 'refinement') {
-                price = 4100;
+                price = basePrices.refinement || 4100;
             }
             return price;
         },
@@ -2299,8 +2229,9 @@ function bookingForm(config) {
         },
 
         calculateCarpoolFee() {
+            const carpoolFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.carpool) ? config.pricingConfig.fees.carpool : 1200;
             if (this.form.pickup_option === 'carpool') {
-                return 1200 * this.form.participants.length;
+                return carpoolFee * this.form.participants.length;
             }
             return 0;
         },
@@ -2309,16 +2240,21 @@ function bookingForm(config) {
             const count = this.form.participants.length;
             const subtotal = this.calculateSubtotal();
             const carpool = this.calculateCarpoolFee();
-            const boat = this.form.boat_dive ? (600 * count) : 0;
-            const lgu = 300 * count;
-            const env = 50 * count;
+            const boatFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.boat_dive) ? config.pricingConfig.fees.boat_dive : 600;
+            const lguFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.lgu_pass) ? config.pricingConfig.fees.lgu_pass : 300;
+            const envFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.environmental) ? config.pricingConfig.fees.environmental : 50;
+            const boat = this.form.boat_dive ? (boatFee * count) : 0;
+            const lgu = lguFee * count;
+            const env = envFee * count;
             return subtotal + carpool + boat + lgu + env;
         },
 
         calculateDownpayment() {
             const total = this.calculateTotal();
             const count = this.form.participants.length;
-            const dpPerHead = (this.form.pickup_option === 'carpool') ? 3000 : 2000;
+            const carpoolDp = (config.pricingConfig && config.pricingConfig.downpayments && config.pricingConfig.downpayments.carpool) ? config.pricingConfig.downpayments.carpool : 3000;
+            const ownTranspoDp = (config.pricingConfig && config.pricingConfig.downpayments && config.pricingConfig.downpayments.own_transpo) ? config.pricingConfig.downpayments.own_transpo : 2000;
+            const dpPerHead = (this.form.pickup_option === 'carpool') ? carpoolDp : ownTranspoDp;
             const totalDp = dpPerHead * count;
             return Math.min(totalDp, total);
         },

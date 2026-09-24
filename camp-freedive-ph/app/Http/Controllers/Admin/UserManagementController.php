@@ -70,19 +70,29 @@ class UserManagementController extends Controller
         $allowedRoles = $currentUser->isOwner() ? ['admin', 'coach'] : ['coach'];
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:120'],
+            'last_name' => ['nullable', 'string', 'max:120'],
+            'name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'phone' => ['required', 'string', 'max:50'],
             'role' => ['required', Rule::in($allowedRoles)],
             'temp_password' => ['nullable', 'string', 'min:8'],
         ]);
 
+        $fullName = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        if (empty($fullName)) {
+            $fullName = $validated['name'] ?? '';
+        }
+        if (empty($fullName)) {
+            return back()->withErrors(['first_name' => 'First and Last name are required.'])->withInput();
+        }
+
         $tempPassword = !empty($validated['temp_password']) ? $validated['temp_password'] : ('TempPass' . mt_rand(1000, 9999) . '!');
 
         $user = User::create([
-            'name' => $validated['name'],
+            'name' => $fullName,
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'phone' => $validated['phone'],
             'role' => $validated['role'],
             'status' => 'active',
             'password' => Hash::make($tempPassword),
@@ -91,7 +101,7 @@ class UserManagementController extends Controller
 
         AuditLogger::log(
             'USER_CREATED',
-            "New {$user->role} provisioned: {$user->email} (Name: {$user->name}) by {$currentUser->name} ({$currentUser->role})",
+            "New {$user->role} account created: {$user->email} (Name: {$user->name}) by {$currentUser->name} ({$currentUser->role})",
             $user,
             $currentUser->name,
             $request
@@ -141,24 +151,32 @@ class UserManagementController extends Controller
         $allowedRoles = $currentUser->isOwner() ? ['owner', 'admin', 'coach'] : ['coach'];
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:120'],
+            'last_name' => ['nullable', 'string', 'max:120'],
+            'name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'phone' => ['required', 'string', 'max:50'],
             'role' => ['required', Rule::in($allowedRoles)],
             'status' => ['required', 'in:active,inactive'],
             'new_password' => ['nullable', 'string', 'min:8'],
         ]);
 
+        $fullName = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        if (empty($fullName)) {
+            $fullName = $validated['name'] ?? $user->name;
+        }
+
         $changes = [];
-        if ($user->name !== $validated['name']) $changes[] = "Name: {$user->name} → {$validated['name']}";
+        if ($user->name !== $fullName) $changes[] = "Name: {$user->name} → {$fullName}";
         if ($user->email !== $validated['email']) $changes[] = "Email: {$user->email} → {$validated['email']}";
+        if ($user->phone !== $validated['phone']) $changes[] = "Phone: {$user->phone} → {$validated['phone']}";
         if ($user->role !== $validated['role']) $changes[] = "Role: {$user->role} → {$validated['role']}";
         if ($user->status !== $validated['status']) $changes[] = "Status: {$user->status} → {$validated['status']}";
 
         $updateData = [
-            'name' => $validated['name'],
+            'name' => $fullName,
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'phone' => $validated['phone'],
             'role' => $validated['role'],
             'status' => $validated['status'],
         ];

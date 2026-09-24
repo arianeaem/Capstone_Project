@@ -39,8 +39,9 @@
 
         <!-- Document Switcher -->
         <nav class="pt-2" aria-label="Legal documents">
-            <div class="inline-flex p-1 bg-[#F2F2F7] rounded-xl text-sm font-semibold">
+            <div class="inline-flex items-center p-1 bg-[#F2F2F7] rounded-xl text-sm font-semibold">
                 <span class="px-4 py-2 bg-white text-[#1D1D1F] rounded-lg shadow-2xs">Terms &amp; Conditions</span>
+                <div class="w-px h-5 bg-[#E5E5EA] mx-0.5 shrink-0"></div>
                 <a href="{{ route('legal.privacy') }}" 
                    class="min-h-[44px] px-4 py-2 inline-flex items-center text-[#636366] hover:text-[#1D1D1F] transition-colors rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-[#780000]">
                     Privacy Policy
