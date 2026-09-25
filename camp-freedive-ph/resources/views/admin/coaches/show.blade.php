@@ -235,7 +235,7 @@
                             <!-- Student List & Booking Link -->
                             <div class="space-y-1.5 pt-1">
                                 <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">COACHED STUDENTS</span>
-                                <div class="divide-y divide-[#E5E5EA] border border-[#E5E5EA] rounded-xl px-3 bg-[#F2F2F7]">
+                                <div class="divide-y divide-[#E5E5EA] px-3">
                                     @foreach($assignmentsInBatch as $assignment)
                                         @php
                                             $student = $assignment->participant;

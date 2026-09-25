@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Create 2D1N Batch | Camp FreedivePH')
+@section('title', 'Create Batch | Camp FreedivePH')
 
 @section('breadcrumb')
     <a href="{{ portal_route('batches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Batches</a>
     <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-    <span class="font-bold text-[#1D1D1F]">Create Batch Schedule</span>
+    <span class="font-bold text-[#1D1D1F]">Create Batch</span>
 @endsection
 
 @section('content')
@@ -14,7 +14,7 @@
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Batch Schedule</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Batch</h1>
         </div>
     </div>
 
@@ -264,7 +264,7 @@
             <div class="flex items-center justify-end gap-3 pt-6 border-t border-[#E5E5EA]">
                 <a href="{{ route('admin.batches.index') }}" class="btn-secondary min-h-[44px] px-6 py-2.5 text-sm font-bold inline-flex items-center justify-center active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">Cancel</a>
                 <button type="submit" class="btn-primary min-h-[44px] px-8 py-2.5 text-sm font-bold inline-flex items-center justify-center active:scale-[0.99] transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-[#780000]">
-                    Create & Confirm Batch
+                    Create Batch
                 </button>
             </div>
         </form>

@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'Manual Reservation Entry | Camp FreedivePH')
+@section('title', 'Create Booking | Camp FreedivePH')
 
 @section('breadcrumb')
     <a href="{{ portal_route('bookings.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Bookings</a>
     <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
-    <span class="font-bold text-[#1D1D1F]">New Booking</span>
+    <span class="font-bold text-[#1D1D1F]">Create Booking</span>
 @endsection
 
 @section('content')
@@ -20,7 +20,7 @@
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Add Manual Reservation</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Booking</h1>
         </div>
     </div>
 
@@ -372,7 +372,7 @@
                 </a>
 
                 <button type="submit" class="btn-primary min-h-[44px] px-8 py-2.5 text-sm font-bold shadow-md inline-flex items-center justify-center active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
-                    Create & Confirm Reservation
+                    Create Booking
                 </button>
             </div>
         </div>

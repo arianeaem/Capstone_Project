@@ -8,9 +8,6 @@
         
         <!-- 404 Hero Code -->
         <div class="space-y-2">
-            <span class="font-mono text-xs sm:text-sm font-bold tracking-widest text-[#780000] uppercase block">
-                Error 404
-            </span>
             <span class="text-xs sm:text-sm font-bold text-[#6E6E73] uppercase tracking-wider block">
                 Resource Not Found
             </span>

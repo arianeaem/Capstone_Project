@@ -10,17 +10,6 @@
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Safety Monitoring</h1>
         </div>
-
-        <div class="flex items-center gap-2.5 flex-wrap">
-            <!-- Sync Forecast Cache Button -->
-            <form action="{{ route('admin.weather.sync_cache') }}" method="POST">
-                @csrf
-                <button type="submit" class="btn-primary px-3.5 py-2 text-sm font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>
-                    <span>Sync Weather Cache</span>
-                </button>
-            </form>
-        </div>
     </div>
 
     <!-- Critical / High Risk Advisory Banner -->
@@ -199,6 +188,18 @@
                             <div class="text-xs text-[#6E6E73] mt-0.5 font-medium">
                                 {{ $batch->formatted_date_range }}
                             </div>
+                            @if(!$isConcluded && isset($mlData['routed_horizon_bucket']))
+                                <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#F2F2F7] text-[#1D1D1F] border border-[#E5E5EA]">
+                                        <svg class="w-2.5 h-2.5 text-[#780000]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                        @if(!empty($mlData['is_beyond_7d']))
+                                            <span>Climatology (&gt;168h)</span>
+                                        @else
+                                            <span>ML Model: H = {{ $mlData['routed_horizon_bucket'] }}h</span>
+                                        @endif
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                         <div class="text-right shrink-0 space-y-0.5">
                             <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wide inline-block {{ $cardBadgeClass }}">

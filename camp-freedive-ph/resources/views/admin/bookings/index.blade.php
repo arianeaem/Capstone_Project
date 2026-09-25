@@ -27,7 +27,7 @@
 
             <a href="{{ route('admin.bookings.create') }}" class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold flex items-center gap-1.5 shadow-2xs">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                <span>Add Booking</span>
+                <span>Create Booking</span>
             </a>
         </div>
     </div>

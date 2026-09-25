@@ -22,7 +22,7 @@
             <a href="{{ route('admin.batches.create') }}" 
                class="btn-primary min-h-[44px] px-4 py-2.5 text-sm font-bold inline-flex items-center justify-center gap-1.5 shrink-0 shadow-2xs active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
                 <svg class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
-                <span>Add Batch</span>
+                <span>Create Batch</span>
             </a>
         </div>
     </div>

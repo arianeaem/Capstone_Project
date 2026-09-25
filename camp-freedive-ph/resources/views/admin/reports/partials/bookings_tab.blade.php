@@ -308,7 +308,7 @@
     </div>
 
     <!-- Bottom: Bookings & Guest List Table (Collapsible) -->
-    <div x-data="{ showBookingsList: true }" class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs space-y-0">
+    <div x-data="{ showBookingsList: false }" class="bg-white rounded-xl border border-[#E5E5EA] overflow-hidden shadow-2xs space-y-0">
         
         <!-- Toggle Header -->
         <button type="button" 

@@ -11,7 +11,7 @@
         .hero-box { background: #FEF2F2; background: linear-gradient(to bottom, rgba(220, 38, 38, 0.12) 0%, rgba(220, 38, 38, 0) 100%); border-radius: 12px; padding: 28px 24px; text-align: center; margin-bottom: 24px; }
         .icon-cell { display: table-cell; vertical-align: middle; text-align: center; }
         .content { padding: 24px; }
-        .status-box { color: #991B1B; margin: 20px 0; }
+        .status-box { padding: 24px; color: #991B1B; margin: 20px 0; }
         .btn { display: inline-block; background: #780000; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; text-align: center; }
         .footer-gradient { background: #380000; background: linear-gradient(180deg, #470000 0%, #220000 100%); padding: 32px 24px 28px 24px; text-align: center; color: #ffffff; }
         .footer-sub { background: #ffffff; padding: 16px 20px; text-align: center; font-size: 12px; color: #6E6E73; border-top: 1px solid #E5E5EA; }

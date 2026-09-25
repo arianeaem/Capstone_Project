@@ -69,6 +69,30 @@ class WeatherSafetyMLService
         'BEYOND_HORIZON' => 'Beyond 16-Day Forecast Horizon',
     ];
 
+    public const TRAINED_HORIZONS = [1, 6, 12, 24, 48, 72, 96, 144, 168];
+
+    /**
+     * Snap continuous lead time H = (target dive timestamp - current timestamp)
+     * to whichever of the 9 trained horizon buckets is closest to that H:
+     * [1h, 6h, 12h, 24h, 48h, 72h, 96h, 144h, 168h].
+     */
+    public static function snapToClosestHorizon(int $hours): int
+    {
+        $hInt = max(1, $hours);
+        $closest = self::TRAINED_HORIZONS[0];
+        $minDiff = abs($hInt - $closest);
+
+        foreach (self::TRAINED_HORIZONS as $h) {
+            $diff = abs($hInt - $h);
+            if ($diff < $minDiff) {
+                $minDiff = $diff;
+                $closest = $h;
+            }
+        }
+
+        return $closest;
+    }
+
     /**
      * Initializes the ML client from configuration.
      *
@@ -478,6 +502,8 @@ class WeatherSafetyMLService
             ],
             'hourly_assessments' => $raw['hourly_assessments'] ?? [],
             'generated_at' => $raw['generated_at'] ?? now()->toIso8601String(),
+            'routed_horizon_bucket' => $raw['routed_horizon_bucket'] ?? null,
+            'physics_forecast' => $raw['physics_forecast'] ?? null,
         ];
     }
 }

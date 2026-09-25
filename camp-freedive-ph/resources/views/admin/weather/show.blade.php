@@ -203,6 +203,7 @@
                 {{ \App\Services\WeatherForecastService::MEANING_MAP[$displayVerdict] ?? 'Proceed with standard camp freediving protocols.' }}
             </h3>
         </div>
+
     </div>
 
     <!-- Day 1 & Day 2 Comparative Marine Condition Panels -->
@@ -238,7 +239,7 @@
             </div>
 
             <!-- Day 1 Quick Stats -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                 <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
                     <span class="text-[#6E6E73] block uppercase font-bold">Worst Hour</span>
                     <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -253,6 +254,19 @@
                             Concluded
                         @else
                             {{ round($day1Assessment->lead_time_hours ?? 0) }}h before dive
+                        @endif
+                    </strong>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">ML Model Bucket</span>
+                    <strong class="text-sm font-extrabold text-[#780000]">
+                        @if($isConcluded)
+                            Archived
+                        @elseif(!empty($batchMLAssessment['is_beyond_7d']))
+                            Climatology (&gt;168h)
+                        @else
+                            H = {{ $batchMLAssessment['day1_routed_bucket'] ?? \App\Services\WeatherSafetyMLService::snapToClosestHorizon((int) round($day1Assessment->lead_time_hours ?? 24)) }}h Bucket
                         @endif
                     </strong>
                 </div>
@@ -391,7 +405,7 @@
             </div>
 
             <!-- Day 2 Quick Stats -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
                 <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
                     <span class="text-[#6E6E73] block uppercase font-bold">Worst Hour</span>
                     <strong class="text-sm font-extrabold text-[#1D1D1F]">
@@ -406,6 +420,19 @@
                             Concluded
                         @else
                             {{ round($day2Assessment->lead_time_hours ?? 0) }}h before dive
+                        @endif
+                    </strong>
+                </div>
+
+                <div class="p-2.5 rounded-lg bg-[#F2F2F7]">
+                    <span class="text-[#6E6E73] block uppercase font-bold">ML Model Bucket</span>
+                    <strong class="text-sm font-extrabold text-[#780000]">
+                        @if($isConcluded)
+                            Archived
+                        @elseif(!empty($batchMLAssessment['is_beyond_7d']))
+                            Climatology (&gt;168h)
+                        @else
+                            H = {{ $batchMLAssessment['day2_routed_bucket'] ?? \App\Services\WeatherSafetyMLService::snapToClosestHorizon((int) round($day2Assessment->lead_time_hours ?? 48)) }}h Bucket
                         @endif
                     </strong>
                 </div>
@@ -541,13 +568,13 @@
                         <span class="w-1.5 h-1.5 rounded-full {{ $isPrimaryActive ? 'bg-emerald-500' : 'bg-blue-500' }}"></span>
                         <span>
                             @if($isPrimaryActive)
-                                AI Safety Model
+                                Dual-Engine (Multi-Horizon ML + Heuristic Safety)
                             @elseif($isCbOpen)
-                                Backup Weather Rules
+                                Physics-Based Heuristic Safety Engine (Circuit Open)
                             @elseif($isCbHalfOpen)
-                                Reconnecting AI Model
+                                Probing ML Microservice Recovery
                             @else
-                                Backup Weather Rules
+                                Physics-Based Heuristic Safety Engine
                             @endif
                         </span>
                     </span>

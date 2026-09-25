@@ -9,9 +9,6 @@
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Settings</h1>
-            <p class="text-sm text-[#6E6E73] mt-1">
-                Manage program pricing, customer deposits, logistics add-ons, and policies.
-            </p>
         </div>
     </div>
 

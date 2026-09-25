@@ -28,7 +28,7 @@ class EnsureUserRole
                 $path = $request->path();
                 $newPath = preg_replace('#^admin#', 'owner', $path);
                 $qs = $request->getQueryString();
-                return redirect('/' . $newPath . ($qs ? '?' . $qs : ''));
+                return redirect('/' . $newPath . ($qs ? '?' . $qs : ''), 307);
             }
 
             // Smart redirection for admin accessing /owner/* (except audit logs)
@@ -39,7 +39,7 @@ class EnsureUserRole
                 $path = $request->path();
                 $newPath = preg_replace('#^owner#', 'admin', $path);
                 $qs = $request->getQueryString();
-                return redirect('/' . $newPath . ($qs ? '?' . $qs : ''));
+                return redirect('/' . $newPath . ($qs ? '?' . $qs : ''), 307);
             }
 
             abort(403, 'Unauthorized access. You do not have permission to view this section.');

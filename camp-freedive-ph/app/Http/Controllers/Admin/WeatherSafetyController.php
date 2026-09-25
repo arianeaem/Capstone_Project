@@ -129,22 +129,25 @@ class WeatherSafetyController extends Controller
                 $wRank = max(WeatherForecastService::RISK_RANK[$rec1] ?? 1, WeatherForecastService::RISK_RANK[$rec2] ?? 1);
                 $wRec = array_search($wRank, WeatherForecastService::RISK_RANK) ?: 'Safe';
                 $daysOut = $horizonInfo['days_out'] ?? max(0, Carbon::now(WeatherForecastService::TIMEZONE)->startOfDay()->diffInDays($b->start_date->copy()->startOfDay(), false));
+                $leadTimeHours = $horizonInfo['lead_time_hours'] ?? max(1, Carbon::now(WeatherForecastService::TIMEZONE)->diffInHours($b->start_date->copy()->setTime(9, 30), false));
+                $routedBucket = $d1ML['routed_horizon_bucket'] ?? WeatherSafetyMLService::snapToClosestHorizon((int) $leadTimeHours);
+                $isBeyond7d = $daysOut > 7 || ($leadTimeHours > 168);
 
-                $d1Conf = ($daysOut >= 4 || ($d1ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
-                $d2Conf = (($daysOut + 1) >= 4 || ($d2ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
-                $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $daysOut >= 4) ? 'low' : 'high';
+                $d1Conf = ($isBeyond7d || ($d1ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+                $d2Conf = (($daysOut + 1) > 7 || ($d2ML['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+                $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $isBeyond7d) ? 'low' : 'high';
 
                 $confidenceTier = match(true) {
-                    $daysOut >= 4 => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
+                    $isBeyond7d => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
                     $batchConfidence === 'low' => 'LOW_CONFIDENCE_ML_UNCERTAIN',
-                    $daysOut >= 2 => 'MODERATE_CONFIDENCE',
+                    $daysOut > 3 => 'MEDIUM_CONFIDENCE_MULTI_HORIZON',
+                    $daysOut > 1 => 'MODERATE_HIGH_CONFIDENCE',
                     default => 'HIGH_CONFIDENCE',
                 };
 
                 $servingSource = match(true) {
-                    $daysOut >= 4 => 'Batangas Climatology Fallback',
-                    $daysOut >= 2 => 'DirectTabular Multi-Step (ONNX)',
-                    default => 'ONNX C++ Ultra-Fast Engine',
+                    $isBeyond7d => 'Batangas Seasonal Climatology (> 168h)',
+                    default => "Multi-Horizon ML Regressors (H = {$routedBucket}h)",
                 };
 
                 $opStatus = ($horizonInfo['status'] === 'CONCLUDED') ? 'CONCLUDED' : ($d1ML['operational_status'] ?? $d2ML['operational_status'] ?? $horizonInfo['status']);
@@ -158,9 +161,12 @@ class WeatherSafetyController extends Controller
                     'confidence' => $batchConfidence,
                     'confidence_tier' => $confidenceTier,
                     'serving_source' => $servingSource,
-                    'confidence_advisory' => ($batchConfidence === 'low') ? "{$wRec}. Confidence is low this far out, recheck in 2 days." : null,
+                    'confidence_advisory' => ($batchConfidence === 'low') ? "{$wRec}. Lead time is beyond the 7-day multi-horizon ML boundary (168h)." : null,
                     'day1' => $d1ML,
                     'day2' => $d2ML,
+                    'lead_time_hours' => $leadTimeHours,
+                    'routed_horizon_bucket' => $routedBucket,
+                    'is_beyond_7d' => $isBeyond7d,
                     'safety_threshold_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
                     'hard_gate_triggered' => ($d1ML['safety_threshold_triggered'] ?? $d1ML['hard_gate_triggered'] ?? false) || ($d2ML['safety_threshold_triggered'] ?? $d2ML['hard_gate_triggered'] ?? false),
                 ];
@@ -402,22 +408,27 @@ class WeatherSafetyController extends Controller
 
             $horizonInfo = WeatherForecastService::getOperationalHorizon($batch);
             $daysOut = $horizonInfo['days_out'] ?? max(0, Carbon::now(WeatherForecastService::TIMEZONE)->startOfDay()->diffInDays($batch->start_date->copy()->startOfDay(), false));
+            $leadTimeHours = $horizonInfo['lead_time_hours'] ?? max(1, Carbon::now(WeatherForecastService::TIMEZONE)->diffInHours($batch->start_date->copy()->setTime(9, 30), false));
+            $d1RoutedBucket = $day1MLAssessment['routed_horizon_bucket'] ?? WeatherSafetyMLService::snapToClosestHorizon((int) $leadTimeHours);
+            $d2LeadTimeHours = max(1, $leadTimeHours + 24);
+            $d2RoutedBucket = $day2MLAssessment['routed_horizon_bucket'] ?? WeatherSafetyMLService::snapToClosestHorizon((int) $d2LeadTimeHours);
+            $isBeyond7d = $daysOut > 7 || ($leadTimeHours > 168);
 
-            $d1Conf = ($daysOut >= 4 || ($day1MLAssessment['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
-            $d2Conf = (($daysOut + 1) >= 4 || ($day2MLAssessment['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
-            $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $daysOut >= 4) ? 'low' : 'high';
+            $d1Conf = ($isBeyond7d || ($day1MLAssessment['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+            $d2Conf = (($daysOut + 1) > 7 || ($day2MLAssessment['confidence'] ?? 'high') === 'low') ? 'low' : 'high';
+            $batchConfidence = ($d1Conf === 'low' || $d2Conf === 'low' || $isBeyond7d) ? 'low' : 'high';
 
             $confidenceTier = match(true) {
-                $daysOut >= 4 => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
+                $isBeyond7d => 'LOW_CONFIDENCE_CLIMATOLOGY_BOUND',
                 $batchConfidence === 'low' => 'LOW_CONFIDENCE_ML_UNCERTAIN',
-                $daysOut >= 2 => 'MODERATE_CONFIDENCE',
+                $daysOut > 3 => 'MEDIUM_CONFIDENCE_MULTI_HORIZON',
+                $daysOut > 1 => 'MODERATE_HIGH_CONFIDENCE',
                 default => 'HIGH_CONFIDENCE',
             };
 
             $servingSource = match(true) {
-                $daysOut >= 4 => 'Batangas Climatology Fallback',
-                $daysOut >= 2 => 'DirectTabular Multi-Step (ONNX)',
-                default => 'ONNX C++ Ultra-Fast Engine',
+                $isBeyond7d => 'Batangas Seasonal Climatology (> 168h)',
+                default => "Multi-Horizon ML Regressors (H = {$d1RoutedBucket}h)",
             };
 
             $opStatus = ($horizonInfo['status'] === 'CONCLUDED') ? 'CONCLUDED' : ($day1MLAssessment['operational_status'] ?? $day2MLAssessment['operational_status'] ?? $horizonInfo['status']);
@@ -432,9 +443,13 @@ class WeatherSafetyController extends Controller
                 'confidence' => $batchConfidence,
                 'confidence_tier' => $confidenceTier,
                 'serving_source' => $servingSource,
-                'confidence_advisory' => ($batchConfidence === 'low') ? "{$worseMLRec}. Confidence is low this far out, recheck in 2 days." : null,
+                'confidence_advisory' => ($batchConfidence === 'low') ? "{$worseMLRec}. Lead time is beyond the 7-day multi-horizon ML boundary (168h)." : null,
                 'day1' => $day1MLAssessment,
                 'day2' => $day2MLAssessment,
+                'lead_time_hours' => $leadTimeHours,
+                'day1_routed_bucket' => $d1RoutedBucket,
+                'day2_routed_bucket' => $d2RoutedBucket,
+                'is_beyond_7d' => $isBeyond7d,
                 'is_authoritative_go' => ($day1MLAssessment['is_authoritative_go'] ?? false) && ($day2MLAssessment['is_authoritative_go'] ?? false),
                 'safety_threshold_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),
                 'hard_gate_triggered' => ($day1MLAssessment['safety_threshold_triggered'] ?? $day1MLAssessment['hard_gate_triggered'] ?? false) || ($day2MLAssessment['safety_threshold_triggered'] ?? $day2MLAssessment['hard_gate_triggered'] ?? false),

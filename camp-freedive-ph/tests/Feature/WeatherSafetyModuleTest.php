@@ -174,7 +174,7 @@ class WeatherSafetyModuleTest extends TestCase
 
         $responseIndex = $this->actingAs($this->admin)->get(route('admin.weather.index'));
         $responseIndex->assertStatus(200);
-        $responseIndex->assertSee('Weather & Marine Safety Monitoring');
+        $responseIndex->assertSee('Safety Monitoring');
 
         $responseShow = $this->actingAs($this->admin)->get(route('admin.weather.show', $batch));
         $responseShow->assertStatus(200);
