@@ -26,40 +26,99 @@
 
             <!-- Name -->
             @php
-                $nameParts = explode(' ', $user->name, 2);
-                $firstName = old('first_name', $nameParts[0] ?? '');
-                $lastName = old('last_name', $nameParts[1] ?? '');
+                $suffixList = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'V', 'Jr', 'Sr'];
+                $rawParts = preg_split('/\s+/', trim($user->name));
+                $parsedSuffix = '';
+                if (count($rawParts) > 1 && in_array(end($rawParts), $suffixList, true)) {
+                    $parsedSuffix = array_pop($rawParts);
+                }
+                $parsedFirst = $rawParts[0] ?? '';
+                $parsedMiddle = '';
+                $parsedLast = '';
+                if (count($rawParts) === 2) {
+                    $parsedLast = $rawParts[1];
+                } elseif (count($rawParts) > 2) {
+                    $parsedLast = array_pop($rawParts);
+                    array_shift($rawParts);
+                    $parsedMiddle = implode(' ', $rawParts);
+                }
+                $firstName = old('first_name', $parsedFirst);
+                $middleName = old('middle_name', $parsedMiddle);
+                $lastName = old('last_name', $parsedLast);
+                $suffix = old('suffix', $parsedSuffix);
+                $hasNoMiddle = old('no_middle_name', empty($middleName) ? '1' : '0') === '1';
             @endphp
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                    <label for="first_name" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
-                        First Name <span class="text-[#780000]">*</span>
-                    </label>
-                    <input type="text" 
-                           name="first_name" 
-                           id="first_name" 
-                           value="{{ $firstName }}" 
-                           required
-                           placeholder="e.g. Maria"
-                           class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
-                    @error('first_name')
-                        <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
-                    @enderror
+            <div x-data="{ noMiddleName: {{ $hasNoMiddle ? 'true' : 'false' }} }">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                    <div>
+                        <label for="first_name" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                            First Name <span class="text-[#780000]">*</span>
+                        </label>
+                        <input type="text" 
+                               name="first_name" 
+                               id="first_name" 
+                               value="{{ $firstName }}" 
+                               required
+                               placeholder="e.g. Maria Ma."
+                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                        @error('first_name')
+                            <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="middle_name" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                            Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span>
+                        </label>
+                        <input type="text" 
+                               name="middle_name" 
+                               id="middle_name" 
+                               value="{{ $middleName }}" 
+                               :disabled="noMiddleName"
+                               placeholder="Full middle name"
+                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                        <label class="inline-flex items-center gap-1.5 mt-1.5 text-xs text-[#6E6E73] cursor-pointer">
+                            <input type="checkbox" name="no_middle_name" value="1" x-model="noMiddleName" class="rounded border-[#D1D1D6] text-[#780000] focus:ring-[#780000]">
+                            <span>I do not have a legal middle name</span>
+                        </label>
+                        @error('middle_name')
+                            <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
-                <div>
-                    <label for="last_name" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
-                        Last Name <span class="text-[#780000]">*</span>
-                    </label>
-                    <input type="text" 
-                           name="last_name" 
-                           id="last_name" 
-                           value="{{ $lastName }}" 
-                           required
-                           placeholder="e.g. Santos"
-                           class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
-                    @error('last_name')
-                        <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
-                    @enderror
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div class="sm:col-span-2">
+                        <label for="last_name" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                            Last Name <span class="text-[#780000]">*</span>
+                        </label>
+                        <input type="text" 
+                               name="last_name" 
+                               id="last_name" 
+                               value="{{ $lastName }}" 
+                               required
+                               placeholder="e.g. Santos-Concepcion or De la Cruz"
+                               class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                        @error('last_name')
+                            <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="suffix" class="block font-bold text-[#1D1D1F] mb-1.5 text-sm">
+                            Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span>
+                        </label>
+                        <select name="suffix" id="suffix" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white font-medium">
+                            <option value="" {{ empty($suffix) ? 'selected' : '' }}>None</option>
+                            <option value="Jr." {{ $suffix === 'Jr.' || $suffix === 'Jr' ? 'selected' : '' }}>Jr.</option>
+                            <option value="Sr." {{ $suffix === 'Sr.' || $suffix === 'Sr' ? 'selected' : '' }}>Sr.</option>
+                            <option value="II" {{ $suffix === 'II' ? 'selected' : '' }}>II</option>
+                            <option value="III" {{ $suffix === 'III' ? 'selected' : '' }}>III</option>
+                            <option value="IV" {{ $suffix === 'IV' ? 'selected' : '' }}>IV</option>
+                            <option value="V" {{ $suffix === 'V' ? 'selected' : '' }}>V</option>
+                        </select>
+                        @error('suffix')
+                            <p class="text-sm text-[#780000] font-semibold mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
                 </div>
             </div>
 

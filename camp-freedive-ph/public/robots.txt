@@ -1,17 +1,18 @@
-# Robots.txt for Camp FreedivePH
-# Controls search engine crawler indexing
-
 User-agent: *
-# Protect private customer lookups, staff portals, and API endpoints
-Disallow: /admin/
-Disallow: /coach/
-Disallow: /manage-booking/
-Disallow: /booking/
-Disallow: /api/
-
-# Allow public landing, packages, and legal pages
 Allow: /
+Allow: /book
 Allow: /terms-and-conditions
-Allow: /terms
 Allow: /privacy-policy
-Allow: /privacy
+Allow: /manage-booking
+
+# Disallow Private & Admin Areas
+Disallow: /admin/
+Disallow: /owner/
+Disallow: /coach/
+Disallow: /login
+Disallow: /staff/
+Disallow: /api/
+Disallow: /webhooks/
+
+# Sitemap Location
+Sitemap: https://campfreedive.ph/sitemap.xml

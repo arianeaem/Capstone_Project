@@ -184,7 +184,7 @@
             <!-- Logistics and Add-ons -->
             <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-4">
                 <h3 class="text-base font-bold text-[#1D1D1F]">Transportation & Add-ons</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
                     <div class="space-y-1">
                         <span class="text-sm text-[#6E6E73] block mb-1">Transportation:</span>
                         <strong class="text-sm text-[#1D1D1F] block">
@@ -200,7 +200,15 @@
                         <strong class="text-sm text-[#1D1D1F] block">
                             {{ $booking->boat_dive ? 'Included (+₱600 / person)' : 'Not Included' }}
                         </strong>
-                        <span class="text-sm text-[#6E6E73] block mt-1">Mabini LGU pass included</span>
+                        <span class="text-sm text-[#6E6E73] block mt-1">Sanctuary exploration</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-sm text-[#6E6E73] block mb-1">Mabini LGU Pass &amp; Env. Fee:</span>
+                        <strong class="text-sm text-[#1D1D1F] block">
+                            ₱{{ number_format(($booking->lgu_fee ?? 0) + ($booking->environmental_fee ?? 0), 2) }}
+                        </strong>
+                        <span class="text-xs text-[#6E6E73] block mt-1">₱350 / head × {{ $booking->participants->count() }} pax</span>
                     </div>
                 </div>
 
@@ -212,6 +220,55 @@
                     </p>
                 </div>
                 @endif
+            </div>
+
+            <!-- Trip Cost & Payment Breakdown -->
+            <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-8 space-y-4">
+                <h3 class="text-base font-bold text-[#1D1D1F]">Trip Cost &amp; Payment Breakdown</h3>
+                <div class="space-y-2.5 text-xs sm:text-sm">
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <span>Course Package ({{ $booking->formatted_class_type }} × {{ $booking->participants->count() }} pax):</span>
+                        <strong class="text-[#1D1D1F]">₱{{ number_format($booking->subtotal, 2) }}</strong>
+                    </div>
+
+                    @if($booking->carpool_fee > 0)
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <span>Transportation (Manila Carpool Service):</span>
+                        <strong class="text-[#1D1D1F]">₱{{ number_format($booking->carpool_fee, 2) }}</strong>
+                    </div>
+                    @endif
+
+                    @if($booking->boat_dive_fee > 0)
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <span>Sanctuary Boat Dive (+₱600 / person):</span>
+                        <strong class="text-[#1D1D1F]">₱{{ number_format($booking->boat_dive_fee, 2) }}</strong>
+                    </div>
+                    @endif
+
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <div>
+                            <span class="block">Mabini LGU Pass &amp; Env. Fee:</span>
+                            <span class="text-xs text-[#8E8E93]">₱350 / head × {{ $booking->participants->count() }} pax (₱300 LGU Pass + ₱50 Env. Fee)</span>
+                        </div>
+                        <strong class="text-[#1D1D1F]">₱{{ number_format(($booking->lgu_fee ?? 0) + ($booking->environmental_fee ?? 0), 2) }}</strong>
+                    </div>
+
+                    <div class="pt-3 border-t border-[#E5E5EA] flex justify-between items-center text-sm sm:text-base">
+                        <strong class="text-[#1D1D1F]">Total Trip Cost:</strong>
+                        <strong class="text-base sm:text-lg font-black text-[#780000]">₱{{ number_format($booking->total_amount, 2) }}</strong>
+                    </div>
+
+                    <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-3 rounded-xl bg-[#F0FDF4] border border-[#DCFCE7]">
+                            <span class="text-xs text-[#166534] font-medium block">Downpayment {{ $booking->status === 'pending_downpayment' ? 'Required' : 'Paid' }}:</span>
+                            <strong class="text-sm font-bold text-[#166534]">₱{{ number_format($booking->downpayment_amount, 2) }}</strong>
+                        </div>
+                        <div class="p-3 rounded-xl bg-[#FFFBEB] border border-[#FEF3C7]">
+                            <span class="text-xs text-[#92400E] font-medium block">Balance Due at Camp:</span>
+                            <strong class="text-sm font-bold text-[#780000]">₱{{ number_format($booking->balance_amount, 2) }}</strong>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Things to Bring Checklist -->

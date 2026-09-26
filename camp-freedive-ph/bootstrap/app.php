@@ -23,9 +23,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'auth.ml_token' => \App\Http\Middleware\VerifyMLToken::class,
         ]);
 
-        $middleware->web(append: [
-            \App\Http\Middleware\RestrictGroup8Tester::class,
-        ]);
 
         $middleware->validateCsrfTokens(except: [
             'api/webhooks/paymongo',

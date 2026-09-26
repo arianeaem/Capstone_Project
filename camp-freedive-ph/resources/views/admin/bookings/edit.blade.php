@@ -11,16 +11,83 @@
 @endsection
 
 @section('content')
+@php
+    $suffixList = ['Jr.', 'Sr.', 'II', 'III', 'IV', 'V', 'Jr', 'Sr'];
+    $parseName = function($fullName) use ($suffixList) {
+        $rawParts = preg_split('/\s+/', trim($fullName ?? ''));
+        $suffix = '';
+        if (count($rawParts) > 1 && in_array(end($rawParts), $suffixList, true)) {
+            $suffix = array_pop($rawParts);
+        }
+        $first = $rawParts[0] ?? '';
+        $middle = '';
+        $last = '';
+        if (count($rawParts) === 2) {
+            $last = $rawParts[1];
+        } elseif (count($rawParts) > 2) {
+            $last = array_pop($rawParts);
+            array_shift($rawParts);
+            $middle = implode(' ', $rawParts);
+        }
+        return [
+            'first_name' => $first,
+            'middle_name' => $middle,
+            'no_middle_name' => false,
+            'last_name' => $last,
+            'suffix' => in_array($suffix, ['Jr', 'Sr']) ? $suffix . '.' : $suffix,
+            'name' => $fullName,
+        ];
+    };
+    $contactParsed = $parseName($booking->contact_name);
+@endphp
 <div class="max-w-4xl mx-auto space-y-6 text-sm"
      x-data="{
-         participants: {{ json_encode($booking->participants->map(fn($p) => [
-             'id' => $p->id,
-             'name' => $p->name,
-             'age' => $p->age,
-             'swimmer_status' => $p->swimmer_status,
-             'health_condition' => $p->health_condition,
-         ])) }},
-         pickupPoints: {{ json_encode($pickupPoints) }}
+         participants: {{ json_encode($booking->participants->map(function($p) use ($parseName) {
+             $parsed = $parseName($p->name);
+             return [
+                 'id' => $p->id,
+                 'name' => $p->name,
+                 'first_name' => $parsed['first_name'],
+                 'middle_name' => $parsed['middle_name'],
+                 'no_middle_name' => false,
+                 'last_name' => $parsed['last_name'],
+                 'suffix' => $parsed['suffix'],
+                 'age' => $p->age,
+                 'swimmer_status' => $p->swimmer_status,
+                 'health_condition' => $p->health_condition,
+             ];
+         })) }},
+         pickupPoints: {{ json_encode($pickupPoints) }},
+         contact_first_name: '{{ addslashes($contactParsed['first_name']) }}',
+         contact_middle_name: '{{ addslashes($contactParsed['middle_name']) }}',
+         contact_no_middle_name: false,
+         contact_last_name: '{{ addslashes($contactParsed['last_name']) }}',
+         contact_suffix: '{{ addslashes($contactParsed['suffix']) }}',
+         contact_name: '{{ addslashes($booking->contact_name) }}',
+         assembleParticipantName(p) {
+             const parts = [
+                 p.first_name || '',
+                 (!p.no_middle_name && p.middle_name) ? p.middle_name : '',
+                 p.last_name || '',
+                 p.suffix || ''
+             ].filter(s => s.trim().length > 0);
+             p.name = parts.join(' ');
+             return p.name;
+         },
+         assembleContactName() {
+             const parts = [
+                 this.contact_first_name || '',
+                 (!this.contact_no_middle_name && this.contact_middle_name) ? this.contact_middle_name : '',
+                 this.contact_last_name || '',
+                 this.contact_suffix || ''
+             ].filter(s => s.trim().length > 0);
+             this.contact_name = parts.join(' ');
+             return this.contact_name;
+         },
+         cleanNameInput(val) {
+             if (!val) return '';
+             return val.toString().replace(/[^\p{L}\s.'-]/gu, '');
+         }
      }">
     
     <!-- Top Header -->
@@ -112,18 +179,71 @@
                             <span class="text-sm font-mono text-[#8E8E93]" x-text="'ID: ' + (p.id || 'Existing')"></span>
                         </div>
 
+                        <input type="hidden" :name="'participants[' + index + '][name]'" :value="assembleParticipantName(p)">
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">First & Last Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" :name="'participants[' + index + '][name]'" x-model="p.name" required placeholder="First & Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">First Name <span class="text-[#780000]">*</span></label>
+                                <input type="text"
+                                       x-model="p.first_name"
+                                       @input="p.first_name = cleanNameInput(p.first_name); assembleParticipantName(p)"
+                                       placeholder="e.g. Maria Ma."
+                                       required
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                             </div>
+
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age <span class="text-[#780000]">*</span></label>
-                                <input type="number" :name="'participants[' + index + '][age]'" x-model="p.age" required min="8" max="85" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm">Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                    <label class="inline-flex items-center gap-1.5 text-xs text-[#6E6E73] cursor-pointer">
+                                        <input type="checkbox"
+                                               x-model="p.no_middle_name"
+                                               @change="if(p.no_middle_name) p.middle_name = ''; assembleParticipantName(p)"
+                                               class="rounded border-gray-300 text-[#780000] focus:ring-[#780000]/30 h-3.5 w-3.5">
+                                        <span class="text-[11px]">No middle name</span>
+                                    </label>
+                                </div>
+                                <input type="text"
+                                       x-model="p.middle_name"
+                                       :disabled="p.no_middle_name"
+                                       @input="p.middle_name = cleanNameInput(p.middle_name); assembleParticipantName(p)"
+                                       placeholder="Full middle name"
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] transition-colors disabled:bg-gray-100 disabled:text-gray-400">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="sm:col-span-2">
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
+                                <input type="text"
+                                       x-model="p.last_name"
+                                       @input="p.last_name = cleanNameInput(p.last_name); assembleParticipantName(p)"
+                                       placeholder="e.g. Santos-Concepcion or De la Cruz"
+                                       required
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                            </div>
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                <select x-model="p.suffix"
+                                        @change="assembleParticipantName(p)"
+                                        class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium focus:border-[#780000]">
+                                    <option value="">None</option>
+                                    <option value="Jr.">Jr.</option>
+                                    <option value="Sr.">Sr.</option>
+                                    <option value="II">II</option>
+                                    <option value="III">III</option>
+                                    <option value="IV">IV</option>
+                                    <option value="V">V</option>
+                                </select>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Age <span class="text-[#780000]">*</span></label>
+                                <input type="number" :name="'participants[' + index + '][age]'" x-model="p.age" required min="8" max="85" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                            </div>
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Swimming Status</label>
                                 <select :name="'participants[' + index + '][swimmer_status]'" x-model="p.swimmer_status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
@@ -132,10 +252,11 @@
                                     <option value="swimmer">Confident Swimmer</option>
                                 </select>
                             </div>
-                            <div>
-                                <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Health Condition Notes</label>
-                                <input type="text" :name="'participants[' + index + '][health_condition]'" x-model="p.health_condition" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
-                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Health Condition Notes</label>
+                            <input type="text" :name="'participants[' + index + '][health_condition]'" x-model="p.health_condition" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         </div>
                     </div>
                 </template>
@@ -146,11 +267,67 @@
         <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 space-y-4">
             <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Primary Contact</h3>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <input type="hidden" name="contact_name" :value="assembleContactName()">
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Contact Name <span class="text-[#780000]">*</span></label>
-                    <input type="text" name="contact_name" value="{{ old('contact_name', $booking->contact_name) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                    <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead First Name <span class="text-[#780000]">*</span></label>
+                    <input type="text"
+                           x-model="contact_first_name"
+                           @input="contact_first_name = cleanNameInput(contact_first_name); assembleContactName()"
+                           placeholder="Juan"
+                           required
+                           class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
                 </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm">Lead Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                        <label class="inline-flex items-center gap-1.5 text-xs text-[#6E6E73] cursor-pointer">
+                            <input type="checkbox"
+                                   x-model="contact_no_middle_name"
+                                   @change="if(contact_no_middle_name) contact_middle_name = ''; assembleContactName()"
+                                   class="rounded border-gray-300 text-[#780000] focus:ring-[#780000]/30 h-3.5 w-3.5">
+                            <span class="text-[11px]">No middle name</span>
+                        </label>
+                    </div>
+                    <input type="text"
+                           x-model="contact_middle_name"
+                           :disabled="contact_no_middle_name"
+                           @input="contact_middle_name = cleanNameInput(contact_middle_name); assembleContactName()"
+                           placeholder="Full middle name"
+                           class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] transition-colors disabled:bg-gray-100 disabled:text-gray-400">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="sm:col-span-2">
+                    <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead Last Name <span class="text-[#780000]">*</span></label>
+                    <input type="text"
+                           x-model="contact_last_name"
+                           @input="contact_last_name = cleanNameInput(contact_last_name); assembleContactName()"
+                           placeholder="Dela Cruz"
+                           required
+                           class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] focus:border-[#780000] text-sm text-[#1D1D1F] bg-white">
+                </div>
+
+                <div>
+                    <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                    <select x-model="contact_suffix"
+                            @change="assembleContactName()"
+                            class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium focus:border-[#780000]">
+                        <option value="">None</option>
+                        <option value="Jr.">Jr.</option>
+                        <option value="Sr.">Sr.</option>
+                        <option value="II">II</option>
+                        <option value="III">III</option>
+                        <option value="IV">IV</option>
+                        <option value="V">V</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                     <label class="block font-bold text-[#1D1D1F] text-sm mb-2">Email <span class="text-[#780000]">*</span></label>
                     <input type="email" name="contact_email" value="{{ old('contact_email', $booking->contact_email) }}" required class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">

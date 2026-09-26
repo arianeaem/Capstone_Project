@@ -70,16 +70,31 @@ class UserManagementController extends Controller
         $allowedRoles = $currentUser->isOwner() ? ['admin', 'coach'] : ['coach'];
 
         $validated = $request->validate([
-            'first_name' => ['nullable', 'string', 'max:120'],
-            'last_name' => ['nullable', 'string', 'max:120'],
+            'first_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'no_middle_name' => ['nullable', 'boolean'],
+            'last_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20'],
             'name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'phone' => ['required', 'string', 'max:50'],
             'role' => ['required', Rule::in($allowedRoles)],
             'temp_password' => ['nullable', 'string', 'min:8'],
+        ], [
+            'first_name.regex' => 'First name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'middle_name.regex' => 'Middle name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'last_name.regex' => 'Last name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
         ]);
 
-        $fullName = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        $first = trim($validated['first_name'] ?? '');
+        $middle = (!empty($validated['no_middle_name'])) ? '' : trim($validated['middle_name'] ?? '');
+        $last = trim($validated['last_name'] ?? '');
+        $suffix = trim($validated['suffix'] ?? '');
+        if ($suffix === 'None' || $suffix === 'none') {
+            $suffix = '';
+        }
+
+        $fullName = implode(' ', array_filter([$first, $middle, $last, $suffix]));
         if (empty($fullName)) {
             $fullName = $validated['name'] ?? '';
         }
@@ -151,17 +166,32 @@ class UserManagementController extends Controller
         $allowedRoles = $currentUser->isOwner() ? ['owner', 'admin', 'coach'] : ['coach'];
 
         $validated = $request->validate([
-            'first_name' => ['nullable', 'string', 'max:120'],
-            'last_name' => ['nullable', 'string', 'max:120'],
+            'first_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'no_middle_name' => ['nullable', 'boolean'],
+            'last_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20'],
             'name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'phone' => ['required', 'string', 'max:50'],
             'role' => ['required', Rule::in($allowedRoles)],
             'status' => ['required', 'in:active,inactive'],
             'new_password' => ['nullable', 'string', 'min:8'],
+        ], [
+            'first_name.regex' => 'First name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'middle_name.regex' => 'Middle name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'last_name.regex' => 'Last name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
         ]);
 
-        $fullName = trim(($validated['first_name'] ?? '') . ' ' . ($validated['last_name'] ?? ''));
+        $first = trim($validated['first_name'] ?? '');
+        $middle = (!empty($validated['no_middle_name'])) ? '' : trim($validated['middle_name'] ?? '');
+        $last = trim($validated['last_name'] ?? '');
+        $suffix = trim($validated['suffix'] ?? '');
+        if ($suffix === 'None' || $suffix === 'none') {
+            $suffix = '';
+        }
+
+        $fullName = implode(' ', array_filter([$first, $middle, $last, $suffix]));
         if (empty($fullName)) {
             $fullName = $validated['name'] ?? $user->name;
         }

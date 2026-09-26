@@ -946,33 +946,6 @@ class WeatherForecastService
      */
     protected function assessWindow(string $plannedDate, string $diveStart, string $diveEnd, string $windowType, ?array $overrides = null): array
     {
-        $overrideTriggered = $this->checkOverrideConditions($overrides);
-
-        // Optional Python FastAPI microservice integration if explicitly configured
-        if (config('services.forecast_engine.enabled', false)) {
-            try {
-                $serviceUrl = config('services.forecast_engine.url', 'http://127.0.0.1:8001');
-                $response = $this->apiClient->execute('ml_service', 'POST', "{$serviceUrl}/assess-booking", [
-                    'json' => [
-                        'planned_date' => $plannedDate,
-                        'dive_start' => $diveStart,
-                        'dive_end' => $diveEnd,
-                        'overrides' => $overrides,
-                        'tide_score' => 0,
-                    ],
-                    'timeout' => 1,
-                    'max_retries' => 0,
-                ]);
-
-                if ($response->successful()) {
-                    $data = $response->json();
-                    return $this->formatEngineWindowResponse($data, $windowType, $overrideTriggered);
-                }
-            } catch (Exception $e) {
-                // Fall back immediately to native cached evaluator
-            }
-        }
-
         // Native live Open-Meteo & sub-millisecond cached scoring pipeline
         return $this->evaluateWindowNatively($plannedDate, $diveStart, $diveEnd, $windowType, $overrides);
     }

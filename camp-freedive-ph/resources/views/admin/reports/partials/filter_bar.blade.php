@@ -19,7 +19,7 @@
                 <button type="button" 
                         @click="customOpen = !customOpen" 
                         class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA] flex items-center gap-2 shadow-2xs">
-                    <img src="{{ asset('icons/icons8-calendar-60 (1).png') }}" class="w-4.5 h-4.5 shrink-0" alt="Calendar">
+                    <img src="{{ asset('icons/icons8-calendar-60.png') }}" class="w-4.5 h-4.5 shrink-0" alt="Calendar">
                     <span>Custom Range</span>
                 </button>
 

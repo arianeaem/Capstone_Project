@@ -302,14 +302,20 @@ class BookingController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
             'participants' => 'required|array|min:1|max:10',
             'participants.*.name' => 'nullable|string|max:255',
-            'participants.*.first_name' => 'nullable|string|max:255',
-            'participants.*.last_name' => 'nullable|string|max:255',
+            'participants.*.first_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'participants.*.middle_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'participants.*.no_middle_name' => 'nullable|boolean',
+            'participants.*.last_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'participants.*.suffix' => ['nullable', 'string', 'max:20'],
             'participants.*.age' => 'required|integer|min:8|max:85',
             'participants.*.health_condition' => 'nullable|string|max:500',
             'participants.*.swimmer_status' => 'nullable|string|in:non_swimmer,beginner,intermediate,advanced,swimmer,casual_swimmer,confident_swimmer',
             'contact_name' => 'nullable|string|max:255',
-            'contact_first_name' => 'nullable|string|max:255',
-            'contact_last_name' => 'nullable|string|max:255',
+            'contact_first_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'contact_middle_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'contact_no_middle_name' => 'nullable|boolean',
+            'contact_last_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'contact_suffix' => ['nullable', 'string', 'max:20'],
             'contact_email' => 'required|email|max:255',
             'contact_phone' => ['required', 'string', 'regex:/^(\+?63|0)?[\s\-]?9\d{2}[\s\-]?\d{3}[\s\-]?\d{4}$/'],
             'contact_facebook' => 'nullable|string|max:255',
@@ -321,11 +327,26 @@ class BookingController extends Controller
         ], [
             'pickup_location.required_if' => 'Please select a carpool pickup location.',
             'contact_phone.regex' => 'Please enter a valid Philippine mobile number (e.g. +63 917-123-4567 or 09171234567).',
+            'participants.*.first_name.regex' => 'Participant first name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'participants.*.middle_name.regex' => 'Participant middle name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'participants.*.last_name.regex' => 'Participant last name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'contact_first_name.regex' => 'Primary contact first name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'contact_middle_name.regex' => 'Primary contact middle name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'contact_last_name.regex' => 'Primary contact last name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
         ]);
+
+        $cfn = trim($validated['contact_first_name'] ?? '');
+        $cmn = (!empty($validated['contact_no_middle_name'])) ? '' : trim($validated['contact_middle_name'] ?? '');
+        $cln = trim($validated['contact_last_name'] ?? '');
+        $csuf = trim($validated['contact_suffix'] ?? '');
+        if ($csuf === 'None' || $csuf === 'none') {
+            $csuf = '';
+        }
+        $assembledContact = implode(' ', array_filter([$cfn, $cmn, $cln, $csuf]));
 
         $contactName = !empty($validated['contact_name']) 
             ? $validated['contact_name'] 
-            : trim(($validated['contact_first_name'] ?? '') . ' ' . ($validated['contact_last_name'] ?? ''));
+            : $assembledContact;
 
         $paxCount = count($validated['participants']);
         $startDate = Carbon::parse($validated['start_date'])->format('Y-m-d');
@@ -430,9 +451,15 @@ class BookingController extends Controller
 
                     // Save individual participant health questionnaires and medical disclosures
                     foreach ($validated['participants'] as $pData) {
-                        $pName = !empty($pData['name'])
-                            ? $pData['name']
-                            : trim(($pData['first_name'] ?? '') . ' ' . ($pData['last_name'] ?? ''));
+                        $pfn = trim($pData['first_name'] ?? '');
+                        $pmn = (!empty($pData['no_middle_name'])) ? '' : trim($pData['middle_name'] ?? '');
+                        $pln = trim($pData['last_name'] ?? '');
+                        $psuf = trim($pData['suffix'] ?? '');
+                        if ($psuf === 'None' || $psuf === 'none') {
+                            $psuf = '';
+                        }
+                        $assembledPName = implode(' ', array_filter([$pfn, $pmn, $pln, $psuf]));
+                        $pName = !empty($pData['name']) ? $pData['name'] : $assembledPName;
 
                         $booking->participants()->create([
                             'name' => $pName ?: 'Participant',

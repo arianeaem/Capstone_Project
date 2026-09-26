@@ -148,10 +148,6 @@ class LoginController extends Controller
                 ->with('warning', 'Please change your temporary password before accessing your dashboard.');
         }
 
-        if (in_array($user->email, ['group8@campfreedive.ph', 'tester@campfreedive.ph'])) {
-            return redirect()->route($user->isOwner() ? 'owner.bookings.index' : 'admin.bookings.index');
-        }
-
         return match ($user->role) {
             'owner' => redirect()->intended(route('owner.dashboard')),
             'admin' => redirect()->intended(route('admin.dashboard')),

@@ -360,14 +360,39 @@
             <form action="{{ route('admin.users.store') }}" method="POST" class="space-y-3.5 text-sm">
                 @csrf
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-1.5">First Name <span class="text-[#780000]">*</span></label>
-                        <input type="text" name="first_name" required placeholder="e.g. Maria" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                <div x-data="{ noMiddleName: false }">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <label class="block font-bold text-[#1D1D1F] mb-1.5">First Name <span class="text-[#780000]">*</span></label>
+                            <input type="text" name="first_name" required placeholder="e.g. Maria Ma." class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[#1D1D1F] mb-1.5">Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                            <input type="text" name="middle_name" :disabled="noMiddleName" placeholder="Full middle name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                            <label class="inline-flex items-center gap-1.5 mt-1.5 text-xs text-[#6E6E73] cursor-pointer">
+                                <input type="checkbox" name="no_middle_name" value="1" x-model="noMiddleName" class="rounded border-[#D1D1D6] text-[#780000] focus:ring-[#780000]">
+                                <span>I do not have a legal middle name</span>
+                            </label>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block font-bold text-[#1D1D1F] mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
-                        <input type="text" name="last_name" required placeholder="e.g. Santos" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block font-bold text-[#1D1D1F] mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
+                            <input type="text" name="last_name" required placeholder="e.g. Santos-Concepcion or De la Cruz" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[#1D1D1F] mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                            <select name="suffix" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
+                                <option value="">None</option>
+                                <option value="Jr.">Jr.</option>
+                                <option value="Sr.">Sr.</option>
+                                <option value="II">II</option>
+                                <option value="III">III</option>
+                                <option value="IV">IV</option>
+                                <option value="V">V</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 

@@ -158,7 +158,7 @@ class PricingRuleEngineTest extends TestCase
         // 1. Index
         $response = $this->actingAs($owner)->get(route('admin.pricing.index'));
         $response->assertOk();
-        $response->assertSee('Dynamic Pricing Management');
+        $response->assertSee('Dynamic Pricing');
 
         // 2. Create
         $response = $this->actingAs($owner)->post(route('admin.pricing.store'), [
@@ -189,16 +189,6 @@ class PricingRuleEngineTest extends TestCase
         $response = $this->actingAs($owner)->delete(route('admin.pricing.destroy', $rule));
         $response->assertRedirect(route('admin.pricing.index'));
         $this->assertSoftDeleted('pricing_rules', ['id' => $rule->id]);
-    }
-
-    public function test_group8_tester_cannot_access_dynamic_pricing_module(): void
-    {
-        $group8 = User::where('email', 'group8@campfreedive.ph')->first();
-
-        if ($group8) {
-            $response = $this->actingAs($group8)->get(route('admin.pricing.index'));
-            $response->assertSee('bawal po gr 8 di pa sya tapos hehehehhe');
-        }
     }
 
     public function test_completed_booking_records_dynamic_price_adjustments(): void

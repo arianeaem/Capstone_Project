@@ -124,7 +124,29 @@ class BookingController extends Controller
             ['id' => 'sto_tomas', 'name' => 'Sto. Tomas SLEX Exit (Batangas) - 5:30 AM'],
         ];
 
-        return view('admin.bookings.create', compact('pickupPoints'));
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $feesData = [
+            'carpool' => (float) ($settingService->get('addons.carpool_fee_per_head') ?? $settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00),
+            'boat_dive' => (float) ($settingService->get('addons.boat_dive_fee_per_head') ?? $settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00),
+            'lgu_pass' => (float) ($settingService->get('addons.lgu_tourism_pass_fee') ?? $settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00),
+            'environmental' => (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00),
+        ];
+
+        $pricingConfig = [
+            'basePrices' => [
+                'discovery' => (float) ($settingService->get('program_pricing.discovery_price', 4250.00) ?? 4250.00),
+                'fundive_cert' => (float) ($settingService->get('program_pricing.fundive_certified_price', 2500.00) ?? 2500.00),
+                'fundive_noncert' => (float) ($settingService->get('program_pricing.fundive_non_certified_price', 3300.00) ?? 3300.00),
+                'refinement' => (float) ($settingService->get('program_pricing.refinement_price', 4100.00) ?? 4100.00),
+            ],
+            'fees' => $feesData,
+            'downpayments' => [
+                'carpool' => (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00),
+                'own_transpo' => (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00),
+            ],
+        ];
+
+        return view('admin.bookings.create', compact('pickupPoints', 'feesData', 'pricingConfig'));
     }
 
     /**
@@ -134,20 +156,34 @@ class BookingController extends Controller
     {
         $currentUser = Auth::user();
 
-        // Merge lead contact first_name and last_name if present
+        // Merge lead contact first_name, middle_name, last_name, and suffix if present
         if ($request->filled('first_name') || $request->filled('last_name')) {
-            $contactName = trim(($request->input('first_name') ?? '') . ' ' . ($request->input('last_name') ?? ''));
+            $cfn = trim($request->input('first_name') ?? '');
+            $cmn = $request->boolean('no_middle_name') ? '' : trim($request->input('middle_name') ?? '');
+            $cln = trim($request->input('last_name') ?? '');
+            $csuf = trim($request->input('suffix') ?? '');
+            if ($csuf === 'None' || $csuf === 'none') {
+                $csuf = '';
+            }
+            $contactName = implode(' ', array_filter([$cfn, $cmn, $cln, $csuf]));
             if ($contactName !== '') {
                 $request->merge(['contact_name' => $contactName]);
             }
         }
 
-        // Merge participant first_name and last_name if present
+        // Merge participant first_name, middle_name, last_name, and suffix if present
         if ($request->has('participants') && is_array($request->input('participants'))) {
             $participants = $request->input('participants');
             foreach ($participants as $i => $p) {
                 if (isset($p['first_name']) || isset($p['last_name'])) {
-                    $pName = trim(($p['first_name'] ?? '') . ' ' . ($p['last_name'] ?? ''));
+                    $pfn = trim($p['first_name'] ?? '');
+                    $pmn = !empty($p['no_middle_name']) ? '' : trim($p['middle_name'] ?? '');
+                    $pln = trim($p['last_name'] ?? '');
+                    $psuf = trim($p['suffix'] ?? '');
+                    if ($psuf === 'None' || $psuf === 'none') {
+                        $psuf = '';
+                    }
+                    $pName = implode(' ', array_filter([$pfn, $pmn, $pln, $psuf]));
                     if ($pName !== '') {
                         $participants[$i]['name'] = $pName;
                     }
@@ -214,9 +250,9 @@ class BookingController extends Controller
             $validated['is_certified_diver'] ?? false
         );
 
-        $carpoolRate = (float) ($settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
-        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
-        $lguRate = (float) ($settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
+        $carpoolRate = (float) ($settingService->get('addons.carpool_fee_per_head') ?? $settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
+        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee_per_head') ?? $settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
+        $lguRate = (float) ($settingService->get('addons.lgu_tourism_pass_fee') ?? $settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
         $envRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
 
         $subtotal = $pricePerPerson * $participantCount;
@@ -417,9 +453,9 @@ class BookingController extends Controller
             (bool)$booking->is_certified_diver
         );
 
-        $carpoolRate = (float) ($settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
-        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
-        $lguRate = (float) ($settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
+        $carpoolRate = (float) ($settingService->get('addons.carpool_fee_per_head') ?? $settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
+        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee_per_head') ?? $settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
+        $lguRate = (float) ($settingService->get('addons.lgu_tourism_pass_fee') ?? $settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
         $envRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
 
         $subtotal = $pricePerPerson * $participantCount;

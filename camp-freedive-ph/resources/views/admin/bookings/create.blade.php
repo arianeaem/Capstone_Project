@@ -12,6 +12,7 @@
 <div class="max-w-4xl mx-auto space-y-6 text-sm" 
      x-data="adminBookingCreate({
          pickupPoints: {{ json_encode($pickupPoints) }},
+         pricingConfig: {{ json_encode($pricingConfig ?? null) }},
          csrfToken: '{{ csrf_token() }}',
          checkWeatherUrl: '{{ route('api.weather.check') }}'
      })"
@@ -178,14 +179,37 @@
                                 </button>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                                 <div>
                                     <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">First Name <span class="text-[#780000]">*</span></label>
-                                    <input type="text" :name="'participants[' + index + '][first_name]'" x-model="p.first_name" required placeholder="First Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                    <input type="text" :name="'participants[' + index + '][first_name]'" x-model="p.first_name" @input="assembleParticipantName(p)" required placeholder="e.g. Maria Ma." class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                                 </div>
                                 <div>
+                                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                    <input type="text" :name="'participants[' + index + '][middle_name]'" x-model="p.middle_name" @input="assembleParticipantName(p)" :disabled="p.no_middle_name" placeholder="Full middle name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                                    <label class="inline-flex items-center gap-1.5 mt-1.5 text-xs text-[#6E6E73] cursor-pointer">
+                                        <input type="checkbox" :name="'participants[' + index + '][no_middle_name]'" value="1" x-model="p.no_middle_name" @change="if(p.no_middle_name) p.middle_name = ''; assembleParticipantName(p)" class="rounded border-[#D1D1D6] text-[#780000] focus:ring-[#780000]">
+                                        <span>I do not have a legal middle name</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-3">
+                                <div class="sm:col-span-2">
                                     <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
-                                    <input type="text" :name="'participants[' + index + '][last_name]'" x-model="p.last_name" required placeholder="Last Name" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                    <input type="text" :name="'participants[' + index + '][last_name]'" x-model="p.last_name" @input="assembleParticipantName(p)" required placeholder="e.g. Santos-Concepcion" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                    <select :name="'participants[' + index + '][suffix]'" x-model="p.suffix" @change="assembleParticipantName(p)" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium">
+                                        <option value="">None</option>
+                                        <option value="Jr.">Jr.</option>
+                                        <option value="Sr.">Sr.</option>
+                                        <option value="II">II</option>
+                                        <option value="III">III</option>
+                                        <option value="IV">IV</option>
+                                        <option value="V">V</option>
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block font-bold text-[#1D1D1F] text-xs mb-1.5">Age <span class="text-[#780000]">*</span></label>
@@ -214,16 +238,99 @@
 
             <!-- 3. Primary Contact & Transportation -->
             <div class="space-y-4">
-                <h3 class="text-base font-extrabold text-[#1D1D1F]">3. Primary Contact & Transportation</h3>
+                <div class="flex items-center justify-between pb-1 flex-wrap gap-2">
+                    <h3 class="text-base font-extrabold text-[#1D1D1F]">3. Primary Contact & Transportation</h3>
+                    <span class="text-xs text-[#6E6E73]">Primary Booker / Coordinator</span>
+                </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">First Name <span class="text-[#780000]">*</span></label>
-                        <input type="text" name="first_name" required placeholder="First Name" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+                <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm">
+                                    Lead First Name <span class="text-[#780000]">*</span>
+                                </label>
+                                <template x-if="selectedLeadIndex === 'custom'">
+                                    <button type="button" 
+                                            @click="selectedLeadIndex = 0; syncLeadContactFromParticipant()" 
+                                            class="text-xs text-[#780000] hover:underline font-semibold">
+                                        Select from participants
+                                    </button>
+                                </template>
+                            </div>
+
+                            <!-- Dropdown for Lead First Name (selecting from participants) -->
+                            <div x-show="selectedLeadIndex !== 'custom'">
+                                <select x-model="selectedLeadIndex" 
+                                        @change="onLeadSelectChange()"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium transition-colors focus:border-[#780000]">
+                                    <template x-for="(p, idx) in participants" :key="idx">
+                                        <option :value="idx" x-text="(p.first_name ? p.first_name : ('Participant #' + (idx + 1))) + (p.last_name ? ' (' + p.name + ')' : '')"></option>
+                                    </template>
+                                    <option value="custom">Other (Enter custom name...)</option>
+                                </select>
+                                <input type="hidden" name="first_name" :value="leadFirstName">
+                            </div>
+
+                            <!-- Text Input for Lead First Name (when custom is chosen) -->
+                            <div x-show="selectedLeadIndex === 'custom'" x-cloak class="space-y-1">
+                                <input type="text" 
+                                       name="first_name" 
+                                       x-model="leadFirstName" 
+                                       :required="selectedLeadIndex === 'custom'"
+                                       placeholder="e.g. Juan" 
+                                       class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white transition-colors focus:border-[#780000]">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                            <input type="text" 
+                                   name="middle_name" 
+                                   x-model="leadMiddleName" 
+                                   :disabled="leadNoMiddleName || selectedLeadIndex !== 'custom'" 
+                                   placeholder="Full middle name" 
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white disabled:bg-gray-100 disabled:text-gray-400">
+                            <label class="inline-flex items-center gap-1.5 mt-1.5 text-xs text-[#6E6E73]" :class="selectedLeadIndex !== 'custom' ? 'cursor-default pointer-events-none' : 'cursor-pointer'">
+                                <input type="checkbox" 
+                                       name="no_middle_name" 
+                                       value="1" 
+                                       x-model="leadNoMiddleName" 
+                                       :disabled="selectedLeadIndex !== 'custom'"
+                                       @change="if(leadNoMiddleName) leadMiddleName = ''" 
+                                       class="rounded border-[#D1D1D6] text-[#780000] focus:ring-[#780000] disabled:opacity-60">
+                                <span>I do not have a legal middle name</span>
+                            </label>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
-                        <input type="text" name="last_name" required placeholder="Last Name" class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                        <div class="sm:col-span-2">
+                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead Last Name <span class="text-[#780000]">*</span></label>
+                            <input type="text" 
+                                   name="last_name" 
+                                   x-model="leadLastName" 
+                                   :readonly="selectedLeadIndex !== 'custom'"
+                                   required 
+                                   placeholder="e.g. Dela Cruz or Santos-Concepcion" 
+                                   class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] transition-colors focus:border-[#780000]"
+                                   :class="selectedLeadIndex !== 'custom' ? 'bg-[#F9FAFB] cursor-default' : 'bg-white'">
+                        </div>
+                        <div>
+                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                            <select name="suffix" 
+                                    x-model="leadSuffix" 
+                                    :disabled="selectedLeadIndex !== 'custom'"
+                                    class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] font-medium disabled:bg-gray-100 disabled:text-gray-400"
+                                    :class="selectedLeadIndex !== 'custom' ? 'bg-[#F9FAFB]' : 'bg-white'">
+                                <option value="">None</option>
+                                <option value="Jr.">Jr.</option>
+                                <option value="Sr.">Sr.</option>
+                                <option value="II">II</option>
+                                <option value="III">III</option>
+                                <option value="IV">IV</option>
+                                <option value="V">V</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -324,6 +431,72 @@
                 </div>
             </div>
 
+            <!-- Booking Cost & Live Fee Summary -->
+            <div class="p-5 sm:p-6 rounded-2xl bg-[#F8F9FA] border border-[#E5E5EA] space-y-4">
+                <div class="flex items-center justify-between">
+                    <h4 class="font-extrabold text-[#1D1D1F] text-base">Booking Cost &amp; Fee Breakdown</h4>
+                    <span class="text-xs font-bold text-[#780000] bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-full" x-text="participants.length + ' Diver' + (participants.length > 1 ? 's' : '')"></span>
+                </div>
+
+                <div class="space-y-2.5 text-xs sm:text-sm border-t border-[#E5E5EA] pt-3">
+                    <!-- Course Fee -->
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <div>
+                            <span class="font-medium text-[#1D1D1F]" x-text="classType === 'discovery' ? 'Discovery Freediving Course' : (classType === 'refinement' ? 'Refinement Freediving Course' : (isCertified ? 'Fundive (Certified)' : 'Fundive (Non-Certified)'))"></span>
+                            <span class="block text-xs text-[#8E8E93]" x-text="'(₱' + formatNumber(calculateBasePriceUnit()) + ' / head × ' + participants.length + ' pax)'"></span>
+                        </div>
+                        <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
+                    </div>
+
+                    <!-- Carpool Transportation -->
+                    <div x-show="pickupOption === 'carpool'" class="flex justify-between items-center text-[#6E6E73]">
+                        <div>
+                            <span class="font-medium text-[#1D1D1F]">Transportation (Manila Carpool Service)</span>
+                            <span class="block text-xs text-[#8E8E93]" x-text="'(₱1,200 / head × ' + participants.length + ' pax)'"></span>
+                        </div>
+                        <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
+                    </div>
+
+                    <!-- Sanctuary Boat Dive -->
+                    <div x-show="boatDive" class="flex justify-between items-center text-[#6E6E73]">
+                        <div>
+                            <span class="font-medium text-[#1D1D1F]">Sanctuary Boat Dive</span>
+                            <span class="block text-xs text-[#8E8E93]" x-text="'(₱600 / head × ' + participants.length + ' pax)'"></span>
+                        </div>
+                        <span class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateBoatFee())"></span>
+                    </div>
+
+                    <!-- Mabini LGU Pass & Env. Fee -->
+                    <div class="flex justify-between items-center text-[#6E6E73]">
+                        <div>
+                            <span class="font-medium text-[#1D1D1F]">Mabini LGU Pass &amp; Env. Fee</span>
+                            <span class="block text-xs text-[#8E8E93]" x-text="'(₱350 / head × ' + participants.length + ' pax: ₱300 LGU Pass + ₱50 Env. Fee)'"></span>
+                        </div>
+                        <strong class="font-bold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateLguAndEnvFee())"></strong>
+                    </div>
+
+                    <!-- Total Amount -->
+                    <div class="flex justify-between items-center text-sm sm:text-base pt-3 border-t border-[#E5E5EA]">
+                        <span class="font-extrabold text-[#1D1D1F]">Total Trip Amount:</span>
+                        <strong class="font-black text-lg text-[#780000]" x-text="'₱' + formatNumber(calculateTotal())"></strong>
+                    </div>
+
+                    <!-- Downpayment vs Balance breakdown -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs sm:text-sm">
+                        <div class="p-3 rounded-xl bg-white border border-[#E5E5EA]">
+                            <span class="text-[#6E6E73] block mb-0.5">Required Downpayment:</span>
+                            <strong class="text-[#065F46] font-bold text-sm block" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
+                            <span class="text-[11px] text-[#6E6E73]" x-text="'(' + (pickupOption === 'carpool' ? '₱3,000' : '₱2,000') + ' / head × ' + participants.length + ' pax)'"></span>
+                        </div>
+                        <div class="p-3 rounded-xl bg-white border border-[#E5E5EA]">
+                            <span class="text-[#6E6E73] block mb-0.5">Balance Due at Camp:</span>
+                            <strong class="text-[#780000] font-bold text-sm block" x-text="'₱' + formatNumber(paymentStage === 'full' ? 0 : (calculateTotal() - calculateDownpayment()))"></strong>
+                            <span class="text-[11px] text-[#6E6E73]" x-text="paymentStage === 'full' ? 'Settled in full' : 'Payable on arrival'"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- 4. Payment Recording (Offline Reception) -->
             <div class="space-y-4">
                 <h3 class="text-base font-extrabold text-[#1D1D1F]">4. Payment Recording</h3>
@@ -384,6 +557,8 @@
 <script>
 function adminBookingCreate(config) {
     return {
+        config: config,
+        pricingConfig: config.pricingConfig || {},
         classType: 'discovery',
         isCertified: false,
         pickupOption: 'carpool',
@@ -395,12 +570,59 @@ function adminBookingCreate(config) {
         endDate: '',
         forecast: null,
         weatherLoading: false,
+        selectedLeadIndex: 0,
+        leadFirstName: '',
+        leadMiddleName: '',
+        leadNoMiddleName: false,
+        leadLastName: '',
+        leadSuffix: '',
         participants: [
-            { first_name: '', last_name: '', age: '', swimmer_status: 'non_swimmer', health_condition: '' }
+            { first_name: '', middle_name: '', no_middle_name: false, last_name: '', suffix: '', name: '', age: '', swimmer_status: 'non_swimmer', health_condition: '' }
         ],
 
         initForm() {
-            // Default trip start date to none
+            this.syncLeadContactFromParticipant();
+        },
+
+        assembleParticipantName(p) {
+            const parts = [
+                p.first_name || '',
+                (!p.no_middle_name && p.middle_name) ? p.middle_name : '',
+                p.last_name || '',
+                p.suffix || ''
+            ].filter(s => s.trim().length > 0);
+            p.name = parts.join(' ');
+
+            const pIdx = this.participants.indexOf(p);
+            if (this.participants.length === 1 || parseInt(this.selectedLeadIndex, 10) === pIdx) {
+                this.syncLeadContactFromParticipant();
+            }
+            return p.name;
+        },
+
+        syncLeadContactFromParticipant() {
+            if (this.participants.length === 1) {
+                this.selectedLeadIndex = 0;
+            }
+            if (this.selectedLeadIndex === 'custom') {
+                return;
+            }
+            const idx = parseInt(this.selectedLeadIndex, 10);
+            if (!isNaN(idx) && this.participants[idx]) {
+                const p = this.participants[idx];
+                this.leadFirstName = p.first_name || '';
+                this.leadMiddleName = p.middle_name || '';
+                this.leadNoMiddleName = !!p.no_middle_name;
+                this.leadLastName = p.last_name || '';
+                this.leadSuffix = p.suffix || '';
+            }
+        },
+
+        onLeadSelectChange() {
+            if (this.selectedLeadIndex === 'custom') {
+                return;
+            }
+            this.syncLeadContactFromParticipant();
         },
 
         async onStartDateChange() {
@@ -483,17 +705,92 @@ function adminBookingCreate(config) {
         addParticipant() {
             this.participants.push({
                 first_name: '',
+                middle_name: '',
+                no_middle_name: false,
                 last_name: '',
+                suffix: '',
+                name: '',
                 age: '',
                 swimmer_status: 'non_swimmer',
                 health_condition: ''
             });
+            if (this.participants.length === 1) {
+                this.selectedLeadIndex = 0;
+                this.syncLeadContactFromParticipant();
+            }
         },
 
         removeParticipant(index) {
             if (this.participants.length > 1) {
                 this.participants.splice(index, 1);
+                if (this.participants.length === 1 || parseInt(this.selectedLeadIndex, 10) === index) {
+                    this.selectedLeadIndex = 0;
+                    this.syncLeadContactFromParticipant();
+                } else if (this.selectedLeadIndex > index && this.selectedLeadIndex !== 'custom') {
+                    this.selectedLeadIndex--;
+                }
             }
+        },
+
+        calculateBasePriceUnit() {
+            const basePrices = (this.pricingConfig && this.pricingConfig.basePrices) ? this.pricingConfig.basePrices : {
+                discovery: 4250,
+                fundive_cert: 2500,
+                fundive_noncert: 3300,
+                refinement: 4100
+            };
+            let price = basePrices.discovery || 4250;
+            if (this.classType === 'fundive') {
+                price = this.isCertified ? (basePrices.fundive_cert || 2500) : (basePrices.fundive_noncert || 3300);
+            } else if (this.classType === 'refinement') {
+                price = basePrices.refinement || 4100;
+            }
+            return price;
+        },
+
+        calculateSubtotal() {
+            return this.calculateBasePriceUnit() * this.participants.length;
+        },
+
+        calculateCarpoolFee() {
+            const carpoolFee = (this.pricingConfig && this.pricingConfig.fees && this.pricingConfig.fees.carpool) ? this.pricingConfig.fees.carpool : 1200;
+            return this.pickupOption === 'carpool' ? (carpoolFee * this.participants.length) : 0;
+        },
+
+        calculateBoatFee() {
+            const boatFee = (this.pricingConfig && this.pricingConfig.fees && this.pricingConfig.fees.boat_dive) ? this.pricingConfig.fees.boat_dive : 600;
+            return this.boatDive ? (boatFee * this.participants.length) : 0;
+        },
+
+        calculateLguFee() {
+            const lguFee = (this.pricingConfig && this.pricingConfig.fees && this.pricingConfig.fees.lgu_pass) ? this.pricingConfig.fees.lgu_pass : 300;
+            return lguFee * this.participants.length;
+        },
+
+        calculateEnvironmentalFee() {
+            const envFee = (this.pricingConfig && this.pricingConfig.fees && this.pricingConfig.fees.environmental) ? this.pricingConfig.fees.environmental : 50;
+            return envFee * this.participants.length;
+        },
+
+        calculateLguAndEnvFee() {
+            return this.calculateLguFee() + this.calculateEnvironmentalFee();
+        },
+
+        calculateTotal() {
+            return this.calculateSubtotal() + this.calculateCarpoolFee() + this.calculateBoatFee() + this.calculateLguAndEnvFee();
+        },
+
+        calculateDownpayment() {
+            const total = this.calculateTotal();
+            const count = this.participants.length;
+            const carpoolDp = (this.pricingConfig && this.pricingConfig.downpayments && this.pricingConfig.downpayments.carpool) ? this.pricingConfig.downpayments.carpool : 3000;
+            const ownTranspoDp = (this.pricingConfig && this.pricingConfig.downpayments && this.pricingConfig.downpayments.own_transpo) ? this.pricingConfig.downpayments.own_transpo : 2000;
+            const dpPerHead = (this.pickupOption === 'carpool') ? carpoolDp : ownTranspoDp;
+            return Math.min(dpPerHead * count, total);
+        },
+
+        formatNumber(num) {
+            return (num || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
     };
 }

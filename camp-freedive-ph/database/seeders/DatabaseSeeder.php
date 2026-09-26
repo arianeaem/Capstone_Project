@@ -123,18 +123,6 @@ class DatabaseSeeder extends Seeder
             'last_login_at' => now(),
         ]);
 
-        // 2b. Peer Reviewer / Tester Account (Group 8)
-        $tester = User::create([
-            'name' => 'Group 8 Peer Tester',
-            'email' => 'group8@campfreedive.ph',
-            'phone' => '0917 000 0008',
-            'password' => Hash::make('Password123!'),
-            'role' => 'admin',
-            'status' => 'active',
-            'must_change_password' => false,
-            'email_verified_at' => now(),
-            'last_login_at' => now(),
-        ]);
 
         // 3. Senior Freediving Coach (Jose Reyes - AIDA 4 / Molchanovs W2)
         $coachJose = User::create([
@@ -217,7 +205,6 @@ class DatabaseSeeder extends Seeder
         // Log Initial Account Provisioning Audits
         AuditLogger::log('USER_CREATED', 'Founder & Owner account initialized: Antonio Mercado (owner@campfreedive.ph)', $owner, 'System Seeder');
         AuditLogger::log('USER_CREATED', 'Admin Coordinator provisioned: Maria Santos (admin@campfreedive.ph)', $admin, 'Antonio Mercado');
-        AuditLogger::log('USER_CREATED', 'Peer Evaluator tester account provisioned: group8@campfreedive.ph', $tester, 'System Seeder');
         AuditLogger::log('USER_CREATED', 'Coach provisioned: Jose Reyes (coach.jose@campfreedive.ph)', $coachJose, 'Maria Santos');
         AuditLogger::log('USER_CREATED', 'Coach provisioned: Mary Grace Bautista (coach.mary@campfreedive.ph)', $coachMary, 'Maria Santos');
         AuditLogger::log('USER_CREATED', 'Coach provisioned: Michael Cruz (coach.michael@campfreedive.ph)', $coachMichael, 'Maria Santos');

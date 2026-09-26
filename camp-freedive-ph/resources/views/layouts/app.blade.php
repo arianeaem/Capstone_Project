@@ -152,7 +152,13 @@
 
                     <!-- Location Address -->
                     <div class="text-sm text-[#D1D1D6]">
-                        <span>The Shack Hideaway by Mayumi Resort, located along the National Road in Barangay Bagalangit, Mabini, Batangas, Philippines.</span>
+                        <a href="https://maps.app.goo.gl/xJ1iSQbwETsdgzf37" 
+                           target="_blank" 
+                           rel="noopener noreferrer" 
+                           class="hover:text-white hover:underline transition-colors inline-block"
+                           aria-label="View The Shack Hideaway on Google Maps (opens in a new tab)">
+                            The Shack Hideaway by Mayumi Resort, located along the National Road in Barangay Bagalangit, Mabini, Batangas, Philippines.
+                        </a>
                     </div>
                 </div>
 

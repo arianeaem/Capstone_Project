@@ -89,6 +89,14 @@
                         </td>
                     </tr>
 
+                    <tr style="border: none !important; border-bottom: none !important;">
+                        <th style="border: none !important; border-bottom: none !important; padding: 10px 6px; text-align: left; color: #6E6E73; font-weight: 600; width: 28%; vertical-align: top;">Mabini LGU Pass &amp; Env. Fee</th>
+                        <td style="border: none !important; border-bottom: none !important; padding: 10px 6px; text-align: left; vertical-align: top;">
+                            ₱{{ number_format(($booking->lgu_fee ?? 0) + ($booking->environmental_fee ?? 0), 2) }}
+                            <span style="font-size: 12px; color: #6E6E73; display: block;">(₱350 / head × {{ $booking->participants ? $booking->participants->count() : 1 }} pax)</span>
+                        </td>
+                    </tr>
+
                     <tr class="total-row" style="border: none !important; border-bottom: none !important;">
                         <th style="border: none !important; border-bottom: none !important; padding: 10px 6px; text-align: left; width: 28%; color: #1D1D1F; font-weight: 700; vertical-align: top;">Total Trip Cost</th>
                         <td style="border: none !important; border-bottom: none !important; padding: 10px 6px; text-align: left; color: #1D1D1F; font-weight: 700; vertical-align: top;">₱{{ number_format($booking->total_amount, 2) }}</td>

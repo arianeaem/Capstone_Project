@@ -63,6 +63,7 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($this->admin)->post(route('admin.users.store'), [
             'name' => 'Juan Dela Cruz',
             'email' => 'juan.delacruz@test.ph',
+            'phone' => '09170001122',
             'role' => 'coach',
             'temp_password' => 'CustomTemp123!',
         ]);
@@ -124,6 +125,7 @@ class UserManagementTest extends TestCase
         $response = $this->actingAs($this->owner)->put(route('admin.users.update', $this->coach), [
             'name' => $this->coach->name,
             'email' => $this->coach->email,
+            'phone' => $this->coach->phone ?? '09170001122',
             'role' => 'coach',
             'status' => 'active',
             'new_password' => 'NewTempResetPass123!',
@@ -138,5 +140,60 @@ class UserManagementTest extends TestCase
 
         $this->coach->refresh();
         $this->assertTrue($this->coach->must_change_password);
+    }
+
+    public function test_user_provisioning_supports_filipino_spanish_characters_and_name_components()
+    {
+        $response = $this->actingAs($this->owner)->post(route('admin.users.store'), [
+            'first_name' => 'Maria Ma.',
+            'middle_name' => 'Nuñez',
+            'last_name' => 'Santos-Concepcion',
+            'suffix' => 'Jr.',
+            'email' => 'maria.santosconcepcion@test.ph',
+            'phone' => '09171112244',
+            'role' => 'coach',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $newUser = User::where('email', 'maria.santosconcepcion@test.ph')->first();
+        $this->assertNotNull($newUser);
+        $this->assertEquals('Maria Ma. Nuñez Santos-Concepcion Jr.', $newUser->name);
+    }
+
+    public function test_user_provisioning_with_no_middle_name_toggle()
+    {
+        $response = $this->actingAs($this->owner)->post(route('admin.users.store'), [
+            'first_name' => 'John Christopher Michael',
+            'middle_name' => 'ShouldBeIgnored',
+            'no_middle_name' => 1,
+            'last_name' => 'De la Cruz',
+            'suffix' => 'III',
+            'email' => 'john.delacruz@test.ph',
+            'phone' => '09171112255',
+            'role' => 'coach',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $newUser = User::where('email', 'john.delacruz@test.ph')->first();
+        $this->assertNotNull($newUser);
+        $this->assertEquals('John Christopher Michael De la Cruz III', $newUser->name);
+    }
+
+    public function test_user_update_with_filipino_name_conventions()
+    {
+        $response = $this->actingAs($this->owner)->put(route('admin.users.update', $this->coach), [
+            'first_name' => 'Mary-Ann',
+            'middle_name' => 'Santo Niño',
+            'last_name' => 'Nuñez',
+            'suffix' => '',
+            'email' => $this->coach->email,
+            'phone' => '09170001122',
+            'role' => 'coach',
+            'status' => 'active',
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $this->coach->refresh();
+        $this->assertEquals('Mary-Ann Santo Niño Nuñez', $this->coach->name);
     }
 }

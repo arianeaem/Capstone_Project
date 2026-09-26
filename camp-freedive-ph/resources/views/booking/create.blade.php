@@ -956,13 +956,13 @@
                                     </div>
 
                                     <!-- Participant Name -->
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
                                         <div>
                                             <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">First Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
                                                    x-model="participant.first_name" 
-                                                   @input="participant.first_name = participant.first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = (participant.first_name + ' ' + (participant.last_name || '')).trim()"
-                                                   placeholder="e.g. Maria" 
+                                                   @input="participant.first_name = cleanNameInput(participant.first_name); assembleParticipantName(participant)"
+                                                   placeholder="e.g. Maria Ma." 
                                                    autocomplete="given-name"
                                                    autocapitalize="words"
                                                    spellcheck="false"
@@ -971,16 +971,38 @@
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateName(participant.first_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                             <span :id="'err-participant-fn-' + index" x-show="touchedStep3 && !validateName(participant.first_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
-                                                Please enter a valid first name (letters only, min 2 chars).
+                                                Please enter a valid first name (letters, hyphens, periods).
                                             </span>
                                         </div>
 
                                         <div>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                            <input type="text" 
+                                                   x-model="participant.middle_name" 
+                                                   :disabled="participant.no_middle_name"
+                                                   @input="participant.middle_name = cleanNameInput(participant.middle_name); assembleParticipantName(participant)"
+                                                   placeholder="Full middle name" 
+                                                   autocomplete="additional-name"
+                                                   autocapitalize="words"
+                                                   spellcheck="false"
+                                                   class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors border-[#D1D1D6] focus:border-[#780000] disabled:bg-gray-100 disabled:text-gray-400">
+                                            <label class="inline-flex items-center gap-1.5 mt-1.5 text-xs text-[#6E6E73] cursor-pointer">
+                                                <input type="checkbox" 
+                                                       x-model="participant.no_middle_name" 
+                                                       @change="if(participant.no_middle_name) participant.middle_name = ''; assembleParticipantName(participant)"
+                                                       class="rounded border-[#D1D1D6] text-[#780000] focus:ring-[#780000]">
+                                                <span>I do not have a legal middle name</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                                        <div class="sm:col-span-2">
                                             <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Last Name <span class="text-[#780000]">*</span></label>
                                             <input type="text" 
                                                    x-model="participant.last_name" 
-                                                   @input="participant.last_name = participant.last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); participant.name = ((participant.first_name || '') + ' ' + participant.last_name).trim()"
-                                                   placeholder="e.g. Santos" 
+                                                   @input="participant.last_name = cleanNameInput(participant.last_name); assembleParticipantName(participant)"
+                                                   placeholder="e.g. Santos-Concepcion or De la Cruz" 
                                                    autocomplete="family-name"
                                                    autocapitalize="words"
                                                    spellcheck="false"
@@ -989,8 +1011,23 @@
                                                    class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
                                                    :class="touchedStep3 && !validateName(participant.last_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
                                             <span :id="'err-participant-ln-' + index" x-show="touchedStep3 && !validateName(participant.last_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
-                                                Please enter a valid last name (letters only, min 2 chars).
+                                                Please enter a valid last name (letters, hyphens, spaces).
                                             </span>
+                                        </div>
+
+                                        <div>
+                                            <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                            <select x-model="participant.suffix" 
+                                                    @change="assembleParticipantName(participant)"
+                                                    class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium focus:border-[#780000]">
+                                                <option value="">None</option>
+                                                <option value="Jr.">Jr.</option>
+                                                <option value="Sr.">Sr.</option>
+                                                <option value="II">II</option>
+                                                <option value="III">III</option>
+                                                <option value="IV">IV</option>
+                                                <option value="V">V</option>
+                                            </select>
                                         </div>
                                     </div>
 
@@ -1041,44 +1078,118 @@
 
                     <!-- Contact Details -->
                     <div class="space-y-4 pt-1">
-                        <h4 class="text-base sm:text-lg font-bold text-[#1D1D1F] pb-1">2. Contact Information</h4>
-                        
+                        <div class="flex items-center justify-between pb-1 flex-wrap gap-2">
+                            <h4 class="text-base sm:text-lg font-bold text-[#1D1D1F]">2. Contact Information</h4>
+                            <span class="text-xs text-[#6E6E73]">Primary Booker / Coordinator</span>
+                        </div>
+
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
-                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead First Name <span class="text-[#780000]">*</span></label>
-                                <input type="text" 
-                                       x-model="form.contact_first_name" 
-                                       @input="form.contact_first_name = form.contact_first_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = (form.contact_first_name + ' ' + (form.contact_last_name || '')).trim()"
-                                       placeholder="Juan" 
-                                       autocomplete="given-name"
-                                       autocapitalize="words"
-                                       spellcheck="false"
-                                       :aria-invalid="touchedStep3 && !validateName(form.contact_first_name)"
-                                       aria-describedby="err-lead-fn"
-                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
-                                <span id="err-lead-fn" x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
-                                    Please enter a valid first name (min 2 chars).
-                                </span>
+                                <div class="flex items-center justify-between mb-1.5">
+                                    <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm">
+                                        Lead First Name <span class="text-[#780000]">*</span>
+                                    </label>
+                                    <template x-if="form.selected_lead_participant === 'custom'">
+                                        <button type="button" 
+                                                @click="form.selected_lead_participant = 0; syncLeadContactFromParticipant()" 
+                                                class="text-xs text-[#780000] hover:underline font-semibold">
+                                            Select from participants
+                                        </button>
+                                    </template>
+                                </div>
+
+                                <!-- Dropdown for Lead First Name (selecting from participants) -->
+                                <div x-show="form.selected_lead_participant !== 'custom'">
+                                    <select x-model="form.selected_lead_participant" 
+                                            @change="onLeadParticipantChange()"
+                                            class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white font-medium transition-colors focus:border-[#780000]">
+                                        <template x-for="(p, idx) in form.participants" :key="idx">
+                                            <option :value="idx" x-text="(p.first_name ? p.first_name : ('Participant #' + (idx + 1))) + (p.last_name ? ' (' + p.name + ')' : '')"></option>
+                                        </template>
+                                        <option value="custom">Other (Enter custom name...)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Text Input for Lead First Name (when custom is chosen) -->
+                                <div x-show="form.selected_lead_participant === 'custom'" x-cloak class="space-y-1">
+                                    <input type="text" 
+                                           x-model="form.contact_first_name" 
+                                           @input="form.contact_first_name = cleanNameInput(form.contact_first_name); assembleContactName()"
+                                           placeholder="Juan" 
+                                           autocomplete="given-name"
+                                           autocapitalize="words"
+                                           spellcheck="false"
+                                           :aria-invalid="touchedStep3 && !validateName(form.contact_first_name)"
+                                           aria-describedby="err-lead-fn"
+                                           class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
+                                           :class="touchedStep3 && !validateName(form.contact_first_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                    <span id="err-lead-fn" x-show="touchedStep3 && !validateName(form.contact_first_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
+                                        Please enter a valid first name (letters, hyphens, periods).
+                                    </span>
+                                </div>
                             </div>
 
                             <div>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead Middle Name <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                <input type="text" 
+                                       x-model="form.contact_middle_name" 
+                                       :disabled="form.contact_no_middle_name || form.selected_lead_participant !== 'custom'"
+                                       @input="form.contact_middle_name = cleanNameInput(form.contact_middle_name); assembleContactName()"
+                                       placeholder="Full middle name" 
+                                       autocomplete="additional-name"
+                                       autocapitalize="words"
+                                       spellcheck="false"
+                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] transition-colors border-[#D1D1D6] focus:border-[#780000] disabled:bg-gray-100 disabled:text-gray-400">
+                                <label class="inline-flex items-center gap-1.5 mt-1.5 text-xs text-[#6E6E73]" :class="form.selected_lead_participant !== 'custom' ? 'cursor-default pointer-events-none' : 'cursor-pointer'">
+                                    <input type="checkbox" 
+                                           x-model="form.contact_no_middle_name" 
+                                           :disabled="form.selected_lead_participant !== 'custom'"
+                                           @change="if(form.contact_no_middle_name) form.contact_middle_name = ''; assembleContactName()"
+                                           class="rounded border-[#D1D1D6] text-[#780000] focus:ring-[#780000] disabled:opacity-60">
+                                    <span>I do not have a legal middle name</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div class="sm:col-span-2">
                                 <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Lead Last Name <span class="text-[#780000]">*</span></label>
                                 <input type="text" 
                                        x-model="form.contact_last_name" 
-                                       @input="form.contact_last_name = form.contact_last_name.replace(/[^a-zA-Z\s\.\'\-]/g, ''); form.contact_name = ((form.contact_first_name || '') + ' ' + form.contact_last_name).trim()"
+                                       :readonly="form.selected_lead_participant !== 'custom'"
+                                       @input="form.contact_last_name = cleanNameInput(form.contact_last_name); assembleContactName()"
                                        placeholder="Dela Cruz" 
                                        autocomplete="family-name"
                                        autocapitalize="words"
                                        spellcheck="false"
                                        :aria-invalid="touchedStep3 && !validateName(form.contact_last_name)"
                                        aria-describedby="err-lead-ln"
-                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] bg-white transition-colors"
-                                       :class="touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]'">
+                                       class="w-full px-3.5 py-2.5 rounded-xl border text-sm text-[#1D1D1F] transition-colors"
+                                       :class="(touchedStep3 && !validateName(form.contact_last_name) ? 'border-[#D70015] bg-red-50/20' : 'border-[#D1D1D6] focus:border-[#780000]') + (form.selected_lead_participant !== 'custom' ? ' bg-[#F9FAFB] cursor-default' : ' bg-white')">
                                 <span id="err-lead-ln" x-show="touchedStep3 && !validateName(form.contact_last_name)" class="text-xs text-[#D70015] font-semibold mt-1 block">
-                                    Please enter a valid last name (min 2 chars).
+                                    Please enter a valid last name (letters, hyphens, spaces).
                                 </span>
                             </div>
+
+                            <div>
+                                <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Suffix <span class="text-xs font-normal text-[#6E6E73]">(Optional)</span></label>
+                                <select x-model="form.contact_suffix" 
+                                        :disabled="form.selected_lead_participant !== 'custom'"
+                                        @change="assembleContactName()"
+                                        class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] font-medium focus:border-[#780000] disabled:bg-gray-100 disabled:text-gray-400"
+                                        :class="form.selected_lead_participant !== 'custom' ? 'bg-[#F9FAFB]' : 'bg-white'">
+                                    <option value="">None</option>
+                                    <option value="Jr.">Jr.</option>
+                                    <option value="Sr.">Sr.</option>
+                                    <option value="II">II</option>
+                                    <option value="III">III</option>
+                                    <option value="IV">IV</option>
+                                    <option value="V">V</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
                             <div>
                                 <label class="block font-bold text-[#1D1D1F] text-xs sm:text-sm mb-1.5">Email Address <span class="text-[#780000]">*</span></label>
@@ -1283,19 +1394,22 @@
 
                             <div x-show="form.boat_dive" class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
                                 <span>Boat Dive (₱{{ number_format($feesData['boat_dive'] ?? 600) }} × <span x-text="form.participants.length"></span>)</span>
-                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber((config.pricingConfig?.fees?.boat_dive || 600) * form.participants.length)"></span>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateBoatFee())"></span>
                             </div>
 
                             <div class="flex justify-between items-center gap-2 text-[#1D1D1F] font-semibold">
-                                <span>Mabini LGU Pass &amp; Env. Fee</span>
-                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(((config.pricingConfig?.fees?.lgu_pass || 300) + (config.pricingConfig?.fees?.environmental || 50)) * form.participants.length)"></span>
+                                <div>
+                                    <span>Mabini LGU Pass &amp; Env. Fee</span>
+                                    <span class="text-[11px] text-[#6E6E73] font-normal block">(₱350 / head × <span x-text="form.participants.length"></span> pax)</span>
+                                </div>
+                                <span class="font-extrabold text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateLguAndEnvFee())"></span>
                             </div>
 
                             <!-- Downpayment Due Now (No background color) -->
                             <div class="pt-2.5 border-t border-[#E5E5EA] flex justify-between items-center gap-2">
                                 <div class="min-w-0">
                                     <span class="font-bold text-[#1D1D1F] block text-xs sm:text-sm leading-tight">Downpayment Due Now</span>
-                                    <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? ('₱' + formatNumber(config.pricingConfig?.downpayments?.carpool || 3000)) : ('₱' + formatNumber(config.pricingConfig?.downpayments?.own_transpo || 2000))) + ' / head)'"></span>
+                                    <span class="text-[11px] sm:text-xs text-[#6E6E73] font-medium block mt-0.5" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000.00' : '₱2,000.00') + ' / head × ' + form.participants.length + ' pax)'"></span>
                                 </div>
                                 <span class="text-sm sm:text-base font-black text-[#1D1D1F] shrink-0 text-right" x-text="'₱' + formatNumber(calculateDownpayment())"></span>
                             </div>
@@ -1372,6 +1486,25 @@
                                 <span class="font-medium text-[#1D1D1F]" x-text="formatDateDisplay(form.start_date) + ' - ' + formatDateDisplay(form.end_date)"></span>
                             </div>
                             <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <span>Course Subtotal</span>
+                                <span class="font-medium text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateSubtotal())"></span>
+                            </div>
+                            <div x-show="form.pickup_option === 'carpool'" class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <span>Transportation (Manila Carpool)</span>
+                                <span class="font-medium text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateCarpoolFee())"></span>
+                            </div>
+                            <div x-show="form.boat_dive" class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <span>Sanctuary Boat Dive</span>
+                                <span class="font-medium text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateBoatFee())"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-[#6E6E73]">
+                                <div>
+                                    <span class="block">Mabini LGU Pass &amp; Env. Fee</span>
+                                    <span class="text-xs text-[#8E8E93]" x-text="'(₱350 / head × ' + form.participants.length + ' pax)'"></span>
+                                </div>
+                                <span class="font-semibold text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateLguAndEnvFee())"></span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-[#6E6E73] pt-2 border-t border-[#E5E5EA]">
                                 <span>Total Trip Cost</span>
                                 <strong class="text-[#1D1D1F]" x-text="'₱' + formatNumber(calculateTotal())"></strong>
                             </div>
@@ -1381,10 +1514,10 @@
                             </div>
 
                             <!-- Downpayment Highlight -->
-                            <div class="pt-3 flex justify-between items-center gap-2">
+                            <div class="pt-3 flex justify-between items-center gap-2 border-t border-[#E5E5EA]">
                                 <div>
                                     <span class="font-bold text-[#065F46] text-sm block">Downpayment Due Now:</span>
-                                    <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? ('₱' + formatNumber(config.pricingConfig?.downpayments?.carpool || 3000)) : ('₱' + formatNumber(config.pricingConfig?.downpayments?.own_transpo || 2000))) + ' / head × ' + form.participants.length + ' pax)'"></span>
+                                    <span class="text-xs text-[#065F46]" x-text="'(' + (form.pickup_option === 'carpool' ? '₱3,000.00' : '₱2,000.00') + ' / head × ' + form.participants.length + ' pax)'"></span>
                                 </div>
                                 <strong class="text-2xl font-black text-[#065F46]" x-text="'₱' + formatNumber(calculateDownpayment())"></strong>
                             </div>
@@ -1591,6 +1724,10 @@
                                 <span class="text-[#6E6E73] shrink-0">Transportation:</span>
                                 <span class="font-bold text-[#1D1D1F] text-right" x-text="form.pickup_option === 'carpool' ? form.pickup_location : 'Own Transportation'"></span>
                             </div>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-[#6E6E73] shrink-0">Mabini LGU Pass &amp; Env. Fee:</span>
+                                <span class="font-bold text-[#1D1D1F] text-right" x-text="'₱' + formatNumber((confirmedBooking.lgu_fee !== undefined && confirmedBooking.environmental_fee !== undefined) ? ((Number(confirmedBooking.lgu_fee) || 0) + (Number(confirmedBooking.environmental_fee) || 0)) : calculateLguAndEnvFee())"></span>
+                            </div>
                             <div class="flex justify-between items-center gap-2">
                                 <span class="text-[#6E6E73]">Downpayment Paid:</span>
                                 <span class="font-bold text-[#065F46]" x-text="'₱' + formatNumber(confirmedBooking.downpayment_paid)"></span>
@@ -1715,6 +1852,7 @@
 // TODO: Implement Web Worker background sync for offline draft storage in IndexedDB.
 function bookingForm(config) {
     return {
+        config: config,
         currentStep: config.initialStep || 1,
         shortStepTitles: [
             "Class",
@@ -1738,10 +1876,14 @@ function bookingForm(config) {
             start_date: '',
             end_date: '',
             participants: [
-                { first_name: '', last_name: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
+                { first_name: '', middle_name: '', no_middle_name: false, last_name: '', suffix: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
             ],
+            selected_lead_participant: 0,
             contact_first_name: '',
+            contact_middle_name: '',
+            contact_no_middle_name: false,
             contact_last_name: '',
+            contact_suffix: '',
             contact_name: '',
             contact_email: '',
             contact_phone: '',
@@ -2015,10 +2157,13 @@ function bookingForm(config) {
 
                         if (!Array.isArray(this.form.participants) || this.form.participants.length === 0) {
                             this.form.participants = [
-                                { first_name: '', last_name: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
+                                { first_name: '', middle_name: '', no_middle_name: false, last_name: '', suffix: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
                             ];
                         } else {
                             this.form.participants.forEach(p => {
+                                if (p.middle_name === undefined) p.middle_name = '';
+                                if (p.no_middle_name === undefined) p.no_middle_name = false;
+                                if (p.suffix === undefined) p.suffix = '';
                                 if (!p.first_name && p.name) {
                                     const parts = p.name.trim().split(/\s+/);
                                     p.first_name = parts[0] || '';
@@ -2027,10 +2172,20 @@ function bookingForm(config) {
                             });
                         }
 
+                        if (this.form.contact_middle_name === undefined) this.form.contact_middle_name = '';
+                        if (this.form.contact_no_middle_name === undefined) this.form.contact_no_middle_name = false;
+                        if (this.form.contact_suffix === undefined) this.form.contact_suffix = '';
                         if (!this.form.contact_first_name && this.form.contact_name) {
                             const parts = this.form.contact_name.trim().split(/\s+/);
                             this.form.contact_first_name = parts[0] || '';
                             this.form.contact_last_name = parts.slice(1).join(' ') || '';
+                        }
+
+                        if (this.form.selected_lead_participant === undefined) {
+                            this.form.selected_lead_participant = 0;
+                        }
+                        if (this.form.participants.length === 1 || this.form.selected_lead_participant !== 'custom') {
+                            this.syncLeadContactFromParticipant();
                         }
 
                         if (this.form.start_date) {
@@ -2073,10 +2228,14 @@ function bookingForm(config) {
                 start_date: '',
                 end_date: '',
                 participants: [
-                    { first_name: '', last_name: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
+                    { first_name: '', middle_name: '', no_middle_name: false, last_name: '', suffix: '', name: '', age: '', health_condition: '', swimmer_status: 'non_swimmer' }
                 ],
+                selected_lead_participant: 0,
                 contact_first_name: '',
+                contact_middle_name: '',
+                contact_no_middle_name: false,
                 contact_last_name: '',
+                contact_suffix: '',
                 contact_name: '',
                 contact_email: '',
                 contact_phone: '',
@@ -2206,7 +2365,10 @@ function bookingForm(config) {
         addParticipant() {
             this.form.participants.push({
                 first_name: '',
+                middle_name: '',
+                no_middle_name: false,
                 last_name: '',
+                suffix: '',
                 name: '',
                 age: '',
                 health_condition: '',
@@ -2214,9 +2376,68 @@ function bookingForm(config) {
             });
         },
 
+        assembleParticipantName(p) {
+            const parts = [
+                p.first_name || '',
+                (!p.no_middle_name && p.middle_name) ? p.middle_name : '',
+                p.last_name || '',
+                p.suffix || ''
+            ].filter(s => s.trim().length > 0);
+            p.name = parts.join(' ');
+
+            const pIdx = this.form.participants.indexOf(p);
+            if (this.form.participants.length === 1 || parseInt(this.form.selected_lead_participant, 10) === pIdx) {
+                this.syncLeadContactFromParticipant();
+            }
+            return p.name;
+        },
+
+        assembleContactName() {
+            const parts = [
+                this.form.contact_first_name || '',
+                (!this.form.contact_no_middle_name && this.form.contact_middle_name) ? this.form.contact_middle_name : '',
+                this.form.contact_last_name || '',
+                this.form.contact_suffix || ''
+            ].filter(s => s.trim().length > 0);
+            this.form.contact_name = parts.join(' ');
+            return this.form.contact_name;
+        },
+
+        syncLeadContactFromParticipant() {
+            if (this.form.participants.length === 1) {
+                this.form.selected_lead_participant = 0;
+            }
+            if (this.form.selected_lead_participant === 'custom') {
+                return;
+            }
+            const idx = parseInt(this.form.selected_lead_participant, 10);
+            if (!isNaN(idx) && this.form.participants[idx]) {
+                const p = this.form.participants[idx];
+                this.form.contact_first_name = p.first_name || '';
+                this.form.contact_middle_name = p.middle_name || '';
+                this.form.contact_no_middle_name = !!p.no_middle_name;
+                this.form.contact_last_name = p.last_name || '';
+                this.form.contact_suffix = p.suffix || '';
+                this.assembleContactName();
+            }
+        },
+
+        onLeadParticipantChange() {
+            if (this.form.selected_lead_participant === 'custom') {
+                return;
+            }
+            this.syncLeadContactFromParticipant();
+        },
+
         removeParticipant(index) {
             if (this.form.participants.length > 1) {
                 this.form.participants.splice(index, 1);
+                if (this.form.participants.length === 1 || this.form.selected_lead_participant === index) {
+                    this.form.selected_lead_participant = 0;
+                    this.syncLeadContactFromParticipant();
+                } else if (this.form.selected_lead_participant > index && this.form.selected_lead_participant !== 'custom') {
+                    this.form.selected_lead_participant--;
+                }
             }
         },
 
@@ -2236,17 +2457,31 @@ function bookingForm(config) {
             return 0;
         },
 
+        calculateBoatFee() {
+            const boatFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.boat_dive) ? config.pricingConfig.fees.boat_dive : 600;
+            return this.form.boat_dive ? (boatFee * this.form.participants.length) : 0;
+        },
+
+        calculateLguFee() {
+            const lguFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.lgu_pass) ? config.pricingConfig.fees.lgu_pass : 300;
+            return lguFee * this.form.participants.length;
+        },
+
+        calculateEnvironmentalFee() {
+            const envFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.environmental) ? config.pricingConfig.fees.environmental : 50;
+            return envFee * this.form.participants.length;
+        },
+
+        calculateLguAndEnvFee() {
+            return this.calculateLguFee() + this.calculateEnvironmentalFee();
+        },
+
         calculateTotal() {
-            const count = this.form.participants.length;
             const subtotal = this.calculateSubtotal();
             const carpool = this.calculateCarpoolFee();
-            const boatFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.boat_dive) ? config.pricingConfig.fees.boat_dive : 600;
-            const lguFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.lgu_pass) ? config.pricingConfig.fees.lgu_pass : 300;
-            const envFee = (config.pricingConfig && config.pricingConfig.fees && config.pricingConfig.fees.environmental) ? config.pricingConfig.fees.environmental : 50;
-            const boat = this.form.boat_dive ? (boatFee * count) : 0;
-            const lgu = lguFee * count;
-            const env = envFee * count;
-            return subtotal + carpool + boat + lgu + env;
+            const boat = this.calculateBoatFee();
+            const lguAndEnv = this.calculateLguAndEnvFee();
+            return subtotal + carpool + boat + lguAndEnv;
         },
 
         calculateDownpayment() {
@@ -2325,10 +2560,15 @@ function bookingForm(config) {
         touchedStep3: false,
         touchedStep4: false,
 
+        cleanNameInput(val) {
+            if (!val) return '';
+            return val.toString().replace(/[^\p{L}\s.'-]/gu, '');
+        },
+
         validateName(name) {
             if (!name) return false;
             const trimmed = name.toString().trim();
-            return trimmed.length >= 2 && /^[a-zA-Z\s\.\'\-]+$/.test(trimmed);
+            return trimmed.length >= 2 && /^[\p{L}\s.'-]+$/u.test(trimmed);
         },
 
         validateAge(age) {
@@ -2379,13 +2619,29 @@ function bookingForm(config) {
                 this.touchedStep3 = true;
                 for (let i = 0; i < this.form.participants.length; i++) {
                     const p = this.form.participants[i];
-                    if (!p.name || !p.name.trim()) {
-                        this.errorMessage = `Please enter the First & Last Name for Participant #${i + 1}.`;
+                    this.assembleParticipantName(p);
+                    if (!p.first_name || !p.first_name.trim()) {
+                        this.errorMessage = `Please enter the First Name for Participant #${i + 1}.`;
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         return;
                     }
-                    if (!this.validateName(p.name)) {
-                        this.errorMessage = `Participant #${i + 1} name must contain letters only (minimum 2 characters).`;
+                    if (!this.validateName(p.first_name)) {
+                        this.errorMessage = `Participant #${i + 1} first name must contain letters only (minimum 2 characters).`;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    if (!p.no_middle_name && p.middle_name && !this.validateName(p.middle_name)) {
+                        this.errorMessage = `Participant #${i + 1} middle name must contain letters only.`;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    if (!p.last_name || !p.last_name.trim()) {
+                        this.errorMessage = `Please enter the Last Name for Participant #${i + 1}.`;
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        return;
+                    }
+                    if (!this.validateName(p.last_name)) {
+                        this.errorMessage = `Participant #${i + 1} last name must contain letters only (minimum 2 characters).`;
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         return;
                     }
@@ -2400,13 +2656,29 @@ function bookingForm(config) {
                         return;
                     }
                 }
-                if (!this.form.contact_name || !this.form.contact_name.trim()) {
-                    this.errorMessage = "Please enter the Primary Contact Name.";
+                this.assembleContactName();
+                if (!this.form.contact_first_name || !this.form.contact_first_name.trim()) {
+                    this.errorMessage = "Please enter the Primary Contact First Name.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
-                if (!this.validateName(this.form.contact_name)) {
-                    this.errorMessage = "Primary Contact Name must contain letters only.";
+                if (!this.validateName(this.form.contact_first_name)) {
+                    this.errorMessage = "Primary Contact First Name must contain letters only.";
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+                if (!this.form.contact_no_middle_name && this.form.contact_middle_name && !this.validateName(this.form.contact_middle_name)) {
+                    this.errorMessage = "Primary Contact Middle Name must contain letters only.";
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+                if (!this.form.contact_last_name || !this.form.contact_last_name.trim()) {
+                    this.errorMessage = "Please enter the Primary Contact Last Name.";
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    return;
+                }
+                if (!this.validateName(this.form.contact_last_name)) {
+                    this.errorMessage = "Primary Contact Last Name must contain letters only.";
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     return;
                 }
