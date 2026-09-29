@@ -12,9 +12,9 @@ return [
     |
     */
 
-    'public_key' => env('PAYMONGO_PUBLIC_KEY', 'pk_test_4nknS81BMiP1t9sTsLzvc2ZE'),
+    'public_key' => env('PAYMONGO_PUBLIC_KEY', ''),
 
-    'secret_key' => env('PAYMONGO_SECRET_KEY', 'sk_test_Mw52DNC4NFpLgbCxQz1A4jjQ'),
+    'secret_key' => env('PAYMONGO_SECRET_KEY', ''),
 
     'webhook_signature_secret' => env('PAYMONGO_WEBHOOK_SIGNATURE_SECRET', ''),
 

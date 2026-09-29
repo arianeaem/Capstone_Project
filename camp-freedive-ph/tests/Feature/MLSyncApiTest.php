@@ -156,5 +156,42 @@ class MLSyncApiTest extends TestCase
                 ],
             ]);
     }
+
+    public function test_training_data_exports_only_completed_batches_and_excludes_future_confirmed(): void
+    {
+        $token = config('services.ml.token');
+
+        // Create completed past batch
+        $completedBatch = Batch::create([
+            'name' => 'Past Completed Batch',
+            'batch_code' => 'BATCH-TEST-COMPLETED',
+            'start_date' => now()->subDays(10),
+            'end_date' => now()->subDays(9),
+            'status' => 'completed',
+            'lifecycle_status' => 'completed',
+            'completed_at' => now()->subDays(9),
+        ]);
+
+        // Create future confirmed batch
+        $futureConfirmedBatch = Batch::create([
+            'name' => 'Future Confirmed Batch',
+            'batch_code' => 'BATCH-TEST-FUTURE',
+            'start_date' => now()->addDays(10),
+            'end_date' => now()->addDays(11),
+            'status' => 'confirmed',
+            'lifecycle_status' => 'confirmed',
+            'completed_at' => null,
+        ]);
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/ml/training-data');
+
+        $response->assertStatus(200);
+
+        $batchIds = collect($response->json('data'))->pluck('batch_id')->all();
+
+        $this->assertContains($completedBatch->id, $batchIds, 'Completed batch must be included');
+        $this->assertNotContains($futureConfirmedBatch->id, $batchIds, 'Future confirmed batch must be excluded');
+    }
 }
 

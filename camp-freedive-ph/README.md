@@ -77,7 +77,7 @@ The platform coordinates weekend freediving operations, dynamic pricing, coach s
 
 2. **Set up the Python ML Microservice**:
    ```bash
-   cd CapstoneProject_ML_SafetyMonitoring
+   cd safety-forecast
    python -m venv .venv
    source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    pip install -r requirements.txt

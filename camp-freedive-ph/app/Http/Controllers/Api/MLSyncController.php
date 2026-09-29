@@ -28,8 +28,8 @@ class MLSyncController extends Controller
         if ($statusFilter) {
             $query->where('status', $statusFilter);
         } elseif (!$includeAll) {
-            // Default to completed batches, or confirmed batches with dive history
-            $query->whereIn('status', ['completed', 'confirmed']);
+            // Only export completed historical batches with recorded completion timestamps
+            $query->whereNotNull('completed_at');
         }
 
         $batches = $query->get();

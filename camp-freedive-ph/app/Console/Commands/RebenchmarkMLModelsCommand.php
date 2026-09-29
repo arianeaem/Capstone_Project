@@ -38,7 +38,7 @@ class RebenchmarkMLModelsCommand extends Command
             ?: config('services.ml_safety.python_path', 'python');
 
         $scriptPath = $this->option('script') 
-            ?: config('services.ml_safety.benchmark_script', base_path('../CapstoneProject_ML_SafetyMonitoring/src/models/benchmark_autogluon_timeseries.py'));
+            ?: config('services.ml_safety.benchmark_script', base_path('../safety-forecast/src/models/benchmark_autogluon_timeseries.py'));
 
         $isDryRun = (bool) $this->option('dry-run');
         $timeout = (int) $this->option('timeout');
@@ -100,7 +100,7 @@ class RebenchmarkMLModelsCommand extends Command
             }
 
             // Execute Scoped Incremental Pipeline (Phases 1–3 for changed cells only)
-            $incrementalScript = base_path('../CapstoneProject_ML_SafetyMonitoring/src/serve/incremental_pipeline.py');
+            $incrementalScript = base_path('../safety-forecast/src/serve/incremental_pipeline.py');
             if (file_exists($incrementalScript)) {
                 $this->info("\nRunning Scoped Incremental Pipeline (Phases 1–3 for changed cells only)...");
                 $incrementalProcess = new Process([$pythonBinary, $incrementalScript]);

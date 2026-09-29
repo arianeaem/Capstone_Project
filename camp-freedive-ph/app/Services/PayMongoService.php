@@ -81,6 +81,7 @@ class PayMongoService
                 'send_email_receipt' => true,
                 'show_description' => true,
                 'show_line_items' => true,
+                'pass_on_fees' => true,
                 'line_items' => $lineItems,
                 'payment_method_types' => $paymentMethodTypes,
                 'description' => $options['description'] ?? 'Camp FreedivePH Booking Downpayment',

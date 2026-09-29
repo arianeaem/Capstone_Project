@@ -15,7 +15,7 @@ class VerifyMLToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $expectedToken = config('services.ml.token') ?: env('ML_API_TOKEN', 'camp_freedive_ml_secret_token_2026');
+        $expectedToken = config('services.ml.token') ?: env('ML_API_TOKEN', '');
 
         // Extract token from Bearer header, X-ML-Secret-Key header, or request parameter
         $token = $request->bearerToken() 

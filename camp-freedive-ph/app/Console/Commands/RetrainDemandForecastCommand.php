@@ -14,18 +14,25 @@ class RetrainDemandForecastCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'ml:retrain-demand 
+    protected $signature = 'demand:retrain 
                             {--script= : Specific path to Python retrain pipeline script} 
                             {--python= : Specific path to Python interpreter binary} 
                             {--dry-run : Simulate execution without spawning long-running processes} 
                             {--timeout=1800 : Maximum process timeout in seconds (default: 30 minutes)}';
 
     /**
+     * Alternative aliases for the command.
+     *
+     * @var array<int, string>
+     */
+    protected $aliases = ['ml:retrain-demand'];
+
+    /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Trigger the automated daily machine learning retraining pipeline for demand and revenue forecasting';
+    protected $description = 'Trigger the automated machine learning retraining pipeline for demand and revenue forecasting';
 
     /**
      * Execute the console command.
@@ -35,7 +42,7 @@ class RetrainDemandForecastCommand extends Command
         $startTime = microtime(true);
 
         $pythonBinary = $this->option('python') 
-            ?: config('services.ml_demand.python_path', config('services.ml_safety.python_path', 'python'));
+            ?: config('services.ml_demand.python_path', env('DEMAND_FORECAST_PYTHON', config('services.ml_safety.python_path', 'python')));
 
         $scriptPath = $this->option('script') 
             ?: config('services.ml_demand.retrain_script', base_path('../demand-forecast/retrain_pipeline.py'));
@@ -46,7 +53,7 @@ class RetrainDemandForecastCommand extends Command
         $timeout = (int) $this->option('timeout');
 
         $this->info("====================================================================");
-        $this->info("CAMP FREEDIVEPH: DAILY AI DEMAND & REVENUE RETRAINING PIPELINE");
+        $this->info("CAMP FREEDIVEPH: AI DEMAND & REVENUE RETRAINING PIPELINE");
         $this->info("====================================================================");
         $this->line("Python Interpreter: <fg=cyan>{$pythonBinary}</>");
         $this->line("Pipeline Script:    <fg=yellow>{$scriptPath}</>");
@@ -54,9 +61,8 @@ class RetrainDemandForecastCommand extends Command
         $this->line("Execution Timeout:  <fg=magenta>{$timeout}s</>");
 
         if (!file_exists($scriptPath) && !$isDryRun) {
-            $this->warn("Local retrain script not found at path: {$scriptPath}");
-            $this->line("<fg=gray>Note: In production/cloud deployment, demand forecasting retraining is triggered and managed independently via GitHub Actions.</>");
-            Log::info("[ml:retrain-demand] Local target script not found at {$scriptPath}. Skipping local process (managed via GitHub Actions).");
+            $this->error("Demand model retraining failed: Script not found at {$scriptPath}");
+            Log::error("Demand model retraining failed: Script not found at {$scriptPath}");
             return self::FAILURE;
         }
 
@@ -65,7 +71,7 @@ class RetrainDemandForecastCommand extends Command
             return self::SUCCESS;
         }
 
-        Log::info("[ml:retrain-demand] Starting daily demand forecasting retraining", [
+        Log::info("Demand model retraining started.", [
             'script' => $scriptPath,
             'python' => $pythonBinary,
             'working_dir' => $workingDir,
@@ -89,7 +95,7 @@ class RetrainDemandForecastCommand extends Command
             });
 
             if (!$process->isSuccessful()) {
-                Log::error("[ml:retrain-demand] Pipeline execution failed", [
+                Log::error("Demand model retraining failed.", [
                     'exit_code' => $process->getExitCode(),
                     'error_output' => $process->getErrorOutput(),
                 ]);
@@ -98,13 +104,13 @@ class RetrainDemandForecastCommand extends Command
             }
 
             $duration = round(microtime(true) - $startTime, 2);
-            $this->info("Daily Demand Retrain Pipeline completed in {$duration}s");
-            Log::info("[ml:retrain-demand] Daily retraining completed successfully in {$duration}s");
+            $this->info("Demand model retraining completed successfully in {$duration}s");
+            Log::info("Demand model retraining completed successfully.", ['duration_seconds' => $duration]);
 
             return self::SUCCESS;
         } catch (Exception $e) {
-            $this->error("Pipeline exception: " . $e->getMessage());
-            Log::error("[ml:retrain-demand] Process execution exception: " . $e->getMessage(), ['exception' => $e]);
+            $this->error("Demand model retraining failed: " . $e->getMessage());
+            Log::error("Demand model retraining failed with exception.", ['message' => $e->getMessage()]);
             return self::FAILURE;
         }
     }
