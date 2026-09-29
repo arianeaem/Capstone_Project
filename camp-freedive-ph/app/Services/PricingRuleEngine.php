@@ -285,6 +285,7 @@ class PricingRuleEngine
             'demand_label' => ucfirst($demand) . ' Demand',
             'forecast_source' => $forecastData ? 'ml_predictive' : 'historical_headcount',
             'predicted_participants' => $forecastData['predicted_participants'] ?? null,
+            'predicted_bookings' => $forecastData['predicted_bookings'] ?? null,
             'lead_time_days' => $leadTimeDays,
             'base_price_per_pax' => $basePrice,
             'adjusted_price_per_pax' => $adjustedPricePerPax,

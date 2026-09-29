@@ -5,28 +5,15 @@ namespace App\Services;
 use App\Models\Batch;
 use App\Models\DemandForecast;
 use App\Models\Payment;
-use App\Services\ExternalApi\ExternalApiClient;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class DemandForecastService
 {
-    protected string $serviceUrl;
-    protected string $apiToken;
-    protected ExternalApiClient $apiClient;
-
-    public function __construct(?ExternalApiClient $apiClient = null)
-    {
-        $this->serviceUrl = rtrim(config('services.ml.url') ?: env('ML_SERVICE_URL', 'http://127.0.0.1:8001'), '/');
-        $this->apiToken = config('services.ml.token') ?: env('ML_API_TOKEN', 'cfml_live_8eef173d6b5670cab3ec93d7ae53736a4128e079484c718819f20625');
-        $this->apiClient = $apiClient ?? app(ExternalApiClient::class);
-    }
-
     /**
-     * Get demand forecast data cached for 1 hour with instant fallback to database records.
+     * Get demand forecast data cached for 1 hour directly from persisted database records.
      */
     public function getForecastData(bool $forceRefresh = false): array
     {
@@ -35,13 +22,6 @@ class DemandForecastService
         }
 
         return Cache::remember('ml_demand_forecast', 3600, function () {
-            // 1. Attempt to fetch fresh forecast from external ML microservice if configured
-            $liveData = $this->fetchFromExternalService();
-            if (!empty($liveData)) {
-                return $liveData;
-            }
-
-            // 2. Fallback to persisted database forecasts
             return $this->loadFromDatabase();
         });
     }
@@ -66,37 +46,12 @@ class DemandForecastService
                 'forecast_date' => $dbRecord->forecast_date?->toDateString(),
                 'days_ahead' => $dbRecord->days_ahead,
                 'predicted_participants' => $dbRecord->predicted_participants,
+                'predicted_bookings' => $dbRecord->predicted_bookings,
                 'predicted_revenue_php' => (float) $dbRecord->predicted_revenue_php,
                 'demand_level' => $dbRecord->demand_level,
                 'season_period' => $dbRecord->season_period,
                 'instructors_needed' => $dbRecord->instructors_needed,
             ];
-        }
-
-        return null;
-    }
-
-    /**
-     * Call external ML service GET /forecast/demand.
-     */
-    public function fetchFromExternalService(): ?array
-    {
-        try {
-            $endpoint = "{$this->serviceUrl}/forecast/demand";
-            $response = $this->apiClient->execute('ml_service', 'GET', $endpoint, [
-                'bearer_token' => $this->apiToken,
-                'timeout' => 3,
-                'max_retries' => 1,
-            ]);
-
-            if ($response->successful()) {
-                $payload = $response->json();
-                if (isset($payload['forecasts']) || isset($payload['horizon_summaries'])) {
-                    return $this->formatPayload($payload);
-                }
-            }
-        } catch (Exception $e) {
-            Log::warning('External ML Demand service call unreachable: ' . $e->getMessage());
         }
 
         return null;
@@ -120,11 +75,17 @@ class DemandForecastService
             $rawHorizon = json_decode($rawHorizon, true);
         }
 
+        $rawMetadata = $first->metadata;
+        if (is_string($rawMetadata)) {
+            $rawMetadata = json_decode($rawMetadata, true);
+        }
+
         $forecastList = $records->map(function ($r) {
             return [
                 'forecast_date' => $r->forecast_date?->format('Y-m-d'),
                 'days_ahead' => $r->days_ahead,
                 'predicted_participants' => (float) $r->predicted_participants,
+                'predicted_bookings' => (float) ($r->predicted_bookings ?? 0),
                 'predicted_revenue_php' => (float) $r->predicted_revenue_php,
                 'demand_level' => $r->demand_level ?: 'Medium',
                 'season_period' => $r->season_period ?: 'Off-Peak',
@@ -133,33 +94,25 @@ class DemandForecastService
         })->values()->all();
 
         $forecastList = $this->ensureFullHorizonList($forecastList);
-        $monthlyHorizons = $this->computeMonthlyHorizons($forecastList);
+
+        $monthlyClassifications = $rawMetadata['monthly_classifications']
+            ?? $rawMetadata['statistical_demand_layer']['monthly_classifications']
+            ?? $rawMetadata['statistical_interpretation']['monthly_classifications']
+            ?? $this->computeMonthlyClassifications($forecastList);
+
+        $monthlyForecasts = $rawMetadata['monthly_forecasts']
+            ?? $this->loadMonthlyForecastsFromArtifact();
+
+        $monthlyHorizons = $this->computeMonthlyHorizons($forecastList, $monthlyClassifications, $monthlyForecasts);
 
         return [
             'synced_at' => $first->synced_at ? $first->synced_at->toDateTimeString() : Carbon::now()->toDateTimeString(),
             'source' => 'database',
             'horizon_summaries' => $rawHorizon ?: $this->computeHorizonSummariesFromList($forecastList),
             'monthly_horizons' => $monthlyHorizons,
+            'monthly_classifications' => $monthlyClassifications,
+            'monthly_forecasts' => $monthlyForecasts,
             'forecasts' => $forecastList,
-        ];
-    }
-
-    /**
-     * Format payload from external API.
-     */
-    protected function formatPayload(array $payload): array
-    {
-        $forecasts = $payload['forecasts'] ?? $payload['data'] ?? [];
-        $forecasts = $this->ensureFullHorizonList($forecasts);
-        $horizons = $payload['horizon_summaries'] ?? $this->computeHorizonSummariesFromList($forecasts);
-        $monthlyHorizons = $this->computeMonthlyHorizons($forecasts);
-
-        return [
-            'synced_at' => Carbon::now()->toDateTimeString(),
-            'source' => 'external_api',
-            'horizon_summaries' => $horizons,
-            'monthly_horizons' => $monthlyHorizons,
-            'forecasts' => $forecasts,
         ];
     }
 
@@ -185,6 +138,7 @@ class DemandForecastService
                 $isShoulder = in_array($month, [10, 11]);
 
                 $pax = $isPeak ? 24 : ($isShoulder ? 18 : 12);
+                $bkg = (int) max(1, round($pax / 2.2));
                 $rev = $pax * 4800;
                 $inst = (int) ceil($pax / 4);
                 $demand = $isPeak ? 'High' : ($isShoulder ? 'Medium' : 'Low');
@@ -194,6 +148,7 @@ class DemandForecastService
                     'forecast_date' => $dateStr,
                     'days_ahead' => $daysAhead,
                     'predicted_participants' => $pax,
+                    'predicted_bookings' => $bkg,
                     'predicted_revenue_php' => $rev,
                     'demand_level' => $demand,
                     'season_period' => $season,
@@ -209,10 +164,26 @@ class DemandForecastService
     /**
      * Compute monthly cards grouped by month for 7d, 30d, 60d, and 90d projection periods.
      */
-    public function computeMonthlyHorizons(array $forecastList): array
+    public function computeMonthlyHorizons(
+        array $forecastList, 
+        array $monthlyClassifications = [], 
+        array $monthlyForecasts = []
+    ): array
     {
         $horizons = [7, 30, 60, 90];
         $result = [];
+
+        $activeMonthlyForecasts = !empty($monthlyForecasts)
+            ? $monthlyForecasts
+            : $this->loadMonthlyForecastsFromArtifact();
+
+        $monthlyForecastMap = [];
+        foreach ($activeMonthlyForecasts as $mf) {
+            $mKey = $mf['month'] ?? null;
+            if ($mKey) {
+                $monthlyForecastMap[$mKey] = $mf;
+            }
+        }
 
         foreach ($horizons as $h) {
             $filtered = array_values(array_filter($forecastList, fn($f) => ($f['days_ahead'] ?? 0) <= $h));
@@ -232,6 +203,7 @@ class DemandForecastService
                         'month_name' => $date->format('F Y'),
                         'short_name' => $date->format('M Y'),
                         'diver_volume' => 0,
+                        'booking_volume' => 0.0,
                         'projected_revenue' => 0.0,
                         'batches_count' => 0,
                         'peak_coaches' => 0,
@@ -241,10 +213,14 @@ class DemandForecastService
                 }
 
                 $pax = (float) ($item['predicted_participants'] ?? 0);
+                $bkg = isset($item['predicted_bookings']) ? (float) $item['predicted_bookings'] : null;
                 $rev = (float) ($item['predicted_revenue_php'] ?? 0);
                 $inst = (int) ($item['instructors_needed'] ?? ceil($pax / 4));
 
                 $monthGroups[$monthKey]['diver_volume'] += $pax;
+                if ($bkg !== null && $bkg > 0) {
+                    $monthGroups[$monthKey]['booking_volume'] += $bkg;
+                }
                 $monthGroups[$monthKey]['projected_revenue'] += $rev;
                 $monthGroups[$monthKey]['batches_count'] += 1;
                 if ($inst > $monthGroups[$monthKey]['peak_coaches']) {
@@ -259,6 +235,17 @@ class DemandForecastService
             }
 
             $cards = [];
+            $classificationMap = [];
+            $activeClassifications = !empty($monthlyClassifications)
+                ? $monthlyClassifications
+                : $this->computeMonthlyClassifications($forecastList);
+
+            foreach ($activeClassifications as $cItem) {
+                if (isset($cItem['month'])) {
+                    $classificationMap[$cItem['month']] = $cItem;
+                }
+            }
+
             foreach ($monthGroups as $mKey => $m) {
                 $dominantDemand = 'Medium';
                 if (!empty($m['demand_levels'])) {
@@ -274,9 +261,32 @@ class DemandForecastService
                     $dominantSeason = array_key_first($counts);
                 }
 
-                $paxTotal = (int) round($m['diver_volume']);
-                // Estimated bookings from party size average (~2.2 pax/booking)
-                $estBookings = (int) max(1, round($paxTotal / 2.2));
+                // If at full 90-day horizon, use Python pre-aggregated monthly figures directly
+                $preAgg = ($h === 90 && isset($monthlyForecastMap[$mKey])) ? $monthlyForecastMap[$mKey] : null;
+
+                $paxTotal = $preAgg !== null && isset($preAgg['predicted_participants'])
+                    ? (int) round((float) $preAgg['predicted_participants'])
+                    : (int) round($m['diver_volume']);
+
+                $estBookings = $preAgg !== null && isset($preAgg['predicted_bookings'])
+                    ? (int) round((float) $preAgg['predicted_bookings'])
+                    : ($m['booking_volume'] > 0
+                        ? (int) round($m['booking_volume'])
+                        : (int) max(1, round($paxTotal / 2.2)));
+
+                $projRevenue = $preAgg !== null && isset($preAgg['predicted_revenue_php'])
+                    ? (float) round((float) $preAgg['predicted_revenue_php'], 2)
+                    : (float) round($m['projected_revenue'], 2);
+
+                $batchCount = $preAgg !== null && isset($preAgg['batches_in_month'])
+                    ? (int) $preAgg['batches_in_month']
+                    : $m['batches_count'];
+
+                $seasonPeriod = $preAgg !== null && !empty($preAgg['season_period'])
+                    ? $preAgg['season_period']
+                    : $dominantSeason;
+
+                $matchingClass = $classificationMap[$m['month_name']] ?? null;
 
                 $cards[] = [
                     'month_key' => $m['month_key'],
@@ -284,11 +294,17 @@ class DemandForecastService
                     'short_name' => $m['short_name'],
                     'diver_volume' => $paxTotal,
                     'estimated_bookings' => $estBookings,
-                    'batches_count' => $m['batches_count'],
-                    'projected_revenue' => (float) round($m['projected_revenue'], 2),
+                    'batches_count' => $batchCount,
+                    'projected_revenue' => $projRevenue,
                     'coaches_needed' => max(1, $m['peak_coaches']),
                     'demand_classification' => $dominantDemand,
-                    'peak_classification' => $dominantSeason . (str_contains(strtolower($dominantSeason), 'season') || str_contains(strtolower($dominantSeason), 'peak') ? '' : ' Season'),
+                    'peak_classification' => $seasonPeriod . (str_contains(strtolower($seasonPeriod), 'season') || str_contains(strtolower($seasonPeriod), 'peak') ? '' : ' Season'),
+                    'monthly_average' => $matchingClass['monthly_average'] ?? null,
+                    'overall_mean' => $matchingClass['overall_mean'] ?? null,
+                    'standard_deviation' => $matchingClass['standard_deviation'] ?? null,
+                    'upper_threshold' => $matchingClass['upper_threshold'] ?? null,
+                    'lower_threshold' => $matchingClass['lower_threshold'] ?? null,
+                    'classification' => $matchingClass['classification'] ?? $seasonPeriod,
                 ];
             }
 
@@ -312,12 +328,14 @@ class DemandForecastService
             $filtered = array_filter($forecastList, fn($f) => ($f['days_ahead'] ?? 0) <= $h);
 
             $pax = 0;
+            $bkg = 0;
             $rev = 0;
             $peakInst = 0;
             $demandLevels = [];
 
             foreach ($filtered as $item) {
                 $pax += (float) ($item['predicted_participants'] ?? 0);
+                $bkg += (float) ($item['predicted_bookings'] ?? 0);
                 $rev += (float) ($item['predicted_revenue_php'] ?? 0);
                 $inst = (int) ($item['instructors_needed'] ?? ceil(($item['predicted_participants'] ?? 0) / 4));
                 if ($inst > $peakInst) {
@@ -338,6 +356,7 @@ class DemandForecastService
             $summaries[$key] = [
                 'batches' => count($filtered),
                 'participants' => (int) round($pax),
+                'bookings' => (int) round($bkg),
                 'revenue' => (float) round($rev, 2),
                 'peak_instructors' => max(1, $peakInst),
                 'demand_level' => $dominantDemand,
@@ -378,13 +397,104 @@ class DemandForecastService
             ];
         }
 
+        $monthlyClassifications = $this->computeMonthlyClassifications($forecastList);
+
         return [
             'synced_at' => Carbon::now()->toDateTimeString(),
             'source' => 'baseline_model',
             'horizon_summaries' => $this->computeHorizonSummariesFromList($forecastList),
-            'monthly_horizons' => $this->computeMonthlyHorizons($forecastList),
+            'monthly_horizons' => $this->computeMonthlyHorizons($forecastList, $monthlyClassifications),
+            'monthly_classifications' => $monthlyClassifications,
             'forecasts' => $forecastList,
         ];
+    }
+
+    /**
+     * Retrieve statistical demand classifications from ML model output.
+     * The Python ML pipeline (retrain_pipeline.py) is the single source of truth for
+     * statistical demand formulas (Mean ± 1 SD thresholds and Peak/Shoulder/Off-Peak logic).
+     */
+    public function computeMonthlyClassifications(array $forecastList = []): array
+    {
+        // 1. Primary: Load directly from the Python ML pipeline's generated output artifact
+        $fromArtifact = $this->loadClassificationsFromArtifact();
+        if (!empty($fromArtifact)) {
+            return $fromArtifact;
+        }
+
+        if (empty($forecastList)) {
+            return [];
+        }
+
+        // 2. Fallback: Map classifications directly from forecast records without duplicating ML statistics
+        $monthGroups = [];
+        foreach ($forecastList as $item) {
+            $date = Carbon::parse($item['forecast_date'] ?? now());
+            $monthName = $date->format('F Y');
+            $pax = (float) ($item['predicted_participants'] ?? 0);
+            $season = $item['season_period'] ?? 'Shoulder';
+            $monthGroups[$monthName]['pax'][] = $pax;
+            $monthGroups[$monthName]['season'] = $season;
+        }
+
+        $result = [];
+        foreach ($monthGroups as $monthName => $data) {
+            $avg = !empty($data['pax']) ? round(array_sum($data['pax']) / count($data['pax']), 1) : 0.0;
+            $result[] = [
+                'month' => $monthName,
+                'monthly_average' => $avg,
+                'overall_mean' => $avg,
+                'standard_deviation' => 0.0,
+                'upper_threshold' => $avg,
+                'lower_threshold' => $avg,
+                'classification' => $data['season'],
+            ];
+        }
+
+        return $result;
+    }
+
+    /**
+     * Load dynamic statistical demand classifications from the ML output artifact.
+     */
+    public function loadClassificationsFromArtifact(): array
+    {
+        $artifactPath = base_path('../demand-forecast/outputs/monthly_demand_classifications.json');
+        if (file_exists($artifactPath)) {
+            $content = file_get_contents($artifactPath);
+            $decoded = json_decode($content, true);
+            if (is_array($decoded) && !empty($decoded)) {
+                return $decoded;
+            }
+        }
+        return [];
+    }
+
+    /**
+     * Load monthly forecast aggregations from the ML output artifact (outputs/forecast_monthly.csv).
+     */
+    public function loadMonthlyForecastsFromArtifact(): array
+    {
+        $csvPath = base_path('../demand-forecast/outputs/forecast_monthly.csv');
+        if (!file_exists($csvPath)) {
+            return [];
+        }
+
+        $lines = file($csvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if (count($lines) <= 1) {
+            return [];
+        }
+
+        $header = str_getcsv(array_shift($lines));
+        $rows = [];
+        foreach ($lines as $line) {
+            $row = str_getcsv($line);
+            if (count($row) === count($header)) {
+                $rows[] = array_combine($header, $row);
+            }
+        }
+
+        return $rows;
     }
 
     /**

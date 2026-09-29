@@ -60,6 +60,7 @@ class MLSyncApiTest extends TestCase
                     'forecast_date' => '2025-11-29',
                     'days_ahead' => 7,
                     'predicted_participants' => 18.8,
+                    'predicted_bookings' => 8.2,
                     'predicted_revenue_php' => 20810.0,
                     'demand_level' => 'Medium',
                     'season_period' => 'Off-Peak',
@@ -69,10 +70,31 @@ class MLSyncApiTest extends TestCase
                     'forecast_date' => '2025-12-06',
                     'days_ahead' => 14,
                     'predicted_participants' => 22.6,
+                    'predicted_bookings' => 9.5,
                     'predicted_revenue_php' => 30599.0,
                     'demand_level' => 'Medium',
                     'season_period' => 'Shoulder',
                     'instructors_needed' => 6,
+                ],
+            ],
+            'monthly_classifications' => [
+                [
+                    'month' => 'November 2025',
+                    'monthly_average' => 18.8,
+                    'overall_mean' => 20.7,
+                    'standard_deviation' => 2.7,
+                    'upper_threshold' => 23.4,
+                    'lower_threshold' => 18.0,
+                    'classification' => 'Shoulder',
+                ],
+                [
+                    'month' => 'December 2025',
+                    'monthly_average' => 22.6,
+                    'overall_mean' => 20.7,
+                    'standard_deviation' => 2.7,
+                    'upper_threshold' => 23.4,
+                    'lower_threshold' => 18.0,
+                    'classification' => 'Shoulder',
                 ],
             ],
         ];
@@ -84,13 +106,55 @@ class MLSyncApiTest extends TestCase
             ->assertJson([
                 'status' => 'success',
                 'synced_count' => 2,
+            ])
+            ->assertJsonStructure([
+                'status',
+                'synced_count',
+                'monthly_classifications',
             ]);
 
         $this->assertEquals(2, DemandForecast::count());
         $this->assertDatabaseHas('demand_forecasts', [
             'forecast_date' => '2025-11-29',
+            'predicted_participants' => 18.8,
+            'predicted_bookings' => 8.2,
             'demand_level' => 'Medium',
             'instructors_needed' => 5,
         ]);
     }
+
+    public function test_get_forecast_endpoint_returns_monthly_classifications(): void
+    {
+        $token = config('services.ml.token');
+
+        // Prime database with forecast
+        $this->test_sync_forecast_imports_predictions();
+
+        $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+            ->getJson('/api/v1/ml/forecast');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status',
+                'data' => [
+                    'synced_at',
+                    'source',
+                    'horizon_summaries',
+                    'monthly_horizons',
+                    'monthly_classifications' => [
+                        '*' => [
+                            'month',
+                            'monthly_average',
+                            'overall_mean',
+                            'standard_deviation',
+                            'upper_threshold',
+                            'lower_threshold',
+                            'classification',
+                        ],
+                    ],
+                    'forecasts',
+                ],
+            ]);
+    }
 }
+

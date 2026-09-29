@@ -16,12 +16,14 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth.ml_token', 'throttle:ml_api'])->prefix('v1/ml')->group(function () {
     Route::get('/training-data', [MLSyncController::class, 'exportTrainingData']);
     Route::get('/export-training-data', [MLSyncController::class, 'exportTrainingData']);
+    Route::get('/forecast', [MLSyncController::class, 'getForecast']);
     Route::post('/sync-forecast', [MLSyncController::class, 'importForecast']);
 });
 
 Route::middleware(['auth.ml_token', 'throttle:ml_api'])->prefix('ml')->group(function () {
     Route::get('/training-data', [MLSyncController::class, 'exportTrainingData']);
     Route::get('/export-training-data', [MLSyncController::class, 'exportTrainingData']);
+    Route::get('/forecast', [MLSyncController::class, 'getForecast']);
     Route::post('/sync-forecast', [MLSyncController::class, 'importForecast']);
 });
 

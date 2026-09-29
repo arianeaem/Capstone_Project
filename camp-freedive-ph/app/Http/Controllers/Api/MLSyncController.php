@@ -145,6 +145,21 @@ class MLSyncController extends Controller
             $forecastList = $rawPayload;
         }
 
+        $monthlyClassifications = $rawPayload['monthly_classifications']
+            ?? $metadata['monthly_classifications']
+            ?? $metadata['statistical_interpretation']['monthly_classifications']
+            ?? null;
+        if (!empty($monthlyClassifications)) {
+            $metadata['monthly_classifications'] = $monthlyClassifications;
+        }
+
+        $monthlyForecasts = $rawPayload['monthly_forecasts']
+            ?? $metadata['monthly_forecasts']
+            ?? null;
+        if (!empty($monthlyForecasts)) {
+            $metadata['monthly_forecasts'] = $monthlyForecasts;
+        }
+
         // Support CSV raw text upload if provided
         if (empty($forecastList) && $request->has('csv_data')) {
             $forecastList = $this->parseCsvForecast($request->input('csv_data'));
@@ -171,6 +186,7 @@ class MLSyncController extends Controller
             $forecastDate = Carbon::parse($item['forecast_date'])->toDateString();
             $daysAhead = (int) ($item['days_ahead'] ?? Carbon::today()->diffInDays(Carbon::parse($forecastDate)));
             $predictedParticipants = (float) ($item['predicted_participants'] ?? 0);
+            $predictedBookings = (float) ($item['predicted_bookings'] ?? 0);
             $predictedRevenue = (float) ($item['predicted_revenue_php'] ?? $item['predicted_revenue'] ?? 0);
             $demandLevel = (string) ($item['demand_level'] ?? ($predictedParticipants > 30 ? 'High' : ($predictedParticipants <= 18 ? 'Low' : 'Medium')));
             $seasonPeriod = (string) ($item['season_period'] ?? 'Off-Peak');
@@ -180,6 +196,7 @@ class MLSyncController extends Controller
                 'forecast_date' => $forecastDate,
                 'days_ahead' => $daysAhead,
                 'predicted_participants' => $predictedParticipants,
+                'predicted_bookings' => $predictedBookings,
                 'predicted_revenue_php' => $predictedRevenue,
                 'demand_level' => ucfirst($demandLevel),
                 'season_period' => ucfirst($seasonPeriod),
@@ -221,7 +238,24 @@ class MLSyncController extends Controller
             'first_forecast_date' => $recordsToInsert[0]['forecast_date'] ?? null,
             'last_forecast_date' => end($recordsToInsert)['forecast_date'] ?? null,
             'horizon_summaries' => $horizonSummaries,
+            'monthly_classifications' => $monthlyClassifications,
+            'monthly_forecasts' => $monthlyForecasts,
             'synced_at' => $now->toDateTimeString(),
+        ]);
+    }
+
+    /**
+     * Retrieve latest demand forecast data including monthly classifications.
+     * GET /api/v1/ml/forecast
+     */
+    public function getForecast(Request $request): JsonResponse
+    {
+        $forecastService = app(\App\Services\DemandForecastService::class);
+        $data = $forecastService->getForecastData();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $data,
         ]);
     }
 

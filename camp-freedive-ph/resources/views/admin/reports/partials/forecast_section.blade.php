@@ -2,6 +2,7 @@
     $forecast = $data['forecast'] ?? [];
     $horizons = $forecast['horizon_summaries'] ?? [];
     $monthlyHorizons = $forecast['monthly_horizons'] ?? [];
+    $monthlyClassifications = $forecast['monthly_classifications'] ?? [];
     $trend = $data['forecast_trend'] ?? [];
     $syncedAt = $forecast['synced_at'] ?? null;
     $source = $forecast['source'] ?? 'ML Model';
@@ -12,6 +13,7 @@
      x-data="{
          selectedHorizon: '30',
          monthlyData: @js($monthlyHorizons),
+         monthlyClassifications: @js($monthlyClassifications),
          trendData: @js($trend),
 
          get currentCards() {
@@ -31,7 +33,9 @@
                  coaches: card.coaches_needed,
                  batches_count: card.batches_count,
                  demand_level: card.demand_classification,
-                 season_period: card.peak_classification
+                 season_period: card.classification ? (card.classification + ' Season') : card.peak_classification,
+                 classification: card.classification,
+                 monthly_average: card.monthly_average
              }));
 
              const groupsMap = new Map();
@@ -214,7 +218,7 @@
                             <h4 class="text-base font-black text-[#1D1D1F] pt-0.5" x-text="card.month_name"></h4>
                             
                             <!-- Badges Column: Demand on top, Season at the bottom of demand -->
-                            <div class="flex flex-col items-end gap-1.5 shrink-0">
+                            <div class="flex flex-col items-end gap-1 shrink-0">
                                 <!-- Demand Classification Badge (No border) -->
                                 <span class="text-[11px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full whitespace-nowrap"
                                       :class="{
@@ -225,15 +229,18 @@
                                       x-text="card.demand_classification + ' Demand'">
                                 </span>
 
-                                <!-- Season Classification Badge (No border) -->
-                                <span class="text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap inline-flex items-center"
-                                      :class="{
-                                          'bg-rose-50 text-[#780000]': card.peak_classification.includes('Peak') && !card.peak_classification.includes('Off'),
-                                          'bg-teal-50 text-teal-800': card.peak_classification.includes('Shoulder'),
-                                          'bg-slate-100 text-slate-700': card.peak_classification.includes('Off')
-                                      }"
-                                      x-text="card.peak_classification">
-                                </span>
+                                <!-- Dynamic Statistical Season Classification Badge (Forecast-Driven) -->
+                                <div class="flex flex-col items-end">
+                                    <span class="text-xs font-bold px-2 py-0.5 rounded-md whitespace-nowrap inline-flex items-center"
+                                          :class="{
+                                              'bg-rose-50 text-[#780000]': (card.classification === 'Peak' || card.peak_classification.includes('Peak')) && !card.peak_classification.includes('Off'),
+                                              'bg-teal-50 text-teal-800': (card.classification === 'Shoulder' || card.peak_classification.includes('Shoulder')),
+                                              'bg-slate-100 text-slate-700': (card.classification === 'Off-Peak' || card.peak_classification.includes('Off'))
+                                          }"
+                                          :title="card.monthly_average ? ('Forecast-driven: ' + card.monthly_average + ' pax/batch average vs statistical thresholds [' + (card.lower_threshold || 15.4) + ' - ' + (card.upper_threshold || 19.6) + ']') : 'Forecast-driven statistical classification'">
+                                        <span x-text="card.classification ? (card.classification + ' Season') : card.peak_classification"></span>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
@@ -251,6 +258,17 @@
                                 <span>Expected Guests:</span>
                                 <strong class="text-[#1D1D1F] font-extrabold" x-text="card.diver_volume + ' Guests'"></strong>
                             </div>
+
+                            <!-- Average Pax per Batch (Statistical Demand Benchmark) -->
+                            <template x-if="card.monthly_average">
+                                <div class="flex items-center justify-between">
+                                    <span>Avg Pax / Batch:</span>
+                                    <span class="font-bold text-[#1D1D1F]">
+                                        <span x-text="card.monthly_average"></span>
+                                        <span class="font-normal text-[#8E8E93]"> pax</span>
+                                    </span>
+                                </div>
+                            </template>
 
                             <!-- Expected Bookings -->
                             <div class="flex items-center justify-between">

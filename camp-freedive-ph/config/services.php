@@ -41,7 +41,6 @@ return [
 
     'ml' => [
         'token' => env('ML_API_TOKEN', 'camp_freedive_ml_secret_token_2026'),
-        'url' => env('ML_SERVICE_URL', 'http://127.0.0.1:8001'),
     ],
 
     'ml_safety' => [
@@ -53,8 +52,9 @@ return [
     ],
 
     'ml_demand' => [
-        'retrain_script' => env('ML_DEMAND_RETRAIN_SCRIPT', base_path('../CapstoneProject_ML/retrain_pipeline.py')),
-        'working_dir' => env('ML_DEMAND_WORKING_DIR', base_path('../CapstoneProject_ML')),
+        'enabled_schedule' => (bool) env('ML_DEMAND_SCHEDULE_ENABLED', false),
+        'retrain_script' => env('ML_DEMAND_RETRAIN_SCRIPT', base_path('../demand-forecast/retrain_pipeline.py')),
+        'working_dir' => env('ML_DEMAND_WORKING_DIR', base_path('../demand-forecast')),
         'python_path' => env('PYTHON_PATH', 'python'),
     ],
 

@@ -38,7 +38,7 @@ class RetrainDemandForecastCommand extends Command
             ?: config('services.ml_demand.python_path', config('services.ml_safety.python_path', 'python'));
 
         $scriptPath = $this->option('script') 
-            ?: config('services.ml_demand.retrain_script', base_path('../CapstoneProject_ML/retrain_pipeline.py'));
+            ?: config('services.ml_demand.retrain_script', base_path('../demand-forecast/retrain_pipeline.py'));
 
         $workingDir = config('services.ml_demand.working_dir', dirname($scriptPath));
 
@@ -54,8 +54,9 @@ class RetrainDemandForecastCommand extends Command
         $this->line("Execution Timeout:  <fg=magenta>{$timeout}s</>");
 
         if (!file_exists($scriptPath) && !$isDryRun) {
-            $this->error("Retrain script not found at path: {$scriptPath}");
-            Log::error("[ml:retrain-demand] Target script not found: {$scriptPath}");
+            $this->warn("Local retrain script not found at path: {$scriptPath}");
+            $this->line("<fg=gray>Note: In production/cloud deployment, demand forecasting retraining is triggered and managed independently via GitHub Actions.</>");
+            Log::info("[ml:retrain-demand] Local target script not found at {$scriptPath}. Skipping local process (managed via GitHub Actions).");
             return self::FAILURE;
         }
 
@@ -71,7 +72,11 @@ class RetrainDemandForecastCommand extends Command
         ]);
 
         try {
-            $process = new Process([$pythonBinary, $scriptPath], $workingDir);
+            $cmd = [$pythonBinary, '-u', $scriptPath];
+            $env = array_merge($_SERVER, [
+                'PYTHONUNBUFFERED' => '1',
+            ]);
+            $process = new Process($cmd, $workingDir, $env);
             $process->setTimeout($timeout);
             $process->setIdleTimeout(300);
 

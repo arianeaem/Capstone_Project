@@ -44,11 +44,13 @@ Schedule::command('forecast:archive-accuracy')
  * Runs daily at 02:00 AM (nightly) to ingest newly completed batch records,
  * re-engineer lag features, fit XGBoost regressors, and push fresh 90-day rolling forecasts.
  */
-Schedule::command('ml:retrain-demand')
-    ->dailyAt('02:00')
-    ->withoutOverlapping()
-    ->runInBackground()
-    ->appendOutputTo(storage_path('logs/ml_demand_retrain.log'));
+if (config('services.ml_demand.enabled_schedule', false)) {
+    Schedule::command('ml:retrain-demand')
+        ->dailyAt('02:00')
+        ->withoutOverlapping()
+        ->runInBackground()
+        ->appendOutputTo(storage_path('logs/ml_demand_retrain.log'));
+}
 
 /**
  * Automated Quarterly ML Multi-Horizon Model Re-benchmarking
