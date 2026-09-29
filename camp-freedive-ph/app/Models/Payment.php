@@ -8,6 +8,25 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * Payment Model representing a monetary transaction for a dive booking.
+ *
+ * Financial Lifecycle Context:
+ * - Records downpayment receipts (₱3,000/head) and final balance settlements.
+ * - Stores PayMongo external references (`paymongo_payment_id`, `paymongo_refund_id`).
+ * - Supports partial refunds, full refunds, and no-show forfeitures according to the cancellation policy.
+ *
+ * @property int $id
+ * @property int $booking_id
+ * @property string $payment_method gcash, maya, card, bpi_bank_transfer, cash
+ * @property string $transaction_id
+ * @property string $paymongo_payment_id
+ * @property float $amount Total gross amount in PHP
+ * @property float $fee_amount Gateway processing fee
+ * @property float $net_amount Net proceeds received
+ * @property string $payment_type downpayment, balance_settlement, full
+ * @property string $status completed, paid, refund_requested, refunded, partially_refunded, forfeited, failed
+ */
 class Payment extends Model
 {
     use HasFactory;
@@ -97,31 +116,31 @@ class Payment extends Model
         return match ($this->status) {
             'completed', 'paid' => [
                 'label' => 'Paid & Verified',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'refund_requested' => [
                 'label' => 'Refund Requested',
-                'class' => 'bg-amber-50 text-amber-700 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-700',
             ],
             'refunded' => [
                 'label' => 'Refunded',
-                'class' => 'bg-blue-50 text-blue-700 border-blue-200',
+                'class' => 'bg-blue-50 text-blue-700',
             ],
             'partially_refunded' => [
                 'label' => 'Partially Refunded',
-                'class' => 'bg-indigo-50 text-indigo-700 border-indigo-200',
+                'class' => 'bg-indigo-50 text-indigo-700',
             ],
             'forfeited' => [
                 'label' => 'Forfeited',
-                'class' => 'bg-purple-50 text-purple-700 border-purple-200',
+                'class' => 'bg-purple-50 text-purple-700',
             ],
             'failed' => [
                 'label' => 'Failed / Cancelled',
-                'class' => 'bg-red-50 text-red-700 border-red-200',
+                'class' => 'bg-red-50 text-red-700',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', $this->status)),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

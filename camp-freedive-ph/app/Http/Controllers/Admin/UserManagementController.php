@@ -8,6 +8,7 @@ use App\Services\AuditLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -47,7 +48,14 @@ class UserManagementController extends Controller
         $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
         $users = $query->paginate($perPage)->withQueryString();
 
-        return view('admin.users.index', compact('users', 'currentUser'));
+        $stats = [
+            'total' => User::count(),
+            'coaches' => User::where('role', 'coach')->count(),
+            'admins' => User::whereIn('role', ['admin', 'owner'])->count(),
+            'active' => User::where('status', 'active')->count(),
+        ];
+
+        return view('admin.users.index', compact('users', 'currentUser', 'stats'));
 
     }
 
@@ -62,19 +70,44 @@ class UserManagementController extends Controller
         $allowedRoles = $currentUser->isOwner() ? ['admin', 'coach'] : ['coach'];
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'no_middle_name' => ['nullable', 'boolean'],
+            'last_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20'],
+            'name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'phone' => ['required', 'string', 'max:50'],
             'role' => ['required', Rule::in($allowedRoles)],
             'temp_password' => ['nullable', 'string', 'min:8'],
+        ], [
+            'first_name.regex' => 'First name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'middle_name.regex' => 'Middle name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'last_name.regex' => 'Last name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
         ]);
 
-        $tempPassword = $validated['temp_password'] ?: ('TempPass' . mt_rand(1000, 9999) . '!');
+        $first = trim($validated['first_name'] ?? '');
+        $middle = (!empty($validated['no_middle_name'])) ? '' : trim($validated['middle_name'] ?? '');
+        $last = trim($validated['last_name'] ?? '');
+        $suffix = trim($validated['suffix'] ?? '');
+        if ($suffix === 'None' || $suffix === 'none') {
+            $suffix = '';
+        }
+
+        $fullName = implode(' ', array_filter([$first, $middle, $last, $suffix]));
+        if (empty($fullName)) {
+            $fullName = $validated['name'] ?? '';
+        }
+        if (empty($fullName)) {
+            return back()->withErrors(['first_name' => 'First and Last name are required.'])->withInput();
+        }
+
+        $tempPassword = !empty($validated['temp_password']) ? $validated['temp_password'] : ('TempPass' . mt_rand(1000, 9999) . '!');
 
         $user = User::create([
-            'name' => $validated['name'],
+            'name' => $fullName,
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'phone' => $validated['phone'],
             'role' => $validated['role'],
             'status' => 'active',
             'password' => Hash::make($tempPassword),
@@ -83,14 +116,24 @@ class UserManagementController extends Controller
 
         AuditLogger::log(
             'USER_CREATED',
-            "New {$user->role} provisioned: {$user->email} (Name: {$user->name}) by {$currentUser->name} ({$currentUser->role})",
+            "New {$user->role} account created: {$user->email} (Name: {$user->name}) by {$currentUser->name} ({$currentUser->role})",
             $user,
             $currentUser->name,
             $request
         );
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Account for {$user->name} created successfully! Temporary password: {$tempPassword}");
+            ->with('success', "Account for {$user->name} created successfully!")
+            ->with('new_user_credentials', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'role_label' => $user->role_badge['label'] ?? ucfirst($user->role),
+                'temp_password' => $tempPassword,
+                'login_url' => route('login'),
+                'is_reset' => false,
+            ]);
     }
 
     /**
@@ -123,29 +166,53 @@ class UserManagementController extends Controller
         $allowedRoles = $currentUser->isOwner() ? ['owner', 'admin', 'coach'] : ['coach'];
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'middle_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'no_middle_name' => ['nullable', 'boolean'],
+            'last_name' => ['nullable', 'string', 'max:120', 'regex:/^[\p{L}\s\.\'\-]+$/u'],
+            'suffix' => ['nullable', 'string', 'max:20'],
+            'name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'phone' => ['required', 'string', 'max:50'],
             'role' => ['required', Rule::in($allowedRoles)],
             'status' => ['required', 'in:active,inactive'],
             'new_password' => ['nullable', 'string', 'min:8'],
+        ], [
+            'first_name.regex' => 'First name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'middle_name.regex' => 'Middle name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
+            'last_name.regex' => 'Last name may only contain letters (including Ñ/ñ), spaces, hyphens, and periods.',
         ]);
 
+        $first = trim($validated['first_name'] ?? '');
+        $middle = (!empty($validated['no_middle_name'])) ? '' : trim($validated['middle_name'] ?? '');
+        $last = trim($validated['last_name'] ?? '');
+        $suffix = trim($validated['suffix'] ?? '');
+        if ($suffix === 'None' || $suffix === 'none') {
+            $suffix = '';
+        }
+
+        $fullName = implode(' ', array_filter([$first, $middle, $last, $suffix]));
+        if (empty($fullName)) {
+            $fullName = $validated['name'] ?? $user->name;
+        }
+
         $changes = [];
-        if ($user->name !== $validated['name']) $changes[] = "Name: {$user->name} → {$validated['name']}";
+        if ($user->name !== $fullName) $changes[] = "Name: {$user->name} → {$fullName}";
         if ($user->email !== $validated['email']) $changes[] = "Email: {$user->email} → {$validated['email']}";
+        if ($user->phone !== $validated['phone']) $changes[] = "Phone: {$user->phone} → {$validated['phone']}";
         if ($user->role !== $validated['role']) $changes[] = "Role: {$user->role} → {$validated['role']}";
         if ($user->status !== $validated['status']) $changes[] = "Status: {$user->status} → {$validated['status']}";
 
         $updateData = [
-            'name' => $validated['name'],
+            'name' => $fullName,
             'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
+            'phone' => $validated['phone'],
             'role' => $validated['role'],
             'status' => $validated['status'],
         ];
 
-        if (!empty($validated['new_password'])) {
+        $hasPasswordReset = !empty($validated['new_password']);
+        if ($hasPasswordReset) {
             $updateData['password'] = Hash::make($validated['new_password']);
             $updateData['must_change_password'] = true;
             $changes[] = "Password reset by admin (temporary password assigned)";
@@ -163,8 +230,23 @@ class UserManagementController extends Controller
             $request
         );
 
-        return redirect()->route('admin.users.index')
+        $response = redirect()->route('admin.users.index')
             ->with('success', "Profile for {$user->name} updated successfully.");
+
+        if ($hasPasswordReset) {
+            $response->with('new_user_credentials', [
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'role' => $user->role,
+                'role_label' => $user->role_badge['label'] ?? ucfirst($user->role),
+                'temp_password' => $validated['new_password'],
+                'login_url' => route('login'),
+                'is_reset' => true,
+            ]);
+        }
+
+        return $response;
     }
 
     /**
@@ -199,27 +281,31 @@ class UserManagementController extends Controller
     }
 
     /**
-     * Delete an internal user account (Owner only).
+     * Delete an internal user account (Owner or Admin for Coaches).
      */
     public function destroy(Request $request, User $user): RedirectResponse
     {
         $currentUser = Auth::user();
-
-        // Only Owner can delete accounts
-        if (!$currentUser->isOwner()) {
-            abort(403, 'Only the Camp Owner can delete user accounts.');
-        }
 
         // Prevent self-deletion
         if ($user->id === $currentUser->id) {
             return back()->with('error', 'You cannot delete your own account.');
         }
 
+        // Admins cannot delete other Admins or Owner
+        if (!$currentUser->isOwner() && ($user->isAdmin() || $user->isOwner())) {
+            abort(403, 'Admins can only delete Freediving Coach accounts.');
+        }
+
         $userEmail = $user->email;
         $userName = $user->name;
         $userRole = $user->role;
 
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            // Delete associated Coach profile record if exists
+            \App\Models\Coach::where('user_id', $user->id)->delete();
+            $user->delete();
+        });
 
         AuditLogger::log(
             'USER_DELETED',
@@ -230,6 +316,6 @@ class UserManagementController extends Controller
         );
 
         return redirect()->route('admin.users.index')
-            ->with('success', "Account for {$userName} ({$userEmail}) has been deleted.");
+            ->with('success', "Account for {$userName} ({$userEmail}) has been deleted successfully.");
     }
 }

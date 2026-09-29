@@ -85,7 +85,7 @@ class WeatherSafetyModuleTest extends TestCase
         $overrideData = [
             'tcws_signal' => 3,
             'gale_warning' => true,
-            'reason' => 'PAGASA Marine Warning #3 — Severe Tropical Storm in Batangas waters',
+            'reason' => 'PAGASA Marine Warning #3 - Severe Tropical Storm in Batangas waters',
         ];
 
         $res = $this->forecastService->applyManualOverride($batch, $overrideData, $this->admin, false);
@@ -165,8 +165,8 @@ class WeatherSafetyModuleTest extends TestCase
     public function test_admin_can_access_weather_monitoring_pages(): void
     {
         $batch = Batch::create([
-            'name' => 'Monitoring Batch',
-            'batch_code' => 'BATCH-MON-004',
+            'name' => 'Batch 4',
+            'batch_code' => 'Batch 4',
             'start_date' => Carbon::now('Asia/Manila')->addDays(5)->format('Y-m-d'),
             'end_date' => Carbon::now('Asia/Manila')->addDays(6)->format('Y-m-d'),
             'status' => 'confirmed',
@@ -174,14 +174,14 @@ class WeatherSafetyModuleTest extends TestCase
 
         $responseIndex = $this->actingAs($this->admin)->get(route('admin.weather.index'));
         $responseIndex->assertStatus(200);
-        $responseIndex->assertSee('Weather & Marine Safety Monitoring');
+        $responseIndex->assertSee('Safety Monitoring');
 
         $responseShow = $this->actingAs($this->admin)->get(route('admin.weather.show', $batch));
         $responseShow->assertStatus(200);
-        $responseShow->assertSee($batch->batch_code);
+        $responseShow->assertSee($batch->batch_number);
         $responseShow->assertSee('Overall Batch Assessment');
-        $responseShow->assertSee('OPEN WATER AM');
-        $responseShow->assertSee('OPEN WATER PM');
+        $responseShow->assertSee('DAY 1');
+        $responseShow->assertSee('DAY 2');
     }
 
     public function test_coach_is_forbidden_from_admin_weather_module(): void

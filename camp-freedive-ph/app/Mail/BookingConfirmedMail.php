@@ -20,7 +20,7 @@ class BookingConfirmedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🌊 Booking Confirmed: ' . $this->booking->booking_number . ' | Camp FreedivePH',
+            subject: 'Booking Confirmed: ' . $this->booking->booking_number . ' | Camp FreedivePH',
         );
     }
 

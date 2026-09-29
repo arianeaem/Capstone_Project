@@ -42,10 +42,16 @@ class PayMongoGateway implements PaymentGatewayInterface
         $defaultCancelUrl = route('paymongo.cancel', ['booking' => $booking->id]);
 
         $sessionOptions = [
+            'reference_number' => $booking->booking_number,
             'description' => "Downpayment for Booking #{$booking->booking_number}",
             'success_url' => $options['success_url'] ?? $defaultSuccessUrl,
             'cancel_url' => $options['cancel_url'] ?? $defaultCancelUrl,
-            'payment_method_types' => $options['payment_method_types'] ?? config('paymongo.payment_method_types', ['gcash', 'grab_pay', 'paymaya', 'card', 'qrph']),
+            'payment_method_types' => $options['payment_method_types'] ?? config('paymongo.payment_method_types', ['qrph', 'gcash', 'paymaya', 'card', 'grab_pay']),
+            'billing' => [
+                'name' => $booking->contact_name,
+                'email' => $booking->contact_email,
+                'phone' => $booking->contact_phone,
+            ],
             'metadata' => [
                 'booking_id' => (string) $booking->id,
                 'booking_number' => $booking->booking_number,

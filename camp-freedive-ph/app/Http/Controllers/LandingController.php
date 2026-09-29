@@ -12,28 +12,70 @@ class LandingController extends Controller
      */
     public function index(): View
     {
+        $settingService = app(\App\Services\SystemSettingService::class);
+
+        $discPrice = (float) ($settingService->get('program_pricing.base_price_discovery', 4250) ?? 4250);
+        $funCertPrice = (float) ($settingService->get('program_pricing.base_price_fundive_cert', 2500) ?? 2500);
+        $funNonCertPrice = (float) ($settingService->get('program_pricing.base_price_fundive_noncert', 3300) ?? 3300);
+        $refPrice = (float) ($settingService->get('program_pricing.base_price_refinement', 4100) ?? 4100);
+
+        $discInc = $settingService->get('program_pricing.discovery_inclusions', [
+            '2 open water dives (2-3 hrs per session)',
+            '1 pool session (10 ft deep pool access)',
+            '2D1N shared AC room accommodation',
+            'Lesson fee and coach fee',
+            'Safety buoy set up',
+            '3 full board meals',
+            'Photos and videos',
+            'Gears',
+        ]);
+        $discExc = $settingService->get('program_pricing.discovery_exclusions', [
+            'Transportation (We arrange carpool)',
+            'Boat dive (optional)',
+            'Mabini LGU divepass',
+        ]);
+
+        $funInc = $settingService->get('program_pricing.fundive_inclusions', [
+            '2 open water dives (2-3 hrs per session)',
+            '1 pool session (10 ft deep pool access)',
+            '2D1N shared AC room accommodation',
+            'Safety coach fee',
+            'Safety buoy set up',
+            '3 full board meals',
+            'Photos and videos',
+            'Gears',
+        ]);
+        $funExc = $settingService->get('program_pricing.fundive_exclusions', [
+            'Transportation (We arrange carpool)',
+            'Boat dive (optional)',
+            'Mabini LGU divepass',
+        ]);
+
+        $refInc = $settingService->get('program_pricing.refinement_inclusions', [
+            '2 open water dives (2-3 hrs per session)',
+            '1 pool session (10 ft deep pool access)',
+            '2D1N shared AC room accommodation',
+            '3 full board meals',
+            'Safety buoy set up',
+            'Photos and videos',
+            'Coach fee',
+            'Gears',
+        ]);
+        $refExc = $settingService->get('program_pricing.refinement_exclusions', [
+            'Transportation (We arrange carpool)',
+            'Boat dive (optional)',
+            'Mabini LGU divepass',
+        ]);
+
         $classes = [
             'discovery' => [
                 'id' => 'discovery',
                 'name' => 'Discovery',
                 'category' => 'BEGINNER CLASS',
-                'price' => 4250,
-                'price_label' => '4,250 php',
-                'inclusions' => [
-                    '2 open water dives (2-3 hrs per session)',
-                    '1 pool session (10 ft deep pool access)',
-                    '2D1N shared AC room accommodation',
-                    'Lesson fee and coach fee',
-                    'Safety buoy set up',
-                    '3 full board meals',
-                    'Photos and videos',
-                    'Gears',
-                ],
-                'exclusions' => [
-                    'Transportation (We arrange carpool)',
-                    'Boat dive (optional)',
-                    'Mabini LGU divepass',
-                ],
+                'price' => $discPrice,
+                'price_label' => number_format($discPrice) . ' php',
+                'inclusions' => is_array($discInc) ? $discInc : [],
+                'exclusions' => is_array($discExc) ? $discExc : [],
                 'note' => 'Perfect for first-time divers. Solo joiners and non-swimmers welcome.',
                 'prerequisite' => null,
             ],
@@ -41,24 +83,11 @@ class LandingController extends Controller
                 'id' => 'fundive',
                 'name' => 'Fundive',
                 'category' => 'PREREQUISITE: DISCOVERY CLASS',
-                'price_certified' => 2500,
-                'price_non_certified' => 3300,
-                'price_label' => 'For certified freedivers: 2,500 php (safety coach not included) | For non certified freedivers: 3,300 php',
-                'inclusions' => [
-                    '2 open water dives (2-3 hrs per session)',
-                    '1 pool session (10 ft deep pool access)',
-                    '2D1N shared AC room accommodation',
-                    'Safety coach fee',
-                    'Safety buoy set up',
-                    '3 full board meals',
-                    'Photos and videos',
-                    'Gears',
-                ],
-                'exclusions' => [
-                    'Transportation (We arrange carpool)',
-                    'Boat dive (optional)',
-                    'Mabini LGU divepass',
-                ],
+                'price_certified' => $funCertPrice,
+                'price_non_certified' => $funNonCertPrice,
+                'price_label' => 'For certified freedivers: ' . number_format($funCertPrice) . ' php (safety coach not included) | For non certified freedivers: ' . number_format($funNonCertPrice) . ' php',
+                'inclusions' => is_array($funInc) ? $funInc : [],
+                'exclusions' => is_array($funExc) ? $funExc : [],
                 'note' => 'For divers ready to explore open water. Solo joiners welcome.',
                 'prerequisite' => 'PREREQUISITE: DISCOVERY CLASS',
             ],
@@ -66,23 +95,10 @@ class LandingController extends Controller
                 'id' => 'refinement',
                 'name' => 'Refinement',
                 'category' => 'PRACTICE DIVE',
-                'price' => 4100,
-                'price_label' => '4,100 php',
-                'inclusions' => [
-                    '2 open water dives (2-3 hrs per session)',
-                    '1 pool session (10 ft deep pool access)',
-                    '2D1N shared AC room accommodation',
-                    '3 full board meals',
-                    'Safety buoy set up',
-                    'Photos and videos',
-                    'Coach fee',
-                    'Gears',
-                ],
-                'exclusions' => [
-                    'Transportation (We arrange carpool)',
-                    'Boat dive (optional)',
-                    'Mabini LGU divepass',
-                ],
+                'price' => $refPrice,
+                'price_label' => number_format($refPrice) . ' php',
+                'inclusions' => is_array($refInc) ? $refInc : [],
+                'exclusions' => is_array($refExc) ? $refExc : [],
                 'note' => 'For divers looking to improve their skills. Solo joiners welcome.',
                 'prerequisite' => 'Prerequisite: Discovery Class completion.',
             ],
@@ -99,7 +115,7 @@ class LandingController extends Controller
             ],
             [
                 'q' => 'How does transportation and carpool work?',
-                'a' => 'We arrange carpools with pickup points in Monumento, Shell Tiendesitas, Market! Market!, Starmall Alabang, and Sto. Tomas Exit. If you choose carpool, the booking downpayment is 2,000 php. If you bring your own transpo, the downpayment is 1,200 php.',
+                'a' => 'We arrange carpools with pickup points in Monumento, Shell Tiendesitas, Market! Market!, Starmall Alabang, and Sto. Tomas Exit. If you choose carpool, the booking downpayment is 3,000 php per person. If you bring your own transpo, the downpayment is 2,000 php per person.',
             ],
             [
                 'q' => 'What are the required local municipal fees?',

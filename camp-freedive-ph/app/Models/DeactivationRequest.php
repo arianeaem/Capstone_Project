@@ -43,19 +43,19 @@ class DeactivationRequest extends Model
         return match ($this->status) {
             'pending' => [
                 'label' => 'Pending Owner Review',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'confirmed' => [
                 'label' => 'Confirmed & Deactivated',
-                'class' => 'bg-red-50 text-red-700 border-red-200',
+                'class' => 'bg-red-50 text-red-700',
             ],
             'dismissed' => [
                 'label' => 'Dismissed',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-300',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
             default => [
                 'label' => ucfirst($this->status),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

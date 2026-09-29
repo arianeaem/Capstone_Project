@@ -1,36 +1,35 @@
 @extends('layouts.admin')
 
-@section('title', 'Create 2D1N Batch | Camp FreedivePH')
+@section('title', 'Create Batch | Camp FreedivePH')
+
+@section('breadcrumb')
+    <a href="{{ portal_route('batches.index') }}" class="text-[#6E6E73] hover:text-[#780000] font-medium transition-colors">Batches</a>
+    <svg class="w-3.5 h-3.5 text-[#6E6E73] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m9 18 6-6-6-6"/></svg>
+    <span class="font-bold text-[#1D1D1F]">Create Batch</span>
+@endsection
 
 @section('content')
 <div class="max-w-4xl mx-auto space-y-6 text-sm" x-data="batchCreateForm()">
     
-    <!-- Top Breadcrumb & Header -->
-    <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-4">
+    <!-- Top Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <a href="{{ route('admin.batches.index') }}" class="text-xs text-[#6E6E73] hover:text-[#1D1D1F] flex items-center gap-1">
-                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
-                <span>Back to Batches</span>
-            </a>
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight mt-1">Create 2D1N Batch Schedule</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
-                Set up a new weekend trip schedule for guest bookings and coach assignments.
-            </p>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Create Batch</h1>
         </div>
     </div>
 
-    <!-- Form Card -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8">
-        <form action="{{ route('admin.batches.store') }}" method="POST" class="space-y-6">
+    <!-- Create Batch Form -->
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-6 sm:p-8 shadow-2xs">
+        <form action="{{ route('admin.batches.store') }}" method="POST" class="space-y-8">
             @csrf
 
-            <!-- Section 1: Date & Auto-Generated Identifiers -->
+            <!-- Batch Dates and Identification -->
             <div class="space-y-4">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">1. 2D1N Dive Dates & Batch Identifier</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">1. Dive Dates & Batch Identifier</h3>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label for="start_date" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="start_date" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             Start Date (Day 1) <span class="text-[#780000]">*</span>
                         </label>
                         <input type="date" 
@@ -41,12 +40,17 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('start_date')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#D70015] font-semibold mt-1.5 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 shrink-0 text-[#D70015]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                <span>{{ $message }}</span>
+                            </span>
                         @enderror
                     </div>
 
                     <div>
-                        <label for="end_date" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                        <label for="end_date" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                             End Date (Day 2) <span class="text-[#780000]">*</span>
                         </label>
                         <input type="date" 
@@ -56,37 +60,46 @@
                                required 
                                class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] text-sm text-[#1D1D1F] bg-white">
                         @error('end_date')
-                            <span class="text-xs text-[#FF3B3C] font-semibold mt-1 block">{{ $message }}</span>
+                            <span class="text-sm text-[#D70015] font-semibold mt-1.5 flex items-center gap-1.5">
+                                <svg class="w-4 h-4 shrink-0 text-[#D70015]" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                </svg>
+                                <span>{{ $message }}</span>
+                            </span>
                         @enderror
                     </div>
                 </div>
 
                 <!-- Duplicate Batch Date Warning Alert & Direct Redirect -->
                 <template x-if="duplicateBatches.length > 0">
-                    <div class="p-4 sm:p-5 rounded-2xl bg-[#FFFBEB] text-[#92400E] space-y-3">
+                    <div class="p-4 rounded-xl bg-[#FFFBEB] text-[#92400E] space-y-3">
                         <div class="flex items-center justify-between gap-3">
-                            <div class="flex items-center gap-2 font-extrabold text-sm text-[#B45309]">
+                            <div class="flex items-center gap-2 font-extrabold text-sm text-[#78350F]">
+                                <svg class="w-4 h-4 text-[#78350F] shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                </svg>
                                 <span>Batch Already Exists for this Date Range!</span>
                             </div>
                         </div>
                         
-                        <p class="text-xs text-[#A16207] leading-relaxed">
+                        <p class="text-sm text-[#92400E] leading-relaxed">
                             To avoid double-scheduling the same weekend, an active batch is already handling <strong x-text="startDate"></strong>. Open the existing batch to manage participants and coaches instead of creating a duplicate:
                         </p>
                         
                         <div class="space-y-2">
                             <template x-for="dup in duplicateBatches" :key="dup.id">
-                                <div class="p-3 rounded-xl bg-white border border-[#FDE68A] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                                <div class="p-3 rounded-xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-sm">
                                     <div>
                                         <div class="flex items-center gap-1.5 flex-wrap">
                                             <strong class="text-[#1D1D1F] text-sm" x-text="dup.name || dup.batch_number"></strong>
-                                            <span class="font-mono text-[#780000] font-bold text-xs" x-text="'[' + (dup.batch_code || dup.batch_number) + ']'"></span>
                                         </div>
-                                        <span class="text-[#6E6E73] mt-0.5 block" x-text="(dup.participants_count || 0) + ' Pax assigned • ' + (dup.coaches_count || 0) + ' Coach(es) staffed'"></span>
+                                        <div class="text-xs text-[#6E6E73] space-y-0.5 mt-0.5">
+                                            <span class="block" x-text="(dup.participants_count || 0) + ' Pax assigned'"></span>
+                                            <span class="block" x-text="(dup.coaches_count || 0) + ' Coach(es) staffed'"></span>
+                                        </div>
                                     </div>
-                                    <a :href="'/admin/batches/' + dup.id" class="btn-primary px-4 py-2 text-xs font-bold shrink-0 flex items-center justify-center gap-1.5 whitespace-nowrap">
+                                    <a :href="'/admin/batches/' + dup.id" class="btn-primary min-h-[44px] px-4 py-2.5 text-sm font-bold shrink-0 inline-flex items-center justify-center gap-1.5 whitespace-nowrap active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
                                         <span>Open Existing Batch</span>
-                                        <span>→</span>
                                     </a>
                                 </div>
                             </template>
@@ -95,64 +108,80 @@
                 </template>
 
                 <div>
-                    <label for="batch_number" class="block font-bold text-[#1D1D1F] text-xs mb-2">
-                        Batch Number <span class="text-[#780000]">*</span>
+                    <label for="batch_number_digits" class="block font-bold text-[#1D1D1F] text-sm mb-2">
+                        Batch Number<span class="text-[#780000]">*</span>
                     </label>
-                    <input type="text" 
-                           name="batch_number" 
-                           id="batch_number" 
-                           x-model="batchNumber" 
-                           required 
-                           placeholder="e.g. Batch 4"
-                           class="w-full px-3.5 py-2.5 rounded-xl border border-[#D1D1D6] font-mono text-sm font-bold text-[#1D1D1F] bg-white">
-                    <span class="text-xs text-[#6E6E73] mt-0.5 block">Unique operational batch number identifier.</span>
+                    <div class="relative flex items-center rounded-xl border border-[#D1D1D6] bg-white overflow-hidden focus-within:border-[#780000] focus-within:ring-2 focus-within:ring-[#780000]/20 max-w-xs">
+                        <span class="px-4 py-2.5 bg-[#F2F2F7] border-r border-[#D1D1D6] text-sm font-extrabold text-[#1D1D1F] select-none shrink-0">
+                            Batch
+                        </span>
+                        <input type="number" 
+                               name="batch_number_digits" 
+                               id="batch_number_digits" 
+                               x-model="batchNumberOnly" 
+                               min="1" 
+                               step="1" 
+                               required 
+                               placeholder="e.g. 10"
+                               class="w-full px-3.5 py-2.5 font-mono text-sm font-bold text-[#1D1D1F] bg-transparent border-0 focus:ring-0 focus:outline-none">
+                        <input type="hidden" name="batch_number" :value="'Batch ' + (batchNumberOnly || '')">
+                    </div>
                 </div>
 
             </div>
 
-            <!-- Section 2: Auto-Grouping Confirmed Unbatched Bookings -->
+            <!-- Auto-Grouping Confirmed Unbatched Bookings -->
             <div class="space-y-4 pt-2">
-                <div class="flex items-center justify-between border-b border-[#E5E5EA] pb-2">
+                <div class="flex items-center justify-between pb-2">
                     <div>
                         <h3 class="text-base font-bold text-[#1D1D1F]">2. Group Confirmed Bookings for this Date</h3>
-                        <p class="text-xs text-[#6E6E73] mt-0.5">
+                        <p class="text-sm text-[#6E6E73] mt-0.5">
                             Auto-suggested bookings matching this dive date. Uncheck any private or custom arrangements.
                         </p>
                     </div>
 
-                    <div class="text-xs text-[#780000] font-bold">
+                    <div class="text-sm text-[#780000] font-bold">
                         <span x-text="selectedBookingIds.length"></span> / <span x-text="unbatchedBookings.length"></span> Bookings Selected
                     </div>
                 </div>
 
-                <div x-show="loadingBookings" class="py-6 text-center text-xs text-[#6E6E73]">
+                <div x-show="loadingBookings" class="py-6 text-center text-sm text-[#6E6E73]">
                     Scanning confirmed bookings for selected date...
                 </div>
 
                 <!-- Bookings Table Container -->
-                <div x-show="!loadingBookings && unbatchedBookings.length > 0" class="border border-[#E5E5EA] rounded-xl overflow-hidden">
-                    <table class="w-full text-left text-xs">
-                        <thead class="bg-[#FAFAFC] border-b border-[#E5E5EA] text-[#6E6E73] font-bold">
+                <div x-show="!loadingBookings && unbatchedBookings.length > 0" class="border border-[#D1D1D6] rounded-xl overflow-hidden">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-[#F2F2F7] border-b border-[#D1D1D6] text-[#6E6E73] font-bold">
                             <tr>
-                                <th class="py-2.5 px-3 w-8">
-                                    <input type="checkbox" @change="toggleAll($event.target.checked)" checked class="w-3.5 h-3.5 rounded text-[#780000] focus:ring-[#780000]">
+                                <th scope="col" class="py-1 px-1 w-12 text-center">
+                                    <label class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center cursor-pointer m-0">
+                                        <input type="checkbox" 
+                                               @change="toggleAll($event.target.checked)" 
+                                               checked 
+                                               aria-label="Select all unbatched bookings"
+                                               class="w-4.5 h-4.5 rounded-md text-[#780000] focus:ring-[#780000]">
+                                    </label>
                                 </th>
-                                <th class="py-2.5 px-3">Booking #</th>
-                                <th class="py-2.5 px-3">Lead Contact</th>
-                                <th class="py-2.5 px-3">Class</th>
-                                <th class="py-2.5 px-3 text-center">Pax</th>
-                                <th class="py-2.5 px-3 text-right">Total</th>
+                                <th scope="col" class="py-2.5 px-3">Booking #</th>
+                                <th scope="col" class="py-2.5 px-3">Lead Contact</th>
+                                <th scope="col" class="py-2.5 px-3">Class</th>
+                                <th scope="col" class="py-2.5 px-3 text-center">Pax</th>
+                                <th scope="col" class="py-2.5 px-3 text-right">Total</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-[#E5E5EA]">
+                        <tbody class="divide-y divide-[#D1D1D6]">
                             <template x-for="b in paginatedBookings" :key="b.id">
-                                <tr class="hover:bg-[#FAFAFC]">
-                                    <td class="py-2.5 px-3">
-                                        <input type="checkbox" 
-                                               name="booking_ids[]" 
-                                               :value="b.id" 
-                                               x-model="selectedBookingIds"
-                                               class="w-3.5 h-3.5 rounded text-[#780000] focus:ring-[#780000]">
+                                <tr class="hover:bg-[#F2F2F7]">
+                                    <td class="py-1 px-1 text-center">
+                                        <label class="min-w-[44px] min-h-[44px] inline-flex items-center justify-center cursor-pointer m-0">
+                                            <input type="checkbox" 
+                                                   name="booking_ids[]" 
+                                                   :value="b.id" 
+                                                   x-model="selectedBookingIds"
+                                                   :aria-label="'Select booking ' + b.booking_number"
+                                                   class="w-4.5 h-4.5 rounded-md text-[#780000] focus:ring-[#780000]">
+                                        </label>
                                     </td>
                                     <td class="py-2.5 px-3 font-mono font-bold text-[#780000]" x-text="b.booking_number"></td>
                                     <td class="py-2.5 px-3 text-[#1D1D1F]" x-text="b.contact_name"></td>
@@ -165,41 +194,51 @@
                     </table>
 
                     <!-- Pagination Controls -->
-                    <div x-show="totalPages > 1" class="bg-[#FAFAFC] px-3 py-2 border-t border-[#E5E5EA] flex items-center justify-between text-xs text-[#6E6E73]">
-                        <div>
-                            Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span> to <span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span>
+                    <div x-show="totalPages > 1" class="bg-[#F2F2F7] px-3.5 py-2.5 border-t border-[#E5E5EA] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-sm text-[#6E6E73] rounded-b-xl select-none">
+                        <div class="font-medium text-[#6E6E73] text-center sm:text-left">
+                            Showing <span class="font-bold text-[#1D1D1F]" x-text="startItem"></span> to <span class="font-bold text-[#1D1D1F]" x-text="endItem"></span> of <span class="font-bold text-[#1D1D1F]" x-text="unbatchedBookings.length"></span> results
                         </div>
-                        <div class="flex items-center gap-1">
-                            <button type="button" 
-                                    @click="currentPage--" 
-                                    :disabled="currentPage <= 1"
-                                    class="px-2 py-1 rounded bg-white border border-[#D1D1D6] hover:bg-[#F2F2F7] disabled:opacity-40 disabled:cursor-not-allowed">
-                                Prev
-                            </button>
-                            <span class="px-2 py-1 font-bold text-[#1D1D1F]">
-                                <span x-text="currentPage"></span> / <span x-text="totalPages"></span>
+                        <div class="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
+                            <span class="font-medium text-[#6E6E73]">
+                                Page <span class="font-bold text-[#1D1D1F]" x-text="currentPage"></span> of <span class="font-bold text-[#1D1D1F]" x-text="totalPages"></span>
                             </span>
-                            <button type="button" 
-                                    @click="currentPage++" 
-                                    :disabled="currentPage >= totalPages"
-                                    class="px-2 py-1 rounded bg-white border border-[#D1D1D6] hover:bg-[#F2F2F7] disabled:opacity-40 disabled:cursor-not-allowed">
-                                Next
-                            </button>
+                            <div class="inline-flex items-center gap-1.5">
+                                <button type="button" 
+                                        @click="currentPage--" 
+                                        :disabled="currentPage <= 1"
+                                        aria-label="Previous page"
+                                        class="inline-flex items-center justify-center px-3.5 py-2 min-h-[44px] rounded-xl bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#6E6E73] active:bg-[#E5E5EA] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#6E6E73] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                                    <svg class="w-4 h-4 mr-1.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span>Prev</span>
+                                </button>
+                                <button type="button" 
+                                        @click="currentPage++" 
+                                        :disabled="currentPage >= totalPages"
+                                        aria-label="Next page"
+                                        class="inline-flex items-center justify-center px-3.5 py-2 min-h-[44px] rounded-xl bg-white border border-[#D1D1D6] text-[#1D1D1F] font-bold text-sm hover:bg-[#F2F2F7] hover:border-[#6E6E73] active:bg-[#E5E5EA] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F2F2F7] disabled:border-[#E5E5EA] disabled:text-[#6E6E73] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                                    <span>Next</span>
+                                    <svg class="w-4 h-4 ml-1.5 shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div x-show="!loadingBookings && unbatchedBookings.length === 0" class="py-6 text-center text-xs text-[#8E8E93] bg-[#FAFAFC] rounded-xl border border-dashed border-[#D1D1D6]">
+                <div x-show="!loadingBookings && unbatchedBookings.length === 0" class="py-8 px-4 text-center text-sm text-[#6E6E73] bg-[#F2F2F7] rounded-xl">
                     No unbatched confirmed bookings found for this start date. You can add bookings later from the batch dashboard.
                 </div>
             </div>
 
-            <!-- Section 3: Operational Capacity & Notes -->
+            <!-- Operational Notes & Overrides -->
             <div class="space-y-4 pt-2">
-                <h3 class="text-base font-bold text-[#1D1D1F] border-b border-[#E5E5EA] pb-2">3. Operational Notes & Overrides</h3>
+                <h3 class="text-base font-bold text-[#1D1D1F] pb-2">3. Operational Notes & Overrides</h3>
 
                 <div>
-                    <label for="capacity_note" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="capacity_note" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         Capacity / Group Structure Tag (Optional)
                     </label>
                     <input type="text" 
@@ -210,7 +249,7 @@
                 </div>
 
                 <div>
-                    <label for="notes" class="block font-bold text-[#1D1D1F] text-xs mb-2">
+                    <label for="notes" class="block font-bold text-[#1D1D1F] text-sm mb-2">
                         Internal Staff Notes
                     </label>
                     <textarea name="notes" 
@@ -221,11 +260,11 @@
                 </div>
             </div>
 
-            <!-- Submit Buttons -->
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-[#E5E5EA]">
-                <a href="{{ route('admin.batches.index') }}" class="btn-secondary px-5 py-2.5 text-sm">Cancel</a>
-                <button type="submit" class="btn-primary px-7 py-2.5 text-sm font-bold">
-                    Create & Confirm Batch
+            <!-- Form Actions -->
+            <div class="flex items-center justify-end gap-3 pt-6 border-t border-[#E5E5EA]">
+                <a href="{{ route('admin.batches.index') }}" class="btn-secondary min-h-[44px] px-6 py-2.5 text-sm font-bold inline-flex items-center justify-center active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-[#780000]">Cancel</a>
+                <button type="submit" class="btn-primary min-h-[44px] px-8 py-2.5 text-sm font-bold inline-flex items-center justify-center active:scale-[0.99] transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-[#780000]">
+                    Create Batch
                 </button>
             </div>
         </form>
@@ -233,19 +272,28 @@
 
 </div>
 
+@php
+    $initBatchNumberOnly = (string) preg_replace('/^Batch\s*/i', '', (string) old('batch_number', $defaultBatchNumber));
+@endphp
+
 <script>
 function batchCreateForm() {
     return {
         startDate: @json(old('start_date', $defaultStartDateStr)),
         endDate: @json(old('end_date', $defaultEndDateStr)),
-        batchNumber: @json(old('batch_number', $defaultBatchNumber)),
+        batchNumberOnly: @json($initBatchNumberOnly),
         unbatchedBookings: @json($initialBookings),
         selectedBookingIds: @json($selectedIds),
         existingBatches: @json($existingBatches ?? []),
         existingBatchesForSelectedDate: [],
+        staffingRec: @json($initialStaffingRec ?? null),
         loadingBookings: false,
         perPage: 5,
         currentPage: 1,
+
+        get batchNumber() {
+            return 'Batch ' + (this.batchNumberOnly || '');
+        },
 
         get duplicateBatches() {
             if (this.existingBatchesForSelectedDate && this.existingBatchesForSelectedDate.length > 0) {
@@ -295,15 +343,16 @@ function batchCreateForm() {
                 .then(data => {
                     this.unbatchedBookings = data.bookings || [];
                     this.selectedBookingIds = (data.bookings || []).map(b => b.id);
-                    if (!this.batchNumber || this.batchNumber.startsWith('Batch #')) {
-                        if (data.suggested_batch_number) {
-                            this.batchNumber = data.suggested_batch_number;
-                        } else if (data.suggested_code) {
-                            this.batchNumber = data.suggested_code;
-                        }
+                    if (data.suggested_batch_number_only) {
+                        this.batchNumberOnly = data.suggested_batch_number_only;
+                    } else if (data.suggested_batch_number) {
+                        this.batchNumberOnly = data.suggested_batch_number.replace(/^Batch\s*/i, '');
                     }
                     if (data.existing_batches) {
                         this.existingBatchesForSelectedDate = data.existing_batches;
+                    }
+                    if (data.ml_recommendation) {
+                        this.staffingRec = data.ml_recommendation;
                     }
                     this.loadingBookings = false;
                 })

@@ -45,7 +45,7 @@ class UpdateForecastCommand extends Command
             $result = $weatherService->updateAllForecasts($days);
             $cacheDuration = round((microtime(true) - $startTime) * 1000, 2);
 
-            $this->info("✓ Successfully cached {$result['days_cached']} days of 24h continuous forecast data in {$cacheDuration}ms.");
+            $this->info("Successfully cached {$result['days_cached']} days of 24h continuous forecast data in {$cacheDuration}ms.");
             $this->line("  Source Marine Endpoint: https://marine-api.open-meteo.com/v1/marine");
             $this->line("  Source Weather Endpoint: https://api.open-meteo.com/v1/forecast");
             $this->line("  Last Updated: " . $result['updated_at']);
@@ -83,16 +83,16 @@ class UpdateForecastCommand extends Command
                 if ($batches->isNotEmpty()) {
                     foreach ($batches as $batch) {
                         $assessResult = $weatherService->assessBatch($batch, null, null);
-                        $this->line("  • Batch <fg=yellow>{$batch->batch_code}</>: Overall Risk = <fg=green>{$assessResult['overall_classification']}</>");
+                        $this->line("  - Batch <fg=yellow>{$batch->batch_code}</>: Overall Risk = <fg=green>{$assessResult['overall_classification']}</>");
                     }
-                    $this->info("✓ Successfully evaluated {$batches->count()} active batch(es).");
+                    $this->info("Successfully evaluated {$batches->count()} active batch(es).");
                 } else {
                     $this->line("  No active batches found in the {$days}-day window.");
                 }
             }
 
             $totalElapsed = round((microtime(true) - $startTime) * 1000, 2);
-            $this->info("\n✓ Finished forecast update pipeline in {$totalElapsed}ms. All requests will now be served from local cache with <1ms latency.");
+            $this->info("\nFinished forecast update pipeline in {$totalElapsed}ms. All requests will now be served from local cache with <1ms latency.");
 
             return self::SUCCESS;
         } catch (Exception $e) {

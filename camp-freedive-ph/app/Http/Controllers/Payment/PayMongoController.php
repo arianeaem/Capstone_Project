@@ -11,9 +11,23 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * PayMongo Payment Gateway Integration & Webhook Controller.
+ *
+ * Architecture & Payment Lifecycle:
+ * 1. Hosted Checkout v2: Dispatches guests to PayMongo's PCI-DSS compliant checkout session
+ *    supporting GCash, Maya, Credit/Debit cards, and GrabPay.
+ * 2. Dual-Verification Protocol:
+ *    - Synchronous Return (Success Route): Reconciles payment status immediately upon browser redirect.
+ *    - Asynchronous Webhook (Webhook Route): Verifies cryptographic HMAC signatures (`Paymongo-Signature`)
+ *      with Redis/Cache-backed 24-hour idempotency deduplication to safely discard duplicate retry payloads.
+ * 3. Automated State Machine: Updates booking status from `pending_downpayment` -> `confirmed`,
+ *    records transaction fee audits, and dispatches customer confirmation emails.
+ */
 class PayMongoController extends Controller
 {
     protected PayMongoGateway $gateway;
@@ -114,11 +128,40 @@ class PayMongoController extends Controller
                     ->latest()
                     ->first();
 
+                $paymongoPaymentId = null;
+                $feeAmount = 0.00;
+                $paymentMethodType = 'paymongo';
+
+                // Query PayMongo Checkout Session to retrieve actual payment details if available
+                if ($payment && $payment->paymongo_resource_id) {
+                    $sessionData = app(\App\Services\PayMongoService::class)->getCheckoutSession($payment->paymongo_resource_id);
+                    $paymentsList = $sessionData['data']['attributes']['payments'] ?? [];
+                    if (!empty($paymentsList)) {
+                        $firstPaid = $paymentsList[0] ?? null;
+                        if ($firstPaid) {
+                            $paymongoPaymentId = $firstPaid['id'] ?? null;
+                            $paymentMethodType = $firstPaid['attributes']['source']['type'] ?? $firstPaid['attributes']['payment_method_type'] ?? 'paymongo';
+                            $feeAmount = ($firstPaid['attributes']['fee'] ?? 0) / 100;
+                        }
+                    }
+                }
+
                 if ($payment && $payment->status !== 'paid') {
                     $payment->update([
                         'status' => 'paid',
                         'paid_at' => now(),
-                        'paymongo_payment_id' => $payment->paymongo_payment_id ?: ('pay_' . bin2hex(random_bytes(8))),
+                        'payment_method' => $paymentMethodType,
+                        'paymongo_payment_id' => $paymongoPaymentId ?: ($payment->paymongo_payment_id ?: ('pay_' . bin2hex(random_bytes(8)))),
+                        'fee_amount' => $feeAmount,
+                    ]);
+
+                    \App\Models\PaymentStatusLog::create([
+                        'payment_id' => $payment->id,
+                        'old_status' => 'pending',
+                        'new_status' => 'paid',
+                        'changed_by' => null,
+                        'note' => "Downpayment paid successfully via PayMongo Hosted Checkout ({$paymentMethodType}).",
+                        'created_at' => now(),
                     ]);
                 }
 
@@ -127,11 +170,22 @@ class PayMongoController extends Controller
                     $booking->update([
                         'status' => 'confirmed',
                     ]);
+
+                    app(\App\Services\SlotReservationService::class)->releaseHold($booking->start_date, $booking->booking_number);
+
+                    \App\Models\BookingStatusLog::create([
+                        'booking_id' => $booking->id,
+                        'old_status' => 'pending_downpayment',
+                        'new_status' => 'confirmed',
+                        'changed_by' => null,
+                        'note' => "Booking confirmed automatically upon successful PayMongo downpayment receipt.",
+                        'created_at' => now(),
+                    ]);
                 }
 
                 AuditLogger::log(
                     'PAYMONGO_PAYMENT_SUCCESS',
-                    "Payment verified and confirmed for Booking #{$booking->booking_number}",
+                    "Payment verified and confirmed for Booking #{$booking->booking_number} via PayMongo",
                     null,
                     "Customer: {$booking->contact_name}"
                 );
@@ -152,8 +206,8 @@ class PayMongoController extends Controller
                 'auth_booking_pin' => $booking->pin,
             ]);
 
-            return redirect()->route('manage.show', [
-                'booking_number' => $booking->booking_number,
+            return redirect()->route('booking.create', [
+                'confirmed' => $booking->booking_number,
                 'pin' => $booking->pin,
             ])->with('success', 'Your downpayment has been received via PayMongo! Your 2D1N freediving camp slot is now confirmed.');
 
@@ -165,8 +219,8 @@ class PayMongoController extends Controller
                 'auth_booking_pin' => $booking->pin,
             ]);
 
-            return redirect()->route('manage.show', [
-                'booking_number' => $booking->booking_number,
+            return redirect()->route('booking.create', [
+                'confirmed' => $booking->booking_number,
                 'pin' => $booking->pin,
             ])->with('success', 'Payment received. Your booking is confirmed.');
         }
@@ -211,7 +265,22 @@ class PayMongoController extends Controller
         $eventType = $processed['event_type'];
         $eventData = $processed['data'];
 
-        Log::info("PayMongo Webhook Event Received: {$eventType}", ['event' => $eventType]);
+        // Webhook Idempotency Deduplication:
+        // PayMongo operates on an at-least-once delivery model, which may retry sending the exact same payload.
+        // Cache::add() is atomic and returns true ONLY if the event has not been processed within the 24-hour TTL window.
+        $eventId = $processed['raw']['data']['id'] ?? ($eventData['id'] ?? null);
+        $dedupKey = $eventId ? "paymongo_webhook_evt:{$eventId}" : 'paymongo_webhook_payload:' . hash('sha256', $payload);
+
+        if (!Cache::add($dedupKey, true, now()->addHours(24))) {
+            Log::info("PayMongo Webhook: Duplicate event delivery discarded (Key: {$dedupKey}, Event: {$eventType})");
+            return response()->json([
+                'received' => true,
+                'event' => $eventType,
+                'status' => 'duplicate_ignored',
+            ], 200);
+        }
+
+        Log::info("PayMongo Webhook Event Received: {$eventType}", ['event' => $eventType, 'event_id' => $eventId]);
 
         try {
             switch ($eventType) {
@@ -299,6 +368,7 @@ class PayMongoController extends Controller
 
             if ($booking->status !== 'confirmed') {
                 $booking->update(['status' => 'confirmed']);
+                app(\App\Services\SlotReservationService::class)->releaseHold($booking->start_date, $booking->booking_number);
             }
 
             AuditLogger::log(

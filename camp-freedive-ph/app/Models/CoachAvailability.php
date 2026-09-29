@@ -33,19 +33,19 @@ class CoachAvailability extends Model
         return match ($this->status) {
             'available' => [
                 'label' => 'Available',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'assigned' => [
                 'label' => 'Assigned',
-                'class' => 'bg-blue-50 text-blue-700 border-blue-200',
+                'class' => 'bg-blue-50 text-blue-700',
             ],
             'unavailable' => [
-                'label' => 'Unavailable / Off',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-300',
+                'label' => 'Unavailable',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
             default => [
                 'label' => ucfirst($this->status),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

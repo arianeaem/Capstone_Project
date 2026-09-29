@@ -21,7 +21,7 @@ class BookingFlowTest extends TestCase
         $response->assertSee('Manage Booking');
     }
 
-    public function test_booking_wizard_page_loads(): void
+    public function test_booking_page_loads(): void
     {
         $response = $this->get('/book?class=discovery');
         $response->assertStatus(200);
@@ -298,5 +298,98 @@ class BookingFlowTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['participants.0.age']);
+    }
+
+    public function test_booking_creation_supports_filipino_spanish_names_and_suffix(): void
+    {
+        $startDate = now()->addDays(20)->format('Y-m-d');
+        $endDate = now()->addDays(21)->format('Y-m-d');
+
+        $response = $this->postJson('/book', [
+            'class_type' => 'discovery',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'contact_first_name' => 'Maria Ma.',
+            'contact_middle_name' => 'Nuñez',
+            'contact_last_name' => 'Santos-Concepcion',
+            'contact_suffix' => 'Jr.',
+            'contact_email' => 'maria.concepcion@example.ph',
+            'contact_phone' => '09171234567',
+            'pickup_option' => 'own',
+            'boat_dive' => false,
+            'confirmation_ack' => true,
+            'payment_method' => 'paymongo',
+            'participants' => [
+                [
+                    'first_name' => 'Mary-Ann',
+                    'middle_name' => 'Santo Niño',
+                    'last_name' => 'De la Cruz',
+                    'suffix' => 'III',
+                    'age' => 24,
+                    'health_condition' => 'None',
+                    'swimmer_status' => 'swimmer',
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['success' => true]);
+
+        $this->assertDatabaseHas('bookings', [
+            'contact_name' => 'Maria Ma. Nuñez Santos-Concepcion Jr.',
+            'contact_email' => 'maria.concepcion@example.ph',
+        ]);
+
+        $this->assertDatabaseHas('booking_participants', [
+            'name' => 'Mary-Ann Santo Niño De la Cruz III',
+            'age' => 24,
+        ]);
+    }
+
+    public function test_booking_creation_with_no_middle_name_toggle(): void
+    {
+        $startDate = now()->addDays(22)->format('Y-m-d');
+        $endDate = now()->addDays(23)->format('Y-m-d');
+
+        $response = $this->postJson('/book', [
+            'class_type' => 'discovery',
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+            'contact_first_name' => 'John Christopher Michael',
+            'contact_middle_name' => 'IgnoredMiddleName',
+            'contact_no_middle_name' => 1,
+            'contact_last_name' => 'Reyes',
+            'contact_suffix' => '',
+            'contact_email' => 'john.reyes@example.ph',
+            'contact_phone' => '09171234568',
+            'pickup_option' => 'own',
+            'boat_dive' => false,
+            'confirmation_ack' => true,
+            'payment_method' => 'paymongo',
+            'participants' => [
+                [
+                    'first_name' => 'Alex',
+                    'no_middle_name' => 1,
+                    'last_name' => 'Santos',
+                    'suffix' => 'II',
+                    'age' => 28,
+                    'health_condition' => 'None',
+                    'swimmer_status' => 'swimmer',
+                ],
+            ],
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJsonFragment(['success' => true]);
+
+        $this->assertDatabaseHas('bookings', [
+            'contact_name' => 'John Christopher Michael Reyes',
+            'contact_email' => 'john.reyes@example.ph',
+        ]);
+
+        $this->assertDatabaseHas('booking_participants', [
+            'name' => 'Alex Santos II',
+            'age' => 28,
+        ]);
     }
 }

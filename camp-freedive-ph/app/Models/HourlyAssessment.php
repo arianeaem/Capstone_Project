@@ -64,27 +64,27 @@ class HourlyAssessment extends Model
         return match ($this->classification) {
             'Very Safe' => [
                 'label' => 'Very Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'Safe' => [
                 'label' => 'Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'Moderate' => [
                 'label' => 'Moderate',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'High Risk' => [
                 'label' => 'High Risk',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
             ],
             'Critical Risk' => [
                 'label' => 'Critical Risk',
-                'class' => 'bg-red-100 text-red-800 border-red-300',
+                'class' => 'bg-red-100 text-red-800',
             ],
             default => [
                 'label' => $this->classification ?: 'Normal',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

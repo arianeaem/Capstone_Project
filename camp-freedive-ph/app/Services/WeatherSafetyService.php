@@ -4,28 +4,52 @@ namespace App\Services;
 
 use Carbon\Carbon;
 
+/**
+ * Weather Safety Evaluation & Risk Classification Service.
+ *
+ * Domain & Marine Safety Context:
+ * Provides unified safety assessments for freediving sessions in Mabini / Anilao, Batangas.
+ * Translates multi-variable meteorological forecasts (wave height, wind speed, gusts,
+ * barometric pressure drops, and current speed) into actionable 5-tier safety states:
+ * - Very Safe & Safe: Normal operations, calm seas, optimal equalizing conditions.
+ * - Moderate: Diveable with caution; sheltered coves selected.
+ * - High Risk: Heavy chop; backup safety divers assigned.
+ * - Critical Risk: Operations suspended; automatic reschedule/refund triggers activated.
+ *
+ * Forecast Horizon Limits:
+ * - 0 to 16 Days: High-resolution Open-Meteo marine and atmospheric models.
+ * - > 16 Days: Historical Batangas climate benchmarks (Amihan vs Habagat seasonal profiles).
+ */
 class WeatherSafetyService
 {
+    /**
+     * @param WeatherForecastService $forecastService Underlying Open-Meteo multi-parameter forecast provider
+     */
     public function __construct(
         protected WeatherForecastService $forecastService
     ) {}
 
     /**
-     * Evaluate dive safety conditions for a given 2D1N date range in Mabini, Batangas.
-     * Integrates live Open-Meteo marine & weather assessment models for dates within 16 days.
+     * Evaluates dive safety conditions for a 2D1N weekend date range in Mabini, Batangas.
+     *
+     * @param string|Carbon $startDate Weekend start date (Saturday)
+     * @param string|Carbon $endDate Weekend end date (Sunday)
+     * @return array Multi-attribute safety assessment including UI theme tokens, risk badges, and hourly breakdowns
      */
     public function getForecast(string|Carbon $startDate, string|Carbon $endDate): array
     {
         $start = Carbon::parse($startDate);
         $end = Carbon::parse($endDate);
 
-        $daysOut = (int) Carbon::now(WeatherForecastService::TIMEZONE)->diffInDays($start->copy()->startOfDay(), false);
+        $today = Carbon::today(WeatherForecastService::TIMEZONE);
+        $daysOut = (int) $today->diffInDays($start->copy()->startOfDay(), false);
 
         if ($daysOut >= 0 && $daysOut <= WeatherForecastService::MAX_FORECAST_DAYS) {
             $assessment = $this->forecastService->previewDateAssessment($start);
-            $overallClass = $assessment['overall_classification'] ?? 'Safe';
-            $day1 = $assessment['day1'] ?? [];
-            $day2 = $assessment['day2'] ?? [];
+            if (!empty($assessment['available'])) {
+                $overallClass = $assessment['overall_classification'] ?? 'Safe';
+                $day1 = $assessment['day1'] ?? [];
+                $day2 = $assessment['day2'] ?? [];
 
             $riskLevel = match ($overallClass) {
                 'Very Safe' => 'very_safe',
@@ -45,44 +69,60 @@ class WeatherSafetyService
                     [
                         'start_date' => $nextSat->format('Y-m-d'),
                         'end_date' => $nextSat->copy()->addDay()->format('Y-m-d'),
-                        'label' => $nextSat->format('M d') . ' to ' . $nextSat->copy()->addDay()->format('M d, Y') . ' (Next Weekend - Safe)',
+                        'label' => $nextSat->format('M d') . ' - ' . $nextSat->copy()->addDay()->format('M d, Y') . ' (Next Weekend - Safe)',
                     ],
                     [
                         'start_date' => $nextSat->copy()->addWeeks(1)->format('Y-m-d'),
                         'end_date' => $nextSat->copy()->addWeeks(1)->addDay()->format('Y-m-d'),
-                        'label' => $nextSat->copy()->addWeeks(1)->format('M d') . ' to ' . $nextSat->copy()->addWeeks(1)->addDay()->format('M d, Y') . ' (2 Weeks Out - Very Safe)',
+                        'label' => $nextSat->copy()->addWeeks(1)->format('M d') . ' - ' . $nextSat->copy()->addWeeks(1)->addDay()->format('M d, Y') . ' (2 Weeks Out - Very Safe)',
                     ]
                 ];
             }
+
+                $reliability = $assessment['reliability'] ?? WeatherForecastService::getReliabilityCategory($daysOut);
+            $confidence = $assessment['confidence'] ?? ($daysOut >= 4 ? 'low' : 'high');
+            $rawAdvisory = $assessment['confidence_advisory'] ?? ($confidence === 'low' ? "Confidence is low this far out, recheck in 2 days." : null);
+            $confidenceAdvisory = $rawAdvisory ? preg_replace('/^(Very Safe|Safe|Moderate|High Risk|Critical Risk)[\.\:\-]\s*/i', '', $rawAdvisory) : null;
+
+            $formattedDescription = $riskConfig['description'];
 
             return [
                 'is_benchmark' => false,
                 'risk_level' => $riskLevel,
                 'overall_classification' => $overallClass,
+                'confidence' => $confidence,
+                'confidence_advisory' => $confidenceAdvisory,
                 'title' => $riskConfig['title'],
                 'badge_color' => $riskConfig['badge_color'],
                 'border_color' => $riskConfig['border_color'],
                 'bg_color' => $riskConfig['bg_color'],
                 'text_color' => $riskConfig['text_color'],
                 'icon' => $riskConfig['icon'],
-                'description' => $riskConfig['description'],
+                'description' => $formattedDescription,
                 'is_bookable' => $riskLevel !== 'critical_risk',
                 'has_storm_signal' => $riskLevel === 'critical_risk',
+                'days_out' => $daysOut,
+                'reliability' => $reliability,
                 'day1' => [
                     'date' => $start->format('M d, Y'),
                     'classification' => $day1['classification'] ?? 'Safe',
+                    'confidence' => $day1['confidence'] ?? $confidence,
+                    'confidence_advisory' => $day1['confidence_advisory'] ?? $confidenceAdvisory,
                     'recommended_action' => $day1['recommended_action'] ?? 'Conditions are generally safe, but normal safety protocols should still be followed.',
                     'worst_hour' => $day1['worst_hour'] ?? '11:00 AM',
                 ],
                 'day2' => [
                     'date' => $end->format('M d, Y'),
                     'classification' => $day2['classification'] ?? 'Safe',
+                    'confidence' => $day2['confidence'] ?? $confidence,
+                    'confidence_advisory' => $day2['confidence_advisory'] ?? $confidenceAdvisory,
                     'recommended_action' => $day2['recommended_action'] ?? 'Conditions are generally safe, but normal safety protocols should still be followed.',
                     'worst_hour' => $day2['worst_hour'] ?? '11:00 AM',
                 ],
                 'suggested_dates' => $suggestedDates,
                 'location' => 'Mabini / Anilao, Batangas',
             ];
+            }
         }
 
         // For dates beyond 16 days or advance bookings:

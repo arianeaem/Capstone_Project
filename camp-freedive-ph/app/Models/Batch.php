@@ -7,8 +7,28 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
+/**
+ * Batch Model representing a discrete 2D1N Freediving Camp weekend.
+ *
+ * Business & Capacity Context:
+ * - Batches run on fixed weekend cycles (Saturday to Sunday) in Mabini, Batangas.
+ * - Maximum capacity is strictly capped at 45 participants per batch based on outrigger banca
+ *   licensing and Philippine Coast Guard safety rules.
+ * - Minimum coach staffing follows a 1:4 coach-to-diver ratio (45 divers = up to 12 coaches).
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $batch_code
+ * @property Carbon $start_date Saturday start date
+ * @property Carbon $end_date Sunday end date
+ * @property string $lifecycle_status open, closing_soon, sold_out, completed, archived
+ * @property string $risk_classification very_safe, safe, moderate, high_risk, critical_risk
+ * @property int $max_capacity Batch capacity ceiling (default 45)
+ * @property string $status confirmed, open, completed, rescheduled, cancelled_by_camp
+ */
 class Batch extends Model
 {
     use HasFactory;
@@ -62,6 +82,11 @@ class Batch extends Model
         return $this->hasMany(ParticipantAssignment::class, 'batch_id');
     }
 
+    public function coachAssignments(): HasMany
+    {
+        return $this->hasMany(ParticipantAssignment::class, 'batch_id');
+    }
+
     public function activeParticipantAssignments(): HasMany
     {
         return $this->hasMany(ParticipantAssignment::class, 'batch_id')->where('status', 'assigned');
@@ -82,14 +107,29 @@ class Batch extends Model
         return $this->hasMany(BatchRiskAssessment::class, 'batch_id')->orderBy('assessed_at', 'desc');
     }
 
+    public function riskAssessment(): HasOne
+    {
+        return $this->hasOne(BatchRiskAssessment::class, 'batch_id')->latestOfMany('assessed_at');
+    }
+
     public function manualOverrides(): HasMany
     {
         return $this->hasMany(ManualOverride::class, 'batch_id')->orderBy('created_at', 'desc');
     }
 
+    public function latestManualOverride(): HasOne
+    {
+        return $this->hasOne(ManualOverride::class, 'batch_id')->latestOfMany();
+    }
+
     public function notificationLogs(): HasMany
     {
         return $this->hasMany(NotificationLog::class, 'batch_id')->orderBy('sent_at', 'desc');
+    }
+
+    public function releaseRequests(): HasMany
+    {
+        return $this->hasMany(AssignmentReleaseRequest::class, 'batch_id')->orderBy('requested_at', 'desc');
     }
 
     public function getLatestDay1AssessmentAttribute(): ?BatchRiskAssessment
@@ -110,15 +150,15 @@ class Batch extends Model
 
     public function getLatestManualOverrideAttribute(): ?ManualOverride
     {
-        return $this->manualOverrides()->first();
+        return $this->latestManualOverride()->first();
     }
 
     /**
-     * Display name of the batch.
+     * Display name of the batch (Batch Number as primary).
      */
     public function getDisplayNameAttribute(): string
     {
-        return $this->name ?: $this->batch_code;
+        return $this->batch_number;
     }
 
     /**
@@ -126,12 +166,33 @@ class Batch extends Model
      */
     public function getAssignedCoachesAttribute(): Collection
     {
-        return $this->activeParticipantAssignments()
+        $fromAssignments = $this->activeParticipantAssignments()
             ->with('coach')
             ->get()
             ->pluck('coach')
             ->unique('id')
             ->filter();
+
+        // Also detect coaches assigned for this batch date when participants are 0
+        $startDateStr = $this->start_date ? $this->start_date->format('Y-m-d') : null;
+        if ($startDateStr) {
+            $batchNum = $this->batch_number;
+            $batchCode = $this->batch_code;
+
+            $fromAvailabilities = User::where('role', 'coach')
+                ->whereHas('coachAvailabilities', function ($q) use ($startDateStr, $batchNum, $batchCode) {
+                    $q->whereDate('date', $startDateStr)
+                      ->where('status', 'assigned')
+                      ->where(function ($sub) use ($batchNum, $batchCode) {
+                          if ($batchNum) $sub->where('notes', 'like', "%{$batchNum}%");
+                          if ($batchCode) $sub->orWhere('notes', 'like', "%{$batchCode}%");
+                      });
+                })->get();
+
+            return $fromAssignments->merge($fromAvailabilities)->unique('id')->values();
+        }
+
+        return $fromAssignments;
     }
 
     public const MAX_CAPACITY = 45;
@@ -150,20 +211,24 @@ class Batch extends Model
     }
 
     /**
-     * Check if coach staffing is pending (0 coaches).
+     * Check if coach staffing is pending (has participants/bookings but 0 coaches assigned).
      */
     public function getIsCoachPendingAttribute(): bool
     {
+        if ($this->total_participants_count === 0) {
+            return false;
+        }
+
         return $this->assigned_coaches_count === 0;
     }
 
     /**
-     * Total participants in active bookings.
+     * Total participants in active confirmed bookings.
      */
     public function getTotalParticipantsCountAttribute(): int
     {
         return (int) $this->bookings()
-            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
             ->withCount('participants')
             ->get()
             ->sum('participants_count');
@@ -190,13 +255,79 @@ class Batch extends Model
     }
 
     /**
-     * Total collected amount for bookings in this batch.
+     * Standardized date range format:
+     * - Same year: Oct 12 - Oct 13, 2026
+     * - Cross year: Dec 31, 2026 - Jan 1, 2027
+     * - Single date: Oct 12, 2026
+     */
+    public function getFormattedDateRangeAttribute(): string
+    {
+        if (!$this->start_date) {
+            return 'N/A';
+        }
+
+        if (!$this->end_date || $this->start_date->eq($this->end_date)) {
+            return $this->start_date->format('M d, Y');
+        }
+
+        if ($this->start_date->year === $this->end_date->year) {
+            return $this->start_date->format('M d') . ' - ' . $this->end_date->format('M d, Y');
+        }
+
+        return $this->start_date->format('M d, Y') . ' - ' . $this->end_date->format('M d, Y');
+    }
+
+    /**
+     * Total expected revenue from active bookings.
+     */
+    public function getTotalRevenueAttribute(): float
+    {
+        return (float) $this->bookings
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
+            ->sum('total_amount');
+    }
+
+    /**
+     * Verified collected amount for bookings in this batch.
+     */
+    public function getCollectedRevenueAttribute(): float
+    {
+        $activeBookings = $this->bookings
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment']);
+
+        $activeBookingIds = $activeBookings->pluck('id');
+
+        $paymentSum = (float) Payment::whereIn('booking_id', $activeBookingIds)
+            ->whereIn('status', ['completed', 'paid'])
+            ->sum('amount');
+
+        if ($paymentSum === 0.0 && $activeBookings->isNotEmpty()) {
+            $calculatedCollected = $activeBookings->sum(function ($b) {
+                return max(0.0, (float) ($b->total_amount - $b->balance_amount));
+            });
+            return (float) max(0.0, $calculatedCollected);
+        }
+
+        return $paymentSum;
+    }
+
+    /**
+     * Total collected amount for bookings in this batch (alias).
      */
     public function getTotalCollectedAmountAttribute(): float
     {
-        return (float) Payment::whereIn('booking_id', $this->bookings()->pluck('id'))
-            ->whereIn('status', ['completed', 'paid'])
-            ->sum('amount');
+        return $this->collected_revenue;
+    }
+
+    /**
+     * Active bookings with an outstanding balance.
+     */
+    public function getOutstandingBalanceBookingsAttribute(): Collection
+    {
+        return $this->bookings
+            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest', 'cancelled', 'pending_downpayment'])
+            ->filter(fn($b) => (float) $b->balance_amount > 0)
+            ->values();
     }
 
     /**
@@ -204,10 +335,7 @@ class Batch extends Model
      */
     public function getOutstandingBalanceBookingsCountAttribute(): int
     {
-        return $this->bookings()
-            ->whereNotIn('status', ['cancelled_by_camp', 'cancelled_by_guest'])
-            ->where('balance_amount', '>', 0)
-            ->count();
+        return $this->outstanding_balance_bookings->count();
     }
 
     /**
@@ -246,14 +374,13 @@ class Batch extends Model
 
     public function getBatchNumberAttribute(): string
     {
-        if (!empty($this->batch_code)) {
-            $cleaned = preg_replace('/^BATCH[-#\s]*/i', '', $this->batch_code);
-            return 'Batch #' . $cleaned;
+        if (!empty($this->batch_code) && preg_match('/(\d+)/', $this->batch_code, $matches)) {
+            return 'Batch ' . $matches[1];
         }
-        if (!empty($this->name) && preg_match('/^Batch\s*#?/i', $this->name)) {
-            return $this->name;
+        if (!empty($this->name) && preg_match('/(\d+)/', $this->name, $matches)) {
+            return 'Batch ' . $matches[1];
         }
-        return 'Batch #' . $this->id;
+        return 'Batch ' . $this->id;
     }
 
     public function getStatusBadgeAttribute(): array
@@ -262,23 +389,23 @@ class Batch extends Model
         return match ($st) {
             'confirmed', 'open' => [
                 'label' => 'Confirmed',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'completed' => [
                 'label' => 'Completed',
-                'class' => 'bg-gray-100 text-gray-700 border-gray-300',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
             'rescheduled' => [
                 'label' => 'Rescheduled',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'cancelled_by_camp', 'cancelled' => [
                 'label' => 'Cancelled by Camp',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', $st)),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }
@@ -289,27 +416,27 @@ class Batch extends Model
         return match ($key) {
             'very_safe' => [
                 'label' => 'Very Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'safe' => [
                 'label' => 'Safe',
-                'class' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
+                'class' => 'bg-emerald-50 text-emerald-700',
             ],
             'moderate' => [
                 'label' => 'Moderate',
-                'class' => 'bg-amber-50 text-amber-800 border-amber-300',
+                'class' => 'bg-amber-50 text-amber-800',
             ],
             'high_risk' => [
                 'label' => 'High Risk',
-                'class' => 'bg-rose-50 text-rose-700 border-rose-200',
+                'class' => 'bg-rose-50 text-rose-700',
             ],
             'critical_risk' => [
                 'label' => 'Critical',
-                'class' => 'bg-red-100 text-red-800 border-red-300',
+                'class' => 'bg-red-100 text-red-800',
             ],
             default => [
                 'label' => ucfirst(str_replace('_', ' ', $this->risk_classification ?: 'Safe')),
-                'class' => 'bg-gray-100 text-gray-700 border-gray-200',
+                'class' => 'bg-gray-100 text-gray-700',
             ],
         };
     }

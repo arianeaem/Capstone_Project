@@ -1,58 +1,112 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Camp Freedive PH — Operations & Marine Safety Monitoring Platform
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A web application and maritime safety intelligence platform designed for Camp Freedive PH in Mabini / Anilao, Batangas.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Overview
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The platform coordinates weekend freediving operations, dynamic pricing, coach staffing, and automated weather safety evaluations. It integrates with a dedicated Python Machine Learning microservice for marine weather risk assessments, with an automated fallback to native PHP heuristics.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Core Features & Business Rules
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Automated Weekend Batch Lifecycle
+- **2D1N Operations**: Batches operate on fixed weekend cycles (Saturday AM to Sunday PM).
+- **45-Pax Capacity Limit**: Enforces the 45-participant maximum capacity per weekend batch as mandated by Philippine Coast Guard (PCG) outrigger banca regulations.
+- **Distributed Locking**: Uses atomic cache locking (`slot_allocation_lock:{date}`) and temporary 15-minute checkout holds to prevent overbooking.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Coach Staffing & Safety Ratio
+- **1:4 Safety Ratio**: Limits each instructor to a maximum of 4 students per open-water session for diver safety.
+- **Staffing Recommendations**: Automatically calculates required coach counts from forecasted student volume.
+- **48-Hour Release Cutoff**: Emergency coach release requests close 48 hours prior to 06:30 AM departure.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### 3. Financial Lifecycle & Cancellation Policy
+- **₱3,000 / Head Downpayment**: Fixed reservation deposit required to secure slots and prevent cart abandonment.
+- **4-Tier Policy Engine**:
+  - **Force Majeure (100% Refund / Free Reschedule)**: Active on official PAGASA Typhoon Signals or PCG Gale Warnings.
+  - **> 14 Days Out (100% Refund / Free Reschedule)**: Ample advance notice window.
+  - **7 to 14 Days Out (Free Reschedule / 0% Refund)**: Downpayment forfeited on cancellation to offset committed room reservations; free reschedule permitted.
+  - **< 7 Days Out (Strict Lockout)**: Non-refundable and non-reschedulable due to locked boat charters and instructor commitments.
 
-## Agentic Development
+### 4. Dynamic Yield Management
+- **Seasonal Pricing**: Adjusts pricing between Batangas Amihan (peak dry season) and Habagat (monsoon season).
+- **Adjustment Cap**: Adjustments are strictly clamped between -30% discount and +30% surge to preserve price fairness.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+### 5. Multi-Variable Marine Safety Engine
+- **9 Parameters Evaluated**: Significant wave height ($H_s$), wave period ($T_p$), swell ratio, wind speed, wind gusts, current velocity ($u, v$), 3-hour pressure tendency ($\Delta P_{3h}$), precipitation, and storm signals.
+- **Compound Synergy**: Compound risk penalties (+15% to +25%) applied for concurrent adverse conditions.
+- **Operational Horizon Policy**:
+  - $T-1\text{h}$ (Tactical Clearance): Active ML classification with Go/No-Go dockside clearance.
+  - $T-6\text{h}/24\text{h}$ (Provisional Trend Outlook): Discrete badge suppressed to prevent false reassurance; surfaces raw physical trajectory and P90 bounds.
+  - $T-48\text{h}+$ (Extended Trend Outlook): Long-range planning outlook with physical backstops.
+
+---
+
+## Tech Stack
+
+- **Web Application**: Laravel 12 (PHP 8.2+), Eloquent ORM, MySQL
+- **Frontend**: Blade, Alpine.js, Tailwind CSS
+- **ML Microservice**: Python 3.10+, FastAPI, ONNX Runtime, XGBoost
+- **Payments**: PayMongo API v2 (Hosted Checkout, QR Ph, GCash, Maya, Cards, HMAC-SHA256 Webhooks)
+- **Data Ingestion**: Open-Meteo Marine API, Copernicus Marine Service (CMEMS), ECMWF ERA5
+
+---
+
+## Getting Started
+
+### Prerequisites
+- PHP >= 8.2 (with `pdo`, `mbstring`, `openssl`, `tokenizer`, `xml`, `curl` extensions)
+- Composer
+- Node.js >= 18.x & NPM
+- Python 3.10+ (for ML Safety Microservice)
+
+### Installation & Setup
+
+1. **Set up the Laravel Application**:
+   ```bash
+   cd camp-freedive-ph
+   composer install
+   npm install && npm run build
+   cp .env.example .env
+   php artisan key:generate
+   php artisan migrate --seed
+   php artisan serve
+   ```
+
+2. **Set up the Python ML Microservice**:
+   ```bash
+   cd safety-forecast
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   pip install -r requirements.txt
+   uvicorn src.serve.main:app --host 127.0.0.1 --port 8001 --reload
+   ```
+
+---
+
+## Testing & Verification
+
+Run automated test suites across the stack:
 
 ```bash
-composer require laravel/boost --dev
+# Laravel Feature & Unit Tests
+php artisan test
+php artisan test --filter=BookingFlowTest
+php artisan test --filter=MLSafetyServiceIntegrationTest
 
-php artisan boost:install
+# Python ML & Safety Threshold Tests
+python src/serve/safety_thresholds.py
+python src/serve/test_service.py
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+---
 
-## Contributing
+## Code Documentation Standards
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+The codebase follows the 4-Pillar Documentation Framework:
+- **Explain the "Why"**: Details domain physics, safety ratios, and business rules.
+- **Document Classes & Functions**: Standard docblocks with parameters and return types.
+- **Zero Stale References**: Accurate references with zero obsolete terms.
+- **Targeted Roadmap Notes**: Clear `TODO` comments for future improvements.

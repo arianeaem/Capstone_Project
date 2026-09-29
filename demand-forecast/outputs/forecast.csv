@@ -1,0 +1,14 @@
+forecast_date,days_ahead,predicted_participants,predicted_bookings,predicted_revenue_php,demand_level,season_period,instructors_needed,_month
+2026-10-07,7,17.5,8.0,64767.33,Medium,Shoulder,5,2026-10
+2026-10-14,14,15.3,6.8,65663.36,Medium,Shoulder,4,2026-10
+2026-10-21,21,14.9,7.3,60034.13,Medium,Shoulder,4,2026-10
+2026-10-28,28,17.8,8.0,66628.55,Medium,Shoulder,5,2026-10
+2026-11-04,35,16.3,7.2,60902.39,Medium,Shoulder,5,2026-11
+2026-11-11,42,18.0,8.5,69719.19,Medium,Shoulder,5,2026-11
+2026-11-18,49,16.1,7.4,61484.57,Medium,Shoulder,5,2026-11
+2026-11-25,56,17.6,8.0,69096.94,Medium,Shoulder,5,2026-11
+2026-12-02,63,24.7,10.5,98879.12,High,Peak,7,2026-12
+2026-12-09,70,22.3,10.2,93330.16,High,Peak,6,2026-12
+2026-12-16,77,19.3,9.1,75890.46,Medium,Peak,5,2026-12
+2026-12-23,84,19.8,8.9,81605.33,Medium,Peak,5,2026-12
+2026-12-30,91,24.9,10.8,81448.32,High,Peak,7,2026-12

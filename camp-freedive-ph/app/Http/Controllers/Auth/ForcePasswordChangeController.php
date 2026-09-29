@@ -21,7 +21,8 @@ class ForcePasswordChangeController extends Controller
 
         if (!$user || !$user->must_change_password) {
             return match ($user?->role) {
-                'owner', 'admin' => redirect()->route('admin.dashboard'),
+                'owner' => redirect()->route('owner.dashboard'),
+                'admin' => redirect()->route('admin.dashboard'),
                 'coach' => redirect()->route('coach.dashboard'),
                 default => redirect()->route('login'),
             };
@@ -58,7 +59,8 @@ class ForcePasswordChangeController extends Controller
         AuditLogger::log('PASSWORD_CHANGED', "Temporary password updated on first login by: {$user->email} (Role: {$user->role})", $user, $user->name, $request);
 
         $redirectRoute = match ($user->role) {
-            'owner', 'admin' => 'admin.dashboard',
+            'owner' => 'owner.dashboard',
+            'admin' => 'admin.dashboard',
             'coach' => 'coach.dashboard',
             default => 'login',
         };

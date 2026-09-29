@@ -31,6 +31,13 @@ class BookingController extends Controller
     {
         $query = Booking::with('participants', 'payments');
 
+        // By default, exclude unpaid downpayment draft bookings unless explicitly requested
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        } else {
+            $query->where('status', '!=', 'pending_downpayment');
+        }
+
         // Search filter (Booking #, Contact Name, Contact Phone, Email)
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -40,11 +47,6 @@ class BookingController extends Controller
                   ->orWhere('contact_phone', 'like', "%{$search}%")
                   ->orWhere('contact_email', 'like', "%{$search}%");
             });
-        }
-
-        // Status filter
-        if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
         }
 
         // Class type filter
@@ -84,8 +86,12 @@ class BookingController extends Controller
         match ($sort) {
             'created_desc' => $query->latest('created_at'),
             'created_asc' => $query->oldest('created_at'),
-            'dive_date_desc' => $query->orderBy('start_date', 'desc'),
-            'dive_date_asc' => $query->orderBy('start_date', 'asc'),
+            'dive_date_asc' => $query->orderBy('start_date', 'asc')->latest('created_at'),
+            'dive_date_desc' => $query->orderBy('start_date', 'desc')->latest('created_at'),
+            'amount_desc' => $query->orderBy('total_amount', 'desc'),
+            'amount_asc' => $query->orderBy('total_amount', 'asc'),
+            'guest_asc' => $query->orderBy('contact_name', 'asc'),
+            'guest_desc' => $query->orderBy('contact_name', 'desc'),
             'status' => $query->orderBy('status'),
             default => $query->latest('created_at'),
         };
@@ -94,7 +100,7 @@ class BookingController extends Controller
         $bookings = $query->paginate($perPage)->withQueryString();
 
         $stats = [
-            'total' => Booking::count(),
+            'total' => Booking::where('status', '!=', 'pending_downpayment')->count(),
             'confirmed' => Booking::where('status', 'confirmed')->count(),
             'rescheduled' => Booking::where('status', 'rescheduled')->count(),
             'completed' => Booking::where('status', 'completed')->count(),
@@ -118,7 +124,29 @@ class BookingController extends Controller
             ['id' => 'sto_tomas', 'name' => 'Sto. Tomas SLEX Exit (Batangas) - 5:30 AM'],
         ];
 
-        return view('admin.bookings.create', compact('pickupPoints'));
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $feesData = [
+            'carpool' => (float) ($settingService->get('addons.carpool_fee_per_head') ?? $settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00),
+            'boat_dive' => (float) ($settingService->get('addons.boat_dive_fee_per_head') ?? $settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00),
+            'lgu_pass' => (float) ($settingService->get('addons.lgu_tourism_pass_fee') ?? $settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00),
+            'environmental' => (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00),
+        ];
+
+        $pricingConfig = [
+            'basePrices' => [
+                'discovery' => (float) ($settingService->get('program_pricing.discovery_price', 4250.00) ?? 4250.00),
+                'fundive_cert' => (float) ($settingService->get('program_pricing.fundive_certified_price', 2500.00) ?? 2500.00),
+                'fundive_noncert' => (float) ($settingService->get('program_pricing.fundive_non_certified_price', 3300.00) ?? 3300.00),
+                'refinement' => (float) ($settingService->get('program_pricing.refinement_price', 4100.00) ?? 4100.00),
+            ],
+            'fees' => $feesData,
+            'downpayments' => [
+                'carpool' => (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00),
+                'own_transpo' => (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00),
+            ],
+        ];
+
+        return view('admin.bookings.create', compact('pickupPoints', 'feesData', 'pricingConfig'));
     }
 
     /**
@@ -127,6 +155,42 @@ class BookingController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $currentUser = Auth::user();
+
+        // Merge lead contact first_name, middle_name, last_name, and suffix if present
+        if ($request->filled('first_name') || $request->filled('last_name')) {
+            $cfn = trim($request->input('first_name') ?? '');
+            $cmn = $request->boolean('no_middle_name') ? '' : trim($request->input('middle_name') ?? '');
+            $cln = trim($request->input('last_name') ?? '');
+            $csuf = trim($request->input('suffix') ?? '');
+            if ($csuf === 'None' || $csuf === 'none') {
+                $csuf = '';
+            }
+            $contactName = implode(' ', array_filter([$cfn, $cmn, $cln, $csuf]));
+            if ($contactName !== '') {
+                $request->merge(['contact_name' => $contactName]);
+            }
+        }
+
+        // Merge participant first_name, middle_name, last_name, and suffix if present
+        if ($request->has('participants') && is_array($request->input('participants'))) {
+            $participants = $request->input('participants');
+            foreach ($participants as $i => $p) {
+                if (isset($p['first_name']) || isset($p['last_name'])) {
+                    $pfn = trim($p['first_name'] ?? '');
+                    $pmn = !empty($p['no_middle_name']) ? '' : trim($p['middle_name'] ?? '');
+                    $pln = trim($p['last_name'] ?? '');
+                    $psuf = trim($p['suffix'] ?? '');
+                    if ($psuf === 'None' || $psuf === 'none') {
+                        $psuf = '';
+                    }
+                    $pName = implode(' ', array_filter([$pfn, $pmn, $pln, $psuf]));
+                    if ($pName !== '') {
+                        $participants[$i]['name'] = $pName;
+                    }
+                }
+            }
+            $request->merge(['participants' => $participants]);
+        }
 
         // Sanitize phone number spacing/dashes before validation
         if ($request->has('contact_phone')) {
@@ -151,7 +215,7 @@ class BookingController extends Controller
             'pickup_option' => 'required|in:none,own,carpool',
             'pickup_location' => 'nullable|string|max:255',
             'boat_dive' => 'boolean',
-            'payment_method' => 'required|in:gcash,bpi_bank_transfer',
+            'payment_method' => 'required|in:gcash,bpi_bank_transfer,maya,bdo,unionbank,cash,other',
             'payment_stage' => 'required|in:downpayment,full',
             'payment_reference' => 'nullable|string|max:100',
             'admin_notes' => 'nullable|string|max:1000',
@@ -174,27 +238,34 @@ class BookingController extends Controller
             ->get()
             ->sum('participants_count');
 
-        $maxCapacity = 45;
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $maxCapacity = (int) ($settingService->get('camp_operations.max_batch_capacity', 45) ?? 45);
         if (($existingPax + $participantCount) > $maxCapacity) {
             $remaining = max(0, $maxCapacity - $existingPax);
             return back()->withInput()->with('error', "Cannot create booking: Batch capacity ceiling of {$maxCapacity} pax reached for {$startDate} (Only {$remaining} slots available).");
         }
 
-        $pricePerPerson = match ($validated['class_type']) {
-            'discovery' => 4250.00,
-            'fundive' => ($validated['is_certified_diver'] ?? false) ? 2500.00 : 3300.00,
-            'refinement' => 4100.00,
-        };
+        $pricePerPerson = app(\App\Services\PricingRuleEngine::class)->getBasePrice(
+            $validated['class_type'], 
+            $validated['is_certified_diver'] ?? false
+        );
+
+        $carpoolRate = (float) ($settingService->get('addons.carpool_fee_per_head') ?? $settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
+        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee_per_head') ?? $settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
+        $lguRate = (float) ($settingService->get('addons.lgu_tourism_pass_fee') ?? $settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
+        $envRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
 
         $subtotal = $pricePerPerson * $participantCount;
-        $carpoolFee = ($validated['pickup_option'] === 'carpool') ? (1200.00 * $participantCount) : 0.00;
-        $boatDiveFee = ($validated['boat_dive'] ?? false) ? (600.00 * $participantCount) : 0.00;
-        $lguFee = 300.00 * $participantCount;
-        $environmentalFee = 50.00 * $participantCount;
+        $carpoolFee = ($validated['pickup_option'] === 'carpool') ? ($carpoolRate * $participantCount) : 0.00;
+        $boatDiveFee = ($validated['boat_dive'] ?? false) ? ($boatDiveRate * $participantCount) : 0.00;
+        $lguFee = $lguRate * $participantCount;
+        $environmentalFee = $envRate * $participantCount;
         $totalAmount = $subtotal + $carpoolFee + $boatDiveFee + $lguFee + $environmentalFee;
 
         // Downpayment rule
-        $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? 3000.00 : 2000.00;
+        $carpoolDp = (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00);
+        $ownTranspoDp = (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00);
+        $downpaymentPerHead = ($validated['pickup_option'] === 'carpool') ? $carpoolDp : $ownTranspoDp;
         $downpaymentAmount = min($downpaymentPerHead * $participantCount, $totalAmount);
 
         $paidAmount = ($validated['payment_stage'] === 'full') ? $totalAmount : $downpaymentAmount;
@@ -376,39 +447,46 @@ class BookingController extends Controller
         $pickupLocation = ($pickupOption === 'carpool') ? ($validated['pickup_location'] ?? $booking->pickup_location) : null;
         $boatDive = (bool)$booking->boat_dive;
 
-        $pricePerPerson = match ($booking->class_type) {
-            'discovery' => 4250.00,
-            'fundive' => $booking->is_certified_diver ? 2500.00 : 3300.00,
-            'refinement' => 4100.00,
-        };
+        $settingService = app(\App\Services\SystemSettingService::class);
+        $pricePerPerson = app(\App\Services\PricingRuleEngine::class)->getBasePrice(
+            $booking->class_type,
+            (bool)$booking->is_certified_diver
+        );
+
+        $carpoolRate = (float) ($settingService->get('addons.carpool_fee_per_head') ?? $settingService->get('addons.carpool_roundtrip_fee', 1200.00) ?? 1200.00);
+        $boatDiveRate = (float) ($settingService->get('addons.boat_dive_fee_per_head') ?? $settingService->get('addons.boat_dive_fee', 600.00) ?? 600.00);
+        $lguRate = (float) ($settingService->get('addons.lgu_tourism_pass_fee') ?? $settingService->get('addons.municipal_environmental_fee', 300.00) ?? 300.00);
+        $envRate = (float) ($settingService->get('addons.environmental_fee', 50.00) ?? 50.00);
 
         $subtotal = $pricePerPerson * $participantCount;
-        $carpoolFee = ($pickupOption === 'carpool') ? (1200.00 * $participantCount) : 0.00;
-        $boatDiveFee = $boatDive ? (600.00 * $participantCount) : 0.00;
-        $lguFee = 300.00 * $participantCount;
-        $environmentalFee = 50.00 * $participantCount;
+        $carpoolFee = ($pickupOption === 'carpool') ? ($carpoolRate * $participantCount) : 0.00;
+        $boatDiveFee = $boatDive ? ($boatDiveRate * $participantCount) : 0.00;
+        $lguFee = $lguRate * $participantCount;
+        $environmentalFee = $envRate * $participantCount;
         $totalAmount = $subtotal + $carpoolFee + $boatDiveFee + $lguFee + $environmentalFee;
 
-        $downpaymentPerHead = ($pickupOption === 'carpool') ? 3000.00 : 2000.00;
+        $carpoolDp = (float) ($settingService->get('program_pricing.downpayment_carpool', 3000.00) ?? 3000.00);
+        $ownTranspoDp = (float) ($settingService->get('program_pricing.downpayment_own_transpo', 2000.00) ?? 2000.00);
+        $downpaymentPerHead = ($pickupOption === 'carpool') ? $carpoolDp : $ownTranspoDp;
         $downpaymentAmount = min($downpaymentPerHead * $participantCount, $totalAmount);
         $balanceAmount = $totalAmount - $booking->payments()->whereIn('status', ['completed', 'paid'])->sum('amount');
 
         // Track changes for immutable audit trail (RA 10173)
         $diffs = [];
         if ($booking->start_date->format('Y-m-d') !== $validated['start_date']) {
-            $diffs[] = "Dates: {$booking->start_date->format('Y-m-d')} → {$validated['start_date']}";
+            $diffs[] = "Dates: {$booking->start_date->format('Y-m-d')} {$validated['start_date']}";
         }
         if ($booking->contact_name !== $validated['contact_name']) {
-            $diffs[] = "Contact Name: {$booking->contact_name} → {$validated['contact_name']}";
+            $diffs[] = "Contact Name: {$booking->contact_name} {$validated['contact_name']}";
         }
         if ($booking->contact_email !== $validated['contact_email']) {
-            $diffs[] = "Contact Email: {$booking->contact_email} → {$validated['contact_email']}";
+            $diffs[] = "Contact Email: {$booking->contact_email} {$validated['contact_email']}";
         }
         if ($booking->contact_phone !== $validated['contact_phone']) {
-            $diffs[] = "Contact Phone: {$booking->contact_phone} → {$validated['contact_phone']}";
+            $diffs[] = "Contact Phone: {$booking->contact_phone} {$validated['contact_phone']}";
         }
         if ($pickupOption === 'carpool' && $booking->pickup_location !== $pickupLocation) {
-            $diffs[] = "Carpool Hub: " . ($booking->pickup_location ?: 'None') . " → " . ($pickupLocation ?: 'None');
+            $diffs[] = "Carpool Hub: " . ($booking->pickup_location ?: 'None') . " " . ($pickupLocation ?: 'None');
         }
 
         DB::transaction(function () use (
@@ -532,7 +610,7 @@ class BookingController extends Controller
 
         AuditLogger::log(
             'BOOKING_STATUS_CHANGED',
-            "Booking #{$booking->booking_number} status transitioned: {$oldStatus} → {$newStatus} by {$currentUser->name}. Note: {$note}",
+            "Booking #{$booking->booking_number} status transitioned: {$oldStatus} {$newStatus} by {$currentUser->name}. Note: {$note}",
             $currentUser,
             $currentUser->name,
             $request

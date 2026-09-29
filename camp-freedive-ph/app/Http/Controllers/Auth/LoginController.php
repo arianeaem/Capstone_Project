@@ -79,11 +79,27 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $authenticatedUser = Auth::user();
-            $authenticatedUser->update([
-                'last_login_at' => now(),
-            ]);
+            
+            // Check if user has never logged in before or has must_change_password flag set
+            $isFirstLogin = is_null($authenticatedUser->last_login_at);
+            $needsPasswordChange = $authenticatedUser->must_change_password || $isFirstLogin;
+
+            if ($needsPasswordChange) {
+                $authenticatedUser->update([
+                    'must_change_password' => true,
+                ]);
+            } else {
+                $authenticatedUser->update([
+                    'last_login_at' => now(),
+                ]);
+            }
 
             AuditLogger::log('LOGIN_SUCCESS', "User logged in: {$authenticatedUser->email} (Role: {$authenticatedUser->role})", $authenticatedUser, $authenticatedUser->name, $request);
+
+            if ($needsPasswordChange) {
+                return redirect()->route('password.force_change')
+                    ->with('warning', 'Please change your temporary password before accessing your dashboard.');
+            }
 
             return $this->authenticatedRedirect($authenticatedUser);
         }
@@ -92,10 +108,17 @@ class LoginController extends Controller
         RateLimiter::hit($throttleKey);
         AuditLogger::log('LOGIN_FAILED', "Failed login attempt for email: {$request->input('email')}", $user, $request->input('email'), $request);
 
+        $errorMessage = $user 
+            ? 'The password you entered is incorrect. Please check your password or click "Forgot password?".'
+            : 'These credentials do not match our records. Please check your email address and password.';
+
+        $fieldErrors = $user
+            ? ['password' => 'Incorrect password entered.']
+            : ['email' => 'These credentials do not match our records.'];
+
         return back()->withInput($request->only('email', 'remember'))
-            ->withErrors([
-                'email' => 'These credentials do not match our records.',
-            ]);
+            ->with('error', $errorMessage)
+            ->withErrors($fieldErrors);
     }
 
     /**
@@ -125,12 +148,9 @@ class LoginController extends Controller
                 ->with('warning', 'Please change your temporary password before accessing your dashboard.');
         }
 
-        if (in_array($user->email, ['group8@campfreedive.ph', 'tester@campfreedive.ph'])) {
-            return redirect()->route('admin.bookings.index');
-        }
-
         return match ($user->role) {
-            'owner', 'admin' => redirect()->intended(route('admin.dashboard')),
+            'owner' => redirect()->intended(route('owner.dashboard')),
+            'admin' => redirect()->intended(route('admin.dashboard')),
             'coach' => redirect()->intended(route('coach.dashboard')),
             default => redirect()->route('landing'),
         };

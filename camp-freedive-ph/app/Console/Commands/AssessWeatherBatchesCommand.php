@@ -98,7 +98,7 @@ class AssessWeatherBatchesCommand extends Command
                     default => 'fg=white',
                 };
 
-                $this->line("    ✓ Done. Day 1: <fg=cyan>{$day1Class}</> | Day 2: <fg=cyan>{$day2Class}</> | Overall: <{$colorTag}>{$overallClass}</>");
+                $this->line("    Done. Day 1: <fg=cyan>{$day1Class}</> | Day 2: <fg=cyan>{$day2Class}</> | Overall: <{$colorTag}>{$overallClass}</>");
                 $successCount++;
             } catch (Exception $e) {
                 $this->error("    ✗ Failed assessing batch {$batchCode}: " . $e->getMessage());

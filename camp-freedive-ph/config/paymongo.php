@@ -7,8 +7,8 @@ return [
     | PayMongo API Keys & Endpoints Configuration
     |--------------------------------------------------------------------------
     |
-    | PayMongo credentials for handling online customer payments, e-wallets
-    | (GCash, GrabPay, Maya, QR Ph, Credit/Debit cards), webhooks, and refunds.
+    | PayMongo credentials for handling online customer payments, hosted checkout
+    | (QR Ph, GCash, BPI, Maya, Cards), webhooks, and refunds.
     |
     */
 
@@ -24,16 +24,15 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Supported Payment Method Types
+    | Supported Hosted Checkout Payment Method Types (QR Ph, GCash, BPI, Card, Maya)
     |--------------------------------------------------------------------------
     */
     'payment_method_types' => [
+        'qrph',
         'gcash',
-        'grab_pay',
         'paymaya',
         'card',
-        'dob',
-        'qrph',
+        'grab_pay',
     ],
 
     /*
@@ -42,6 +41,6 @@ return [
     |--------------------------------------------------------------------------
     */
     'verify_ssl' => env('PAYMONGO_VERIFY_SSL', true),
-    'timeout' => (int) env('PAYMONGO_TIMEOUT', 15),
+    'timeout' => (int) env('PAYMONGO_TIMEOUT', 20),
 
 ];

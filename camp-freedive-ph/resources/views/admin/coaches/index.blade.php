@@ -5,86 +5,134 @@
 @section('content')
 <div class="space-y-6 text-sm">
     
-    <!-- Top Header & Action Controls -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E5EA] pb-5">
+    <!-- Header and Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1D1D1F] tracking-tight">Coach Roster & Schedules</h1>
-            <p class="text-xs sm:text-sm text-[#6E6E73] mt-1">
-                View certified freediving coaches, student assignments, and availability calendars.
-            </p>
         </div>
 
         <div class="flex items-center gap-2.5 flex-wrap">
-            <!-- Shortcut 1: Matching Queue -->
+            <!-- Coach Requests Shortcut -->
+            <a href="{{ route('admin.coaches.requests') }}" 
+               class="btn-secondary px-3.5 py-2 text-sm sm:text-sm font-semibold flex items-center gap-1.5">
+                <span>Coach Requests</span>
+            </a>
+
+            <!-- Matching Queue Shortcut (Primary Action on Right) -->
             <a href="{{ route('admin.coaches.matching') }}" 
-               class="btn-primary px-4 py-2.5 text-xs sm:text-sm font-bold flex items-center gap-2">
-                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+               class="btn-primary px-4 py-2 text-sm sm:text-sm font-bold flex items-center gap-2 shadow-2xs">
                 <span>Students Needing Coach</span>
                 @if($unassignedStudentsCount > 0)
-                    <span class="px-2 py-0.5 rounded-full text-xs font-black bg-[#FF3B3C] text-white">
+                    <span class="px-2 py-0.5 rounded-md text-sm font-bold bg-white text-[#780000]">
                         {{ $unassignedStudentsCount }}
                     </span>
                 @endif
             </a>
-
-            <!-- Shortcut 2: Coach Requests -->
-            <a href="{{ route('admin.coaches.requests') }}" 
-               class="btn-secondary px-3.5 py-2.5 text-xs sm:text-sm font-semibold flex items-center gap-1.5">
-                <svg class="w-4 h-4 text-[#FF8D28]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                <span>Coach Requests</span>
-            </a>
         </div>
     </div>
 
-    <!-- Search & Filter Controls (Flat border, no shadow) -->
-    <div class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 space-y-4">
-        <form action="{{ route('admin.coaches.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+    <!-- Toolbar and Filter Controls -->
+    <div class="bg-white rounded-xl border border-[#E5E5EA] p-3 shadow-2xs">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             
-            <!-- Search -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Search Coach</label>
-                <input type="text" 
-                       name="search" 
-                       value="{{ request('search') }}" 
-                       placeholder="Name, email, or phone..." 
-                       class="w-full px-3.5 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
+            <!-- Status Filter Tabs -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+                <a href="{{ request()->fullUrlWithQuery(['status' => '']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ !request('status') ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    All Coaches ({{ $activeCount + $inactiveCount }})
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'active']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('status') === 'active' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Active ({{ $activeCount }})
+                </a>
+                <a href="{{ request()->fullUrlWithQuery(['status' => 'inactive']) }}" 
+                   class="px-3 py-1.5 rounded-lg text-sm font-bold transition-all shrink-0 {{ request('status') === 'inactive' ? 'bg-[#780000] text-white shadow-2xs' : 'bg-white text-[#6E6E73] hover:text-[#1D1D1F] hover:bg-[#F2F2F7] border border-[#E5E5EA]' }}">
+                    Inactive ({{ $inactiveCount }})
+                </a>
             </div>
 
-            <!-- Status Filter -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Account Status</label>
-                <select name="status" class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-                    <option value="">All Statuses ({{ $activeCount + $inactiveCount }})</option>
-                    <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Active Only ({{ $activeCount }})</option>
-                    <option value="inactive" {{ request('status') === 'inactive' ? 'selected' : '' }}>Inactive Only ({{ $inactiveCount }})</option>
-                </select>
+            <!-- Search and Filter Controls -->
+            <div class="flex items-center gap-2 w-full lg:w-auto" x-data="{ openFilters: false }">
+                <form action="{{ route('admin.coaches.index') }}" method="GET" class="flex-1 min-w-0 lg:flex-initial">
+                    @if(request('status'))
+                        <input type="hidden" name="status" value="{{ request('status') }}">
+                    @endif
+                    @if(request('available_on'))
+                        <input type="hidden" name="available_on" value="{{ request('available_on') }}">
+                    @endif
+
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}" 
+                               placeholder="Search coach name, email..." 
+                               class="w-full pl-8 pr-3 py-1.5 text-sm rounded-lg border border-[#D1D1D6] bg-white focus:bg-white focus:border-[#780000]">
+                        <svg class="w-3.5 h-3.5 text-[#8E8E93] absolute left-2.5 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+                </form>
+
+                <!-- Filter Controls -->
+                <div class="relative shrink-0">
+                    <button type="button" 
+                            @click="openFilters = !openFilters" 
+                            class="btn-secondary flex items-center justify-center gap-1.5 px-3 py-1.5 text-sm font-semibold whitespace-nowrap shrink-0 cursor-pointer">
+                        <img src="{{ asset('icons/icons8-filter-60.png') }}" alt="Filter" class="w-4.5 h-4.5 object-contain inline-block shrink-0">
+                        <span class="whitespace-nowrap">Filter</span>
+                        @if(request()->filled('available_on'))
+                            <span class="w-2 h-2 rounded-full bg-[#780000] shrink-0"></span>
+                        @endif
+                    </button>
+
+                    <!-- Filter Form Dropdown -->
+                    <div x-show="openFilters" 
+                         @click.outside="openFilters = false" 
+                         x-cloak 
+                         x-transition:enter="transition ease-out duration-150 transform"
+                         x-transition:enter-start="opacity-0 scale-95 -translate-y-1"
+                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave="transition ease-in duration-100 transform"
+                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 scale-95 -translate-y-1"
+                         class="absolute right-0 mt-2 w-[calc(100vw-2rem)] sm:w-80 max-w-sm bg-white rounded-2xl border border-[#E5E5EA] shadow-xl p-4 z-50 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-sm text-[#1D1D1F]">Filter Coaches</h4>
+                            <a href="{{ route('admin.coaches.index') }}" class="text-sm text-[#780000] hover:underline font-bold">Reset</a>
+                        </div>
+
+                        <form action="{{ route('admin.coaches.index') }}" method="GET" class="space-y-3 text-sm">
+                            @if(request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                            @endif
+                            @if(request('search'))
+                                <input type="hidden" name="search" value="{{ request('search') }}">
+                            @endif
+
+                            <div>
+                                <label class="block font-bold text-[#6E6E73] text-sm mb-1">Available on Specific Date</label>
+                                <input type="date" 
+                                       name="available_on" 
+                                       value="{{ request('available_on') }}" 
+                                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-sm font-medium">
+                            </div>
+
+                            <div class="pt-2 border-t border-[#E5E5EA] flex justify-end">
+                                <button type="submit" class="btn-primary w-full py-2 text-sm font-bold shadow-2xs">
+                                    Apply Filter
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
 
-            <!-- Date Filter -->
-            <div>
-                <label class="block font-bold text-[#1D1D1F] mb-1">Available on Specific Date</label>
-                <input type="date" 
-                       name="available_on" 
-                       value="{{ request('available_on') }}" 
-                       class="w-full px-3 py-2 rounded-xl border border-[#D1D1D6] text-xs text-[#1D1D1F] bg-white">
-            </div>
-
-            <!-- Submit / Reset -->
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary px-4 py-2 text-xs font-bold w-full">
-                    Apply Filters
-                </button>
-                @if(request()->anyFilled(['search', 'status', 'available_on', 'has_capacity']))
-                    <a href="{{ route('admin.coaches.index') }}" class="btn-secondary px-3 py-2 text-xs text-center">
-                        Reset
-                    </a>
-                @endif
-            </div>
-        </form>
+        </div>
     </div>
 
-    <!-- Coach Roster Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Coach Roster -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         @forelse($coaches as $coach)
         @php
             $upcomingCount = $coach->assignedParticipants()
@@ -104,109 +152,78 @@
             $markedAvailableCount = $coach->coachAvailabilities->where('status', 'available')->where('date', '>=', now()->toDateString())->count();
         @endphp
         
-        <div class="bg-white rounded-2xl border border-[#E5E5EA] p-5 hover:border-[#008E98]/40 transition-all flex flex-col justify-between space-y-4">
+        <div tabindex="0" 
+             role="link" 
+             onclick="window.location='{{ route('admin.coaches.show', $coach) }}'" 
+             onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location='{{ route('admin.coaches.show', $coach) }}';}" 
+             class="bg-white rounded-xl border border-[#E5E5EA] p-4 sm:p-5 hover:ring-1 hover:ring-[#780000] focus:outline-none focus:ring-2 focus:ring-[#780000] active:scale-[0.99] cursor-pointer transition-all flex flex-col justify-between space-y-4 shadow-2xs group">
             
-            <!-- Card Header: Avatar, Name & Status -->
-            <div>
+            <div class="space-y-3.5">
+                <!-- Coach Header: Avatar + Name on Left, Status Badge on Right -->
                 <div class="flex items-start justify-between gap-3">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#780000] to-[#A00000] text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    <div class="flex items-center gap-3 min-w-0 flex-1">
+                        <div class="w-11 h-11 rounded-full bg-[#F8EAEA] text-[#780000] border-2 border-[#780000] flex items-center justify-center font-extrabold text-base shrink-0 shadow-2xs">
                             {{ substr($coach->name, 0, 1) }}
                         </div>
-                        <div>
-                            <a href="{{ route('admin.coaches.show', $coach) }}" class="font-extrabold text-[#1D1D1F] hover:text-[#780000] text-base block leading-tight">
+                        <div class="min-w-0 flex-1">
+                            <span class="font-extrabold text-[#1D1D1F] text-base block leading-tight truncate group-hover:text-[#780000] transition-colors">
                                 {{ $coach->name }}
-                            </a>
+                            </span>
                             @if($coach->nickname)
-                                <span class="text-xs font-semibold text-[#008E98]">"{{ $coach->nickname }}"</span>
+                                <span class="text-xs sm:text-sm font-semibold text-[#780000] block mt-0.5">"{{ $coach->nickname }}"</span>
                             @endif
-                            <div class="text-[11px] text-[#6E6E73] mt-0.5">
-                                {{ $coach->specialties_notes ?: 'Certified Freedive Coach' }}
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Status Pill -->
-                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold border shrink-0 {{ $coach->status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200' }}">
+                    <!-- Status Badge -->
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold shrink-0 {{ $coach->status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700' }}">
                         {{ ucfirst($coach->status) }}
                     </span>
                 </div>
 
-                <!-- Contact Details -->
-                <div class="mt-4 pt-3 border-t border-[#F2F2F7] space-y-1 text-xs text-[#6E6E73]">
-                    <div class="flex items-center gap-2 truncate">
-                        <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
-                        <span class="truncate">{{ $coach->email }}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <svg class="w-3.5 h-3.5 text-[#8E8E93] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                        <span>{{ $coach->phone ?: 'No phone recorded' }}</span>
-                    </div>
-                </div>
-
-                <!-- Schedule & Student Load Stats -->
-                <div class="mt-4 p-3 rounded-xl bg-[#FAFAFC] border border-[#E5E5EA] space-y-2.5 text-xs">
-                    <!-- Upcoming Dives -->
-                    <div class="flex items-center justify-between">
-                        <span class="text-[#6E6E73]">Upcoming Dive Dates:</span>
-                        @if($upcomingCount > 0)
-                            <span class="font-bold text-[#1D1D1F]">{{ $upcomingCount }} Date(s)</span>
-                        @else
-                            <span class="text-[#8E8E93] italic">None scheduled</span>
-                        @endif
+                <!-- 2x2 Data Grid (Matching Reference Picture Styling) -->
+                <div class="grid grid-cols-2 gap-x-4 gap-y-3 pt-3 border-t border-[#F2F2F7]">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">UPCOMING ACTIVE DATES</span>
+                        <span class="text-sm font-semibold text-[#1D1D1F] block mt-0.5">
+                            {{ $upcomingCount }} scheduled
+                        </span>
                     </div>
 
-                    <!-- Next Student Load -->
-                    @if($nextAssignment)
-                        <div class="space-y-1 pt-1 border-t border-[#E5E5EA]">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[#6E6E73]">Next Assignment ({{ $nextAssignment->dive_date->format('M d') }}):</span>
-                                <span class="font-bold text-[#1D1D1F]">{{ $loadOnNext }} / 4 Pax</span>
-                            </div>
-                            <div class="w-full bg-[#E5E5EA] rounded-full h-1.5 overflow-hidden">
-                                <div class="h-1.5 rounded-full {{ $loadOnNext > 4 ? 'bg-[#FF3B3C]' : ($loadOnNext === 4 ? 'bg-[#34C759]' : 'bg-[#0088FF]') }}" 
-                                     style="width: {{ min(100, ($loadOnNext / 4) * 100) }}%"></div>
-                            </div>
-                            @if($loadOnNext > 4)
-                                <span class="text-[11px] font-bold text-[#FF3B3C] block">Override Exception (Over Capacity)</span>
-                            @endif
-                        </div>
-                    @endif
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">CALENDAR AVAILABILITY</span>
+                        <span class="text-sm font-semibold block mt-0.5 {{ $markedAvailableCount > 0 ? 'text-emerald-700' : 'text-[#8E8E93]' }}">
+                            {{ $markedAvailableCount > 0 ? $markedAvailableCount . ' Open Dates' : '0 open dates' }}
+                        </span>
+                    </div>
 
-                    <!-- Availability Summary -->
-                    <div class="flex items-center justify-between pt-1 border-t border-[#E5E5EA]">
-                        <span class="text-[#6E6E73]">Calendar Availability:</span>
-                        @if($markedAvailableCount > 0)
-                            <span class="px-2 py-0.5 rounded-full font-bold text-[#065F46] text-[11px]">
-                                {{ $markedAvailableCount }} Open Dates
-                            </span>
-                        @else
-                            <span class="text-[#8E8E93] text-[11px]">0 future dates open</span>
-                        @endif
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">NEXT DIVE BATCH</span>
+                        <span class="text-sm font-semibold text-[#1D1D1F] block mt-0.5">
+                            {{ $nextAssignment ? \Carbon\Carbon::parse($nextAssignment->dive_date)->format('M d, Y') : 'None' }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#8E8E93] block">NEXT BATCH LOAD</span>
+                        <span class="text-sm font-semibold block mt-0.5 {{ $loadOnNext > ($coach->max_ratio ?? 4) ? 'text-rose-700 font-bold' : ($nextAssignment ? 'text-[#1D1D1F]' : 'text-[#8E8E93]') }}">
+                            {{ $nextAssignment ? $loadOnNext . ' / ' . ($coach->max_ratio ?? 4) . ' Students' : '0 / ' . ($coach->max_ratio ?? 4) . ' Students' }}
+                        </span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Card Footer Actions -->
-            <div class="pt-2 border-t border-[#F2F2F7] flex items-center justify-between gap-2">
-                <a href="{{ route('admin.coaches.show', $coach) }}" 
-                   class="w-full py-2 px-3 rounded-xl font-bold text-xs text-center flex items-center justify-center gap-1.5 whitespace-nowrap btn-secondary hover:bg-[#F2F2F7] transition-all">
-                    <span>View Profile</span>
-                    <span>→</span>
-                </a>
             </div>
 
         </div>
         @empty
-        <div class="col-span-full py-12 text-center text-[#6E6E73] bg-white rounded-2xl border border-[#E5E5EA]">
+        <div class="col-span-full py-10 text-center text-[#6E6E73] bg-white rounded-xl border border-[#E5E5EA]">
             <p class="text-base font-bold text-[#1D1D1F]">No coaches found</p>
-            <p class="text-xs text-[#6E6E73] mt-1">Try adjusting your search criteria or clear active filters.</p>
+            <p class="text-sm text-[#6E6E73] mt-1">Try adjusting your search criteria or clear active filters.</p>
         </div>
         @endforelse
     </div>
 
-    <!-- Pagination -->
-    <div class="pt-2">
+    <!-- Table Pagination -->
+    <div class="bg-[#F2F2F7] rounded-xl border border-[#E5E5EA] overflow-hidden [&>*]:border-t-0">
         {{ $coaches->links() }}
     </div>
 

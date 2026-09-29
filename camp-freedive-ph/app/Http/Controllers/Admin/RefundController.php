@@ -42,10 +42,10 @@ class RefundController extends Controller
             ->withQueryString();
 
 
-        // Calculate live policy snapshot for each pending request
+        // Calculate live policy snapshot for each pending request based on when it was submitted
         $policies = [];
         foreach ($pendingRefunds as $req) {
-            $policies[$req->id] = $this->policyEngine->evaluate($req->booking);
+            $policies[$req->id] = $this->policyEngine->evaluate($req->booking, $req->requested_at ?? $req->created_at);
         }
 
         return view('admin.payments.refunds', compact('pendingRefunds', 'processedRefunds', 'policies'));
@@ -64,8 +64,22 @@ class RefundController extends Controller
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $refundAmount = $payment->amount;
-        $paymongoPaymentId = $payment->paymongo_payment_id ?: $payment->transaction_id;
+        $refundAmount = (float) ($refundRequest->refund_amount ?: $payment->amount);
+        $paymongoPaymentId = $payment->paymongo_payment_id;
+
+        // Auto-resolve real PayMongo payment_id from Checkout Session if needed
+        if ((empty($paymongoPaymentId) || !str_starts_with($paymongoPaymentId, 'pay_')) && !empty($payment->paymongo_resource_id)) {
+            $session = $this->payMongoService->getCheckoutSession($payment->paymongo_resource_id);
+            $sessPayments = $session['data']['attributes']['payments'] ?? [];
+            if (!empty($sessPayments[0]['id'])) {
+                $paymongoPaymentId = $sessPayments[0]['id'];
+                $payment->update(['paymongo_payment_id' => $paymongoPaymentId]);
+            }
+        }
+
+        if (empty($paymongoPaymentId)) {
+            $paymongoPaymentId = $payment->transaction_id ?: 'offline';
+        }
 
         // Call PayMongo Refund API
         $refundResult = $this->payMongoService->refund(
@@ -76,17 +90,8 @@ class RefundController extends Controller
         );
 
         if (!$refundResult['success']) {
-            $payment->update(['status' => 'failed']);
-            PaymentStatusLog::create([
-                'payment_id' => $payment->id,
-                'old_status' => $payment->status,
-                'new_status' => 'failed',
-                'changed_by' => $currentUser->id,
-                'note' => 'PayMongo Refund API execution failed. Please retry.',
-                'created_at' => now(),
-            ]);
-
-            return back()->with('error', 'PayMongo refund API execution failed. The request remains pending for retry.');
+            $errMsg = $refundResult['error'] ?? 'PayMongo refund execution failed. Please retry.';
+            return back()->with('error', "PayMongo Refund Error: {$errMsg}");
         }
 
         $paymongoRefundId = $refundResult['refund_id'] ?? ('ref_' . bin2hex(random_bytes(8)));

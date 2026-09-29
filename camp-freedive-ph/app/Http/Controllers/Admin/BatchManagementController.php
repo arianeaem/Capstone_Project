@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Batch;
 use App\Models\Booking;
 use App\Services\BatchManagementService;
+use App\Services\DemandForecastService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\JsonResponse;
@@ -13,14 +14,31 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
+/**
+ * Administrative Batch Management & Logistics Controller.
+ *
+ * Operational Responsibilities:
+ * 1. Batch Lifecycle Management: Handles creation, confirmation, active execution,
+ *    and completion of weekend freediving batches.
+ * 2. Passenger Manifest & Roster Generation: Groups confirmed bookings into coherent batch rosters
+ *    ensuring coach-to-student ratios (1:4) and van seating capacities are balanced.
+ * 3. Demand Forecasting & Capacity Allocation: Integrates demand predictions to recommend
+ *    opening additional weekend slots or allocating extra safety divers during peak seasons.
+ */
 class BatchManagementController extends Controller
 {
     public function __construct(
-        protected BatchManagementService $batchService
+        protected BatchManagementService $batchService,
+        protected DemandForecastService $forecastService
     ) {}
 
+    // TODO: Implement iCal / Google Calendar synchronization feed for coaches to import scheduled batches directly to mobile devices.
+
     /**
-     * Page 1: Batch List.
+     * Page 1: Batch List Roster.
+     *
+     * @param Request $request Filter parameters (status, date_from, date_to, search, sort).
+     * @return View Renders the batch management index table.
      */
     public function index(Request $request): View
     {
@@ -49,8 +67,19 @@ class BatchManagementController extends Controller
             });
         }
 
-        // Default Sort by newest to oldest dive date & creation
-        $batches = $query->orderBy('start_date', 'desc')->orderBy('created_at', 'desc')->get();
+        // Sort options
+        $sort = $request->input('sort', 'date_asc');
+        match ($sort) {
+            'date_desc' => $query->orderBy('start_date', 'desc')->orderBy('created_at', 'desc'),
+            'date_asc' => $query->orderBy('start_date', 'asc')->orderBy('created_at', 'desc'),
+            'batch_asc' => $query->orderBy('batch_code', 'asc'),
+            'batch_desc' => $query->orderBy('batch_code', 'desc'),
+            'created_desc' => $query->latest('created_at'),
+            'created_asc' => $query->oldest('created_at'),
+            default => $query->orderBy('start_date', 'asc')->orderBy('created_at', 'desc'),
+        };
+
+        $batches = $query->get();
 
         // Staffing Status Filter (in-memory computed)
         if ($request->filled('staffing')) {
@@ -59,6 +88,13 @@ class BatchManagementController extends Controller
             } elseif ($request->input('staffing') === 'staffed') {
                 $batches = $batches->filter(fn($b) => !$b->is_coach_pending);
             }
+        }
+
+        // Capacity-based sorting (in-memory computed)
+        if ($sort === 'capacity_desc') {
+            $batches = $batches->sortByDesc(fn($b) => $b->total_participants_count)->values();
+        } elseif ($sort === 'capacity_asc') {
+            $batches = $batches->sortBy(fn($b) => $b->total_participants_count)->values();
         }
 
         // Needs Attention count
@@ -75,7 +111,7 @@ class BatchManagementController extends Controller
 
         // Paginate batches collection
         $page = (int) $request->input('page', 1);
-        $perPage = max(5, min(100, (int) $request->input('per_page', 10)));
+        $perPage = max(4, min(100, (int) $request->input('per_page', 12)));
         $total = $batches->count();
         $batches = new \Illuminate\Pagination\LengthAwarePaginator(
             $batches->forPage($page, $perPage)->values(),
@@ -100,14 +136,14 @@ class BatchManagementController extends Controller
      */
     public function create(Request $request): View
     {
-        $defaultDate = $request->input('date') ? Carbon::parse($request->input('date')) : Carbon::now()->next(Carbon::SATURDAY);
-        $defaultEndDate = $defaultDate->copy()->addDay();
-        $defaultStartDateStr = $defaultDate->format('Y-m-d');
-        $defaultEndDateStr = $defaultEndDate->format('Y-m-d');
-        $batchCount = Batch::count();
-        $defaultBatchNumber = 'Batch ' . ($batchCount + 1);
+        $defaultDate = $request->filled('date') ? Carbon::parse($request->input('date')) : null;
+        $defaultEndDate = $defaultDate ? $defaultDate->copy()->addDay() : null;
+        $defaultStartDateStr = $defaultDate ? $defaultDate->format('Y-m-d') : '';
+        $defaultEndDateStr = $defaultEndDate ? $defaultEndDate->format('Y-m-d') : '';
+        $suggestedNum = $defaultDate ? $this->batchService->getNextBatchNumber($defaultDate) : $this->batchService->getNextBatchNumber();
+        $defaultBatchNumber = 'Batch ' . $suggestedNum;
 
-        $unbatchedBookings = $this->batchService->getUnbatchedBookingsForDate($defaultDate);
+        $unbatchedBookings = $defaultDate ? $this->batchService->getUnbatchedBookingsForDate($defaultDate) : collect();
 
         $initialBookings = $unbatchedBookings->map(function ($b) {
             return [
@@ -121,6 +157,7 @@ class BatchManagementController extends Controller
         })->values()->all();
 
         $selectedIds = $unbatchedBookings->pluck('id')->values()->all();
+        $initialStaffingRec = $defaultDate ? $this->forecastService->getStaffingRecommendationForDate($defaultDate) : null;
 
         $existingBatches = Batch::all()->map(function ($b) {
             return [
@@ -144,7 +181,8 @@ class BatchManagementController extends Controller
             'unbatchedBookings',
             'initialBookings',
             'selectedIds',
-            'existingBatches'
+            'existingBatches',
+            'initialStaffingRec'
         ));
     }
 
@@ -156,7 +194,8 @@ class BatchManagementController extends Controller
         $dateStr = $request->input('date', Carbon::today()->format('Y-m-d'));
         $date = Carbon::parse($dateStr);
         $bookings = $this->batchService->getUnbatchedBookingsForDate($date);
-        $batchCount = Batch::count();
+        $suggestedNum = $this->batchService->getNextBatchNumber($date);
+        $mlRec = $this->forecastService->getStaffingRecommendationForDate($date);
 
         $existingForDate = Batch::whereDate('start_date', $date)->get()->map(function ($b) {
             return [
@@ -172,11 +211,13 @@ class BatchManagementController extends Controller
 
         return response()->json([
             'date' => $date->format('Y-m-d'),
-            'suggested_batch_number' => 'Batch ' . ($batchCount + 1),
-            'suggested_name' => 'Batch ' . ($batchCount + 1),
-            'suggested_code' => 'Batch ' . ($batchCount + 1),
+            'suggested_batch_number' => 'Batch ' . $suggestedNum,
+            'suggested_batch_number_only' => (string) $suggestedNum,
+            'suggested_name' => 'Batch ' . $suggestedNum,
+            'suggested_code' => 'Batch ' . $suggestedNum,
             'count' => $bookings->count(),
             'existing_batches' => $existingForDate,
+            'ml_recommendation' => $mlRec,
             'bookings' => $bookings->map(function ($b) {
                 return [
                     'id' => $b->id,
@@ -208,10 +249,17 @@ class BatchManagementController extends Controller
             'booking_ids.*' => 'exists:bookings,id',
         ]);
 
-        if (!empty($validated['batch_number'])) {
-            $validated['batch_code'] = $validated['batch_number'];
-            $validated['name'] = $validated['batch_number'];
+        $batchRaw = $validated['batch_number'] ?? $request->input('batch_number_digits') ?? '';
+        if (preg_match('/(\d+)/', (string) $batchRaw, $m)) {
+            $batchIdentifier = 'Batch ' . $m[1];
+        } else {
+            $nextNum = $this->batchService->getNextBatchNumber(Carbon::parse($validated['start_date']));
+            $batchIdentifier = 'Batch ' . $nextNum;
         }
+
+        $validated['batch_number'] = $batchIdentifier;
+        $validated['batch_code'] = $batchIdentifier;
+        $validated['name'] = $batchIdentifier;
 
         // Check if an existing batch already exists for the same start date to prevent duplicate date batches
         $existingBatch = Batch::whereDate('start_date', $validated['start_date'])->first();
@@ -233,7 +281,7 @@ class BatchManagementController extends Controller
             );
 
             return redirect()->route('admin.batches.show', $batch)
-                ->with('success', "✓ Batch {$batch->name} ({$batch->batch_code}) created with " . count($request->input('booking_ids', [])) . " linked booking(s).");
+                ->with('success', "Batch {$batch->name} ({$batch->batch_code}) created with " . count($request->input('booking_ids', [])) . " linked booking(s).");
         } catch (Exception $e) {
             return back()->withInput()->with('error', 'Batch creation failed: ' . $e->getMessage());
         }
@@ -251,6 +299,9 @@ class BatchManagementController extends Controller
             'creator',
         ]);
 
+        // Pre-trip assigned coaches for this batch
+        $assignedCoaches = $batch->assigned_coaches;
+
         // Unassigned students count in this batch
         $unassignedStudentsCount = $batch->bookings->flatMap->participants
             ->filter(fn($p) => !$p->activeAssignment)
@@ -263,9 +314,85 @@ class BatchManagementController extends Controller
 
         return view('admin.batches.show', compact(
             'batch',
+            'assignedCoaches',
             'unassignedStudentsCount',
             'otherBatches'
         ));
+    }
+
+    /**
+     * Quick on-site pod assignment for a participant using the batch's pre-trip assigned coaches.
+     */
+    public function assignParticipant(Request $request, Batch $batch): RedirectResponse
+    {
+        $validated = $request->validate([
+            'participant_id' => 'required|exists:booking_participants,id',
+            'coach_id' => 'nullable|exists:users,id',
+        ]);
+
+        $participant = \App\Models\BookingParticipant::findOrFail($validated['participant_id']);
+
+        if ($participant->booking?->batch_id !== $batch->id) {
+            return back()->with('error', 'Participant does not belong to this batch.');
+        }
+
+        $diveDate = $batch->start_date;
+        $assignedBy = auth()->user();
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($batch, $participant, $validated, $diveDate, $assignedBy) {
+            $oldAssignment = \App\Models\ParticipantAssignment::where('participant_id', $participant->id)
+                ->where('status', 'assigned')
+                ->first();
+
+            $oldCoachId = $oldAssignment?->coach_id;
+
+            if (empty($validated['coach_id'])) {
+                if ($oldAssignment) {
+                    $oldAssignment->delete();
+                    \App\Models\AssignmentLog::create([
+                        'participant_id' => $participant->id,
+                        'old_coach_id' => $oldCoachId,
+                        'new_coach_id' => null,
+                        'changed_by' => $assignedBy->id,
+                        'reason' => 'On-site unassigned from pod.',
+                    ]);
+                }
+            } else {
+                $newCoach = \App\Models\User::findOrFail($validated['coach_id']);
+
+                if ($oldAssignment) {
+                    $oldAssignment->update([
+                        'coach_id' => $newCoach->id,
+                        'batch_id' => $batch->id,
+                        'dive_date' => $diveDate,
+                        'assigned_by' => $assignedBy->id,
+                        'assigned_at' => now(),
+                    ]);
+                } else {
+                    \App\Models\ParticipantAssignment::create([
+                        'participant_id' => $participant->id,
+                        'booking_id' => $participant->booking_id,
+                        'coach_id' => $newCoach->id,
+                        'batch_id' => $batch->id,
+                        'dive_date' => $diveDate,
+                        'assigned_by' => $assignedBy->id,
+                        'assigned_at' => now(),
+                        'status' => 'assigned',
+                    ]);
+                }
+
+                \App\Models\AssignmentLog::create([
+                    'participant_id' => $participant->id,
+                    'old_coach_id' => $oldCoachId,
+                    'new_coach_id' => $newCoach->id,
+                    'changed_by' => $assignedBy->id,
+                    'reason' => 'On-site pod assignment during session.',
+                ]);
+            }
+        });
+
+        $coachName = !empty($validated['coach_id']) ? \App\Models\User::find($validated['coach_id'])?->name : 'Shared Pool';
+        return back()->with('success', "Assigned {$participant->name} to {$coachName}.");
     }
 
     /**
@@ -293,7 +420,7 @@ class BatchManagementController extends Controller
                 default => 'Updated to ' . ucfirst($validated['status']),
             };
 
-            return back()->with('success', "✓ Batch status updated: {$actionLabel}.");
+            return back()->with('success', "Batch status updated: {$actionLabel}.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -321,7 +448,7 @@ class BatchManagementController extends Controller
                 $validated['reason'] ?? null
             );
 
-            return back()->with('success', "✓ Booking {$booking->booking_number} moved successfully.");
+            return back()->with('success', "Booking {$booking->booking_number} moved successfully.");
         } catch (Exception $e) {
             return back()->with('error', $e->getMessage());
         }

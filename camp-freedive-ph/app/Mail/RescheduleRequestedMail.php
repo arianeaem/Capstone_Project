@@ -22,7 +22,7 @@ class RescheduleRequestedMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '📅 Reschedule Request Received: ' . $this->booking->booking_number . ' | Camp FreedivePH',
+            subject: 'Reschedule Request Received: ' . $this->booking->booking_number . ' | Camp FreedivePH',
         );
     }
 
