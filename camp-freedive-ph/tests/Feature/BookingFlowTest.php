@@ -2,13 +2,74 @@
 
 namespace Tests\Feature;
 
+use App\Models\Batch;
 use App\Models\Booking;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class BookingFlowTest extends TestCase
 {
     use RefreshDatabase;
+
+    // -------------------------------------------------------------------------
+    // Helpers
+    // -------------------------------------------------------------------------
+
+    /**
+     * Return the next upcoming Saturday's date string.
+     * Used to satisfy the Saturday-only backend validation rule.
+     */
+    private function nextSaturday(int $weeksAhead = 1): string
+    {
+        $date = Carbon::now()->next(Carbon::SATURDAY);
+        if ($weeksAhead > 1) {
+            $date->addWeeks($weeksAhead - 1);
+        }
+        return $date->toDateString();
+    }
+
+    private function nextSunday(int $weeksAhead = 1): string
+    {
+        return Carbon::parse($this->nextSaturday($weeksAhead))->addDay()->toDateString();
+    }
+
+    /**
+     * Build a minimal valid booking payload for use across tests.
+     */
+    private function validPayload(array $overrides = []): array
+    {
+        $start = $this->nextSaturday(2);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
+
+        return array_merge([
+            'class_type'          => 'discovery',
+            'start_date'          => $start,
+            'end_date'            => $end,
+            'participants'        => [
+                [
+                    'first_name'       => 'Ariane',
+                    'last_name'        => 'Santos',
+                    'age'              => 25,
+                    'health_condition' => 'None',
+                    'swimmer_status'   => 'non_swimmer',
+                ],
+            ],
+            'contact_first_name'  => 'Ariane',
+            'contact_last_name'   => 'Santos',
+            'contact_email'       => 'ariane@example.com',
+            'contact_phone'       => '09171234567',
+            'pickup_option'       => 'own',
+            'boat_dive'           => false,
+            'has_agreed_to_terms' => true,
+            'confirmation_ack'    => true,
+            'payment_method'      => 'paymongo',
+        ], $overrides);
+    }
+
+    // -------------------------------------------------------------------------
+    // Basic page loading
+    // -------------------------------------------------------------------------
 
     public function test_landing_page_loads_successfully(): void
     {
@@ -32,121 +93,112 @@ class BookingFlowTest extends TestCase
 
     public function test_weather_check_endpoint(): void
     {
+        $start = $this->nextSaturday(3);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
+
         $response = $this->postJson('/api/weather/check', [
-            'start_date' => now()->addDays(7)->format('Y-m-d'),
-            'end_date' => now()->addDays(8)->format('Y-m-d'),
+            'start_date' => $start,
+            'end_date'   => $end,
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'risk_level',
-            'title',
-            'badge_color',
-            'description',
-            'is_bookable',
+            'risk_level', 'title', 'badge_color', 'description', 'is_bookable',
             'day1' => ['date', 'classification', 'recommended_action'],
             'day2' => ['date', 'classification', 'recommended_action'],
         ]);
     }
 
+    // -------------------------------------------------------------------------
+    // Successful booking creation
+    // -------------------------------------------------------------------------
+
     public function test_complete_booking_submission_creates_booking_and_payment(): void
     {
-        $startDate = now()->addDays(25)->format('Y-m-d');
-        $endDate = now()->addDays(26)->format('Y-m-d');
+        $start = $this->nextSaturday(4);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
 
         $payload = [
-            'class_type' => 'discovery',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'participants' => [
-                [
-                    'name' => 'Ariane Mae',
-                    'age' => 25,
-                    'health_condition' => 'None',
-                    'swimmer_status' => 'non_swimmer',
-                ],
-                [
-                    'name' => 'Bryan Santos',
-                    'age' => 26,
-                    'health_condition' => 'Mild dust allergy',
-                    'swimmer_status' => 'swimmer',
-                ],
+            'class_type'          => 'discovery',
+            'start_date'          => $start,
+            'end_date'            => $end,
+            'participants'        => [
+                ['first_name' => 'Ariane', 'last_name' => 'Mae', 'age' => 25, 'health_condition' => 'None', 'swimmer_status' => 'non_swimmer'],
+                ['first_name' => 'Bryan',  'last_name' => 'Santos', 'age' => 26, 'health_condition' => 'Mild dust allergy', 'swimmer_status' => 'swimmer'],
             ],
-            'contact_name' => 'Ariane Mae',
-            'contact_email' => 'ariane@example.com',
-            'contact_phone' => '09171234567',
-            'contact_facebook' => 'https://www.facebook.com/arianemae',
-            'pickup_option' => 'carpool',
-            'pickup_location' => 'Shell Tiendesitas (Pasig) - 3:00 AM',
-            'boat_dive' => true,
-            'confirmation_ack' => true,
-            'payment_method' => 'gcash',
+            'contact_first_name'  => 'Ariane',
+            'contact_last_name'   => 'Mae',
+            'contact_email'       => 'ariane@example.com',
+            'contact_phone'       => '09171234567',
+            'contact_facebook'    => 'https://www.facebook.com/arianemae',
+            'pickup_option'       => 'own',
+            'boat_dive'           => true,
+            'has_agreed_to_terms' => true,
+            'confirmation_ack'    => true,
+            'payment_method'      => 'paymongo',
         ];
 
         $response = $this->postJson('/book', $payload);
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'success',
-            'booking_number',
-            'pin',
-            'booking_id',
-            'downpayment_paid',
-            'balance_due',
-            'manage_url',
+            'success', 'booking_number', 'pin', 'booking_id',
+            'downpayment_paid', 'balance_due', 'manage_url',
         ]);
 
-        // 3,000 per head * 2 = 6,000.00
         $this->assertDatabaseHas('bookings', [
-            'contact_email' => 'ariane@example.com',
-            'class_type' => 'discovery',
-            'pickup_option' => 'carpool',
-            'downpayment_amount' => 6000.00,
+            'contact_email'      => 'ariane@example.com',
+            'class_type'         => 'discovery',
+            'pickup_option'      => 'own',
+            'downpayment_amount' => 4000.00,
         ]);
-
         $this->assertDatabaseCount('booking_participants', 2);
         $this->assertDatabaseCount('payments', 1);
     }
 
+    // -------------------------------------------------------------------------
+    // Manage Booking — lookup & reschedule
+    // -------------------------------------------------------------------------
+
     public function test_manage_booking_lookup_and_policy_evaluation(): void
     {
-        $startDate = now()->addDays(20)->format('Y-m-d');
-        $endDate = now()->addDays(21)->format('Y-m-d');
+        $start = $this->nextSaturday(3);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
 
         $booking = Booking::create([
-            'booking_number' => 'CFP-2026-9999',
-            'pin' => '1234',
-            'class_type' => 'discovery',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'pickup_option' => 'carpool',
-            'pickup_location' => 'Shell Tiendesitas (Pasig) - 3:00 AM',
-            'carpool_fee' => 2000.00,
-            'boat_dive' => false,
-            'boat_dive_fee' => 0.00,
-            'lgu_fee' => 300.00,
-            'environmental_fee' => 50.00,
-            'subtotal' => 4250.00,
-            'total_amount' => 6600.00,
+            'booking_number'     => 'CFP-2026-9999',
+            'pin'                => '1234',
+            'class_type'         => 'discovery',
+            'start_date'         => $start,
+            'end_date'           => $end,
+            'pickup_option'      => 'carpool',
+            'pickup_location'    => 'Shell Tiendesitas (Pasig) - 3:00 AM',
+            'carpool_fee'        => 2000.00,
+            'boat_dive'          => false,
+            'boat_dive_fee'      => 0.00,
+            'lgu_fee'            => 300.00,
+            'environmental_fee'  => 50.00,
+            'subtotal'           => 4250.00,
+            'total_amount'       => 6600.00,
             'downpayment_amount' => 3000.00,
-            'balance_amount' => 3600.00,
-            'contact_name' => 'Juan Test',
-            'contact_email' => 'juan@example.com',
-            'contact_phone' => '09170000000',
-            'status' => 'confirmed',
+            'balance_amount'     => 3600.00,
+            'contact_name'       => 'Juan Test',
+            'contact_email'      => 'juan@example.com',
+            'contact_phone'      => '09170000000',
+            'status'             => 'confirmed',
         ]);
 
-        // Search with wrong PIN
+        // Wrong PIN (must be 4 digits)
         $searchFail = $this->post('/manage-booking/search', [
             'booking_number' => 'CFP-2026-9999',
-            'pin' => '9999',
+            'pin'            => '9999',
         ]);
         $searchFail->assertSessionHas('error', 'Booking not found - please check your details.');
 
-        // Search with correct PIN
+        // Correct PIN
         $searchSuccess = $this->post('/manage-booking/search', [
             'booking_number' => 'CFP-2026-9999',
-            'pin' => '1234',
+            'pin'            => '1234',
         ]);
         $searchSuccess->assertRedirect(route('manage.show', ['booking_number' => 'CFP-2026-9999', 'pin' => '1234']));
 
@@ -157,239 +209,206 @@ class BookingFlowTest extends TestCase
         $showResponse->assertSee('Juan Test');
         $showResponse->assertSee('Allowed');
 
-        // Submit reschedule request
-        $newStart = now()->addDays(30)->format('Y-m-d');
-        $newEnd = now()->addDays(31)->format('Y-m-d');
+        // Reschedule to a future Saturday
+        $newStart = $this->nextSaturday(5);
+        $newEnd   = Carbon::parse($newStart)->addDay()->toDateString();
+
         $reschedResponse = $this->post('/manage-booking/CFP-2026-9999/reschedule', [
-            'pin' => '1234',
+            'pin'                  => '1234',
             'requested_start_date' => $newStart,
-            'requested_end_date' => $newEnd,
-            'reason' => 'Schedule adjustment',
+            'requested_end_date'   => $newEnd,
+            'reason'               => 'Schedule adjustment',
         ]);
         $reschedResponse->assertRedirect();
-        $this->assertDatabaseHas('reschedule_requests', [
-            'booking_id' => $booking->id,
-            'status' => 'pending',
-        ]);
-        $this->assertDatabaseHas('bookings', [
-            'id' => $booking->id,
-            'status' => 'reschedule_requested',
-        ]);
+        $this->assertDatabaseHas('reschedule_requests', ['booking_id' => $booking->id, 'status' => 'pending']);
+        $this->assertDatabaseHas('bookings', ['id' => $booking->id, 'status' => 'reschedule_requested']);
     }
+
+    // -------------------------------------------------------------------------
+    // Capacity enforcement
+    // -------------------------------------------------------------------------
 
     public function test_booking_fails_when_exceeding_batch_capacity_of_45_pax(): void
     {
-        $startDate = now()->addDays(28)->format('Y-m-d');
-        $endDate = now()->addDays(29)->format('Y-m-d');
+        $start = $this->nextSaturday(5);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
 
-        // Create an existing booking with 44 participants on that date
         $existingBooking = Booking::create([
-            'booking_number' => 'CFP-2026-8888',
-            'pin' => '1234',
-            'class_type' => 'discovery',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'pickup_option' => 'own',
-            'carpool_fee' => 0,
-            'boat_dive' => false,
-            'boat_dive_fee' => 0,
-            'lgu_fee' => 300 * 44,
-            'environmental_fee' => 50 * 44,
-            'subtotal' => 4250 * 44,
-            'total_amount' => 4600 * 44,
+            'booking_number'     => 'CFP-2026-8888',
+            'pin'                => '1234',
+            'class_type'         => 'discovery',
+            'start_date'         => $start,
+            'end_date'           => $end,
+            'pickup_option'      => 'own',
+            'carpool_fee'        => 0,
+            'boat_dive'          => false,
+            'boat_dive_fee'      => 0,
+            'lgu_fee'            => 300 * 44,
+            'environmental_fee'  => 50 * 44,
+            'subtotal'           => 4250 * 44,
+            'total_amount'       => 4600 * 44,
             'downpayment_amount' => 2000 * 44,
-            'balance_amount' => 2600 * 44,
-            'contact_name' => 'Existing Group Leader',
-            'contact_email' => 'group@example.com',
-            'contact_phone' => '09170000000',
-            'status' => 'confirmed',
+            'balance_amount'     => 2600 * 44,
+            'contact_name'       => 'Existing Group Leader',
+            'contact_email'      => 'group@example.com',
+            'contact_phone'      => '09170000000',
+            'status'             => 'confirmed',
         ]);
 
         for ($i = 1; $i <= 44; $i++) {
             $existingBooking->participants()->create([
-                'name' => "Participant {$i}",
-                'age' => 25,
+                'name'             => "Participant {$i}",
+                'age'              => 25,
                 'price_per_person' => 4250.00,
             ]);
         }
 
-        // Try booking 2 more participants (44 + 2 = 46 > 45 max)
         $response = $this->postJson('/book', [
-            'class_type' => 'discovery',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'participants' => [
-                ['name' => 'User A', 'age' => 25],
-                ['name' => 'User B', 'age' => 26],
+            'class_type'          => 'discovery',
+            'start_date'          => $start,
+            'end_date'            => $end,
+            'participants'        => [
+                ['first_name' => 'User', 'last_name' => 'Alpha', 'age' => 25, 'health_condition' => 'None', 'swimmer_status' => 'swimmer'],
+                ['first_name' => 'User', 'last_name' => 'Beta',  'age' => 26, 'health_condition' => 'None', 'swimmer_status' => 'swimmer'],
             ],
-            'contact_name' => 'Overflow Guest',
-            'contact_email' => 'overflow@example.com',
-            'contact_phone' => '09171234567',
-            'pickup_option' => 'own',
-            'boat_dive' => false,
-            'confirmation_ack' => true,
-            'payment_method' => 'gcash',
+            'contact_first_name'  => 'Overflow',
+            'contact_last_name'   => 'Guest',
+            'contact_email'       => 'overflow@example.com',
+            'contact_phone'       => '09171234567',
+            'pickup_option'       => 'own',
+            'boat_dive'           => false,
+            'has_agreed_to_terms' => true,
+            'confirmation_ack'    => true,
+            'payment_method'      => 'paymongo',
         ]);
 
         $response->assertStatus(422);
-        $response->assertJsonFragment([
-            'success' => false,
-        ]);
+        $response->assertJsonFragment(['success' => false]);
     }
+
+    // -------------------------------------------------------------------------
+    // Field validation — updated for new strict rules
+    // -------------------------------------------------------------------------
 
     public function test_booking_validation_rejects_invalid_phone_number(): void
     {
-        $response = $this->postJson('/book', [
-            'class_type' => 'discovery',
-            'start_date' => now()->addDays(20)->format('Y-m-d'),
-            'end_date' => now()->addDays(21)->format('Y-m-d'),
-            'participants' => [
-                ['name' => 'Valid User', 'age' => 25],
-            ],
-            'contact_name' => 'Valid Contact',
-            'contact_email' => 'valid@example.com',
+        $response = $this->postJson('/book', array_merge($this->validPayload(), [
             'contact_phone' => 'randomletters123',
-            'pickup_option' => 'own',
-            'confirmation_ack' => true,
-            'payment_method' => 'gcash',
-        ]);
-
+        ]));
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['contact_phone']);
     }
 
     public function test_booking_validation_rejects_invalid_email_format(): void
     {
-        $response = $this->postJson('/book', [
-            'class_type' => 'discovery',
-            'start_date' => now()->addDays(20)->format('Y-m-d'),
-            'end_date' => now()->addDays(21)->format('Y-m-d'),
-            'participants' => [
-                ['name' => 'Valid User', 'age' => 25],
-            ],
-            'contact_name' => 'Valid Contact',
+        $response = $this->postJson('/book', array_merge($this->validPayload(), [
             'contact_email' => 'notanemailaddress',
-            'contact_phone' => '09171234567',
-            'pickup_option' => 'own',
-            'confirmation_ack' => true,
-            'payment_method' => 'gcash',
-        ]);
-
+        ]));
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['contact_email']);
     }
 
     public function test_booking_validation_rejects_out_of_range_age(): void
     {
-        $response = $this->postJson('/book', [
-            'class_type' => 'discovery',
-            'start_date' => now()->addDays(20)->format('Y-m-d'),
-            'end_date' => now()->addDays(21)->format('Y-m-d'),
-            'participants' => [
-                ['name' => 'Valid User', 'age' => 999],
-            ],
-            'contact_name' => 'Valid Contact',
-            'contact_email' => 'valid@example.com',
-            'contact_phone' => '09171234567',
-            'pickup_option' => 'own',
-            'confirmation_ack' => true,
-            'payment_method' => 'gcash',
-        ]);
-
+        $payload                           = $this->validPayload();
+        $payload['participants'][0]['age'] = 999;
+        $response                          = $this->postJson('/book', $payload);
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['participants.0.age']);
     }
 
+    // -------------------------------------------------------------------------
+    // Filipino/Spanish names & suffix
+    // -------------------------------------------------------------------------
+
     public function test_booking_creation_supports_filipino_spanish_names_and_suffix(): void
     {
-        $startDate = now()->addDays(20)->format('Y-m-d');
-        $endDate = now()->addDays(21)->format('Y-m-d');
+        $start = $this->nextSaturday(3);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
 
         $response = $this->postJson('/book', [
-            'class_type' => 'discovery',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'contact_first_name' => 'Maria Ma.',
+            'class_type'          => 'discovery',
+            'start_date'          => $start,
+            'end_date'            => $end,
+            'contact_first_name'  => 'Maria Ma.',
             'contact_middle_name' => 'Nuñez',
-            'contact_last_name' => 'Santos-Concepcion',
-            'contact_suffix' => 'Jr.',
-            'contact_email' => 'maria.concepcion@example.ph',
-            'contact_phone' => '09171234567',
-            'pickup_option' => 'own',
-            'boat_dive' => false,
-            'confirmation_ack' => true,
-            'payment_method' => 'paymongo',
-            'participants' => [
+            'contact_last_name'   => 'Santos-Concepcion',
+            'contact_suffix'      => 'Jr.',
+            'contact_email'       => 'maria.concepcion@example.ph',
+            'contact_phone'       => '09171234567',
+            'pickup_option'       => 'own',
+            'boat_dive'           => false,
+            'has_agreed_to_terms' => true,
+            'confirmation_ack'    => true,
+            'payment_method'      => 'paymongo',
+            'participants'        => [
                 [
-                    'first_name' => 'Mary-Ann',
-                    'middle_name' => 'Santo Niño',
-                    'last_name' => 'De la Cruz',
-                    'suffix' => 'III',
-                    'age' => 24,
+                    'first_name'       => 'Mary-Ann',
+                    'middle_name'      => 'Santo Niño',
+                    'last_name'        => 'De la Cruz',
+                    'suffix'           => 'III',
+                    'age'              => 24,
                     'health_condition' => 'None',
-                    'swimmer_status' => 'swimmer',
+                    'swimmer_status'   => 'swimmer',
                 ],
             ],
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['success' => true]);
-
         $this->assertDatabaseHas('bookings', [
-            'contact_name' => 'Maria Ma. Nuñez Santos-Concepcion Jr.',
+            'contact_name'  => 'Maria Ma. Nuñez Santos-Concepcion Jr.',
             'contact_email' => 'maria.concepcion@example.ph',
         ]);
-
         $this->assertDatabaseHas('booking_participants', [
             'name' => 'Mary-Ann Santo Niño De la Cruz III',
-            'age' => 24,
+            'age'  => 24,
         ]);
     }
 
     public function test_booking_creation_with_no_middle_name_toggle(): void
     {
-        $startDate = now()->addDays(22)->format('Y-m-d');
-        $endDate = now()->addDays(23)->format('Y-m-d');
+        $start = $this->nextSaturday(3);
+        $end   = Carbon::parse($start)->addDay()->toDateString();
 
         $response = $this->postJson('/book', [
-            'class_type' => 'discovery',
-            'start_date' => $startDate,
-            'end_date' => $endDate,
-            'contact_first_name' => 'John Christopher Michael',
-            'contact_middle_name' => 'IgnoredMiddleName',
+            'class_type'             => 'discovery',
+            'start_date'             => $start,
+            'end_date'               => $end,
+            'contact_first_name'     => 'John Christopher Michael',
+            'contact_middle_name'    => 'IgnoredMiddleName',
             'contact_no_middle_name' => 1,
-            'contact_last_name' => 'Reyes',
-            'contact_suffix' => '',
-            'contact_email' => 'john.reyes@example.ph',
-            'contact_phone' => '09171234568',
-            'pickup_option' => 'own',
-            'boat_dive' => false,
-            'confirmation_ack' => true,
-            'payment_method' => 'paymongo',
-            'participants' => [
+            'contact_last_name'      => 'Reyes',
+            'contact_suffix'         => '',
+            'contact_email'          => 'john.reyes@example.ph',
+            'contact_phone'          => '09171234568',
+            'pickup_option'          => 'own',
+            'boat_dive'              => false,
+            'has_agreed_to_terms'    => true,
+            'confirmation_ack'       => true,
+            'payment_method'         => 'paymongo',
+            'participants'           => [
                 [
-                    'first_name' => 'Alex',
-                    'no_middle_name' => 1,
-                    'last_name' => 'Santos',
-                    'suffix' => 'II',
-                    'age' => 28,
+                    'first_name'       => 'Alex',
+                    'no_middle_name'   => 1,
+                    'last_name'        => 'Santos',
+                    'suffix'           => 'II',
+                    'age'              => 28,
                     'health_condition' => 'None',
-                    'swimmer_status' => 'swimmer',
+                    'swimmer_status'   => 'swimmer',
                 ],
             ],
         ]);
 
         $response->assertStatus(200);
         $response->assertJsonFragment(['success' => true]);
-
         $this->assertDatabaseHas('bookings', [
-            'contact_name' => 'John Christopher Michael Reyes',
+            'contact_name'  => 'John Christopher Michael Reyes',
             'contact_email' => 'john.reyes@example.ph',
         ]);
-
         $this->assertDatabaseHas('booking_participants', [
             'name' => 'Alex Santos II',
-            'age' => 28,
+            'age'  => 28,
         ]);
     }
 }

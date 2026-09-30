@@ -2784,6 +2784,7 @@ function bookingForm(config) {
             try {
                 const payload = {
                     ...this.form,
+                    has_agreed_to_terms: this.form.hasAgreedToTerms,
                     payment_method: 'paymongo'
                 };
 
