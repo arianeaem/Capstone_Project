@@ -211,16 +211,20 @@ class PricingRuleEngineTest extends TestCase
             'start_date' => '2026-12-12',
             'end_date' => '2026-12-13',
             'participants' => [
-                ['name' => 'Alice Test', 'age' => 25, 'health_condition' => 'None', 'swimmer_status' => 'beginner'],
-                ['name' => 'Bob Test', 'age' => 26, 'health_condition' => 'None', 'swimmer_status' => 'intermediate'],
+                ['first_name' => 'Alice', 'last_name' => 'Test', 'name' => 'Alice Test', 'age' => 25, 'health_condition' => 'None', 'swimmer_status' => 'beginner'],
+                ['first_name' => 'Bob', 'last_name' => 'Test', 'name' => 'Bob Test', 'age' => 26, 'health_condition' => 'None', 'swimmer_status' => 'intermediate'],
             ],
+            'contact_first_name' => 'Alice',
+            'contact_last_name' => 'Test',
             'contact_name' => 'Alice Test',
             'contact_email' => 'alice.test@example.com',
             'contact_phone' => '09171234567',
             'pickup_option' => 'carpool',
             'pickup_location' => 'Shell Tiendesitas - 3:00 AM',
             'boat_dive' => true,
-            'payment_method' => 'gcash',
+            'has_agreed_to_terms' => true,
+            'confirmation_ack' => true,
+            'payment_method' => 'paymongo',
         ];
 
         $response = $this->postJson(route('booking.store'), $payload);

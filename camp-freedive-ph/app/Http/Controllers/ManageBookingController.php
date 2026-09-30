@@ -61,8 +61,11 @@ class ManageBookingController extends Controller
     public function search(Request $request): RedirectResponse
     {
         $request->validate([
-            'booking_number' => 'required|string',
-            'pin' => 'required|string',
+            'booking_number' => ['required', 'string', 'regex:/^CFP-\d{4}-[A-Za-z0-9]{4,10}$/'],
+            'pin' => ['required', 'digits:4'],
+        ], [
+            'booking_number.regex' => 'Please enter a valid booking reference number (e.g. CFP-2026-XXXXX).',
+            'pin.digits' => 'The PIN must be exactly 4 digits.',
         ]);
 
         $booking = Booking::where('booking_number', strtoupper(trim($request->booking_number)))
@@ -147,10 +150,30 @@ class ManageBookingController extends Controller
     public function reschedule(Request $request, string $booking_number): RedirectResponse
     {
         $validated = $request->validate([
-            'pin' => 'required|string',
-            'requested_start_date' => 'required|date|after_or_equal:today',
-            'requested_end_date' => 'required|date|after:requested_start_date',
+            'pin' => ['required', 'digits:4'],
+            'requested_start_date' => ['required', 'date', 'after_or_equal:today'],
+            'requested_end_date' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) use ($request) {
+                    $startDate = $request->input('requested_start_date');
+                    if (!$startDate) {
+                        return;
+                    }
+                    try {
+                        $start = Carbon::parse($startDate)->startOfDay();
+                        $end = Carbon::parse($value)->startOfDay();
+                        if ($start->copy()->addDay()->format('Y-m-d') !== $end->format('Y-m-d')) {
+                            $fail('The requested end date must be exactly one calendar day after the start date.');
+                        }
+                    } catch (\Throwable $e) {
+                        $fail('The requested end date is invalid.');
+                    }
+                },
+            ],
             'reason' => 'nullable|string|max:500',
+        ], [
+            'pin.digits' => 'The PIN must be exactly 4 digits.',
         ]);
 
         $booking = Booking::where('booking_number', strtoupper(trim($booking_number)))
@@ -213,9 +236,11 @@ class ManageBookingController extends Controller
     public function cancel(Request $request, string $booking_number): RedirectResponse
     {
         $validated = $request->validate([
-            'pin' => 'required|string',
+            'pin' => ['required', 'digits:4'],
             'confirm_cancel_ack' => 'required|accepted',
             'reason' => 'nullable|string|max:500',
+        ], [
+            'pin.digits' => 'The PIN must be exactly 4 digits.',
         ]);
 
         $booking = Booking::where('booking_number', strtoupper(trim($booking_number)))
